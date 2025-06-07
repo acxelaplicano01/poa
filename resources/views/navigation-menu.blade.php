@@ -1,223 +1,237 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-mark class="block h-9 w-auto" />
-                    </a>
-                </div>
+<div>
+@php
+function isActiveModule($module) {
+    static $routeMap = null;
+    
+    // Generar el routeMap solo una vez
+    if ($routeMap === null) {
+        $routeMap = [];
+        $allModules = config('rutas');
+        
+        if (is_array($allModules)) {
+            foreach ($allModules as $moduleName => $moduleLinks) {
+                $routeMap[$moduleName] = [];
+                
+                if (is_array($moduleLinks)) {
+                    foreach ($moduleLinks as $link) {
+                        if (isset($link['route'])) {
+                            $routeMap[$moduleName][] = $link['route'];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    $currentRoute = request()->route() ? request()->route()->getName() : '';
+    
+    return isset($routeMap[$module]) && in_array($currentRoute, $routeMap[$module]);
+}
+@endphp
+   <aside id="logo-sidebar"
+      class="fixed top-0 left-0 z-40 w-64 h-screen pt-4 transition-transform -translate-x-full bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 border-r sm:translate-x-0"
+      aria-label="Sidebar">
+      <div class="h-full px-3 pb-4 overflow-y-auto barra dark:barra bg-zinc-50 dark:bg-zinc-900 flex flex-col">
+         <ul class="space-y-2 font-medium flex-grow">
+         <div class="flex items-center justify-start rtl:justify-end mb-6">
+            <a href="/dashboard" class="flex ms-2 md:me-24">
+               <!-- Logo para modo claro -->
+               <img src="{{ asset('Logo/poav2_grey.png') }}" alt="Logo" height="80px" width="80px" class="dark:hidden" />
+         
+               <!-- Logo para modo oscuro -->
+               <img src="{{ asset('Logo/poav2.webp') }}" alt="Logo" height="80px" width="80px" class="hidden dark:block" />
+         
+               <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white"></span>
+            </a>
+         </div>
+            <li>
+               <x-sidebar-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')"
+                  class="flex items-center p-1 rounded-lg group">
+                  <x-activeIcons :active="request()->routeIs('dashboard')" class="w-5 h-5 ml-2" aria-hidden="true"
+                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5" />
+                  </x-activeIcons>
+                  <span class="ms-3">Inicio</span>
+               </x-sidebar-link>
+            </li>
+            <li>
+               <x-sidebar-link href="{{ route('planificar') }}" :active="isActiveModule('planificacion')"
+                  class="flex items-center p-1 rounded-lg group">
+                  <x-activeIcons :active="isActiveModule('planificacion')" class="w-5 h-5 ml-2" aria-hidden="true"
+                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 3v4a1 1 0 0 1-1 1H5m4 10v-2m3 2v-6m3 6v-3m4-11v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1Z" />
+                  </x-activeIcons>
+                  <span class="ms-3">Planificación</span>
+               </x-sidebar-link>
+            </li>
+            <li>
+               <x-sidebar-link href="{{ route('dashboard') }}" :active="isActiveModule('gestion')"
+                  class="flex items-center p-1 rounded-lg group">
+                  <x-activeIcons :active="isActiveModule('gestion')" class="w-5 h-5 ml-2" aria-hidden="true"
+                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9.143 4H4.857A.857.857 0 0 0 4 4.857v4.286c0 .473.384.857.857.857h4.286A.857.857 0 0 0 10 9.143V4.857A.857.857 0 0 0 9.143 4Zm10 0h-4.286a.857.857 0 0 0-.857.857v4.286c0 .473.384.857.857.857h4.286A.857.857 0 0 0 20 9.143V4.857A.857.857 0 0 0 19.143 4Zm-10 10H4.857a.857.857 0 0 0-.857.857v4.286c0 .473.384.857.857.857h4.286a.857.857 0 0 0 .857-.857v-4.286A.857.857 0 0 0 9.143 14Zm10 0h-4.286a.857.857 0 0 0-.857.857v4.286c0 .473.384.857.857.857h4.286a.857.857 0 0 0 .857-.857v-4.286a.857.857 0 0 0-.857-.857Z" />
+                  </x-activeIcons>
+                  <span class="ms-3">Gestión Administrativa</span>
+               </x-sidebar-link>
+            </li>
+            <li>
+               <x-sidebar-link href="{{ route('dashboard') }}" :active="isActiveModule('reportes')"
+                  class="flex items-center p-1 rounded-lg group">
+                  <x-activeIcons :active="isActiveModule('reportes')" class="w-5 h-5 ml-2" aria-hidden="true"
+                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 6.025A7.5 7.5 0 1 0 17.975 14H10V6.025Z" />
+                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13.5 3c-.169 0-.334.014-.5.025V11h7.975c.011-.166.025-.331.025-.5A7.5 7.5 0 0 0 13.5 3Z" />
+                  </x-activeIcons>
+                  <span class="ms-3">Reportes</span>
+               </x-sidebar-link>
+            </li>
+            <li>
+               <x-sidebar-link href="{{ route('dashboard') }}" :active="isActiveModule('consolas')"
+                  class="flex items-center p-1 rounded-lg group">
+                  <x-activeIcons :active="isActiveModule('consolas')" class="w-5 h-5 ml-2" aria-hidden="true"
+                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13.6 16.733c.234.269.548.456.895.534a1.4 1.4 0 0 0 1.75-.762c.172-.615-.446-1.287-1.242-1.481-.796-.194-1.41-.861-1.241-1.481a1.4 1.4 0 0 1 1.75-.762c.343.077.654.26.888.524m-1.358 4.017v.617m0-5.939v.725M4 15v4m3-6v6M6 8.5 10.5 5 14 7.5 18 4m0 0h-3.5M18 4v3m2 8a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z" />
+                  </x-activeIcons>
+                  <span class="ms-3">Consolas</span>
+               </x-sidebar-link>
+            </li>
+            <!-- aquí más enlaces si es necesario -->
+         </ul>
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
-    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
-</button>
-                </div>
-            </div>
+         <!-- Componente de perfil al final del sidebar -->
+         <div class="mt-auto  border-zinc-200 dark:border-zinc-700 pt-4">
+            <ul class="space-y-2 font-medium flex-grow mb-6">
+               <li>
+                  <x-sidebar-link href="{{ route('roles') }}" :active="isActiveModule('configuracion')"
+                     class="flex items-center p-1 rounded-lg group">
+                     <x-activeIcons :active="isActiveModule('configuracion')" class="w-5 h-5 ml-2" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                           d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535 1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536.707-1.707H20a1 1 0 0 0 1-1Z" />
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                           d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                     </x-activeIcons>
+                     <span class="ms-3">Configuración</span>
+                  </x-sidebar-link>
+               </li>
+               <li>
+                  <x-sidebar-link href="https://chat.whatsapp.com/CnEA4qNlOBoLK1Hh8NKsKI"
+                     class="flex items-center p-1 rounded-lg group">
+                     <x-activeIcons class="w-5 h-5 ml-2" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                           d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                     </x-activeIcons>
+                     <span class="ms-3">Ayuda</span>
+                  </x-sidebar-link>
+               </li>
 
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <!-- Teams Dropdown -->
-                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
-                    <div class="ms-3 relative">
-                        <x-dropdown align="right" width="60">
-                            <x-slot name="trigger">
-                                <span class="inline-flex rounded-md">
-                                    <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
-                                        {{ Auth::user()->currentTeam->name }}
+               <!-- Añadír aquí más enlaces si es necesario -->
 
-                                        <svg class="ms-2 -me-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-                                        </svg>
-                                    </button>
-                                </span>
-                            </x-slot>
-
-                            <x-slot name="content">
-                                <div class="w-60">
-                                    <!-- Team Management -->
-                                    <div class="block px-4 py-2 text-xs text-gray-400">
-                                        {{ __('Manage Team') }}
-                                    </div>
-
-                                    <!-- Team Settings -->
-                                    <x-dropdown-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
-                                        {{ __('Team Settings') }}
-                                    </x-dropdown-link>
-
-                                    @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
-                                        <x-dropdown-link href="{{ route('teams.create') }}">
-                                            {{ __('Create New Team') }}
-                                        </x-dropdown-link>
-                                    @endcan
-
-                                    <!-- Team Switcher -->
-                                    @if (Auth::user()->allTeams()->count() > 1)
-                                        <div class="border-t border-gray-200"></div>
-
-                                        <div class="block px-4 py-2 text-xs text-gray-400">
-                                            {{ __('Switch Teams') }}
-                                        </div>
-
-                                        @foreach (Auth::user()->allTeams() as $team)
-                                            <x-switchable-team :team="$team" />
-                                        @endforeach
-                                    @endif
-                                </div>
-                            </x-slot>
-                        </x-dropdown>
-                    </div>
+            </ul>
+            <div class="flex items-center justify-between">
+               <button type="button" id="user-dropdown-sidebar-button" data-dropdown-toggle="user-dropdown-sidebar"
+                  class="flex items-center w-full p-1 text-sm text-zinc-900 rounded-lg dark:text-white hover:bg-zinc-800/5 dark:hover:bg-white/[7%] group">
+                  <div class="flex items-center">
+                     @if (Auth::user()->profile_photo_path)
+                   <img class="w-8 h-8 rounded-lg object-cover mr-2"
+                     src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="{{ Auth::user()->name }}">
+                @else
+                   <img class="w-8 h-8 rounded-lg object-cover mr-2"
+                     src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}&amp;color=fff&amp;background=6366f1"
+                     alt="{{ Auth::user()->name }}">
                 @endif
+                     <div>
+                        <span class=" text-base font-medium">{{ Auth::user()->name }}</span>
+                     </div>
+                  </div>
+                  <svg class="w-4 h-4 ml-auto" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+               </button>
 
-                <!-- Settings Dropdown -->
-                <div class="ms-3 relative">
-                    <x-dropdown align="right" width="48">
-                        <x-slot name="trigger">
-                            @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
-                                <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
-                                    <img class="size-8 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
-                                </button>
-                            @else
-                                <span class="inline-flex rounded-md">
-                                    <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
-                                        {{ Auth::user()->name }}
-
-                                        <svg class="ms-2 -me-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                        </svg>
-                                    </button>
-                                </span>
-                            @endif
-                        </x-slot>
-
-                        <x-slot name="content">
-                            <!-- Account Management -->
-                            <div class="block px-4 py-2 text-xs text-gray-400">
-                                {{ __('Manage Account') }}
-                            </div>
-
-                            <x-dropdown-link href="{{ route('profile.show') }}">
-                                {{ __('Profile') }}
-                            </x-dropdown-link>
-
-                            @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
-                                <x-dropdown-link href="{{ route('api-tokens.index') }}">
-                                    {{ __('API Tokens') }}
-                                </x-dropdown-link>
-                            @endif
-
-                            <div class="border-t border-gray-200"></div>
-
-                            <!-- Authentication -->
-                            <form method="POST" action="{{ route('logout') }}" x-data>
-                                @csrf
-
-                                <x-dropdown-link href="{{ route('logout') }}"
-                                         @click.prevent="$root.submit();">
-                                    {{ __('Log Out') }}
-                                </x-dropdown-link>
-                            </form>
-                        </x-slot>
-                    </x-dropdown>
-                </div>
+               <!-- Dropdown menu -->
+               <div id="user-dropdown-sidebar"
+                  class="z-10 hidden bg-white divide-y divide-zinc-100 rounded-lg shadow w-56 dark:bg-zinc-700 dark:divide-zinc-600">
+                  <ul class="py-2 text-sm text-zinc-700 dark:text-zinc-200">
+                     <li>
+                        <a href="{{ route('profile.show') }}"
+                           class="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white">
+                           {{ __('Mi Perfil') }}
+                        </a>
+                     </li>
+                  </ul>
+                  <div class="py-1">
+                     <form method="POST" action="{{ route('logout') }}" x-data>
+                        @csrf
+                        <x-dropdown-link href="{{ route('logout') }}"
+                           class="block px-4 py-2 text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white"
+                           @click.prevent="$root.submit();">
+                           {{ __('Cerrar Sesión') }}
+                        </x-dropdown-link>
+                     </form>
+                  </div>
+               </div>
             </div>
+         </div>
+      </div>
+   </aside>
+   <script>
+      document.addEventListener('DOMContentLoaded', function () {
+         const dropdownButton2 = document.getElementById('dropdown2');
+         const dropdownMenu2 = document.getElementById('dropdown-menu2');
 
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                    <svg class="size-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
+         dropdownButton2.addEventListener('click', function () {
+            const isExpanded = dropdownMenu2.classList.contains('max-h-screen');
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-        </div>
+            if (isExpanded) {
+               dropdownMenu2.classList.remove('max-h-screen', 'opacity-100');
+               dropdownMenu2.classList.add('max-h-0', 'opacity-0');
+            } else {
+               dropdownMenu2.classList.remove('max-h-0', 'opacity-0');
+               dropdownMenu2.classList.add('max-h-screen', 'opacity-100');
+            }
+         });
+      });
 
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="flex items-center px-4">
-                @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
-                    <div class="shrink-0 me-3">
-                        <img class="size-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
-                    </div>
-                @endif
+      document.addEventListener('DOMContentLoaded', function () {
+         const dropdownButton3 = document.getElementById('dropdown3');
+         const dropdownMenu3 = document.getElementById('dropdown-menu3');
 
-                <div>
-                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-                </div>
-            </div>
+         dropdownButton3.addEventListener('click', function () {
+            const isExpanded = dropdownMenu3.classList.contains('max-h-screen');
 
-            <div class="mt-3 space-y-1">
-                <!-- Account Management -->
-                <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
+            if (isExpanded) {
+               dropdownMenu3.classList.remove('max-h-screen', 'opacity-100');
+               dropdownMenu3.classList.add('max-h-0', 'opacity-0');
+            } else {
+               dropdownMenu3.classList.remove('max-h-0', 'opacity-0');
+               dropdownMenu3.classList.add('max-h-screen', 'opacity-100');
+            }
+         });
+      });
 
-                @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
-                    <x-responsive-nav-link href="{{ route('api-tokens.index') }}" :active="request()->routeIs('api-tokens.index')">
-                        {{ __('API Tokens') }}
-                    </x-responsive-nav-link>
-                @endif
+      const userDropdownButton = document.getElementById('user-dropdown-sidebar-button');
+      const userDropdownMenu = document.getElementById('user-dropdown-sidebar');
 
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}" x-data>
-                    @csrf
+      if (userDropdownButton && userDropdownMenu) {
+         userDropdownButton.addEventListener('click', function () {
+            userDropdownMenu.classList.toggle('hidden');
+         });
 
-                    <x-responsive-nav-link href="{{ route('logout') }}"
-                                   @click.prevent="$root.submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-
-                <!-- Team Management -->
-                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
-                    <div class="border-t border-gray-200"></div>
-
-                    <div class="block px-4 py-2 text-xs text-gray-400">
-                        {{ __('Manage Team') }}
-                    </div>
-
-                    <!-- Team Settings -->
-                    <x-responsive-nav-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}" :active="request()->routeIs('teams.show')">
-                        {{ __('Team Settings') }}
-                    </x-responsive-nav-link>
-
-                    @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
-                        <x-responsive-nav-link href="{{ route('teams.create') }}" :active="request()->routeIs('teams.create')">
-                            {{ __('Create New Team') }}
-                        </x-responsive-nav-link>
-                    @endcan
-
-                    <!-- Team Switcher -->
-                    @if (Auth::user()->allTeams()->count() > 1)
-                        <div class="border-t border-gray-200"></div>
-
-                        <div class="block px-4 py-2 text-xs text-gray-400">
-                            {{ __('Switch Teams') }}
-                        </div>
-
-                        @foreach (Auth::user()->allTeams() as $team)
-                            <x-switchable-team :team="$team" component="responsive-nav-link" />
-                        @endforeach
-                    @endif
-                @endif
-            </div>
-        </div>
-    </div>
-</nav>
+         // Cerrar el dropdown cuando se hace clic fuera de él
+         document.addEventListener('click', function (event) {
+            if (!userDropdownButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {
+               userDropdownMenu.classList.add('hidden');
+            }
+         });
+      }
+   </script>
+</div>
