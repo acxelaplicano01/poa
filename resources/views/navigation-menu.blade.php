@@ -24,39 +24,35 @@
       return false;
    }
 
-   function hasModuleAccess($module)
-   {
-      $user = auth()->user();
-      if (!$user) return false;
+  function hasModuleAccess($module)
+{
+   $user = auth()->user();
+   if (!$user) return false;
 
-      // Super admin tiene acceso a todo
-      if ($user->hasRole('super-admin')) return true;
-      
-      // Verificar la configuración del módulo
-      $moduleConfig = config('rutas.' . $module, []);
-      
-      // Si hay algún item con always_visible
+   // Super admin tiene acceso a todo
+   if ($user->hasRole('super-admin')) return true;
+   
+   // Verificar la configuración del módulo
+   $moduleConfig = config('rutas.' . $module, []);
+   
+   // Verificar permiso general del módulo
+   $permiso = "acceso-{$module}";
+   $hasModuleAccess = $user->can($permiso);
+   
+   // Si no tiene acceso al módulo, verificar si hay al menos un item always_visible
+   if (!$hasModuleAccess) {
       if (isset($moduleConfig['items']) && is_array($moduleConfig['items'])) {
          foreach ($moduleConfig['items'] as $item) {
             if (isset($item['always_visible']) && $item['always_visible']) {
-               return true;
-            }
-            
-            // Verificar permisos de items
-            if (isset($item['permisos']) && is_array($item['permisos'])) {
-               foreach ($item['permisos'] as $permiso) {
-                  if ($user->can($permiso)) {
-                     return true;
-                  }
-               }
+               return true; // Mostrar el módulo si tiene al menos un item always_visible
             }
          }
       }
-      
-      // Verificar permiso general del módulo
-      $permiso = "acceso-{$module}";
-      return $user->can($permiso);
+      return false; // No tiene acceso al módulo ni hay items always_visible
    }
+   
+   return true; // Tiene acceso al módulo
+}
 
    // Obtener la configuración del menú
    $moduleConfig = config('rutas', []);
