@@ -16,29 +16,59 @@ class PermisoSeeder extends Seeder
         // Resetear roles y permisos en caché
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         
-        $permissions = [
-            'acceso-configuracion',
-            'acceso-planificacion',
-            'configuracion.roles',
+        // Permisos organizados por módulo
+        $modulePermissions = [
+            'configuracion' => [
+                'roles',
+                'usuarios',
+                // Agregar más subpermisos aquí
+            ],
+            'planificacion' => [
+                'planificar',
+                // Agregar más subpermisos aquí
+            ],
+            'gestion' => [
+                'reportes',
+                'pei',
+                'poa',
+                'rrhh',
+                'seguimientos',
+                // Agregar más subpermisos aquí
+            ],
+            'reportes' => [
+                'ver_reportes',
+                'exportar_reportes',
+                // Subpermisos de reportes
+            ],
+            'consolas' => [
+                'administrar_consolas',
+                // Subpermisos de consolas
+            ]
+        ];
+        
+        // Permisos de acceso a módulos (estos son los permisos principales)
+        $modules = array_keys($modulePermissions);
+        foreach ($modules as $module) {
+            Permission::firstOrCreate(['name' => "acceso-{$module}", 'guard_name' => 'web']);
+        }
+        
+        // Permisos específicos por módulo (estos son los subpermisos)
+        foreach ($modulePermissions as $module => $permissions) {
+            foreach ($permissions as $permission) {
+                Permission::firstOrCreate(['name' => "{$module}.{$permission}", 'guard_name' => 'web']);
+            }
+        }
+        
+        // Otros permisos que no siguen la estructura jerárquica
+        $otherPermissions = [
             'admin-admin-permiso',
-            'configuracion.usuarios',
-            'planificacion.planificar',
             'admin-admin-configuracion',
             'admin-admin-dashboard',
-            'Gestion_Reportes',
-            'Gestion_PEI',
-            'Crear_PEI',
-            'Gestion_Revisiones',
-            'Gestion_POA',
-            'Crear_POA',
-            'Deshabilitar_POA',
-            'Gestion_RRHH',
-            'Gestion_Seguimientos',
-            'Gestion_MIS_POAS',
-         ];
-         
-         foreach ($permissions as $permission) {
+            // Cualquier otro permiso que no siga el formato de módulo
+        ];
+        
+        foreach ($otherPermissions as $permission) {
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
-         }
+        }
     }
 }

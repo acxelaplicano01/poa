@@ -21,13 +21,22 @@ Route::middleware([
 
     // Rutas del módulo de configuración
     Route::middleware(['auth', CheckModuleAccess::class.':configuracion'])->group(function () {
-        Route::get('/configuracion/roles', Roles::class)->name('roles');
-        Route::get('/configuracion/usuarios', Usuarios::class)->name('usuarios');
+        
+        Route::get('/configuracion/roles', Roles::class)
+        ->name('roles')
+        ->middleware('can:configuracion.roles');
+
+        Route::get('/configuracion/usuarios', Usuarios::class)
+        ->name('usuarios')
+        ->middleware('can:configuracion.usuarios');
         
     });
     // Rutas del módulo de planificacion
     Route::middleware(['auth', CheckModuleAccess::class.':planificacion'])->group(function () {
-        Route::get('/planificacion/planificar', Planificar::class)->name('planificar');
+        
+        Route::get('/planificacion/planificar', Planificar::class)
+        ->name('planificar')
+        ->middleware('can:planificacion.planificar');
         
     });
 

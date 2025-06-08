@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Rol;
 
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -22,7 +23,7 @@ class Roles extends Component
     public $confirmingDelete = false;
     public $IdAEliminar;
     public $nombreAEliminar;
-    
+
     protected $rules = [
         'name' => 'required|unique:roles,name',
         'description' => 'required|string|max:255',
@@ -37,9 +38,9 @@ class Roles extends Component
     public function render()
     {
         $roles = Role::where('name', 'like', '%' . $this->search . '%')
-                    ->orderBy('id', 'DESC')
-                    ->paginate(5);
-                    
+            ->orderBy('id', 'DESC')
+            ->paginate(5);
+
         return view('livewire.rol.roles', [
             'roles' => $roles
         ])->layout('layouts.app');
@@ -68,6 +69,7 @@ class Roles extends Component
         }
     }
 
+
     private function createRole()
     {
         try {
@@ -79,6 +81,18 @@ class Roles extends Component
 
             $permissionIds = Permission::whereIn('id', $this->selectedPermissions)->pluck('id')->toArray();
             $role->syncPermissions($permissionIds);
+
+            // Limpiar caché de permisos
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+            // Si el usuario actual tiene este rol (caso de asignación inmediata), refrescar sesión
+            $currentUser = auth()->user();
+            if ($currentUser && $currentUser->hasRole($role->name)) {
+                $currentUser->getPermissionsViaRoles();
+                auth()->setUser($currentUser->fresh());
+                session()->regenerate();
+                $this->dispatch('user-permissions-updated');
+            }
 
             session()->flash('message', 'Rol creado exitosamente.');
             $this->permissions = Permission::all();
@@ -115,11 +129,17 @@ class Roles extends Component
 
             $role->update([
                 'name' => $this->name,
-                'description' =>$this->description,
+                'description' => $this->description,
             ]);
 
             $permissionIds = Permission::whereIn('id', $validatedData['selectedPermissions'])->pluck('id')->toArray();
             $role->syncPermissions($permissionIds);
+
+            // Limpiar caché de permisos
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+            // Refrescar permisos para todos los usuarios con este rol
+            $this->refreshUsersWithRole($role);
 
             session()->flash('message', 'Rol actualizado exitosamente');
             $this->resetInputFields();
@@ -127,6 +147,27 @@ class Roles extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Error al actualizar rol: ' . $e->getMessage());
             Log::error('Error updating role: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Refresca los permisos para todos los usuarios que tienen este rol
+     * y actualiza la sesión del usuario actual si le afecta el cambio
+     */
+    private function refreshUsersWithRole($role)
+    {
+        // Siempre limpiar caché de permisos en Spatie
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Comprobar si el usuario actual tiene este rol
+        $currentUser = auth()->user();
+        if ($currentUser && $currentUser->hasRole($role->name)) {
+            // Refrescar el objeto del usuario para obtener los permisos actualizados
+            $freshUser = $currentUser->fresh();
+            auth()->setUser($freshUser);
+
+            // Redirigir a la URL actual
+            redirect()->route('roles');
         }
     }
 
@@ -148,7 +189,7 @@ class Roles extends Component
                 session()->flash('error', 'Error al eliminar rol: ' . $e->getMessage());
                 Log::error('Error deleting role: ' . $e->getMessage());
             }
-            
+
             $this->confirmingDelete = false;
         }
     }
@@ -163,7 +204,7 @@ class Roles extends Component
         }
 
         if ($role->users()->exists()) {
-            session()->flash('error', 'No se puede eliminar el rol: '. $role->name .', porque está enlazado a uno o más usuarios');
+            session()->flash('error', 'No se puede eliminar el rol: ' . $role->name . ', porque está enlazado a uno o más usuarios');
             return;
         }
 
@@ -176,7 +217,7 @@ class Roles extends Component
     {
         $this->isOpen = false;
     }
-    
+
     private function resetInputFields()
     {
         $this->name = '';

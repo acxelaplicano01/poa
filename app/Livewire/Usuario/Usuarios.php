@@ -45,9 +45,9 @@ class Usuarios extends Component
     public function render()
     {
         $users = User::where('name', 'like', '%' . $this->search . '%')
-                     ->orWhere('email', 'like', '%' . $this->search . '%')
-                     ->orderBy('id', 'DESC')
-                     ->paginate(10);
+            ->orWhere('email', 'like', '%' . $this->search . '%')
+            ->orderBy('id', 'DESC')
+            ->paginate(10);
 
         return view('livewire.Usuario.usuarios', ['users' => $users])->layout('layouts.app');
     }
@@ -145,6 +145,8 @@ class Usuarios extends Component
             $this->roles = Role::all();
             $this->reset();
             $this->closeModal();
+            // Redirigir a la URL login
+            redirect()->route('roles');
 
         } catch (\Exception $e) {
             session()->flash('error', 'Error al actualizar el usuario: ' . $e->getMessage());
@@ -155,15 +157,15 @@ class Usuarios extends Component
     public function delete()
     {
         if ($this->confirmingDelete) {
-            $user  = User::find($this->IdAEliminar);
+            $user = User::find($this->IdAEliminar);
 
-            if (!$user ) {
+            if (!$user) {
                 session()->flash('error', 'Usuario no encontrado.');
                 $this->confirmingDelete = false;
                 return;
             }
 
-            $user ->forceDelete();
+            $user->forceDelete();
             session()->flash('message', 'usuario eliminado correctamente!');
             $this->confirmingDelete = false;
         }
@@ -171,15 +173,15 @@ class Usuarios extends Component
 
     public function confirmDelete($id)
     {
-        $user  = User::find($id);
+        $user = User::find($id);
 
-        if (!$user ) {
+        if (!$user) {
             session()->flash('error', 'usuario no encontrado.');
             return;
         }
 
         $this->IdAEliminar = $id;
-        $this->nombreAEliminar = $user->name . ' ' . $user ->email;
+        $this->nombreAEliminar = $user->name . ' ' . $user->email;
         $this->confirmingDelete = true;
     }
 

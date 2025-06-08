@@ -31,22 +31,38 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('super-admin') ? true : null;
         });
 
-        // Define el Gate personalizado para verificar acceso a módulos
+        // Gate para verificar acceso a módulos
         Gate::define('acceder-modulo', function ($user, $module) {
-            // Verificar si el usuario tiene permiso específico para este módulo
-            if ($user->hasPermissionTo('acceso-' . $module)) {
+            // Si es super-admin, siempre tiene acceso
+            if ($user->hasRole('super-admin')) {
                 return true;
             }
 
-            // O verificar si tiene algún permiso relacionado con el módulo
-            $permissions = $user->getAllPermissions()->pluck('name')->toArray();
-            foreach ($permissions as $permission) {
-                if (strpos($permission, $module . '.') === 0) {
-                    return true;
+            // Verificar el permiso específico del módulo
+            return $user->can("acceso-{$module}");
+        });
+
+        // Gate para permisos específicos dentro de un módulo
+        Gate::define('usar-funcionalidad', function ($user, $permission) {
+            // Si es super-admin, siempre tiene permiso
+            if ($user->hasRole('super-admin')) {
+                return true;
+            }
+
+            // Si el permiso incluye un punto, verificar que tenga acceso al módulo padre
+            if (strpos($permission, '.') !== false) {
+                list($module, $action) = explode('.', $permission, 2);
+                $moduleAccess = "acceso-{$module}";
+
+                // Si no tiene acceso al módulo, no puede usar ninguna funcionalidad
+                if (!$user->can($moduleAccess)) {
+                    return false;
                 }
             }
 
-            return false;
+            // Verificar el permiso específico
+            return $user->can($permission);
         });
+        \Spatie\Permission\Models\Role::observe(\App\Observers\RolePermissionObserver::class);
     }
 }
