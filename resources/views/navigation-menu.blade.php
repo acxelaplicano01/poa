@@ -67,20 +67,9 @@
       aria-label="Sidebar">
       <div class="h-full px-3 pb-4 overflow-y-auto barra dark:barra bg-zinc-50 dark:bg-zinc-900 flex flex-col">
          <ul class="space-y-2 font-medium flex-grow">
-            <div class="flex items-center justify-start rtl:justify-end mb-6">
-               <a href="/dashboard" class="flex ms-2 md:me-24">
-                  <!-- Logo para modo claro -->
-                  <img src="{{ asset('Logo/poav2_grey.png') }}" alt="Logo" height="80px" width="80px"
-                     class="dark:hidden" />
-
-                  <!-- Logo para modo oscuro -->
-                  <img src="{{ asset('Logo/poav2.webp') }}" alt="Logo" height="80px" width="80px"
-                     class="hidden dark:block" />
-
-                  <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white"></span>
-               </a>
+            <div class="mb-6">
+                  <x-application-logo />
             </div>
-
             {{-- Generar menú principal dinámicamente - SOLO MÓDULOS --}}
             @foreach($moduleConfig as $moduleKey => $moduleData)
                @if(!isset($moduleData['footer']) || !$moduleData['footer'])

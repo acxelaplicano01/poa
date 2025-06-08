@@ -3,8 +3,8 @@
 
 @php
     $classes = $active ?? false
-        ? 'flex items-center relative px-3 h-8 text-indigo-500 dark:text-white font-medium transition duration-100 ease-in-out rounded-lg hover:bg-indigo-100 dark:hover:bg-white/[7%] group'
-        : 'flex items-center relative px-3 h-8 text-zinc-500 dark:text-white/80 hover:text-zinc-800 dark:hover:text-white transition duration-100 ease-in-out rounded-lg hover:bg-zinc-800/5 dark:hover:bg-white/[7%] group';
+        ? 'flex items-center relative px-4 h-8 text-indigo-500 dark:text-white font-medium transition duration-100 ease-in-out rounded-lg hover:bg-indigo-100 dark:hover:bg-white/[7%] group'
+        : 'flex items-center relative px-4 h-8 text-zinc-500 dark:text-white/80 hover:text-zinc-800 dark:hover:text-white transition duration-100 ease-in-out rounded-lg hover:bg-zinc-800/5 dark:hover:bg-white/[7%] group';
     
     // Generar un ID único para este elemento (para el CSS del indicador)
     $uniqueId = 'nav-link-' . md5(uniqid());
