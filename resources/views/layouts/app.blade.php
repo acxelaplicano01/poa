@@ -31,6 +31,7 @@
 
     <div class="min-h-screen bg-white dark:bg-zinc-800 scrollbar-hidden">
         @livewire('navigation-menu')
+        <x-nav />
         <!-- Page Content -->
         <main class="dark:bg-zinc-800">
                 <div class="p-4 sm:ml-60 mt-14">

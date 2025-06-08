@@ -1,5 +1,3 @@
-<!-- filepath: c:\Users\acxel\Desktop\Desarrollo\Git Repos\POA\resources\views\components\nav.blade.php -->
-@props(['current_module' => 'configuracion'])
 
 <header wire:ignore
     class="fixed top-0 right-0 left-0 z-30 sm:left-64 min-h-14 flex items-center bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700"
@@ -23,13 +21,30 @@
         <div class="flex-1"></div>
     </nav>
 
-    <!-- Contenedor principal para alineación de elementos -->
-    <div class="flex items-center justify-between w-full px-6">
-        <!-- Navbar con links de navegación -->
-        <nav class="flex items-center gap-1 py-3 overflow-x-auto overflow-y-hidden" data-flux-navbar="">
-            <x-rutas module="{{ $current_module }}" />
-        </nav>
+    <!-- Navegación de escritorio con ítems del módulo actual -->
+    <nav class="hidden lg:flex items-center gap-2 py-3 px-6">
+        @php
+            $currentModule = 'dashboard'; // Valor por defecto
+            
+            // Detectar el módulo actual basado en la ruta actual
+            $currentRoute = request()->route() ? request()->route()->getName() : '';
+            foreach(config('rutas') as $moduleKey => $moduleData) {
+                if(isset($moduleData['items'])) {
+                    foreach($moduleData['items'] as $item) {
+                        if(isset($item['routes']) && is_array($item['routes']) && in_array($currentRoute, $item['routes'])) {
+                            $currentModule = $moduleKey;
+                            break 2;
+                        }
+                    }
+                }
+            }
+        @endphp
+        
+        <x-rutas :module="$currentModule" />
+    </nav>
 
+    <!-- Contenedor principal para alineación de elementos -->
+    <div class="flex items-center justify-end flex-1 px-4 lg:px-6">
         <!-- Acciones del usuario alineadas a la derecha -->
         <div class="flex items-center ml-auto">
             <div class="flex items-center">

@@ -1,106 +1,82 @@
 <?php
 return [
-    // Módulo de configuración
-    'configuracion' => [
-        [
-            'name' => 'Roles',
-            'route' => 'roles',
-            'translation_key' => 'Roles',
-            'permissions' => ['configuracion.roles']
-        ],
-        [
-            'name' => 'Usuarios',
-            'route' => 'usuarios',
-            'translation_key' => 'Usuarios', 
-            'permissions' => ['configuracion.usuarios']
-        ],
-       /* [
-            'name' => 'Empleados',
-            'route' => 'empleados', 
-            'translation_key' => 'Empleados',
-            'permissions' => ['configuracion.empleados']
-        ],
-        [
-            'name' => 'Departamentos',
-            'route' => 'departamentos',
-            'translation_key' => 'Departamentos',
-            'permissions' => ['configuracion.departamentos']
-        ],
-        [
-            'name' => 'Procesos de compras',
-            'route' => 'procesos-compras',
-            'translation_key' => 'Procesos de compras',
-            'permissions' => ['configuracion.procesos-compras']
-        ],
-        [
-            'name' => 'Cubs',
-            'route' => 'cubs',
-            'translation_key' => 'Cubs',
-            'permissions' => ['configuracion.cubs']
-        ],*/
+    // Módulo de Dashboard/Inicio
+    'dashboard' => [
+        'titulo' => 'Inicio',
+        'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5" />',
+        'route' => 'dashboard',
+        'items' => [
+            [
+                'titulo' => 'Panel Principal',
+                'route' => 'dashboard',
+                'routes' => ['dashboard'],
+                'permisos' => [],
+                'icono' => '',
+                'always_visible' => true
+            ]
+        ]
     ],
     
     // Módulo de planificación
     'planificacion' => [
-        [
-            'name' => 'Planificar',
-            'route' => 'planificar',
-            'translation_key' => 'Planificar',
-            'permissions' => ['planificacion.planificar']
-        ],
-        /*[
-            'name' => 'Seguimiento',
-            'route' => 'seguimiento',
-            'translation_key' => 'Seguimiento',
-            'permissions' => ['planificacion.seguimiento']
-        ],*/
+        'titulo' => 'Planificación',
+        'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 3v4a1 1 0 0 1-1 1H5m4 10v-2m3 2v-6m3 6v-3m4-11v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1Z" />',
+        'route' => 'planificar',
+        'items' => [
+            [
+                'titulo' => 'Mis planificaciones',
+                'route' => 'planificar',
+                'routes' => [
+                    'planificar',
+                    'planificar.nuevo',
+                    'planificar.editar',
+                    'planificar.ver'
+                ],
+                'permisos' => ['planificacion.planificar'],
+                'icono' => ''
+            ],
+           /* [
+                'titulo' => 'Proyectos',
+                'route' => 'planificar.proyectos',
+                'routes' => [
+                    'planificar.proyectos',
+                    'planificar.proyectos.nuevo',
+                    'planificar.proyectos.editar'
+                ],
+                'permisos' => ['planificacion.proyectos'],
+                'icono' => ''
+            ],
+            [
+                'titulo' => 'Seguimiento',
+                'route' => 'planificar.seguimiento',
+                'routes' => ['planificar.seguimiento'],
+                'permisos' => ['planificacion.seguimiento'],
+                'icono' => ''
+            ]*/
+        ]
     ],
     
-    // Módulo de gestión
-    /*'gestion' => [
-        [
-            'name' => 'Gestión 1',
-            'route' => 'gestion1',
-            'translation_key' => 'Gestión 1',
-            'permissions' => ['gestion.gestion1']
+    // Módulo de configuración
+    'configuracion' => [
+        'titulo' => 'Configuración',
+        'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535 1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536.707-1.707H20a1 1 0 0 0 1-1Z" /><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />',
+        'route' => 'roles',
+        'items' => [
+            [
+                'titulo' => 'Roles',
+                'route' => 'roles',
+                'routes' => ['roles', 'roles.crear', 'roles.editar', 'roles.permisos'],
+                'permisos' => ['configuracion.roles'],
+                'icono' => ''
+            ],
+            [
+                'titulo' => 'Usuarios',
+                'route' => 'usuarios',
+                'routes' => ['usuarios', 'usuarios.crear', 'usuarios.editar'],
+                'permisos' => ['configuracion.usuarios'],
+                'icono' => ''
+            ],
         ],
-        [
-            'name' => 'Gestión 2',
-            'route' => 'gestion2',
-            'translation_key' => 'Gestión 2',
-            'permissions' => ['gestion.gestion2']
-        ],
-    ],*/
-    
-   /* // Módulo de reportes
-    'reportes' => [
-        [
-            'name' => 'Reporte 1',
-            'route' => 'reporte1',
-            'translation_key' => 'Reporte 1',
-            'permissions' => ['reportes.reporte1']
-        ],
-        [
-            'name' => 'Reporte 2',
-            'route' => 'reporte2',
-            'translation_key' => 'Reporte 2',
-            'permissions' => ['reportes.reporte2']
-        ],
-    ],*/
-    
-   /* // Módulo de consolas
-    'consolas' => [
-        [
-            'name' => 'Consola 1',
-            'route' => 'consola1',
-            'translation_key' => 'Consola 1',
-            'permissions' => ['consolas.consola1']
-        ],
-        [
-            'name' => 'Consola 2',
-            'route' => 'consola2',
-            'translation_key' => 'Consola 2',
-            'permissions' => ['consolas.consola2']
-        ],
-    ],*/
+        'footer' => true
+    ]
 ];
