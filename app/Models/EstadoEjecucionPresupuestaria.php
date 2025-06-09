@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class EstadoEjecucionPresupuestaria extends Model
+class EstadoEjecucionPresupuestaria extends BaseModel
 {
-    //
+    protected $table = 'estado_ejecucion_presupuestaria';
+
+    protected $fillable = [
+        'estado',
+     
+    ];
 }

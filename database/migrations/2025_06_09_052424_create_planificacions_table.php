@@ -33,10 +33,9 @@ return new class extends Migration {
                 $table->string('ejecutado')->nullable();
                 $table->dateTime('fecha')->nullable();
 
-               $table->foreign('idPlanificacion')->references('id')->on('planificacions');
-                $table->foreign('idActividad')->references('id')->on('actividads');
-                $table->foreign('idPoaDepto')->references('id')->on('poa_deptos');
-            
+                $table->foreignId('idPlanificacion')->constrained('planificacions');
+                $table->foreignId('idActividad')->constrained('actividads');
+                $table->foreignId('idPoaDepto')->constrained('poa_deptos');
 
                 $table->foreignId('created_by')->nullable()->constrained('users');
                 $table->foreignId('updated_by')->nullable()->constrained('users');
@@ -44,10 +43,9 @@ return new class extends Migration {
 
                 $table->timestamps();
                 $table->softDeletes();
-
-                
-                
             });
+                            
+           
         }
 
          if (!Schema::hasTable('medio_verificacion_planificacion')) {
@@ -55,11 +53,11 @@ return new class extends Migration {
                 $table->id();
                 $table->string('observacion');
 
-                $table->foreign('idArchivo')->references('id')->on('archivos');
-                $table->foreign('idActividad')->references('id')->on('actividads');
-                $table->foreign('idPlanificacion')->references('id')->on('planificacions');
-                $table->foreign('idSeguimiento')->references('id')->on('seguimiento_planificacions');
-           
+                $table->foreignId('idArchivo')->constrained('archivos');
+                $table->foreignId('idActividad')->constrained('actividads');
+                $table->foreignId('idPlanificacion')->constrained('planificacions');
+                $table->foreignId('idSeguimiento')->constrained('seguimiento_planificacions');
+
                 $table->foreignId('created_by')->nullable()->constrained('users');
                 $table->foreignId('updated_by')->nullable()->constrained('users');
                 $table->foreignId('deleted_by')->nullable()->constrained('users');

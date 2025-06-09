@@ -29,7 +29,7 @@ return new class extends Migration
 
         // Crear tabla deptos (antes estaba como deptos)
         if (!Schema::hasTable('departamentos')) {
-            Schema::create('deptos', function (Blueprint $table) {
+            Schema::create('departamentos', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
                 $table->string('siglas');

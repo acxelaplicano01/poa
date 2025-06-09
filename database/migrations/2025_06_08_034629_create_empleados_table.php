@@ -36,7 +36,7 @@ return new class extends Migration
             Schema::create('empleado_deptos', function (Blueprint $table) {
                 $table->id(); 
                 $table->foreignId('idEmpleado')->constrained('empleados');
-                $table->foreignId('idDepto')->constrained('deptos');
+                $table->foreignId('idDepto')->constrained('departamentos');
                 $table->timestamps();
                 $table->softDeletes();
                 $table->foreignId('created_by')->nullable()->constrained('users');

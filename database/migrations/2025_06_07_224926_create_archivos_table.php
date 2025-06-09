@@ -17,7 +17,7 @@ return new class extends Migration
                 $table->string('url_alternativa')->nullable();
 
                 $table->foreignId('subido_por')->nullable()->constrained('users');
-                $table->foreignId('idUnidadEjecutora')->nullable()->constrained('unidad_ejecutoras');
+                $table->foreignId('idUnidadEjecutora')->nullable()->constrained('unidad_ejecutora');
 
                 $table->foreignId('created_by')->nullable()->constrained('users');
                 $table->foreignId('updated_by')->nullable()->constrained('users');

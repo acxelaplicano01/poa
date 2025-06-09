@@ -17,7 +17,7 @@ return new class extends Migration
 
               
                 $table->foreignId('idInstitucion')->constrained('institucions');
-                $table->foreignId('idUE')->constrained('unidad_ejecutoras');
+                $table->foreignId('idUE')->constrained('unidad_ejecutora');
 
                 $table->foreignId('created_by')->nullable()->constrained('users');
                 $table->foreignId('updated_by')->nullable()->constrained('users');
@@ -35,7 +35,7 @@ return new class extends Migration
                 $table->boolean('isActive')->default(true);
 
                 $table->foreignId('idPoaUE')->constrained('poas');
-                $table->foreignId('idDepto')->constrained('deptos');
+                $table->foreignId('idDepto')->constrained('departamentos');
                 
                 $table->foreignId('created_by')->nullable()->constrained('users');
                 $table->foreignId('updated_by')->nullable()->constrained('users');

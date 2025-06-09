@@ -10,10 +10,10 @@ return new class extends Migration {
             Schema::create('techo_ues', function (Blueprint $table) {
                 $table->id();
                 $table->decimal('monto', 10, 2);
-                $table->foreignId('idUE')->constrained('ues');
+                $table->foreignId('idUE')->constrained('unidad_ejecutora');
                 $table->foreignId('idPoa')->constrained('poas');
                 $table->unsignedBigInteger('idGrupo')->nullable(); 
-                $table->foreignId('idFuente')->constrained('fuentes');
+                $table->foreignId('idFuente')->constrained('fuente');
                 $table->foreignId('created_by')->nullable()->constrained('users');
                 $table->foreignId('updated_by')->nullable()->constrained('users');
                 $table->foreignId('deleted_by')->nullable()->constrained('users');
@@ -26,9 +26,9 @@ return new class extends Migration {
             Schema::create('techo_deptos', function (Blueprint $table) {
                 $table->id();
                 $table->decimal('monto', 10, 2);
-                $table->foreignId('idUE')->constrained('ues');
+                $table->foreignId('idUE')->constrained('unidad_ejecutora');
                 $table->foreignId('idPoa')->constrained('poas');
-                $table->foreignId('idDepto')->constrained('deptartamentos');
+                $table->foreignId('idDepartamento')->constrained('departamentos');
                 $table->foreignId('idPoaDepto')->constrained('poa_deptos');
                 $table->foreignId('idTechoUE')->constrained('techo_ues');
                 $table->unsignedBigInteger('idGrupo')->nullable(); 

@@ -15,7 +15,7 @@ return new class extends Migration
             Schema::create('procesos_compras', function (Blueprint $table) {
                 $table->id();
                 $table->string('nombre_proceso');
-                $table->foreignId('idUE')->constrained('unidad_ejecutoras');
+                $table->foreignId('idUE')->constrained('unidad_ejecutora');
                 $table->timestamps();
                 $table->softDeletes();
                 $table->foreignId('created_by')->nullable()->constrained('users');

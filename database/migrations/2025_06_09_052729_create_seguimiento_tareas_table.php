@@ -30,25 +30,23 @@ return new class extends Migration {
 
         if (!Schema::hasTable('medio_verificacions')) {
             Schema::create('medio_verificacions', function (Blueprint $table) {
-                $table->id();
-                $table->text('nombre');
-                $table->text('descripcion');
-                $table->text('url')->nullable();
-                $table->text('nombre_Archivo')->nullable();
+                 $table->id();
+                    $table->text('nombre');
+                    $table->text('descripcion');
+                    $table->text('url')->nullable();
+                    $table->text('nombre_Archivo')->nullable();
 
-                table->foreign('idSeguimiento')->references('id')->on('seguimiento_tareas');
+                    $table->foreignId('idSeguimiento')->constrained('seguimiento_tareas');
 
-                $table->foreignId('created_by')->nullable()->constrained('users');
-                $table->foreignId('updated_by')->nullable()->constrained('users');
-                $table->foreignId('deleted_by')->nullable()->constrained('users');
+                    $table->foreignId('created_by')->nullable()->constrained('users');
+                    $table->foreignId('updated_by')->nullable()->constrained('users');
+                    $table->foreignId('deleted_by')->nullable()->constrained('users');
 
-                $table->timestamps();
-                $table->softDeletes();
+                    $table->timestamps();
+                    $table->softDeletes();
 
             });
         }
-
-
     }
 
     public function down(): void

@@ -40,7 +40,7 @@ return new class extends Migration
                 $table->foreignId('idPoa')->constrained('poas');
                 $table->foreignId('idPoaDepto')->constrained('poa_deptos');
                 $table->foreignId('idInstitucion')->constrained('institucions');
-                $table->foreignId('idDepto')->constrained('departamentos'); // 
+                $table->foreignId('idDeptartamento')->constrained('departamentos'); // 
                 $table->foreignId('idUE')->constrained('unidad_ejecutora'); // 
                 $table->foreignId('idTipo')->constrained('tipo_actividads');
                 $table->foreignId('idResultado')->constrained('resultados');
@@ -108,8 +108,8 @@ return new class extends Migration
                 $table->text('revision');
                 $table->enum('tipo', ['TAREA', 'INDICADOR', 'PLANIFICACION']);
                 $table->boolean('corregido')->default(false);
-                $table->unsignedBigInteger('idForaneo');
-                 $table->foreign('idActividad')->references('id')->on('actividads');
+
+                $table->foreignId('idActividad')->constrained('actividads');
 
                 $table->foreignId('created_by')->nullable()->constrained('users');
                 $table->foreignId('updated_by')->nullable()->constrained('users');
@@ -121,13 +121,13 @@ return new class extends Migration
         }
 
         // Tabla medio_verificacion_actividad
-        if (!Schema::hasTable('medio_verificacion_actividad')) {
+        if (!Schema::hasTable('medio_verificacion_actividad')) {        
             Schema::create('medio_verificacion_actividad', function (Blueprint $table) {
                 $table->id();
                 $table->string('observacion');
 
-                $table->foreign('idArchivo')->references('id')->on('archivos');
-                $table->foreign('idActividad')->references('id')->on('actividads');
+                $table->foreignId('idArchivo')->constrained('archivos');
+                $table->foreignId('idActividad')->constrained('actividads');
 
                 $table->foreignId('created_by')->nullable()->constrained('users');
                 $table->foreignId('updated_by')->nullable()->constrained('users');
@@ -135,8 +135,6 @@ return new class extends Migration
 
                 $table->timestamps();
                 $table->softDeletes();
-
-                
             });
         }
 
@@ -162,6 +160,8 @@ return new class extends Migration
                 $table->softDeletes();
             });
         }
+
+        
     }
 
     public function down(): void

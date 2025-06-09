@@ -20,7 +20,7 @@ return new class extends Migration
                 $table->string('descripcion_regional');
 
                 $table->foreignId('idUE')
-                      ->constrained('unidad_ejecutoras')
+                      ->constrained('unidad_ejecutora')
                       ->onDelete('cascade');
 
                 $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();

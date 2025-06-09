@@ -21,34 +21,34 @@ return new class extends Migration
                 $table->softDeletes();
             });
 
-            // Insertar registros iniciales
+            // Insertar registros sin claves foráneas
             $now = Carbon::now();
             DB::table('estado_ejecucion_presupuestaria')->insert([
                 [
                     'estado' => 'Parcialmente ejecutado',
-                    'created_by' => 1,
-                    'updated_by' => 1,
+                    'created_by' => null,
+                    'updated_by' => null,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ],
                 [
                     'estado' => 'Ejecutado',
-                    'created_by' => 1,
-                    'updated_by' => 1,
+                    'created_by' => null,
+                    'updated_by' => null,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ],
                 [
                     'estado' => 'Ejecucion cancelada',
-                    'created_by' => 1,
-                    'updated_by' => 1,
+                    'created_by' => null,
+                    'updated_by' => null,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ],
                 [
                     'estado' => 'Ejecucion finalizada',
-                    'created_by' => 1,
-                    'updated_by' => 1,
+                    'created_by' => null,
+                    'updated_by' => null,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ],

@@ -39,7 +39,7 @@ return new class extends Migration {
      
         if (!Schema::hasTable('presupuestos')) {
             Schema::create('presupuestos', function (Blueprint $table) {
-                $table->integer('idP')->primary();
+                $table->id();
                 $table->decimal('cantidad', 10, 2);
                 $table->decimal('costounitario', 10, 2);
                 $table->decimal('total', 10, 2);

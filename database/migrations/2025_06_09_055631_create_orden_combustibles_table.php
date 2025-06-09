@@ -28,7 +28,7 @@ return new class extends Migration {
                 $table->unsignedBigInteger('responsable')->nullable();
 
                 $table->foreign('idPoa')->references('id')->on('poas');
-                $table->foreign('idDetalleRequisicion')->references('id')->on('DetalleRequisicion');
+                $table->foreign('idDetalleRequisicion')->references('id')->on('detalle_requisicion');
                 $table->foreign('idRecurso')->references('id')->on('tareas_historicos');
                 $table->foreign('responsable')->references('id')->on('empleados');
 

@@ -37,10 +37,10 @@ return new class extends Migration
                 $table->enum('estado', ['REVISION', 'APROBADO', 'RECHAZADO']);
                 $table->boolean('isPresupuesto')->default(false);
                 
-                $table->foreignId('idActividad')->constrained('actividades')->cascadeOnDelete();
+                $table->foreignId('idActividad')->constrained('actividads')->cascadeOnDelete();
                 $table->foreignId('idPoa')->constrained('poas')->cascadeOnDelete();
-                $table->foreignId('idDepto')->constrained('departamentos')->cascadeOnDelete();
-                $table->foreignId('idUE')->constrained('unidad_ejecutoras')->cascadeOnDelete();
+                $table->foreignId('idDeptartamento')->constrained('departamentos')->cascadeOnDelete();
+                $table->foreignId('idUE')->constrained('unidad_ejecutora')->cascadeOnDelete();
 
                 $table->timestamps();
                 $table->softDeletes();
