@@ -1,223 +1,233 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-mark class="block h-9 w-auto" />
-                    </a>
-                </div>
+<div>
+   @php
+function isActiveModule($module)
+{
+   $currentRoute = request()->route() ? request()->route()->getName() : '';
+   $moduleConfig = config('rutas.' . $module, []);
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
-    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
-</button>
-                </div>
+   // Si el módulo tiene una ruta directa y coincide con la actual
+   if (isset($moduleConfig['route']) && $currentRoute == $moduleConfig['route']) {
+      return true;
+   }
+
+   // Verificar todas las rutas en todos los items del módulo
+   if (isset($moduleConfig['items']) && is_array($moduleConfig['items'])) {
+      foreach ($moduleConfig['items'] as $item) {
+         if (isset($item['routes']) && is_array($item['routes'])) {
+            if (in_array($currentRoute, $item['routes'])) {
+               return true;
+            }
+         }
+      }
+   }
+
+   return false;
+}
+
+function hasModuleAccess($module)
+{
+   $user = auth()->user();
+   if (!$user)
+      return false;
+
+   // Super admin tiene acceso a todo
+   if ($user->hasRole('super-admin'))
+      return true;
+
+   // Verificar la configuración del módulo
+   $moduleConfig = config('rutas.' . $module, []);
+
+   // Verificar permiso general del módulo
+   $permiso = "acceso-{$module}";
+   $hasModuleAccess = $user->can($permiso);
+
+   // Si no tiene acceso al módulo, verificar si hay al menos un item always_visible
+   if (!$hasModuleAccess) {
+      if (isset($moduleConfig['items']) && is_array($moduleConfig['items'])) {
+         foreach ($moduleConfig['items'] as $item) {
+            if (isset($item['always_visible']) && $item['always_visible']) {
+               return true; // Mostrar el módulo si tiene al menos un item always_visible
+            }
+         }
+      }
+      return false; // No tiene acceso al módulo ni hay items always_visible
+   }
+
+   return true; // Tiene acceso al módulo
+}
+
+// Obtener la configuración del menú
+$moduleConfig = config('rutas', []);
+   @endphp
+   
+   <aside id="logo-sidebar"
+      class="fixed top-0 left-0 z-40 w-64 h-screen pt-4 transition-transform -translate-x-full bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 border-r sm:translate-x-0"
+      aria-label="Sidebar">
+      <div class="h-full px-3 pb-4 overflow-y-auto barra dark:barra bg-zinc-50 dark:bg-zinc-900 flex flex-col">
+         <ul class="space-y-2 font-medium flex-grow">
+            <div class="mb-6">
+                  <x-application-logo />
             </div>
+            {{-- Generar menú principal dinámicamente - SOLO MÓDULOS --}}
+            @foreach($moduleConfig as $moduleKey => $moduleData)
+               @if(!isset($moduleData['footer']) || !$moduleData['footer'])
+                  @if(hasModuleAccess($moduleKey))
+                     <li>
+                        <x-sidebar-link href="{{ route($moduleData['route']) }}" :active="isActiveModule($moduleKey)">
+                           <x-activeIcons :active="isActiveModule($moduleKey)" class="w-5 h-5 ml-2" aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                              {!! $moduleData['icono'] !!}
+                           </x-activeIcons>
+                           <span class="ms-3">{{ $moduleData['titulo'] }}</span>
+                        </x-sidebar-link>
+                     </li>
+                  @endif
+               @endif
+            @endforeach
+         </ul>
 
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <!-- Teams Dropdown -->
-                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
-                    <div class="ms-3 relative">
-                        <x-dropdown align="right" width="60">
-                            <x-slot name="trigger">
-                                <span class="inline-flex rounded-md">
-                                    <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
-                                        {{ Auth::user()->currentTeam->name }}
+         <!-- Componente de perfil al final del sidebar -->
+         <div class="mt-auto border-zinc-200 dark:border-zinc-700 pt-4">
+            <ul class="space-y-2 font-medium flex-grow mb-6">
+               {{-- Generar menú de footer dinámicamente --}}
+               @foreach($moduleConfig as $moduleKey => $moduleData)
+                  @if(isset($moduleData['footer']) && $moduleData['footer'] && hasModuleAccess($moduleKey))
+                     <li>
+                        <x-sidebar-link href="{{ route($moduleData['route']) }}" :active="isActiveModule($moduleKey)">
+                           <x-activeIcons :active="isActiveModule($moduleKey)" class="w-5 h-5 ml-2" aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                              {!! $moduleData['icono'] !!}
+                           </x-activeIcons>
+                           <span class="ms-3">{{ $moduleData['titulo'] }}</span>
+                        </x-sidebar-link>
+                     </li>
+                  @endif
+               @endforeach
+               
+               <li>
+                  <x-sidebar-link href="https://chat.whatsapp.com/CnEA4qNlOBoLK1Hh8NKsKI">
+                     <svg class="w-5 h-5 ml-2 text-zinc-500 transition duration-75 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                        width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                           d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                     </svg>
+                     <span class="ms-3">Ayuda</span>
+                  </x-sidebar-link>
+               </li>
+            </ul>
+            <div class="flex items-center justify-between">
+               <button type="button" id="user-dropdown-sidebar-button" data-dropdown-toggle="user-dropdown-sidebar"
+                  class="flex items-center w-full p-1 text-sm text-zinc-900 rounded-lg dark:text-white hover:bg-zinc-800/5 dark:hover:bg-white/[7%] group">
+                  <div class="flex items-center">
+                     @if (Auth::user()->profile_photo_path)
+                        <img class="w-8 h-8 rounded-lg object-cover mr-2"
+                           src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="{{ Auth::user()->name }}">
+                     @else
+                        <img class="w-8 h-8 rounded-lg object-cover mr-2"
+                           src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}&amp;color=fff&amp;background=6366f1"
+                           alt="{{ Auth::user()->name }}">
+                     @endif
+                     <div>
+                        <span class="text-base font-medium">{{ Auth::user()->name }}</span>
+                     </div>
+                  </div>
+                  <svg class="w-4 h-4 ml-auto" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+               </button>
 
-                                        <svg class="ms-2 -me-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-                                        </svg>
-                                    </button>
-                                </span>
-                            </x-slot>
-
-                            <x-slot name="content">
-                                <div class="w-60">
-                                    <!-- Team Management -->
-                                    <div class="block px-4 py-2 text-xs text-gray-400">
-                                        {{ __('Manage Team') }}
-                                    </div>
-
-                                    <!-- Team Settings -->
-                                    <x-dropdown-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
-                                        {{ __('Team Settings') }}
-                                    </x-dropdown-link>
-
-                                    @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
-                                        <x-dropdown-link href="{{ route('teams.create') }}">
-                                            {{ __('Create New Team') }}
-                                        </x-dropdown-link>
-                                    @endcan
-
-                                    <!-- Team Switcher -->
-                                    @if (Auth::user()->allTeams()->count() > 1)
-                                        <div class="border-t border-gray-200"></div>
-
-                                        <div class="block px-4 py-2 text-xs text-gray-400">
-                                            {{ __('Switch Teams') }}
-                                        </div>
-
-                                        @foreach (Auth::user()->allTeams() as $team)
-                                            <x-switchable-team :team="$team" />
-                                        @endforeach
-                                    @endif
-                                </div>
-                            </x-slot>
-                        </x-dropdown>
-                    </div>
-                @endif
-
-                <!-- Settings Dropdown -->
-                <div class="ms-3 relative">
-                    <x-dropdown align="right" width="48">
-                        <x-slot name="trigger">
-                            @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
-                                <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
-                                    <img class="size-8 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
-                                </button>
-                            @else
-                                <span class="inline-flex rounded-md">
-                                    <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
-                                        {{ Auth::user()->name }}
-
-                                        <svg class="ms-2 -me-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                        </svg>
-                                    </button>
-                                </span>
-                            @endif
-                        </x-slot>
-
-                        <x-slot name="content">
-                            <!-- Account Management -->
-                            <div class="block px-4 py-2 text-xs text-gray-400">
-                                {{ __('Manage Account') }}
-                            </div>
-
-                            <x-dropdown-link href="{{ route('profile.show') }}">
-                                {{ __('Profile') }}
-                            </x-dropdown-link>
-
-                            @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
-                                <x-dropdown-link href="{{ route('api-tokens.index') }}">
-                                    {{ __('API Tokens') }}
-                                </x-dropdown-link>
-                            @endif
-
-                            <div class="border-t border-gray-200"></div>
-
-                            <!-- Authentication -->
-                            <form method="POST" action="{{ route('logout') }}" x-data>
-                                @csrf
-
-                                <x-dropdown-link href="{{ route('logout') }}"
-                                         @click.prevent="$root.submit();">
-                                    {{ __('Log Out') }}
-                                </x-dropdown-link>
-                            </form>
-                        </x-slot>
-                    </x-dropdown>
-                </div>
+               <!-- Dropdown menu -->
+               <div id="user-dropdown-sidebar"
+                  class="z-10 hidden bg-white divide-y divide-zinc-100 rounded-lg shadow w-56 dark:bg-zinc-700 dark:divide-zinc-600">
+                  <ul class="py-2 text-sm text-zinc-700 dark:text-zinc-200">
+                     <li>
+                        <a href="{{ route('profile.show') }}"
+                           class="group flex items-center gap-3 px-4 py-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white w-full">
+                           <svg
+                              class="w-5 h-5 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition duration-100 ease-in-out"
+                              aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                 d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 13 16h-2a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 12 21Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                           </svg>
+                           <span class="group-hover:text-zinc-900 dark:group-hover:text-white transition duration-100 ease-in-out">
+                               {{ __('Mi Perfil') }}
+                           </span>
+                        </a>
+                     </li>
+                  </ul>
+                  <div class="py-1">
+                     <form method="POST" action="{{ route('logout') }}" x-data>
+                        @csrf
+                        <a href="{{ route('logout') }}"
+                           class="group flex items-center gap-3 px-4 py-2 text-red-800 dark:text-zinc-400 hover:bg-red-100 dark:hover:bg-zinc-600 dark:hover:text-white w-full"
+                           @click.prevent="$root.submit();">
+                           <svg
+                              class="w-5 h-5 text-red-800 dark:text-zinc-400 group-hover:text-red-600 dark:group-hover:text-white transition duration-100 ease-in-out"
+                              aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                 d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2" />
+                           </svg>
+                           <span class="group-hover:text-red-600 dark:group-hover:text-white transition duration-100 ease-in-out">
+                              {{ __('Cerrar Sesión') }}
+                           </span>
+                        </a>
+                     </form>
+                  </div>
+               </div>
             </div>
+         </div>
+      </div>
+   </aside>
+   <script>
+      document.addEventListener('DOMContentLoaded', function () {
+         const dropdownButton2 = document.getElementById('dropdown2');
+         const dropdownMenu2 = document.getElementById('dropdown-menu2');
 
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                    <svg class="size-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
+         dropdownButton2.addEventListener('click', function () {
+            const isExpanded = dropdownMenu2.classList.contains('max-h-screen');
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-        </div>
+            if (isExpanded) {
+               dropdownMenu2.classList.remove('max-h-screen', 'opacity-100');
+               dropdownMenu2.classList.add('max-h-0', 'opacity-0');
+            } else {
+               dropdownMenu2.classList.remove('max-h-0', 'opacity-0');
+               dropdownMenu2.classList.add('max-h-screen', 'opacity-100');
+            }
+         });
+      });
 
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="flex items-center px-4">
-                @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
-                    <div class="shrink-0 me-3">
-                        <img class="size-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
-                    </div>
-                @endif
+      document.addEventListener('DOMContentLoaded', function () {
+         const dropdownButton3 = document.getElementById('dropdown3');
+         const dropdownMenu3 = document.getElementById('dropdown-menu3');
 
-                <div>
-                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-                </div>
-            </div>
+         dropdownButton3.addEventListener('click', function () {
+            const isExpanded = dropdownMenu3.classList.contains('max-h-screen');
 
-            <div class="mt-3 space-y-1">
-                <!-- Account Management -->
-                <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
+            if (isExpanded) {
+               dropdownMenu3.classList.remove('max-h-screen', 'opacity-100');
+               dropdownMenu3.classList.add('max-h-0', 'opacity-0');
+            } else {
+               dropdownMenu3.classList.remove('max-h-0', 'opacity-0');
+               dropdownMenu3.classList.add('max-h-screen', 'opacity-100');
+            }
+         });
+      });
 
-                @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
-                    <x-responsive-nav-link href="{{ route('api-tokens.index') }}" :active="request()->routeIs('api-tokens.index')">
-                        {{ __('API Tokens') }}
-                    </x-responsive-nav-link>
-                @endif
+      const userDropdownButton = document.getElementById('user-dropdown-sidebar-button');
+      const userDropdownMenu = document.getElementById('user-dropdown-sidebar');
 
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}" x-data>
-                    @csrf
+      if (userDropdownButton && userDropdownMenu) {
+         userDropdownButton.addEventListener('click', function () {
+            userDropdownMenu.classList.toggle('hidden');
+         });
 
-                    <x-responsive-nav-link href="{{ route('logout') }}"
-                                   @click.prevent="$root.submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-
-                <!-- Team Management -->
-                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
-                    <div class="border-t border-gray-200"></div>
-
-                    <div class="block px-4 py-2 text-xs text-gray-400">
-                        {{ __('Manage Team') }}
-                    </div>
-
-                    <!-- Team Settings -->
-                    <x-responsive-nav-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}" :active="request()->routeIs('teams.show')">
-                        {{ __('Team Settings') }}
-                    </x-responsive-nav-link>
-
-                    @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
-                        <x-responsive-nav-link href="{{ route('teams.create') }}" :active="request()->routeIs('teams.create')">
-                            {{ __('Create New Team') }}
-                        </x-responsive-nav-link>
-                    @endcan
-
-                    <!-- Team Switcher -->
-                    @if (Auth::user()->allTeams()->count() > 1)
-                        <div class="border-t border-gray-200"></div>
-
-                        <div class="block px-4 py-2 text-xs text-gray-400">
-                            {{ __('Switch Teams') }}
-                        </div>
-
-                        @foreach (Auth::user()->allTeams() as $team)
-                            <x-switchable-team :team="$team" component="responsive-nav-link" />
-                        @endforeach
-                    @endif
-                @endif
-            </div>
-        </div>
-    </div>
-</nav>
+         // Cerrar el dropdown cuando se hace clic fuera de él
+         document.addEventListener('click', function (event) {
+            if (!userDropdownButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {
+               userDropdownMenu.classList.add('hidden');
+            }
+         });
+      }
+   </script>
+</div>
