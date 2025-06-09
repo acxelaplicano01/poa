@@ -1,44 +1,46 @@
 <div>
    @php
-   function isActiveModule($module)
-   {
-      $currentRoute = request()->route() ? request()->route()->getName() : '';
-      $moduleConfig = config('rutas.' . $module, []);
-      
-      // Si el módulo tiene una ruta directa y coincide con la actual
-      if (isset($moduleConfig['route']) && $currentRoute == $moduleConfig['route']) {
-         return true;
-      }
-      
-      // Verificar todas las rutas en todos los items del módulo
-      if (isset($moduleConfig['items']) && is_array($moduleConfig['items'])) {
-         foreach ($moduleConfig['items'] as $item) {
-            if (isset($item['routes']) && is_array($item['routes'])) {
-               if (in_array($currentRoute, $item['routes'])) {
-                  return true;
-               }
+function isActiveModule($module)
+{
+   $currentRoute = request()->route() ? request()->route()->getName() : '';
+   $moduleConfig = config('rutas.' . $module, []);
+
+   // Si el módulo tiene una ruta directa y coincide con la actual
+   if (isset($moduleConfig['route']) && $currentRoute == $moduleConfig['route']) {
+      return true;
+   }
+
+   // Verificar todas las rutas en todos los items del módulo
+   if (isset($moduleConfig['items']) && is_array($moduleConfig['items'])) {
+      foreach ($moduleConfig['items'] as $item) {
+         if (isset($item['routes']) && is_array($item['routes'])) {
+            if (in_array($currentRoute, $item['routes'])) {
+               return true;
             }
          }
       }
-      
-      return false;
    }
 
-  function hasModuleAccess($module)
+   return false;
+}
+
+function hasModuleAccess($module)
 {
    $user = auth()->user();
-   if (!$user) return false;
+   if (!$user)
+      return false;
 
    // Super admin tiene acceso a todo
-   if ($user->hasRole('super-admin')) return true;
-   
+   if ($user->hasRole('super-admin'))
+      return true;
+
    // Verificar la configuración del módulo
    $moduleConfig = config('rutas.' . $module, []);
-   
+
    // Verificar permiso general del módulo
    $permiso = "acceso-{$module}";
    $hasModuleAccess = $user->can($permiso);
-   
+
    // Si no tiene acceso al módulo, verificar si hay al menos un item always_visible
    if (!$hasModuleAccess) {
       if (isset($moduleConfig['items']) && is_array($moduleConfig['items'])) {
@@ -50,12 +52,12 @@
       }
       return false; // No tiene acceso al módulo ni hay items always_visible
    }
-   
+
    return true; // Tiene acceso al módulo
 }
 
-   // Obtener la configuración del menú
-   $moduleConfig = config('rutas', []);
+// Obtener la configuración del menú
+$moduleConfig = config('rutas', []);
    @endphp
    
    <aside id="logo-sidebar"
@@ -141,8 +143,16 @@
                   <ul class="py-2 text-sm text-zinc-700 dark:text-zinc-200">
                      <li>
                         <a href="{{ route('profile.show') }}"
-                           class="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white">
-                           {{ __('Mi Perfil') }}
+                           class="group flex items-center gap-3 px-4 py-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white w-full">
+                           <svg
+                              class="w-5 h-5 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition duration-100 ease-in-out"
+                              aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                 d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 13 16h-2a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 12 21Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                           </svg>
+                           <span class="group-hover:text-zinc-900 dark:group-hover:text-white transition duration-100 ease-in-out">
+                               {{ __('Mi Perfil') }}
+                           </span>
                         </a>
                      </li>
                   </ul>
@@ -150,9 +160,17 @@
                      <form method="POST" action="{{ route('logout') }}" x-data>
                         @csrf
                         <a href="{{ route('logout') }}"
-                           class="block px-4 py-2 text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white"
+                           class="group flex items-center gap-3 px-4 py-2 text-red-800 dark:text-zinc-400 hover:bg-red-100 dark:hover:bg-zinc-600 dark:hover:text-white w-full"
                            @click.prevent="$root.submit();">
-                           {{ __('Cerrar Sesión') }}
+                           <svg
+                              class="w-5 h-5 text-red-800 dark:text-zinc-400 group-hover:text-red-600 dark:group-hover:text-white transition duration-100 ease-in-out"
+                              aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                 d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2" />
+                           </svg>
+                           <span class="group-hover:text-red-600 dark:group-hover:text-white transition duration-100 ease-in-out">
+                              {{ __('Cerrar Sesión') }}
+                           </span>
                         </a>
                      </form>
                   </div>
