@@ -3,7 +3,6 @@
 namespace App\Models\Mes;
 use App\Models\BaseModel;
 use App\Models\Mes\Mes;
-use App\Models\Mes\Trimestre;
 
 class Trimestre extends BaseModel
 {
