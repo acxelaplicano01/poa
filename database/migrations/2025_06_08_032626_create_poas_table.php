@@ -34,8 +34,8 @@ return new class extends Migration
                 $table->id();
                 $table->boolean('isActive')->default(true);
 
-                $table->foreignId('idPoaUE')->constrained('poas');
-                $table->foreignId('idDepto')->constrained('departamentos');
+                $table->foreignId('idPoa')->constrained('poas');
+                $table->foreignId('idDepartamento')->constrained('departamentos');
                 
                 $table->foreignId('created_by')->nullable()->constrained('users');
                 $table->foreignId('updated_by')->nullable()->constrained('users');
