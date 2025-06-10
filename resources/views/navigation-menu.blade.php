@@ -1,5 +1,5 @@
 <div>
-   @php
+  @php
 function isActiveModule($module)
 {
    $currentRoute = request()->route() ? request()->route()->getName() : '';
@@ -56,6 +56,46 @@ function hasModuleAccess($module)
    return true; // Tiene acceso al módulo
 }
 
+function findFirstAccessibleRoute($module)
+{
+   $user = auth()->user();
+   $moduleConfig = config('rutas.' . $module, []);
+   
+   // Si es super-admin o no hay config, usar la ruta principal
+   if (!$user || !isset($moduleConfig['items']) || empty($moduleConfig['items'])) {
+      return isset($moduleConfig['route']) ? $moduleConfig['route'] : 'dashboard';
+   }
+   
+   if ($user->hasRole('super-admin')) {
+      return $moduleConfig['route'];
+   }
+   
+   // Primero buscar en items always_visible
+   foreach ($moduleConfig['items'] as $item) {
+      if (isset($item['always_visible']) && $item['always_visible'] && isset($item['route'])) {
+         return $item['route'];
+      }
+   }
+   
+   // Luego buscar en items donde tenga permiso
+   foreach ($moduleConfig['items'] as $item) {
+      // Si no tiene permisos, es accesible
+      if (!isset($item['permisos']) || empty($item['permisos'])) {
+         return $item['route'];
+      }
+      
+      // Verificar si tiene alguno de los permisos requeridos
+      foreach ((array)$item['permisos'] as $permiso) {
+         if ($user->can($permiso)) {
+            return $item['route'];
+         }
+      }
+   }
+   
+   // Si ningún item es accesible, retornar la ruta principal como fallback
+   return $moduleConfig['route'];
+}
+
 // Obtener la configuración del menú
 $moduleConfig = config('rutas', []);
    @endphp
@@ -73,9 +113,8 @@ $moduleConfig = config('rutas', []);
                @if(!isset($moduleData['footer']) || !$moduleData['footer'])
                   @if(hasModuleAccess($moduleKey))
                      <li>
-                        <x-sidebar-link href="{{ route($moduleData['route']) }}" :active="isActiveModule($moduleKey)">
-                           <x-activeIcons :active="isActiveModule($moduleKey)" class="w-5 h-5 ml-2" aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <x-sidebar-link href="{{ route(findFirstAccessibleRoute($moduleKey)) }}" :active="isActiveModule($moduleKey)">
+                           <x-activeIcons :active="isActiveModule($moduleKey)">
                               {!! $moduleData['icono'] !!}
                            </x-activeIcons>
                            <span class="ms-3">{{ $moduleData['titulo'] }}</span>
@@ -93,9 +132,8 @@ $moduleConfig = config('rutas', []);
                @foreach($moduleConfig as $moduleKey => $moduleData)
                   @if(isset($moduleData['footer']) && $moduleData['footer'] && hasModuleAccess($moduleKey))
                      <li>
-                        <x-sidebar-link href="{{ route($moduleData['route']) }}" :active="isActiveModule($moduleKey)">
-                           <x-activeIcons :active="isActiveModule($moduleKey)" class="w-5 h-5 ml-2" aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <x-sidebar-link href="{{ route(findFirstAccessibleRoute($moduleKey)) }}" :active="isActiveModule($moduleKey)">
+                           <x-activeIcons :active="isActiveModule($moduleKey)">
                               {!! $moduleData['icono'] !!}
                            </x-activeIcons>
                            <span class="ms-3">{{ $moduleData['titulo'] }}</span>

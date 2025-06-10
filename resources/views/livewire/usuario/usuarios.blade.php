@@ -17,8 +17,8 @@
 
                     <div class="flex flex-col sm:flex-row w-full sm:w-auto space-y-3 sm:space-y-0 sm:space-x-2">
                         <div class="relative w-full sm:w-auto">
-                            <input wire:model.live="search" type="text" placeholder="Buscar usuarios..."
-                                class="w-full pl-10 pr-4 py-2 border rounded-md dark:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-600 focus:ring-indigo-500 focus:border-indigo-500">
+                            <x-input wire:model.live="search" type="text" placeholder="Buscar usuarios..."
+                                class="w-full pl-10 pr-4 py-2" />
                             <div class="absolute left-3 top-2.5">
                                 <svg class="h-5 w-5 text-zinc-500 dark:text-zinc-400" xmlns="http://www.w3.org/2000/svg"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">

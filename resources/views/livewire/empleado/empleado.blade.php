@@ -1,45 +1,42 @@
 <div>
-   
-    <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 rounded-lg mt-8 sm:mt-10 lg:mt-12 mb-6">
+    
+
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 rounded-lg mt-8 sm:mt-10 lg:mt-12 mb-6">
         <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow sm:rounded-lg p-4 sm:p-6">
 
             @if (session()->has('message'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
-                    role="alert">
-                    <span class="block sm:inline">{{ session('message') }}</span>
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md" role="alert">
+                    <p class="font-medium">{{ session('message') }}</p>
                 </div>
             @endif
 
-            @if (session()->has('error'))
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                    <span class="block sm:inline">{{ session('error') }}</span>
-                </div>
-            @endif
+            <div class="mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <h2 class="text-xl font-semibold text-zinc-800 dark:text-zinc-200">
+                        {{ __('Administración de Empleados') }}</h2>
 
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                <h2 class="text-xl font-semibold text-zinc-800 dark:text-zinc-200">{{ __('Administración de Roles')}}
-                </h2>
-
-                <div class="flex flex-col sm:flex-row w-full sm:w-auto space-y-3 sm:space-y-0 sm:space-x-2">
-                    <div class="relative w-full sm:w-auto">
-                        <x-input wire:model.live="search" type="text" placeholder="Buscar roles..."
-                            class="w-full pl-10 pr-4 py-2"/>
-                        <div class="absolute left-3 top-2.5">
-                            <svg class="h-5 w-5 text-zinc-500 dark:text-zinc-400" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                    <div class="flex flex-col sm:flex-row w-full sm:w-auto space-y-3 sm:space-y-0 sm:space-x-2">
+                        <div class="relative w-full sm:w-auto">
+                            <x-input  type="text" placeholder="Buscar empleados..."
+                                class="w-full pl-10 pr-4 py-2" />
+                            <div class="absolute left-3 top-2.5">
+                                <svg class="h-5 w-5 text-zinc-500 dark:text-zinc-400" xmlns="http://www.w3.org/2000/svg"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
                         </div>
-                    </div>
 
-                    <x-button wire:click="create" class="w-full sm:w-auto justify-center">
-                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        {{ __('Nuevo rol')}}
-                    </x-button>
+                        <x-button wire:click="" class="w-full sm:w-auto justify-center">
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            {{ __('Nuevo Empleado') }}
+                        </x-button>
+                    </div>
                 </div>
             </div>
 
@@ -50,44 +47,42 @@
                         <tr>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
-                                ID</th>
+                                DNI</th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
-                                Rol</th>
+                                N° Empleado</th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
-                                Descripción</th>
+                                Nombre</th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
-                                Permisos</th>
+                                Departamentos</th>
                             <th
-                                class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                class="px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                                 Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-200 dark:bg-zinc-800 dark:divide-zinc-700">
-                        @forelse ($roles as $role)
                             <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-                                <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">{{ $role->id }}
+                                <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">123456789122
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">{{ $role->name }}
+                                <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">198885
                                 </td>
-                                <td class="px-6 py-4  text-zinc-900 dark:text-zinc-300">{{ $role->description }}
+                                <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">Juan Pérez
                                 </td>
                                 <td class="px-6 py-4 text-zinc-900 dark:text-zinc-300">
                                     <div class="flex flex-wrap gap-2">
-                                        @foreach($role->permissions as $permission)
-                                            <span
-                                                class="bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-300 px-2 py-1 rounded-full text-xs">
-                                                {{ $permission->name }}
-                                            </span>
-                                        @endforeach
+                                        <span
+                                            class="bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-300 px-2 py-1 rounded-full text-xs">
+                                             Departamento 1
+                                        </span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex space-x-2">
-                                        <button wire:click="edit({{ $role->id }})"
-                                            class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-2">
+                                        <button wire:click=""
+                                            class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                                            title="Editar">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                 fill="currentColor">
                                                 <path
@@ -97,8 +92,9 @@
                                                     clip-rule="evenodd" />
                                             </svg>
                                         </button>
-                                        <button wire:click="confirmDelete({{ $role->id }})"
-                                            class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                        <button
+                                            class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                            title="Eliminar">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                 fill="currentColor">
                                                 <path fill-rule="evenodd"
@@ -109,31 +105,28 @@
                                     </div>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="px-6 py-4 text-center text-zinc-500 dark:text-zinc-400">
-                                    {{ __('No se encontraron roles')}}
+                           <!-- <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-zinc-500 dark:text-zinc-400">
+                                    No se encontraron Empleados
                                 </td>
-                            </tr>
-                        @endforelse
+                            </tr> -->
                     </tbody>
                 </table>
             </div>
 
             <!-- Vista de tarjetas para pantallas pequeñas (móviles) -->
             <div class="md:hidden space-y-4 mt-6">
-                @forelse ($roles as $role)
                     <div
                         class="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700">
                         <div class="flex justify-between items-start mb-2">
                             <div>
                                 <span
                                     class="bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-300 px-2 py-1 rounded-full text-xs">
-                                    ID: {{ $role->id }}
+                                    DNI: 123456789122
                                 </span>
                             </div>
                             <div class="flex space-x-2">
-                                <button wire:click="edit({{ $role->id }})"
+                                <button wire:click=""
                                     class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                         fill="currentColor">
@@ -144,7 +137,7 @@
                                             clip-rule="evenodd" />
                                     </svg>
                                 </button>
-                                <button wire:click="confirmDelete({{ $role->id }})"
+                                <button wire:click=""
                                     class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                         fill="currentColor">
@@ -155,36 +148,66 @@
                                 </button>
                             </div>
                         </div>
-                        <h3 class="font-semibold text-zinc-900 dark:text-zinc-200 text-lg mb-2">{{ $role->name }}</h3>
+                        <h3 class="font-semibold text-zinc-900 dark:text-zinc-200 text-lg mb-1">Juan Perez</h3>
+                        <p class="text-zinc-600 dark:text-zinc-400 text-sm mb-2">juan.perez@example.com</p>
+
                         <div class="mt-2">
-                            <h4 class="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">{{__('Permisos:')}}</h4>
-                            <div class="flex flex-wrap gap-2">
-                                @foreach($role->permissions as $permission)
+                            <h4 class="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Departamentos:</h4>
+                            <div class="flex flex-wrap gap-2">                          
                                     <span
                                         class="bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-300 px-2 py-1 rounded-full text-xs">
-                                        {{ $permission->name }}
+                                        Departamento 1
                                     </span>
-                                @endforeach
                             </div>
                         </div>
                     </div>
-                @empty
+                <!--
                     <div
                         class="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow text-center text-zinc-500 dark:text-zinc-400">
-                        {{__('No se encontraron roles')}}
+                        No se encontraron Empleados
                     </div>
-                @endforelse
+                -->
             </div>
 
-            <div class="mt-4">
-                {{ $roles->links() }}
+            <div class="mt-6">
+               <!-- paginacion -->
             </div>
         </div>
     </div>
 
-    <!-- Modal para crear/editar rol -->
-    @include('livewire.Rol.create')
+    <!-- Modal de error -->
+    @if (session()->has('error'))
+        <x-dialog-modal wire:model="showErrorModal">
+            <x-slot name="title">
+                <div class="flex items-center">
+                    <div class="bg-red-100 dark:bg-red-900/20 rounded-full p-2 mr-2">
+                        <svg class="h-6 w-6 text-red-600 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-medium text-zinc-900 dark:text-white">Error</h3>
+                </div>
+            </x-slot>
+
+            <x-slot name="content">
+                <p>{{ session('error') }}</p>
+            </x-slot>
+
+            <x-slot name="footer">
+                <div class="flex justify-end">
+                    <x-secondary-button wire:click="$set('showErrorModal', false)" wire:loading.attr="disabled">
+                        Aceptar
+                    </x-secondary-button>
+                </div>
+            </x-slot>
+        </x-dialog-modal>
+    @endif
+
+    <!-- Modal para crear/editar Empleado -->
+    @include('livewire.empleado.create')
 
     <!-- Modal de confirmación para eliminar -->
-    @include('livewire.Rol.delete-confirmation')
+    @include('livewire.empleado.delete-confirmation')
 </div>

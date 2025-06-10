@@ -16,7 +16,7 @@ return [
             ]
         ]
     ],
-    
+
     // Módulo de planificación
     'planificacion' => [
         'titulo' => 'Planificación',
@@ -26,36 +26,34 @@ return [
             [
                 'titulo' => 'Mis planificaciones',
                 'route' => 'planificar',
-                'routes' => [
-                    'planificar',
-                    'planificar.nuevo',
-                    'planificar.editar',
-                    'planificar.ver'
-                ],
+                'routes' => ['planificar'],
                 'permisos' => ['planificacion.planificar'],
                 'icono' => ''
             ],
-           /* [
-                'titulo' => 'Proyectos',
-                'route' => 'planificar.proyectos',
-                'routes' => [
-                    'planificar.proyectos',
-                    'planificar.proyectos.nuevo',
-                    'planificar.proyectos.editar'
-                ],
-                'permisos' => ['planificacion.proyectos'],
+            [
+                'titulo' => 'Requerir',
+                'route' => 'requerir',
+                'routes' => ['planificar.requerir'],
+                'permisos' => ['planificacion.requerir'],
                 'icono' => ''
             ],
             [
-                'titulo' => 'Seguimiento',
-                'route' => 'planificar.seguimiento',
+                'titulo' => 'Dar seguimiento',
+                'route' => 'seguimiento',
                 'routes' => ['planificar.seguimiento'],
                 'permisos' => ['planificacion.seguimiento'],
                 'icono' => ''
-            ]*/
+            ],
+            [
+                'titulo' => 'Consolidado',
+                'route' => 'consolidado',
+                'routes' => ['planificar.consolidado'],
+                'permisos' => ['planificacion.consolidado'],
+                'icono' => ''
+            ]
         ]
     ],
-    
+
     // Módulo de configuración
     'configuracion' => [
         'titulo' => 'Configuración',
@@ -65,18 +63,138 @@ return [
             [
                 'titulo' => 'Roles',
                 'route' => 'roles',
-                'routes' => ['roles', 'roles.crear', 'roles.editar', 'roles.permisos'],
+                'routes' => ['roles'],
                 'permisos' => ['configuracion.roles'],
-                'icono' => ''
+                'icono' => '',
+                'default_route' => true // Esta sería la ruta por defecto si el usuario tiene permiso
             ],
             [
                 'titulo' => 'Usuarios',
                 'route' => 'usuarios',
-                'routes' => ['usuarios', 'usuarios.crear', 'usuarios.editar'],
+                'routes' => ['usuarios'],
                 'permisos' => ['configuracion.usuarios'],
                 'icono' => ''
             ],
+            [
+                'titulo' => 'Empleados',
+                'route' => 'empleados',
+                'routes' => ['empleados'],
+                'permisos' => ['configuracion.empleados'],
+                'icono' => ''
+            ],
+            [
+                'titulo' => 'Departamentos',
+                'route' => 'departamentos',
+                'routes' => ['departamentos'],
+                'permisos' => ['configuracion.departamentos'],
+                'icono' => ''
+            ],
+            [
+                'titulo' => 'Procesos de compras',
+                'route' => 'procesoscompras',
+                'routes' => ['procesoscompras'],
+                'permisos' => ['configuracion.procesoscompras'],
+                'icono' => ''
+            ],
+            [
+                'titulo' => 'Cubs',
+                'route' => 'cubs',
+                'routes' => ['cubs'],
+                'permisos' => ['configuracion.cubs'],
+                'icono' => ''
+            ],
         ],
+        //para que el modulo se muestre en el footer
         'footer' => true
-    ]
+    ],
+
+    // Módulo de gestion administrativa
+   /* 'gestion' => [
+        'titulo' => 'Gestión Administrativa',
+        'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3z" />',
+        'route' => 'gestionadministrativa',
+        'items' => [
+            [
+                'titulo' => 'Gestion Administrativa',
+                'route' => 'gestionadministrativa',
+                'routes' => ['gestionadministrativa'],
+                'permisos' => ['gestionadministrativa.gestionadministrativa'],
+                'icono' => ''
+            ],
+            [
+                'titulo' => 'Configuración',
+                'route' => 'configuracion',
+                'routes' => ['configuracion'],
+                'permisos' => ['gestionadministrativa.configuracion'],
+                'icono' => ''
+            ],
+            [
+                'titulo' => 'Plan Anual de Compras',
+                'route' => 'plananualcompras',
+                'routes' => ['plananualcompras'],
+                'permisos' => ['gestionadministrativa.plananualcompras'],
+                'icono' => ''
+            ],
+        ]
+    ],
+
+    // Módulo de reportes
+    'reportes' => [
+        'titulo' => 'Reportes',
+        'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3z" />',
+        'route' => 'reportegeneral',
+        'items' => [
+            [
+                'titulo' => 'Reporte general',
+                'route' => 'reportegeneral',
+                'routes' => ['reportegeneral'],
+                'permisos' => ['reportes.reportegeneral'],
+                'icono' => ''
+            ],
+            [
+                'titulo' => 'Resumen trimestral',
+                'route' => 'resumentrimestral',
+                'routes' => ['resumentrimestral'],
+                'permisos' => ['reportes.resumentrimestral'],
+                'icono' => ''
+            ],
+            [
+                'titulo' => 'Consolidado',
+                'route' => 'consolidado',
+                'routes' => ['consolidado'],
+                'permisos' => ['reportes.consolidado'],
+                'icono' => ''
+            ],
+            [
+                'titulo' => 'Recursos planificados',
+                'route' => 'recursosplanificados',
+                'routes' => ['recursosplanificados'],
+                'permisos' => ['reportes.recursosplanificados'],
+                'icono' => ''
+            ],
+        ]
+    ],
+
+    // Modulo Consola
+    'consola' => [
+        'titulo' => 'Consola',
+        'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3z" />',
+        'route' => 'consola',
+        'items' => [
+            [
+                'titulo' => 'Plan estratégico institucional',
+                'route' => 'planestrategico',
+                'routes' => ['planestrategico'],
+                'permisos' => ['consola.planestrategico'],
+                'icono' => ''
+            ],
+            [
+                'titulo' => 'Asignación presupuestaria',
+                'route' => 'asignacionpresupuestaria',
+                'routes' => ['asignacionpresupuestaria'],
+                'permisos' => ['consola.asignacionpresupuestaria'],
+                'icono' => ''
+            ],
+        ]
+    ]*/
 ];

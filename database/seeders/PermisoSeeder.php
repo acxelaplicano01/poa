@@ -21,27 +21,35 @@ class PermisoSeeder extends Seeder
             'configuracion' => [
                 'roles',
                 'usuarios',
+                'empleados',
+                'departamentos',
+                'procesoscompras',
+                'cubs',
                 // Agregar más subpermisos aquí
             ],
             'planificacion' => [
                 'planificar',
+                'requerir',
+                'seguimiento',
+                'consolidado',
                 // Agregar más subpermisos aquí
             ],
             'gestion' => [
-                'reportes',
-                'pei',
-                'poa',
-                'rrhh',
-                'seguimientos',
+                'gestionadministrativa',
+                'configuracion',
+                'plananualcompras',
                 // Agregar más subpermisos aquí
             ],
             'reportes' => [
-                'ver_reportes',
-                'exportar_reportes',
+                'reportegeneral',
+                'resumentrimestral',
+                'consolidado',
+                'recursosplanificados',
                 // Subpermisos de reportes
             ],
             'consolas' => [
-                'administrar_consolas',
+                'planestrategico',
+                'asignacionpresupuestaria',
                 // Subpermisos de consolas
             ]
         ];

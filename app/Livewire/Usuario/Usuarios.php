@@ -146,7 +146,7 @@ class Usuarios extends Component
             $this->reset();
             $this->closeModal();
             // Redirigir a la URL login
-            redirect()->route('roles');
+            redirect()->route('usuarios');
 
         } catch (\Exception $e) {
             session()->flash('error', 'Error al actualizar el usuario: ' . $e->getMessage());
