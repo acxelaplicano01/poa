@@ -2,7 +2,7 @@
 
 namespace App\Models\Requisicion;
 use App\Models\BaseModel;
-use App\Models\Poa\Poa;
+use App\Models\Poa\Poas;
 use App\Models\Departamento\Departamentos;
 use App\Models\Requisicion\EstadoRequisicion;
 use App\Models\RequisicionLog\EstadoRequisicionLog;

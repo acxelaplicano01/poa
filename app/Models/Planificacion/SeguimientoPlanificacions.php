@@ -4,7 +4,7 @@ namespace App\Models\Planificacion;
 use App\Models\BaseModel;
 use App\Models\Planificacion\Planificacion;
 use App\Models\Actividad\Actividad;
-use App\Models\Poas\PoaDepto;
+use App\Models\Poa\PoaDeptos;
 use App\Models\Planificacion\MedioVerificacionPlanificacion;
 
 class SeguimientoPlanificacion extends BaseModel

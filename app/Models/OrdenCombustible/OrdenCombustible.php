@@ -4,7 +4,7 @@ namespace App\Models\OrdenCombustible;
 use App\Models\BaseModel;
 use App\Models\Poa\Poas;
 use App\Models\Requisicion\DetalleRequisicion;
-use App\Models\Tareas\TareasHistorico;
+use App\Models\Tareas\TareasHistoricos;
 use App\Models\Empleados\Empleados;
 
 class OrdenCombustible extends BaseModel
@@ -46,6 +46,6 @@ class OrdenCombustible extends BaseModel
 
     public function responsableEmpleado()
     {
-        return $this->belongsTo(Empleado::class, 'responsable');
+        return $this->belongsTo(Empleados::class, 'responsable');
     }
 }

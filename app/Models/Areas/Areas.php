@@ -33,12 +33,12 @@ class Areas extends BaseModel
     // Relación con Pei
     public function pei()
     {
-        return $this->belongsTo(Pei::class, 'idPei');
+        return $this->belongsTo(Peis::class, 'idPei');
     }
 
     // Relación con Resultados
     public function resultados()
     {
-        return $this->hasMany(Resultado::class, 'idArea');
+        return $this->hasMany(Resultados::class, 'idArea');
     }
 }

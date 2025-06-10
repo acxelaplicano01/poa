@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UnidadEjecutoraSeeder::class);
         $this->call(FuenteSeeder::class);
         //$this->call(GrupoGastoSeeder::class);
-      //  $this->call(ObjetoGastoSeeder::class);
+        //$this->call(ObjetoGastoSeeder::class);
         //$this->call(CubSeeder::class);
     }
 }

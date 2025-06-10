@@ -4,7 +4,7 @@ namespace App\Models\Poa;
 use App\Models\BaseModel;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\Instituciones\Institucions;
-use App\Models\Poa\PoaDepto;
+use App\Models\Poa\PoaDeptos;
 
 
 class Poas extends BaseModel

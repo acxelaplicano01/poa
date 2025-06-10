@@ -3,9 +3,9 @@
 namespace App\Models\Objetivos;
 use App\Models\BaseModel;
 use App\Models\Dimension\Dimension;
-use App\Models\Poa\Pei;
-use App\Models\Areas\Area;
-use App\Models\Resultados\Resultado;
+use App\Models\Poa\Peis;
+use App\Models\Areas\Areas;
+use App\Models\Resultados\Resultados;
 
 class Objetivo extends BaseModel
 {
@@ -22,24 +22,24 @@ class Objetivo extends BaseModel
     // Relación con Dimension
     public function dimension()
     {
-        return $this->belongsTo(Dimension::class, 'idDimension');
+        return $this->belongsTo(Dimensions::class, 'idDimension');
     }
 
     // Relación con Pei
     public function pei()
     {
-        return $this->belongsTo(Pei::class, 'idPei');
+        return $this->belongsTo(Peis::class, 'idPei');
     }
 
     // Relación con Areas
     public function areas()
     {
-        return $this->hasMany(Area::class, 'idObjetivos');
+        return $this->hasMany(Areas::class, 'idObjetivos');
     }
 
     // Relación con Resultados
     public function resultados()
     {
-        return $this->hasMany(Resultado::class, 'idObjetivos');
+        return $this->hasMany(Resultados::class, 'idObjetivos');
     }
 }

@@ -6,8 +6,9 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Cubs\Cubs;
+use App\Models\UnidadEjecutora\UnidadEjecutora;
 
-class CubsTableSeeder extends Seeder
+class CubSeeder extends Seeder
 {
     public function run()
     {
