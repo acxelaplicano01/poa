@@ -2,8 +2,8 @@
 
 namespace App\Models\Requisicion;
 use App\Models\BaseModel;
-use App\Models\Poa\Poas;
-use App\Models\Departamento\Departamentos;
+use App\Models\Poa\Poa;
+use App\Models\Departamento\Departamento;
 use App\Models\Requisicion\EstadoRequisicion;
 use App\Models\RequisicionLog\EstadoRequisicionLog;
 use App\Models\User;
@@ -28,12 +28,12 @@ class Requisicion extends BaseModel
 
     public function poa()
     {
-        return $this->belongsTo(Poas::class, 'idPoa');
+        return $this->belongsTo(Poa::class, 'idPoa');
     }
 
     public function departamento()
     {
-        return $this->belongsTo(Departamentos::class, 'idDepartamento');
+        return $this->belongsTo(Departamento::class, 'idDepartamento');
     }
 
     public function estado()
@@ -53,6 +53,6 @@ class Requisicion extends BaseModel
 
     public function logs()
     {
-        return $this->hasMany(EstadoRequisicionLogs::class, 'idRequisicion');
+        return $this->hasMany(EstadoRequisicionLog::class, 'idRequisicion');
     }
 }

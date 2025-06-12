@@ -2,10 +2,10 @@
 
 namespace App\Models\OrdenCombustible;
 use App\Models\BaseModel;
-use App\Models\Poa\Poas;
+use App\Models\Poa\Poa;
 use App\Models\Requisicion\DetalleRequisicion;
-use App\Models\Tareas\TareasHistoricos;
-use App\Models\Empleados\Empleados;
+use App\Models\Tareas\TareaHistorico;
+use App\Models\Empleados\Empleado;
 
 class OrdenCombustible extends BaseModel
 {
@@ -31,7 +31,7 @@ class OrdenCombustible extends BaseModel
 
     public function poa()
     {
-        return $this->belongsTo(Poas::class, 'idPoa');
+        return $this->belongsTo(Poa::class, 'idPoa');
     }
 
     public function detalleRequisicion()
@@ -41,11 +41,11 @@ class OrdenCombustible extends BaseModel
 
     public function recurso()
     {
-        return $this->belongsTo(TareasHistoricos::class, 'idRecurso');
+        return $this->belongsTo(TareaHistorico::class, 'idRecurso');
     }
 
     public function responsableEmpleado()
     {
-        return $this->belongsTo(Empleados::class, 'responsable');
+        return $this->belongsTo(Empleado::class, 'responsable');
     }
 }

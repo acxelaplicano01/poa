@@ -1,0 +1,42 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        if (!Schema::hasTable('planificacions')) {
+            Schema::create('planificacions', function (Blueprint $table) {
+                $table->id();
+                $table->double('cantidad');
+                $table->date('fechaInicio');
+                $table->date('fechaFin');
+
+                $table->unsignedBigInteger('idActividad');
+                $table->unsignedBigInteger('idIndicador');
+                $table->unsignedBigInteger('idMes');
+
+                $table->foreignId('created_by')->nullable()->constrained('users');
+                $table->foreignId('updated_by')->nullable()->constrained('users');
+                $table->foreignId('deleted_by')->nullable()->constrained('users');
+
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('planificacions');
+    }
+};

@@ -3,7 +3,7 @@
 namespace App\Models\EjecucionPresupuestaria;
 use App\Models\BaseModel;
 use App\Models\EjecucionPresupuestaria\EjecucionPresupuestaria;
-use App\Models\Presupuestos\Presupuestos;
+use App\Models\Presupuestos\Presupuesto;
 use App\Models\Requisicion\DetalleRequisicion;
 use App\Models\Requisicion\Requisicion;
 
@@ -26,7 +26,7 @@ class DetalleEjecucionPresupuestaria extends BaseModel
 
     public function presupuesto()
     {
-        return $this->belongsTo(Presupuestos::class, 'idPresupuesto');
+        return $this->belongsTo(Presupuesto::class, 'idPresupuesto');
     }
 
     public function detalleRequisicion()

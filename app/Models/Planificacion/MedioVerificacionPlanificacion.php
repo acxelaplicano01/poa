@@ -2,7 +2,7 @@
 
 namespace App\Models\Planificacion;
 use App\Models\BaseModel;
-use App\Models\Archivos\Archivos;
+use App\Models\Archivos\Archivo;
 use App\Models\Actividad\Actividad;
 use App\Models\Planificacion\Planificacion;
 use App\Models\Planificacion\SeguimientoPlanificacion;
@@ -22,7 +22,7 @@ class MedioVerificacionPlanificacion extends BaseModel
 
     public function archivo()
     {
-        return $this->belongsTo(Archivos::class, 'idArchivo');
+        return $this->belongsTo(Archivo::class, 'idArchivo');
     }
 
     public function actividad()

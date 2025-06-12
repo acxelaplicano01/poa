@@ -2,11 +2,11 @@
 
 namespace App\Models\Requisicion;
 use App\Models\BaseModel;
-use App\Models\Poa\Poas;
-use App\Models\Presupuestos\Presupuestos;
-use App\Models\Tareas\TareasHistoricos;
+use App\Models\Poa\Poa;
+use App\Models\Presupuestos\Presupuesto;
+use App\Models\Tareas\TareaHistorico;
 use App\Models\Requisicion\Requisicion;
-use App\Models\Requisicion\UnidadMedidas;
+use App\Models\Requisicion\UnidadMedida;
 use App\Models\EjecucionPresupuestaria\DetalleEjecucionPresupuestaria;
 
 class DetalleRequisicion extends BaseModel
@@ -32,22 +32,22 @@ class DetalleRequisicion extends BaseModel
 
     public function poa()
     {
-        return $this->belongsTo(Poas::class, 'idPoa');
+        return $this->belongsTo(Poa::class, 'idPoa');
     }
 
     public function presupuesto()
     {
-        return $this->belongsTo(Presupuestos::class, 'idPresupuesto');
+        return $this->belongsTo(Presupuesto::class, 'idPresupuesto');
     }
 
     public function recurso()
     {
-        return $this->belongsTo(TareasHistoricos::class, 'idRecurso');
+        return $this->belongsTo(TareaHistorico::class, 'idRecurso');
     }
 
     public function unidadMedida()
     {
-        return $this->belongsTo(UnidadMedidas::class, 'idUnidadMedida');
+        return $this->belongsTo(UnidadMedida::class, 'idUnidadMedida');
     }
 
     public function ejecuciones()

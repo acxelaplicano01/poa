@@ -3,15 +3,15 @@
 namespace App\Models\Actividad;
 use App\Models\BaseModel;
 use App\Models\Actividad\TipoActividad;
-use App\Models\Poa\Poas;
-use App\Models\Departamento\Departamentos;
+use App\Models\Poa\Poa;
+use App\Models\Departamento\Departamento;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
-use App\Models\Resultados\Resultados;
-use App\Models\Actividad\Indicadores;
-use App\Models\Actividad\Eventos;
-use App\Models\Actividad\Revisions;
+use App\Models\Resultados\Resultado;
+use App\Models\Actividad\Indicador;
+use App\Models\Actividad\Evento;
+use App\Models\Actividad\Revision;
 use App\Models\Actividad\MedioVerificacionActividad;
-use App\Models\Empleados\Empleados;
+use App\Models\Empleados\Empleado;
 
 class Actividad extends BaseModel
 {
@@ -46,12 +46,12 @@ class Actividad extends BaseModel
 
     public function poa()
     {
-        return $this->belongsTo(Poas::class, 'idPoa');
+        return $this->belongsTo(Poa::class, 'idPoa');
     }
 
     public function departamento()
     {
-        return $this->belongsTo(Departamentos::class, 'idDeptartamento');
+        return $this->belongsTo(Departamento::class, 'idDeptartamento');
     }
 
     public function unidadEjecutora()
@@ -61,22 +61,22 @@ class Actividad extends BaseModel
 
     public function resultado()
     {
-        return $this->belongsTo(Resultados::class, 'idResultado');
+        return $this->belongsTo(Resultado::class, 'idResultado');
     }
 
     public function indicadores()
     {
-        return $this->hasMany(Indicadores::class, 'idActividad');
+        return $this->hasMany(Indicador::class, 'idActividad');
     }
 
     public function eventos()
     {
-        return $this->hasMany(Eventos::class, 'idActividad');
+        return $this->hasMany(Evento::class, 'idActividad');
     }
 
     public function revisiones()
     {
-        return $this->hasMany(Revisions::class, 'idActividad');
+        return $this->hasMany(Revision::class, 'idActividad');
     }
 
     public function mediosVerificacion()
@@ -86,7 +86,7 @@ class Actividad extends BaseModel
 
     public function empleados()
     {
-        return $this->belongsToMany(Empleados::class, 'empleado_actividads', 'idActividad', 'idEmpleado')
+        return $this->belongsToMany(Empleado::class, 'empleado_actividads', 'idActividad', 'idEmpleado')
             ->withTimestamps()
             ->withPivot(['descripcion', 'created_by', 'updated_by', 'deleted_by']);
     }

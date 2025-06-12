@@ -3,9 +3,9 @@
 namespace App\Models\Planificacion;
 use App\Models\BaseModel;
 use App\Models\Actividad\Actividad;
-use App\Models\Actividad\Indicadores;
+use App\Models\Actividad\Indicador;
 use App\Models\Mes\Mes;
-use App\Models\Planificacion\SeguimientoPlanificacions;
+use App\Models\Planificacion\SeguimientoPlanificacion;
 use App\Models\Planificacion\MedioVerificacionPlanificacion;
 
 class Planificacion extends BaseModel
@@ -29,7 +29,7 @@ class Planificacion extends BaseModel
 
     public function indicador()
     {
-        return $this->belongsTo(Indicadores::class, 'idIndicador');
+        return $this->belongsTo(Indicador::class, 'idIndicador');
     }
 
     public function mes()
@@ -39,7 +39,7 @@ class Planificacion extends BaseModel
 
     public function seguimientos()
     {
-        return $this->hasMany(SeguimientoPlanificacions::class, 'idPlanificacion');
+        return $this->hasMany(SeguimientoPlanificacion::class, 'idPlanificacion');
     }
 
     public function mediosVerificacion()

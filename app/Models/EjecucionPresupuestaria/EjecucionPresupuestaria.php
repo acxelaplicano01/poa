@@ -31,6 +31,6 @@ class EjecucionPresupuestaria extends BaseModel
 
     public function logs()
     {
-        return $this->hasMany(EjecucionPresupuestariaLogs::class, 'idEjecucionPresupuestaria');
+        return $this->hasMany(EjecucionPresupuestariaLog::class, 'idEjecucionPresupuestaria');
     }
 }
