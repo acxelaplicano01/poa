@@ -15,19 +15,19 @@
         <form id="userForm" class="space-y-4">
             <div>
                 <x-label for="name" value="{{ __('Nombre') }}" />
-                <x-input id="name" type="text" class="mt-1 block w-full" wire:model="name" />
+                <x-input id="name" type="text" class="mt-1 block w-full" wire:model="name" placeholder="Ingrese el nombre" />
                 @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
 
             <div>
                 <x-label for="email" value="{{ __('Correo Electrónico') }}" />
-                <x-input id="email" type="email" class="mt-1 block w-full" wire:model="email" />
+                <x-input id="email" type="email" class="mt-1 block w-full" wire:model="email" placeholder="Ingrese el correo electrónico" />
                 @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
 
             <div>
                 <x-label for="password" value="{{ __('Contraseña') }}" />
-                <x-input id="password" type="password" class="mt-1 block w-full" wire:model="password" />
+                <x-input id="password" type="password" class="mt-1 block w-full" wire:model="password" placeholder="Ingrese la contraseña" />
                 <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                     {{ $isEditing ? 'Dejar en blanco para mantener la contraseña actual.' : 'La contraseña debe tener al menos 8 caracteres.' }}
                 </p>
@@ -36,7 +36,7 @@
 
             <div>
                 <x-label for="password_confirmation" value="{{ __('Confirmar Contraseña') }}" />
-                <x-input id="password_confirmation" type="password" class="mt-1 block w-full" wire:model="password_confirmation" />
+                <x-input id="password_confirmation" type="password" class="mt-1 block w-full" wire:model="password_confirmation" placeholder="Confirme la contraseña" />
                 @error('password_confirmation') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             

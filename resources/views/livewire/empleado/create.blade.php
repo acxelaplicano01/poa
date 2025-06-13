@@ -22,12 +22,12 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <x-label for="dni" value="DNI" />
-                        <x-input id="dni" type="text" class="mt-1 block w-full" wire:model="dni" />
+                        <x-input id="dni" type="text" class="mt-1 block w-full" wire:model="dni" placeholder="Ingrese el DNI" />
                         @error('dni') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     <div>
                         <x-label for="num_empleado" value="Número de Empleado" />
-                        <x-input id="num_empleado" type="text" class="mt-1 block w-full" wire:model="num_empleado" />
+                        <x-input id="num_empleado" type="text" class="mt-1 block w-full" wire:model="num_empleado" placeholder="Ingrese número de empleado" />
                         @error('num_empleado') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                 </div>
@@ -35,12 +35,12 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <x-label for="nombre" value="Nombre" />
-                        <x-input id="nombre" type="text" class="mt-1 block w-full" wire:model="nombre" />
+                        <x-input id="nombre" type="text" class="mt-1 block w-full" wire:model="nombre" placeholder="Ingrese el nombre" />
                         @error('nombre') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     <div>
                         <x-label for="apellido" value="Apellido" />
-                        <x-input id="apellido" type="text" class="mt-1 block w-full" wire:model="apellido" />
+                        <x-input id="apellido" type="text" class="mt-1 block w-full" wire:model="apellido" placeholder="Ingrese el apellido" />
                         @error('apellido') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                 </div>
@@ -48,7 +48,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <x-label for="telefono" value="Teléfono" />
-                        <x-input id="telefono" type="text" class="mt-1 block w-full" wire:model="telefono" />
+                        <x-input id="telefono" type="text" class="mt-1 block w-full" wire:model="telefono" placeholder="Ingrese el teléfono" />
                         @error('telefono') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     <div>
@@ -73,7 +73,7 @@
                     </div>
                     <div>
                         <x-label for="direccion" value="Dirección" />
-                        <x-input id="direccion" type="text" class="mt-1 block w-full" wire:model="direccion" />
+                        <x-input id="direccion" type="text" class="mt-1 block w-full" wire:model="direccion" placeholder="Ingrese la dirección" />
                         @error('direccion') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                 </div>

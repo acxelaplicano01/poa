@@ -22,7 +22,7 @@
                 <label for="name" class="block text-zinc-700 dark:text-zinc-300 font-semibold">Nombre del rol</label>
                 <x-input wire:model="name" type="text" name="name"
                     class="form-input mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                    id="name" />
+                    id="name" placeholder="Ingrese el nombre del rol"/>
                 @error('name')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -33,7 +33,7 @@
                     class="block text-zinc-700 dark:text-zinc-300 font-semibold">Descripción</label>
                 <x-input wire:model="description" type="text" name="description"
                     class="form-input mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                    id="description" />
+                    id="description" placeholder="Ingrese la descripción del rol"/>
                 @error('description')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
