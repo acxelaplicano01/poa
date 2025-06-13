@@ -185,7 +185,7 @@
 
     <!-- Modal de error -->
     @if (session()->has('error'))
-        <x-dialog-modal wire:model="showErrorModal">
+        <x-dialog-modal wire:model="confirmingDelete">
             <x-slot name="title">
                 <div class="flex items-center">
                     <div class="bg-red-100 dark:bg-red-900/20 rounded-full p-2 mr-2">
@@ -205,7 +205,7 @@
 
             <x-slot name="footer">
                 <div class="flex justify-end">
-                    <x-secondary-button wire:click="$set('showErrorModal', false)" wire:loading.attr="disabled">
+                    <x-secondary-button wire:click="$set('confirmingDelete', false)" wire:loading.attr="disabled">
                         Aceptar
                     </x-secondary-button>
                 </div>

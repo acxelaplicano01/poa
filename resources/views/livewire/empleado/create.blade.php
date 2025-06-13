@@ -1,145 +1,202 @@
-<x-dialog-modal maxWidth="md">
-    <x-slot name="title">
-        <div class="flex justify-between items-center">
-            <h3 class="text-lg font-semibold text-zinc-900 dark:text-white"> Crear Empleado</h3>
-            <button wire:click="closeModal" type="button"
-                class="text-zinc-400 bg-transparent hover:bg-zinc-200 hover:text-zinc-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-zinc-600 dark:hover:text-white">
-                <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                <span class="sr-only">Cerrar modal</span>
-            </button>
-        </div>
-    </x-slot>
-
-    <x-slot name="content">
-        <form id="userForm" class="space-y-4">
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <x-label for="dni" value="{{ __('DNI') }}" />
-                    <x-input id="dni" type="text" class="mt-1 block w-full" />
-                    @error('dni') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
-                <div>
-                    <x-label for="nEmpleado" value="{{ __('N° Empleado') }}" />
-                    <x-input id="nEmpleado" type="text" class="mt-1 block w-full" />
-                    @error('nEmpleado') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
+<!-- Modal para crear/editar empleado -->
+    <x-dialog-modal wire:model="isOpen" maxWidth="md">
+        <x-slot name="title">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">
+                    {{ $isEditing ? 'Editar Empleado' : 'Crear Empleado' }}
+                </h3>
+                <button wire:click="closeModal" type="button"
+                    class="text-zinc-400 bg-transparent hover:bg-zinc-200 hover:text-zinc-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-zinc-600 dark:hover:text-white">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="sr-only">Cerrar modal</span>
+                </button>
             </div>
+        </x-slot>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <x-label for="nombre" value="{{ __('Nombre') }}" />
-                    <x-input id="nombre" type="text" class="mt-1 block w-full" wire:model="nombre" />
-                    @error('nombre') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
-                <div>
-                    <x-label for="apellido" value="{{ __('Apellido') }}" />
-                    <x-input id="apellido" type="text" class="mt-1 block w-full" wire:model="apellido" />
-                    @error('apellido') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <x-label for="telefono" value="{{ __('Teléfono') }}" />
-                    <x-input id="telefono" type="text" class="mt-1 block w-full" wire:model="telefono" />
-                    @error('telefono') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
-                <div>
-                    <x-label for="fechaNacimiento" value="{{ __('Fecha de Nacimiento') }}" />
-                    <x-input id="fechaNacimiento" type="date" class="mt-1 block w-full" wire:model="fechaNacimiento" />
-                    @error('fechaNacimiento') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-            </div>
-
-            <div>
-                <x-label for="direccion" value="{{ __('Dirección') }}" />
-                <x-input id="direccion" type="text" class="mt-1 block w-full" wire:model="direccion" />
-                @error('direccion') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-            </div>
-
-            <div>
-                <x-label for="Departamento" value="{{ __('Departamentos') }}" />
-                <div class="mt-1">
-                    <div class="relative">
-                        <select id="departamento-select"
-                            class="block w-full rounded-md border-zinc-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-                            wire:model="selectedDepartamento">
-                            <option value="">Seleccione un departamento</option>
-                            @foreach($departamentos as $departamento)
-                                <option value="{{ $departamento->id }}">{{ $departamento->nombre }}</option>
-                            @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                            <svg class="w-4 h-4 text-zinc-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
+        <x-slot name="content">
+            <form class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <x-label for="dni" value="DNI" />
+                        <x-input id="dni" type="text" class="mt-1 block w-full" wire:model="dni" />
+                        @error('dni') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
-                    <button type="button" wire:click="addDepartamento"
-                        class="mt-2 px-3 py-1 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md">
-                        Añadir departamento
-                    </button>
+                    <div>
+                        <x-label for="num_empleado" value="Número de Empleado" />
+                        <x-input id="num_empleado" type="text" class="mt-1 block w-full" wire:model="num_empleado" />
+                        @error('num_empleado') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
                 </div>
 
-                <!-- Departamentos seleccionados -->
-                <div class="mt-3">
-                    <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                        Departamentos seleccionados:
-                    </p>
-                    <div class="flex flex-wrap gap-2 mt-2">
-                        @forelse($selectedDepartamentos as $index => $deptoId)
-                            @php
-                                $departamentoNombre = $departamentos->where('id', $deptoId)->first()->nombre ?? 'Desconocido';
-                            @endphp
-                            <div
-                                class="flex items-center gap-1 px-2 py-1 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-200 text-indigo-800 text-sm rounded-md">
-                                <span>{{ $departamentoNombre }}</span>
-                                <button wire:click="removeDepartamento({{ $index }})" type="button"
-                                    class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"></path>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <x-label for="nombre" value="Nombre" />
+                        <x-input id="nombre" type="text" class="mt-1 block w-full" wire:model="nombre" />
+                        @error('nombre') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <x-label for="apellido" value="Apellido" />
+                        <x-input id="apellido" type="text" class="mt-1 block w-full" wire:model="apellido" />
+                        @error('apellido') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <x-label for="telefono" value="Teléfono" />
+                        <x-input id="telefono" type="text" class="mt-1 block w-full" wire:model="telefono" />
+                        @error('telefono') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <x-label for="fechaNacimiento" value="Fecha de Nacimiento" />
+                        <x-input id="fechaNacimiento" type="date" class="mt-1 block w-full"
+                            wire:model="fechaNacimiento" />
+                        @error('fechaNacimiento') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                    <div>
+                        <x-label for="sexo" value="Sexo" />
+                        <select id="sexo" wire:model="sexo"
+                            class="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                            <option value="">Seleccione...</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                        </select>
+                        @error('sexo') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <x-label for="direccion" value="Dirección" />
+                        <x-input id="direccion" type="text" class="mt-1 block w-full" wire:model="direccion" />
+                        @error('direccion') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+                <div>
+                    <x-label for="idUnidadEjecutora" value="Unidad Ejecutora" />
+                    <select id="idUnidadEjecutora" wire:model="idUnidadEjecutora"
+                        class="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                        <option value="">Seleccione una unidad ejecutora</option>
+                        <option value="{{1}}">Ni modo</option>
+                    </select>
+                    @error('idUnidadEjecutora') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                </div>
+                <!-- Selector de departamentos con buscador integrado y lista hacia arriba -->
+                <div x-data="{ 
+                    open: false, 
+                    search: '', 
+                    get filteredDepartamentos() {
+                        return this.search === '' 
+                            ? $wire.departamentos 
+                            : $wire.departamentos.filter(dept => 
+                                dept.name.toLowerCase().includes(this.search.toLowerCase())
+                            );
+                    }
+                }" class="relative">
+                    <x-label for="departamentos" value="Departamentos" />
+                    <div class="mt-1 relative">
+                        <!-- Input de búsqueda como selector principal -->
+                        <div class="relative">
+                            <x-input
+                                x-model="search"
+                                @focus="open = true"
+                                @input="open = true"
+                                type="text"
+                                placeholder="{{ count($selectedDepartamentos) > 0 ? count($selectedDepartamentos) . ' departamento(s) seleccionado(s)' : 'Buscar y seleccionar departamentos...' }}"
+                                class="block w-full"
+                                @keydown.escape.prevent="open = false"
+                                @click="open = !open; $event.stopPropagation();"
+                            />
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-2">
+                                <button type="button" @click="open = !open; $event.stopPropagation();"
+                                    class="text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 focus:outline-none">
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
                                     </svg>
-                                    <span class="sr-only">Eliminar</span>
                                 </button>
                             </div>
-                        @empty
-                            <p class="text-sm text-zinc-500 dark:text-zinc-400 italic">
-                                Ningún departamento seleccionado
-                            </p>
-                        @endforelse
+                        </div>
+
+                        <!-- Lista desplegable de departamentos (ahora aparece arriba) -->
+                        <div x-show="open" @click.away="open = false"
+                            class="absolute bottom-full mb-1 w-full z-50 bg-white border dark:border-zinc-700 dark:bg-zinc-800 shadow-lg rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95">
+                            
+                            <!-- Lista de departamentos filtrados -->
+                            <div class="max-h-60 overflow-y-auto">
+                                <template x-for="departamento in filteredDepartamentos" :key="departamento.id">
+                                    <button type="button" @click="$wire.addDepartamento(departamento.id); search = '';"
+                                        class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                                        :class="{ 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-900 dark:text-indigo-200': $wire.selectedDepartamentos.includes(departamento.id), 'text-zinc-900 dark:text-zinc-300': !$wire.selectedDepartamentos.includes(departamento.id) }">
+                                        <span x-text="departamento.name"></span>
+                                    </button>
+                                </template>
+                                
+                                <!-- Mensaje cuando no hay resultados -->
+                                <div 
+                                    x-show="filteredDepartamentos.length === 0" 
+                                    class="px-4 py-2 text-sm text-zinc-500 dark:text-zinc-400 text-center">
+                                    No se encontraron departamentos
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Mostrar departamentos seleccionados como tags -->
+                    <div class="mt-3">
+                        <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                            Departamentos seleccionados:
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            @forelse($selectedDepartamentos as $index => $deptId)
+                                @php
+                                    $dept = collect($departamentos)->firstWhere('id', $deptId);
+                                @endphp
+                                @if($dept)
+                                    <div
+                                        class="inline-flex items-center px-2 py-1 rounded-md text-sm bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
+                                        <span>{{ $dept['name'] }}</span>
+                                        <button type="button" wire:click="removeDepartamento({{ $index }})"
+                                            class="ml-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endif
+                            @empty
+                                <p class="text-sm text-zinc-500 dark:text-zinc-400 italic">
+                                    Ningún departamento seleccionado
+                                </p>
+                            @endforelse
+                        </div>
+                    </div>
+                    @error('selectedDepartamentos') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
+            </form>
+        </x-slot>
 
-                @error('selectedDepartamentos')
-                    <span class="text-red-500 text-sm block mt-1">{{ $message }}</span>
-                @enderror
+        <x-slot name="footer">
+            <div class="flex justify-end gap-x-4">
+                <x-secondary-button wire:click="closeModal">
+                    Cancelar
+                </x-secondary-button>
+
+                <x-button wire:click="store">
+                    {{ $isEditing ? 'Actualizar' : 'Guardar' }}
+                </x-button>
             </div>
-        </form>
-    </x-slot>
-
-    <x-slot name="footer">
-        <div class="flex justify-end gap-x-4">
-            <x-secondary-button wire:click="closeModal" wire:loading.attr="disabled">
-                {{ __('Cancelar') }}
-            </x-secondary-button>
-
-            <x-button wire:click="store" wire:loading.attr="disabled">
-                Guardar
-            </x-button>
-        </div>
-    </x-slot>
-</x-dialog-modal>
+        </x-slot>
+    </x-dialog-modal>
