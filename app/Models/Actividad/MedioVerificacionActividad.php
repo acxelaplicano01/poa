@@ -3,7 +3,7 @@
 namespace App\Models\Actividad;
 use App\Models\BaseModel;
 use App\Models\Actividad\Actividad;
-use App\Models\Archivos\Archivos;
+use App\Models\Archivos\Archivo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,6 +24,6 @@ class MedioVerificacionActividad extends BaseModel
 
     public function archivo()
     {
-        return $this->belongsTo(Archivos::class, 'idArchivo');
+        return $this->belongsTo(Archivo::class, 'idArchivo');
     }
 }

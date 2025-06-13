@@ -2,7 +2,7 @@
 
 namespace App\Models\MedioVerificacion;
 use App\Models\BaseModel;
-use App\Models\Tareas\SeguimientoTareas;   
+use App\Models\Tareas\SeguimientoTarea;   
 
 class MedioVerificacion extends BaseModel
 {
@@ -19,6 +19,6 @@ class MedioVerificacion extends BaseModel
 
     public function seguimiento()
     {
-        return $this->belongsTo(SeguimientoTareas::class, 'idSeguimiento');
+        return $this->belongsTo(SeguimientoTarea::class, 'idSeguimiento');
     }
 }

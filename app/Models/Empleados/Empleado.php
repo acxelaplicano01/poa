@@ -4,7 +4,7 @@ namespace App\Models\Empleados;
 use App\Models\BaseModel;
 use App\Models\User;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
-use App\Models\Departamento\Departamentos;
+use App\Models\Departamento\Departamento;
 
 class Empleado extends BaseModel
 {
@@ -39,7 +39,7 @@ class Empleado extends BaseModel
     // Relación con departamentos (muchos a muchos a través de empleado_deptos)
     public function departamentos()
     {
-        return $this->belongsToMany(Departamentos::class, 'empleado_deptos', 'idEmpleado', 'idDepto')
+        return $this->belongsToMany(Departamento::class, 'empleado_deptos', 'idEmpleado', 'idDepto')
                     ->withTimestamps()
                     ->withPivot(['created_by', 'updated_by', 'deleted_by']);
     }

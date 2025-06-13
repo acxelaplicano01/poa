@@ -9,6 +9,5 @@ class EstadoEjecucionPresupuestaria extends BaseModel
 
     protected $fillable = [
         'estado',
-        // Los campos created_by, updated_by y deleted_by se manejan en BaseModel
     ];
 }

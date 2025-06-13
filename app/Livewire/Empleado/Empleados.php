@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Empleado;
 
-use App\Models\Departamento\Departamentos;
+use App\Models\Departamento\Departamento;
 use App\Models\Empleados\Empleado;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -89,7 +89,7 @@ class Empleados extends Component
     // Cargar departamentos disponibles
     public function loadDepartamentos()
     {
-        $this->departamentos = Departamentos::select('id', 'name')->orderBy('name')->get()->toArray();
+        $this->departamentos = Departamento::select('id', 'name')->orderBy('name')->get()->toArray();
     }
 
     // Renderizar la vista

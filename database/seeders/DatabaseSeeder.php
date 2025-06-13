@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
         $this->call(FuenteSeeder::class);
         $this->call(DepartamentoSeeder::class);
         //$this->call(GrupoGastoSeeder::class);
-      //  $this->call(ObjetoGastoSeeder::class);
+        //$this->call(ObjetoGastoSeeder::class);
         //$this->call(CubSeeder::class);
     }
 }

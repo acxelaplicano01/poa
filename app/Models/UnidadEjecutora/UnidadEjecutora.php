@@ -2,8 +2,8 @@
 
 namespace App\Models\UnidadEjecutora;
 use App\Models\BaseModel;
-use App\Models\Instituciones\Institucions;
-use App\Models\Departamento\Departamentos;
+use App\Models\Instituciones\Institucion;
+use App\Models\Departamento\Departamento;
 
 class UnidadEjecutora extends BaseModel
 {
@@ -20,12 +20,12 @@ class UnidadEjecutora extends BaseModel
     // Relación con Institucion
     public function institucion()
     {
-        return $this->belongsTo(Institucions::class, 'idInstitucion');
+        return $this->belongsTo(Institucion::class, 'idInstitucion');
     }
 
     // Relación con Departamentos
     public function departamentos()
     {
-        return $this->hasMany(Departamentos::class, 'idUnidadEjecutora');
+        return $this->hasMany(Departamento::class, 'idUnidadEjecutora');
     }
 }
