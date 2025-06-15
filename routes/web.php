@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ModuleRedirectController;
 use App\Http\Middleware\CheckModuleAccess;
+use App\Livewire\Actas\TipoActaEntregas;
 use App\Livewire\Consolidado\Consolidado;
 use App\Livewire\Cub\Cubs;
 use App\Livewire\Departamento\Departamentos;
@@ -9,9 +10,11 @@ use App\Livewire\Empleado\Empleados;
 use App\Livewire\Planificar\Planificar;
 use App\Livewire\ProcesCompra\ProcesCompras;
 use App\Livewire\Requerir\Requerir;
+use App\Livewire\Requisicion\UnidadMedidas;
 use App\Livewire\Rol\Roles;
 use App\Livewire\Seguimiento\Seguimiento;
-use App\Livewire\Trimestres;
+use App\Livewire\Actividad\TipoActividades;
+use App\Livewire\Mes\Trimestres;
 use App\Livewire\Usuario\Usuarios;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +38,14 @@ Route::middleware([
 
     Route::get('/trimestres', Trimestres::class)->name('trimestres');
 
+    Route::get('/tipoactividades', TipoActividades::class)
+        ->name('tipoactividades');
+
+    Route::get('/tipo-acta-entregas', TipoActaEntregas::class)
+        ->name('tipo-acta-entregas');
+
+    Route::get('/unidad-medidas', UnidadMedidas::class)
+        ->name('unidad-medidas');
 
     // Rutas del módulo de configuración
     Route::middleware(['auth', CheckModuleAccess::class.':configuracion'])->group(function () {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Mes;
 
 use App\Models\Mes\Trimestre;
 use Livewire\Component;
@@ -142,7 +142,7 @@ class Trimestres extends Component
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
             
-        return view('livewire.trimestres', [
+        return view('livewire.mes.trimestres', [
             'trimestres' => $trimestres,
         ])->layout('layouts.app');
     }
