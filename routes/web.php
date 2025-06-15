@@ -3,6 +3,7 @@
 use App\Http\Controllers\ModuleRedirectController;
 use App\Http\Middleware\CheckModuleAccess;
 use App\Livewire\Actas\TipoActaEntregas;
+use App\Livewire\Admin\SessionManager;
 use App\Livewire\Consolidado\Consolidado;
 use App\Livewire\Cub\Cubs;
 use App\Livewire\Departamento\Departamentos;
@@ -46,6 +47,11 @@ Route::middleware([
 
     Route::get('/unidad-medidas', UnidadMedidas::class)
         ->name('unidad-medidas');
+
+    Route::get('/sessions', SessionManager::class)
+        ->name('sessions');
+
+    
 
     // Rutas del módulo de configuración
     Route::middleware(['auth', CheckModuleAccess::class.':configuracion'])->group(function () {
