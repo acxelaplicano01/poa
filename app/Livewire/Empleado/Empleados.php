@@ -18,7 +18,7 @@ class Empleados extends Component
     public $confirmingDelete = false;
     public $errorMessage = '';
     public $showErrorModal = false;
-    public $perPage = 10;
+    public $perPage = 10; //numero de paginas por empleados
     public $search = '';
     public $sortField = 'id';
     public $sortDirection = 'desc';
@@ -51,7 +51,7 @@ class Empleados extends Component
             'telefono' => 'required|string|max:20',
             'fechaNacimiento' => 'required|date',
             'direccion' => 'required|string|max:255',
-            'sexo' => 'required|string|max:10', 
+            'sexo' => 'required|string|max:10|in:M,F', // M para Masculino, F para Femenino
             'selectedDepartamentos' => 'required|array|min:1',
             'idUnidadEjecutora' => 'nullable|exists:unidad_ejecutora,id', 
         ];
@@ -72,8 +72,9 @@ class Empleados extends Component
             'fechaNacimiento.date' => 'La fecha de nacimiento debe ser una fecha válida',
             'direccion.required' => 'La dirección es obligatoria',
             'selectedDepartamentos.required' => 'Debe seleccionar al menos un departamento',
-            'selectedDepartamentos.min' => 'Debe seleccionar al menos un departamento',
-            'sexo.required' => 'El sexo es obligatorio',  
+            'selectedDepartamentos.min' => 'Debe seleccionar al menos un departamento', 
+            'sexo.required' => 'El campo sexo es obligatorio',
+            'sexo.in' => 'El valor seleccionado para sexo no es válido', 
             'idUnidadEjecutora.required' => 'Debe seleccionar una unidad ejecutora',
             'idUnidadEjecutora.exists' => 'La unidad ejecutora seleccionada no es válida',
         ];
@@ -95,19 +96,34 @@ class Empleados extends Component
     // Renderizar la vista
     public function render()
     {
-        $empleados = Empleado::where(function($query) {
-                if ($this->search) {
-                    $query->where('nombre', 'like', '%'.$this->search.'%')
-                        ->orWhere('apellido', 'like', '%'.$this->search.'%')
-                        ->orWhere('dni', 'like', '%'.$this->search.'%')
-                        ->orWhere('num_empleado', 'like', '%'.$this->search.'%');
-                }
-            })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage);
-
+        $query = Empleado::query()
+            ->with('departamentos')
+            ->when($this->search, function($query) {
+                $query->where(function($q) {
+                    $q->where('nombre', 'like', '%' . $this->search . '%')
+                      ->orWhere('apellido', 'like', '%' . $this->search . '%')
+                      ->orWhere('num_empleado', 'like', '%' . $this->search . '%')
+                      ->orWhere('dni', 'like', '%' . $this->search . '%')
+                      ->orWhereHas('departamentos', function($subq) {
+                          $subq->where('name', 'like', '%' . $this->search . '%');
+                      });
+                });
+            });
+        
+        // Manejo de ordenamiento para campos complejos o relaciones
+        if ($this->sortField === 'nombre') {
+            $query->orderBy('nombre', $this->sortDirection)
+                  ->orderBy('apellido', $this->sortDirection);
+        } else {
+            $query->orderBy($this->sortField, $this->sortDirection);
+        }
+        
+        $empleados = $query->paginate($this->perPage);
+        $departamentos = Departamento::orderBy('name')->get();
+        
         return view('livewire.empleado.empleado', [
             'empleados' => $empleados,
+            'departamentos' => $departamentos,
         ])->layout('layouts.app');
     }
 
@@ -135,7 +151,7 @@ class Empleados extends Component
             $this->apellido = $empleado->apellido;
             $this->sexo = $empleado->sexo; 
             $this->telefono = $empleado->telefono;
-            $this->fechaNacimiento = $empleado->fecha_nacimiento;
+            $this->fechaNacimiento = $empleado->fechaNacimiento;
             $this->direccion = $empleado->direccion;
             $this->idUnidadEjecutora = $empleado->idUnidadEjecutora; // Cargar unidad ejecutora
             
@@ -165,7 +181,7 @@ class Empleados extends Component
                     'nombre' => $this->nombre,
                     'apellido' => $this->apellido,
                     'telefono' => $this->telefono,
-                    'fecha_nacimiento' => $this->fechaNacimiento,
+                    'fechaNacimiento' => $this->fechaNacimiento,
                     'direccion' => $this->direccion,
                     'sexo' => $this->sexo, 
                     'idUnidadEjecutora' => $this->idUnidadEjecutora,
@@ -183,7 +199,7 @@ class Empleados extends Component
                     'nombre' => $this->nombre,
                     'apellido' => $this->apellido,
                     'telefono' => $this->telefono,
-                    'fecha_nacimiento' => $this->fechaNacimiento,
+                    'fechaNacimiento' => $this->fechaNacimiento,
                     'direccion' => $this->direccion,
                     'sexo' => $this->sexo,  
                     'idUnidadEjecutora' => $this->idUnidadEjecutora,
@@ -248,17 +264,6 @@ class Empleados extends Component
         }
     }
 
-    // Ordenar resultados
-    public function sortBy($field)
-    {
-        if ($this->sortField === $field) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortField = $field;
-            $this->sortDirection = 'asc';
-        }
-    }
-
     // Reiniciar paginación al buscar
     public function updatingSearch()
     {
@@ -306,5 +311,17 @@ class Empleados extends Component
         $this->selectedDepartamentos = [];
         $this->idUnidadEjecutora = null;
         $this->resetValidation();
+    }
+
+     // Método para ordenar por columna
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+        
+        $this->sortField = $field;
     }
 }

@@ -1,5 +1,5 @@
 <!-- Modal de error -->
-<x-dialog-modal maxWidth="md" wire:model="showErrorModal">
+<x-dialog-modal maxWidth="md" wire:model="showErrorModal" style="z-index: 1000;">
     <x-slot name="title">
         <div class="flex items-center">
             <svg class="h-6 w-6 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"

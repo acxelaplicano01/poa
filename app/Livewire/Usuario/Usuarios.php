@@ -18,6 +18,7 @@ class Usuarios extends Component
     public $password;
     public $user;
     public $search = '';
+    public $perPage = 10; // Número de usuarios por página
     public $selectedRoles = [];
     public $roles;
     public $isOpen = false;
@@ -26,6 +27,8 @@ class Usuarios extends Component
     public $IdAEliminar;
     public $nombreAEliminar;
     public $profile_photo_path;
+    public $sortField = 'id';
+    public $sortDirection = 'asc';
 
     protected $rules = [
         'name' => 'required',
@@ -44,12 +47,25 @@ class Usuarios extends Component
 
     public function render()
     {
-        $users = User::where('name', 'like', '%' . $this->search . '%')
-            ->orWhere('email', 'like', '%' . $this->search . '%')
-            ->orderBy('id', 'DESC')
-            ->paginate(10);
+        $query = User::query()
+            ->with('roles')  // Pre-cargar relación de roles para mejor rendimiento
+            ->when($this->search, function($query) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%');
+                });
+            });
+        
+        // Aplicar ordenamiento dinámico    
+        $query->orderBy($this->sortField, $this->sortDirection);
+        
+        // Obtener usuarios paginados
+        $users = $query->paginate($this->perPage ?? 10);
 
-        return view('livewire.Usuario.usuarios', ['users' => $users])->layout('layouts.app');
+        return view('livewire.Usuario.usuarios', [
+            'users' => $users,
+            'roles' => $this->roles
+        ])->layout('layouts.app');
     }
 
     public function create()
@@ -197,5 +213,15 @@ class Usuarios extends Component
         $this->profile_photo_path = '';
         $this->password = '';
         $this->selectedRoles = [];
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+        $this->sortField = $field;
     }
 }

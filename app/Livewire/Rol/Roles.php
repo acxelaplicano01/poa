@@ -18,6 +18,7 @@ class Roles extends Component
     public $name;
     public $description;
     public $search = '';
+    public $perPage = 10; // Número de roles por página
     public $selectedPermissions = [];
     public $isOpen = false;
     public $confirmingDelete = false;
@@ -37,9 +38,21 @@ class Roles extends Component
 
     public function render()
     {
-        $roles = Role::where('name', 'like', '%' . $this->search . '%')
-            ->orderBy('id', 'DESC')
-            ->paginate(5);
+        $query = Role::query();
+        
+        // Aplicar búsqueda
+        if ($this->search) {
+            $query->where(function($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                ->orWhere('description', 'like', '%' . $this->search . '%');
+            });
+        }
+        
+        // Aplicar ordenamiento
+        $query->orderBy($this->sortField, $this->sortDirection);
+        
+        // Obtener resultados paginados
+        $roles = $query->paginate($this->perPage ?? 10);
 
         return view('livewire.rol.roles', [
             'roles' => $roles
@@ -223,5 +236,19 @@ class Roles extends Component
         $this->name = '';
         $this->description = '';
         $this->selectedPermissions = [];
+    }
+
+    public $sortField = 'id';
+    public $sortDirection = 'asc';
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+
+        $this->sortField = $field;
     }
 }

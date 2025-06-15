@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         // Tabla trimestres
-        if (!Schema::hasTable('trimestre')) {
-            Schema::create('trimestre', function (Blueprint $table) {
+        if (!Schema::hasTable('trimestres')) {
+            Schema::create('trimestres', function (Blueprint $table) {
                 $table->id();
                 $table->string('trimestre');
                 $table->timestamps();
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('trimestre');
+        Schema::dropIfExists('trimestres');
     }
 };

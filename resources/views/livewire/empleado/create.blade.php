@@ -63,13 +63,18 @@
 
                     <div>
                         <x-label for="sexo" value="Sexo" />
-                        <select id="sexo" wire:model="sexo"
-                            class="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                            <option value="">Seleccione...</option>
-                            <option value="M">Masculino</option>
-                            <option value="F">Femenino</option>
-                        </select>
-                        @error('sexo') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        <x-select 
+                            id="sexo" 
+                            wire:model="sexo"
+                            :options="[
+                                ['value' => 'M', 'text' => 'Masculino'],
+                                ['value' => 'F', 'text' => 'Femenino'],
+                            ]"
+                            :placeholder="'Seleccione el sexo'"
+                            :has-error="$errors->has('sexo')"
+                            class="mt-1"
+                        />
+                        @error('sexo') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                     </div>
                     <div>
                         <x-label for="direccion" value="Dirección" />

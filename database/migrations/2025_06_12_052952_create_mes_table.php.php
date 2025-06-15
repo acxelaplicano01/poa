@@ -16,7 +16,7 @@ return new class extends Migration
             Schema::create('mes', function (Blueprint $table) {
                 $table->id();
                 $table->string('mes');
-                $table->foreignId('idTrimestre')->constrained('trimestre')->cascadeOnDelete();
+                $table->foreignId('idTrimestre')->constrained('trimestres')->cascadeOnDelete();
                 $table->timestamps();
                 $table->softDeletes();
 

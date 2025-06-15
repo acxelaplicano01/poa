@@ -6,7 +6,7 @@ use App\Models\Mes\Mes;
 
 class Trimestre extends BaseModel
 {
-    protected $table = 'trimestre';
+    protected $table = 'trimestres';
 
     protected $fillable = [
         'trimestre',

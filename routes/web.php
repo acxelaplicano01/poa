@@ -11,6 +11,7 @@ use App\Livewire\ProcesCompra\ProcesCompras;
 use App\Livewire\Requerir\Requerir;
 use App\Livewire\Rol\Roles;
 use App\Livewire\Seguimiento\Seguimiento;
+use App\Livewire\Trimestres;
 use App\Livewire\Usuario\Usuarios;
 use Illuminate\Support\Facades\Route;
 
@@ -28,8 +29,12 @@ Route::middleware([
     'verified',
 ])->group(function () {
 
+    // Ruta para el dashboard
      Route::get('/dashboard', function () {return view('dashboard');})
     ->name('dashboard');
+
+    Route::get('/trimestres', Trimestres::class)->name('trimestres');
+
 
     // Rutas del módulo de configuración
     Route::middleware(['auth', CheckModuleAccess::class.':configuracion'])->group(function () {
