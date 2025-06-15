@@ -18,7 +18,29 @@
                 </svg>
             </button>
         </div>
-        <div class="flex-1"></div>
+        <!-- Contenedor con scroll horizontal para enlaces en móvil -->
+        <div class="flex-1 overflow-x-auto overflow-y-hidden whitespace-nowrap pb-2">
+            @php
+                $currentModule = 'dashboard'; // Valor por defecto
+
+                // Detectar el módulo actual basado en la ruta actual
+                $currentRoute = request()->route() ? request()->route()->getName() : '';
+                foreach (config('rutas') as $moduleKey => $moduleData) {
+                    if (isset($moduleData['items'])) {
+                        foreach ($moduleData['items'] as $item) {
+                            if (isset($item['routes']) && is_array($item['routes']) && in_array($currentRoute, $item['routes'])) {
+                                $currentModule = $moduleKey;
+                                break 2;
+                            }
+                        }
+                    }
+                }
+            @endphp
+            
+            <div class="flex items-center gap-1 py-1 px-1">
+                <x-rutas :module="$currentModule" />
+            </div>
+        </div>
     </nav>
 
     <!-- Contenedor principal para alineación de elementos -->
