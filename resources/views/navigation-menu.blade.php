@@ -101,9 +101,9 @@ $moduleConfig = config('rutas', []);
    @endphp
    
    <aside id="logo-sidebar"
-      class="fixed top-0 left-0 z-40 w-64 h-screen pt-4 transition-transform -translate-x-full bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 border-r sm:translate-x-0"
+      class="fixed top-0 left-0 z-40 w-64 h-screen pt-4 transition-transform -translate-x-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 border-r sm:translate-x-0"
       aria-label="Sidebar">
-      <div class="h-full px-3 pb-4 overflow-y-auto barra dark:barra bg-zinc-50 dark:bg-zinc-900 flex flex-col">
+      <div class="h-full px-3 pb-4 overflow-y-auto barra dark:barra bg-white dark:bg-zinc-900 flex flex-col">
          <ul class="space-y-2 font-medium flex-grow">
             <div class="mb-6">
                   <x-application-logo />

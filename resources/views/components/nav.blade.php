@@ -1,6 +1,6 @@
 
 <header wire:ignore
-    class="fixed top-0 right-0 left-0 z-30 sm:left-64 min-h-14 flex items-center bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700"
+    class="fixed top-0 right-0 left-0 z-30 sm:left-64 min-h-14 flex items-center bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700"
     data-flux-header="">
 
     <!-- Navbar para móviles -->
