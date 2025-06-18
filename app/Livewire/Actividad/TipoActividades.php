@@ -3,8 +3,10 @@
 namespace App\Livewire\Actividad;
 
 use App\Models\Actividad\TipoActividad;
+use App\Services\LogService;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Log;
 
 class TipoActividades extends Component
 {
@@ -77,7 +79,8 @@ class TipoActividades extends Component
 
     public function store()
     {
-        // Si estamos editando, ignorar la validación unique para el propio registro
+        try {
+            // Si estamos editando, ignorar la validación unique para el propio registro
         if ($this->isEditing) {
             $this->rules['tipo'] = 'required|string|max:100|unique:tipo_actividads,tipo,'.$this->tipoActividad_id;
         }
@@ -88,11 +91,38 @@ class TipoActividades extends Component
             'tipo' => $this->tipo,
         ]);
 
+        LogService::activity(
+            $this->isEditing ? 'actualizar' : 'crear',
+            'Configuración',
+            $this->isEditing ? 'Tipo de actividad actualizado correctamente.' : 'Tipo de actividad creado correctamente.',
+            [
+                'tipo_actividad_id' => $this->tipoActividad_id,
+                'tipo' => $this->tipo,
+                'user_id' => auth()->id(),
+            ]
+        );
+
         session()->flash('message', $this->isEditing ? 'Tipo de actividad actualizado correctamente.' : 'Tipo de actividad creado correctamente.');
         
         $this->closeModal();
         $this->resetInputFields();
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        LogService::activity(
+            $this->isEditing ? 'actualizar' : 'crear',
+            'Configuración',
+            'Error de validación al guardar tipo de actividad',
+            [
+                'tipo_actividad_id' => $this->tipoActividad_id,
+                'tipo' => $this->tipo,
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id(),
+            ],
+            'error'
+        );
+        session()->flash('error', 'Error de validación: ' . $e->getMessage());
+        return;
     }
+}
 
     public function resetInputFields()
     {
@@ -129,8 +159,30 @@ class TipoActividades extends Component
             }
             
             $tipoActividad->delete();
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                'Tipo de actividad eliminado correctamente.',
+                [
+                    'tipo_actividad_id' => $this->tipoActividad_id,
+                    'tipo' => $this->tipoAEliminar,
+                    'user_id' => auth()->id(),
+                ]
+            );
             session()->flash('message', 'Tipo de actividad eliminado correctamente.');
         } catch (\Exception $e) {
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                'Error al eliminar tipo de actividad',
+                [
+                    'tipo_actividad_id' => $this->tipoActividad_id,
+                    'tipo' => $this->tipoAEliminar,
+                    'error' => $e->getMessage(),
+                    'user_id' => auth()->id(),
+                ],
+                'error'
+            );
             session()->flash('error', 'Ocurrió un error al eliminar el tipo de actividad.');
         }
         

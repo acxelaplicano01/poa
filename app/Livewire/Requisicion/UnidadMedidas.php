@@ -3,6 +3,7 @@
 namespace App\Livewire\Requisicion;
 
 use App\Models\Requisicion\UnidadMedida;
+use App\Services\LogService;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -77,7 +78,8 @@ class UnidadMedidas extends Component
 
     public function store()
     {
-        // Si estamos editando, ignorar la validación unique para el propio registro
+        try{
+            // Si estamos editando, ignorar la validación unique para el propio registro
         if ($this->isEditing) {
             $this->rules['nombre'] = 'required|string|max:100|unique:unidadmedidas,nombre,'.$this->unidadMedida_id;
         }
@@ -88,12 +90,37 @@ class UnidadMedidas extends Component
             'nombre' => $this->nombre,
         ]);
 
+        LogService::activity(
+            $this->isEditing ? 'actualizar' : 'crear',
+            'Configuración',
+            $this->isEditing ? 'Unidad de medida actualizada correctamente.' : 'Unidad de medida creada correctamente.',
+            [
+                'unidad_medida_id' => $this->unidadMedida_id,
+                'nombre' => $this->nombre,
+                'user_id' => auth()->id(),
+            ]
+        );
+
         session()->flash('message', $this->isEditing ? 
             'Unidad de medida actualizada correctamente.' : 
             'Unidad de medida creada correctamente.');
         
         $this->closeModal();
         $this->resetInputFields();
+        } catch (\Exception $e) {
+            LogService::activity(
+                $this->isEditing ? 'actualizar' : 'crear',
+                'Configuración',
+                'Error al ' . ($this->isEditing ? 'actualizar' : 'crear') . ' la unidad de medida',
+                [
+                    'unidad_medida_id' => $this->unidadMedida_id,
+                    'error' => $e->getMessage(),
+                    'user_id' => auth()->id(),
+                ],
+                'error'
+            );
+            session()->flash('error', 'Error: ' . $e->getMessage());
+        }
     }
 
     public function resetInputFields()
@@ -133,8 +160,29 @@ class UnidadMedidas extends Component
             // }
             
             $unidadMedida->delete();
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                'Unidad de medida eliminada correctamente.',
+                [
+                    'unidad_medida_id' => $this->unidadMedida_id,
+                    'nombre' => $this->unidadAEliminar,
+                    'user_id' => auth()->id(),
+                ]
+            );
             session()->flash('message', 'Unidad de medida eliminada correctamente.');
         } catch (\Exception $e) {
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                'Error al eliminar la unidad de medida',
+                [
+                    'unidad_medida_id' => $this->unidadMedida_id,
+                    'error' => $e->getMessage(),
+                    'user_id' => auth()->id(),
+                ],
+                'error'
+            );
             session()->flash('error', 'Ocurrió un error al eliminar la unidad de medida.');
         }
         

@@ -36,7 +36,7 @@
                     }
                 }
             @endphp
-            
+
             <div class="flex items-center gap-1 py-1 px-1">
                 <x-rutas :module="$currentModule" />
             </div>

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Rol;
 
+use App\Services\LogService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
@@ -106,14 +107,36 @@ class Roles extends Component
                 session()->regenerate();
                 $this->dispatch('user-permissions-updated');
             }
-
+            LogService::activity(
+                'crear',
+                'Configuración',
+                'Creación de rol',
+                [
+                    'rol' => $this->name,
+                    'created_by' => Auth::user()->email,
+                    'permissions' => $role->permissions->pluck('name')
+                ]
+            );
             session()->flash('message', 'Rol creado exitosamente.');
             $this->permissions = Permission::all();
             $this->resetInputFields();
             $this->closeModal();
         } catch (\Exception $e) {
             session()->flash('error', 'Error al crear el rol: ' . $e->getMessage());
-            Log::error('Error creating role: ' . $e->getMessage());
+            LogService::activity(
+                'crear',
+                'Configuración',
+                'Error al crear rol',
+                [
+                    'attempted_changes' => [
+                        'name' => $this->name,
+                        'description' => $this->description,
+                        'permissions' => $this->selectedPermissions
+                    ],
+                    'error' => $e->getMessage(),
+                ],
+                'error'
+            );
         }
     }
 
@@ -155,11 +178,33 @@ class Roles extends Component
             $this->refreshUsersWithRole($role);
 
             session()->flash('message', 'Rol actualizado exitosamente');
+            LogService::activity(
+                'actualizar',
+                'Configuración',
+                'Actualización de rol',
+                ['rol' => $this->role->name,
+                    'updated_by' => Auth::user()->email,
+                    'permissions' => $role->permissions->pluck('name')
+                ]
+            );
             $this->resetInputFields();
             $this->closeModal();
         } catch (\Exception $e) {
             session()->flash('error', 'Error al actualizar rol: ' . $e->getMessage());
-            Log::error('Error updating role: ' . $e->getMessage());
+            LogService::activity(
+                'actualizar',
+                'Configuración',
+                'Error al actualizar rol',
+                [
+                    'role_id' => $this->role->id,
+                    'attempted_changes' => [
+                        'name' => $this->name,
+                        'description' => $this->description,
+                    ],
+                    'error' => $e->getMessage(),
+                ],
+                'error'
+            );
         }
     }
 
@@ -197,10 +242,33 @@ class Roles extends Component
 
             try {
                 $role->forceDelete();
+                // Limpiar caché de permisos
+                app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+                // Refrescar permisos para todos los usuarios con este rol
+                $this->refreshUsersWithRole($role);
+                LogService::activity(
+                    'eliminar',
+                    'Configuración',
+                    'Eliminación de rol',
+                    ['rol' => $role->name,
+                        'deleted_by' => Auth::user()->email]
+                );
                 session()->flash('message', 'Rol eliminado correctamente!');
             } catch (\Exception $e) {
                 session()->flash('error', 'Error al eliminar rol: ' . $e->getMessage());
-                Log::error('Error deleting role: ' . $e->getMessage());
+                LogService::activity(
+                    'eliminar',
+                    'Configuración',
+                    'Error al eliminar rol',
+                    [
+                        'role_id' => $role->id,
+                        'attempted_changes' => [
+                            'name' => $role->name,
+                        ],
+                        'error' => $e->getMessage(),
+                    ],
+                    'error'
+                );
             }
 
             $this->confirmingDelete = false;

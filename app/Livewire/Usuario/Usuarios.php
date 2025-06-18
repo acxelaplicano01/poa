@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Usuario;
 
+use App\Services\LogService;
+use Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\User;
@@ -49,16 +51,16 @@ class Usuarios extends Component
     {
         $query = User::query()
             ->with('roles')  // Pre-cargar relación de roles para mejor rendimiento
-            ->when($this->search, function($query) {
+            ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%');
+                        ->orWhere('email', 'like', '%' . $this->search . '%');
                 });
             });
-        
+
         // Aplicar ordenamiento dinámico    
         $query->orderBy($this->sortField, $this->sortDirection);
-        
+
         // Obtener usuarios paginados
         $users = $query->paginate($this->perPage ?? 10);
 
@@ -96,26 +98,52 @@ class Usuarios extends Component
 
     private function createUser()
     {
-        $user = User::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'profile_photo_path' => $this->profile_photo_path,
-            'password' => Hash::make($this->password),
-        ]);
+        $this->validate();
+        try {
+            $user = User::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'profile_photo_path' => $this->profile_photo_path,
+                'password' => Hash::make($this->password),
+            ]);
 
-        Log::info('Created User:', $user->toArray());
-        Log::info('Selected Roles for Creation:', $this->selectedRoles);
 
-        $roleIds = Role::whereIn('id', $this->selectedRoles)->pluck('id')->toArray();
-        Log::info('Existing Roles for Creation:', $roleIds);
+            $roleIds = Role::whereIn('id', $this->selectedRoles)->pluck('id')->toArray();
 
-        $user->syncRoles($roleIds);
-
-        session()->flash('message', 'Usuario creado exitosamente.');
-        $this->roles = Role::all();
-        $this->reset();
-        $this->isOpen = false;
+            $user->syncRoles($roleIds);
+            // Registrar log de creación exitosa
+            LogService::activity(
+                'crear',
+                'Configuración',
+                "Se creó el usuario {$user->name}",
+                [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    // No incluir password por seguridad
+                ]
+            );
+            session()->flash('message', 'Usuario creado exitosamente.');
+            $this->roles = Role::all();
+            $this->reset();
+            $this->isOpen = false;
+        } catch (\Exception $e) {
+            // Registrar log de error
+            LogService::activity(
+                'crear',
+                'Configuración',
+                'Error al crear usuario',
+                [
+                    'input_name' => $this->name,
+                    'input_email' => $this->email,
+                    'error' => $e->getMessage(),
+                ],
+                'error'
+            );
+            session()->flash('error', 'Error al crear el usuario: ' . $e->getMessage());
+        }
     }
+
+
 
     public function edit(User $user)
     {
@@ -142,8 +170,7 @@ class Usuarios extends Component
 
         try {
             $user = User::findOrFail($this->user->id);
-
-            Log::info('Selected Roles for Update:', $validatedData['selectedRoles']);
+            $oldData = $this->user->only(['name', 'email']);
 
             $user->update([
                 'name' => $this->name,
@@ -152,8 +179,22 @@ class Usuarios extends Component
                 'password' => $this->password ? Hash::make($this->password) : $user->password,
             ]);
 
+            // Registrar log de actualización
+            LogService::activity(
+                'actualizar',
+                'Configuración',
+                "Se actualizó el usuario {$this->user->name}",
+                [
+                    'user_id' => $this->user->id,
+                    'changes' => [
+                        'old' => $oldData,
+                        'new' => $user->only(['name', 'email', 'profile_photo_path']),
+                    ]
+                ]
+            );
+
             $roleIds = Role::whereIn('id', $validatedData['selectedRoles'])->pluck('id')->toArray();
-            Log::info('Existing Roles for Update:', $roleIds);
+
 
             $user->syncRoles($roleIds);
 
@@ -165,25 +206,70 @@ class Usuarios extends Component
             redirect()->route('usuarios');
 
         } catch (\Exception $e) {
+            // Registrar log de error en actualización
+            LogService::activity(
+                'actualizar',
+                'Configuración',
+                'Error al actualizar usuario',
+                [
+                    'user_id' => $this->user->id,
+                    'attempted_changes' => [
+                        'name' => $this->name,
+                        'email' => $this->email,
+                        'profile_photo_path' => $this->profile_photo_path,
+                    ],
+                    'error' => $e->getMessage(),
+                ],
+                'error'
+            );
             session()->flash('error', 'Error al actualizar el usuario: ' . $e->getMessage());
-            Log::error('Error updating user: ' . $e->getMessage());
         }
     }
 
     public function delete()
     {
-        if ($this->confirmingDelete) {
-            $user = User::find($this->IdAEliminar);
+        try {
+            // Verificar si se está confirmando la eliminación
+            if ($this->confirmingDelete) {
+                $user = User::find($this->IdAEliminar);
 
-            if (!$user) {
-                session()->flash('error', 'Usuario no encontrado.');
+                if (!$user) {
+                    session()->flash('error', 'Usuario no encontrado.');
+                    $this->confirmingDelete = false;
+                    return;
+                }
+
+                $user->forceDelete();
+                // Registrar log de eliminación
+                LogService::activity(
+                    'eliminar',
+                    'Configuración',
+                    "Se eliminó el usuario {$user->name}",
+                    [
+                        'deleted_user_id' => $user->id,
+                        'deleted_user_email' => $user->email,
+                    ]
+                );
+                // Limpiar caché de permisos
+                app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+                // Refrescar permisos para todos los usuarios con este rol
+
+                session()->flash('message', 'usuario eliminado correctamente!');
                 $this->confirmingDelete = false;
-                return;
             }
-
-            $user->forceDelete();
-            session()->flash('message', 'usuario eliminado correctamente!');
-            $this->confirmingDelete = false;
+        } catch (\Exception $e) {
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                'Error al eliminar usuario',
+                [
+                    'user_id' => $this->IdAEliminar,
+                    'deleted_by' => Auth::user()->email,
+                    'error' => $e->getMessage(),
+                ],
+                'error'
+            );
+            session()->flash('error', 'Error al eliminar el usuario: ' . $e->getMessage());
         }
     }
 

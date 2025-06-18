@@ -4,9 +4,11 @@ namespace App\Livewire\Empleado;
 
 use App\Models\Departamento\Departamento;
 use App\Models\Empleados\Empleado;
+use App\Services\LogService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
+use Log;
 
 class Empleados extends Component
 {
@@ -160,6 +162,16 @@ class Empleados extends Component
             
             $this->openModal();
         } catch (\Exception $e) {
+            LogService::activity(
+                'actualizar',
+                'Configuración',
+                'Error al cargar empleado para edición',
+                [
+                    'empleado_id' => $id,
+                    'error' => $e->getMessage(),
+                ],
+                'error'
+            );
             $this->showError('Error al cargar el empleado: ' . $e->getMessage());
         }
     }
@@ -191,6 +203,17 @@ class Empleados extends Component
                 $empleado->departamentos()->sync($this->selectedDepartamentos);
                 
                 $accion = 'actualizado';
+                LogService::activity(
+                    'actualizar',
+                    'Configuración',
+                    "Empleado {$accion} correctamente",
+                    [
+                        'empleado_id' => $empleado->id,
+                        'user_id' => auth()->id(),
+                        'action' => $accion,
+                        'departamentos' => $this->selectedDepartamentos,
+                    ]
+                );
             } else {
                 // Crear nuevo empleado
                 $empleado = Empleado::create([
@@ -213,10 +236,31 @@ class Empleados extends Component
             DB::commit();
             
             $this->closeModal();
-            
+            LogService::activity(
+                'crear',
+                'Configuración',
+                "Empleado {$accion} correctamente",
+                [
+                    'empleado_id' => $empleado->id,
+                    'user_id' => auth()->id(),
+                    'action' => $accion,
+                    'departamentos' => $this->selectedDepartamentos,
+                ]
+            );
             session()->flash('message', "Empleado {$accion} correctamente con " . count($this->selectedDepartamentos) . " departamento(s).");
         } catch (\Exception $e) {
             DB::rollBack();
+            LogService::activity(
+                'crear',
+                'Configuración',
+                'Error al crear empleado',
+                [
+                    'input_nombre' => $this->nombre,
+                    'input_apellido' => $this->apellido,
+                    'error' => $e->getMessage(),
+                ],
+                'error'
+            );
             $this->showError('Error al guardar el empleado: ' . $e->getMessage());
         }
     }
@@ -241,8 +285,27 @@ class Empleados extends Component
             $empleado->delete();
             
             $this->confirmingDelete = false;
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                "Empleado eliminado correctamente",
+                [
+                    'empleado_id' => $empleado->id,
+                    'user_id' => auth()->id(),
+                ]
+            );
             session()->flash('message', 'Empleado eliminado correctamente.');
         } catch (\Exception $e) {
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                'Error al eliminar empleado',
+                [
+                    'empleado_id' => $this->empleadoToDelete,
+                    'error' => $e->getMessage(),
+                ],
+                'error'
+            );
             $this->showError('Error al eliminar el empleado: ' . $e->getMessage());
         }
     }

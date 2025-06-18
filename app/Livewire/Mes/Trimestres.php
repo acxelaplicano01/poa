@@ -3,8 +3,10 @@
 namespace App\Livewire\Mes;
 
 use App\Models\Mes\Trimestre;
+use App\Services\LogService;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Log;
 
 class Trimestres extends Component
 {
@@ -89,9 +91,30 @@ class Trimestres extends Component
             $this->closeModal();
             $this->resetInputFields();
             
+            LogService::activity(
+                $this->isEditing ? 'actualizar' : 'crear',
+                'Configuración',
+                $this->isEditing ? 'Trimestre actualizado exitosamente.' : 'Trimestre creado exitosamente.',
+                [
+                    'trimestre_id' => $this->trimestre_id,
+                    'trimestre' => $this->trimestre,
+                    'user_id' => auth()->id(),
+                ]
+            );
             $message = $this->isEditing ? 'Trimestre actualizado exitosamente.' : 'Trimestre creado exitosamente.';
             $this->dispatch('alert', ['type' => 'success', 'message' => $message]);
         } catch (\Exception $e) {
+            LogService::activity(
+                $this->isEditing ? 'actualizar' : 'crear',
+                'Configuración',
+                'Error al ' . ($this->isEditing ? 'actualizar' : 'crear') . ' el trimestre',
+                [
+                    'trimestre_id' => $this->trimestre_id,
+                    'error' => $e->getMessage(),
+                    'user_id' => auth()->id(),
+                ],
+                'error'
+            );
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
@@ -120,9 +143,29 @@ class Trimestres extends Component
             Trimestre::find($this->trimestreIdToDelete)->delete();
             $this->confirmingDelete = false;
             $this->trimestreIdToDelete = null;
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                'Trimestre eliminado exitosamente.',
+                [
+                    'trimestre_id' => $this->trimestreIdToDelete,
+                    'user_id' => auth()->id(),
+                ]
+            );
             session()->flash('message', 'Trimestre eliminado exitosamente.');
 
         } catch (\Exception $e) {
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                'Error al eliminar el trimestre',
+                [
+                    'trimestre_id' => $this->trimestreIdToDelete,
+                    'error' => $e->getMessage(),
+                    'user_id' => auth()->id(),
+                ],
+                'error'
+            );
             session()->flash('error', 'Error al crear el trimestre: ' . $e->getMessage());
         }
     }

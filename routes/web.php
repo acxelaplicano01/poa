@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LogViewerController;
 use App\Http\Controllers\ModuleRedirectController;
 use App\Http\Middleware\CheckModuleAccess;
 use App\Livewire\Actas\TipoActaEntregas;
@@ -82,6 +83,7 @@ Route::middleware([
 
         
     });
+
     // Rutas del módulo de planificacion
     Route::middleware(['auth', CheckModuleAccess::class.':planificacion'])->group(function () {
         
@@ -101,6 +103,14 @@ Route::middleware([
         ->name('consolidado')
         ->middleware('can:planificacion.consolidado');
         
+    });
+
+    // Rutas para el visor de logs (protegidas por middleware)
+    Route::middleware(['auth', 'can:ver-logs'])->prefix('logs')->name('logs.')->group(function () {
+        Route::get('/', [LogViewerController::class, 'index'])->name('index');
+        Route::get('/dashboard', [LogViewerController::class, 'dashboard'])->name('dashboard');
+        Route::get('/{log}', [LogViewerController::class, 'show'])->name('show');
+        Route::post('/cleanup', [LogViewerController::class, 'cleanup'])->name('cleanup');
     });
 
 });

@@ -8,6 +8,7 @@
     $breadcrumbItems = [];
     $moduleKey = null;
     $itemKey = null;
+    $moduleIcon = null;
     
     // Buscar la ruta actual en la configuración
     foreach (config('rutas') as $mk => $moduleData) {
@@ -17,6 +18,7 @@
                 if (isset($item['routes']) && is_array($item['routes']) && in_array($currentRoute, $item['routes'])) {
                     $moduleKey = $mk;
                     $itemKey = $ik;
+                    $moduleIcon = $moduleData['icono'] ?? null;
                     break 2;
                 }
             }
@@ -30,7 +32,8 @@
         // Añadir el módulo al breadcrumb
         $breadcrumbItems[] = [
             'label' => $module['breadcrumb_label'] ?? $module['titulo'],
-            'url' => isset($module['route']) ? route($module['route']) : null
+            'url' => isset($module['route']) ? route($module['route']) : null,
+            'icon' => $module['icono'] ?? null
         ];
         
         // Si tenemos un ítem específico
@@ -44,7 +47,8 @@
                     if (isset($parentItem['route']) && $parentItem['route'] === $item['parent_breadcrumb']) {
                         $breadcrumbItems[] = [
                             'label' => $parentItem['titulo'],
-                            'url' => route($parentItem['route'])
+                            'url' => route($parentItem['route']),
+                            'icon' => $parentItem['icono'] ?? null
                         ];
                         break;
                     }
@@ -54,7 +58,8 @@
             // Añadir el ítem actual
             $breadcrumbItems[] = [
                 'label' => $item['titulo'],
-                'url' => null // El ítem actual no tiene enlace
+                'url' => null, // El ítem actual no tiene enlace
+                'icon' => $item['icono'] ?? null
             ];
             
             // Detectar acciones específicas (show, edit, create)
@@ -71,7 +76,8 @@
                 $breadcrumbItems[count($breadcrumbItems) - 1]['url'] = route($item['route']); // El ítem principal ahora tiene enlace
                 $breadcrumbItems[] = [
                     'label' => $actionLabels[$lastPart],
-                    'url' => null
+                    'url' => null,
+                    'icon' => null
                 ];
             }
         }
@@ -81,7 +87,8 @@
         if (count($routeParts) > 1) {
             $breadcrumbItems[] = [
                 'label' => ucfirst($routeParts[count($routeParts) - 2]),
-                'url' => null
+                'url' => null,
+                'icon' => null
             ];
             
             $actionLabels = [
@@ -95,13 +102,15 @@
             if (isset($actionLabels[$lastPart])) {
                 $breadcrumbItems[] = [
                     'label' => $actionLabels[$lastPart],
-                    'url' => null
+                    'url' => null,
+                    'icon' => null
                 ];
             }
         } elseif (!empty($routeParts[0])) {
             $breadcrumbItems[] = [
                 'label' => ucfirst($routeParts[0]),
-                'url' => null
+                'url' => null,
+                'icon' => null
             ];
         }
     }
@@ -110,36 +119,60 @@
 @if(count($breadcrumbItems) > 0)
 <nav {{ $attributes->merge(['class' => 'flex items-center py-3']) }} aria-label="Breadcrumb">
     <ol class="inline-flex items-center flex-wrap gap-1 md:gap-2">
-        <!-- Elemento inicial - Dashboard -->
-        <li class="inline-flex items-center">
-            <a href="{{ route('dashboard') }}" class="inline-flex items-center text-sm font-medium text-zinc-700 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white">
-                <svg class="w-4 h-4 mr-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
-                </svg>
-                Inicio
-            </a>
-        </li>
-        
-        <!-- Elementos dinámicos del breadcrumb -->
+        <!-- Elementos del breadcrumb con el icono del módulo en el primer elemento -->
         @foreach($breadcrumbItems as $index => $item)
-            <!-- Separador entre elementos -->
-            <li class="flex items-center">
-                <span class="mx-1 text-sm text-zinc-500 dark:text-zinc-500">{{ $separator }}</span>
-            </li>
-            
-            <li class="inline-flex items-center" aria-current="{{ $loop->last ? 'page' : 'false' }}">
-                @if($loop->last || !isset($item['url']) || !$item['url'])
-                    <!-- Último elemento (actual) o elemento sin URL -->
-                    <span class="text-sm font-medium text-zinc-500 dark:text-zinc-500">
-                        {{ $item['label'] }}
-                    </span>
-                @else
-                    <!-- Elemento con enlace -->
-                    <a href="{{ $item['url'] }}" class="inline-flex items-center text-sm font-medium text-zinc-700 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white">
-                        {{ $item['label'] }}
-                    </a>
-                @endif
-            </li>
+            @if($loop->first)
+                <li class="inline-flex items-center">
+                    @if(isset($item['url']) && $item['url'])
+                        <a href="{{ $item['url'] }}" class="inline-flex items-center text-sm font-medium text-zinc-700 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white">
+                            @if(isset($item['icon']) && $item['icon'])
+                                <svg class="w-4 h-4 mr-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    {!! $item['icon'] !!}
+                                </svg>
+                            @endif
+                            {{ $item['label'] }}
+                        </a>
+                    @else
+                        <span class="inline-flex items-center text-sm font-medium text-zinc-500 dark:text-zinc-500">
+                            @if(isset($item['icon']) && $item['icon'])
+                                <svg class="w-4 h-4 mr-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    {!! $item['icon'] !!}
+                                </svg>
+                            @endif
+                            {{ $item['label'] }}
+                        </span>
+                    @endif
+                </li>
+            @else
+                <!-- Separador entre elementos -->
+                <li class="flex items-center">
+                    <span class="mx-1 text-sm text-zinc-500 dark:text-zinc-500">{{ $separator }}</span>
+                </li>
+                
+                <li class="inline-flex items-center" aria-current="{{ $loop->last ? 'page' : 'false' }}">
+                    @if($loop->last || !isset($item['url']) || !$item['url'])
+                        <!-- Último elemento (actual) o elemento sin URL -->
+                        <span class="text-sm font-medium text-zinc-500 dark:text-zinc-500">
+                            @if(isset($item['icon']) && $item['icon'])
+                                <svg class="w-4 h-4 mr-1.5 inline" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    {!! $item['icon'] !!}
+                                </svg>
+                            @endif
+                            {{ $item['label'] }}
+                        </span>
+                    @else
+                        <!-- Elemento con enlace -->
+                        <a href="{{ $item['url'] }}" class="inline-flex items-center text-sm font-medium text-zinc-700 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white">
+                            @if(isset($item['icon']) && $item['icon'])
+                                <svg class="w-4 h-4 mr-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    {!! $item['icon'] !!}
+                                </svg>
+                            @endif
+                            {{ $item['label'] }}
+                        </a>
+                    @endif
+                </li>
+            @endif
         @endforeach
     </ol>
 </nav>

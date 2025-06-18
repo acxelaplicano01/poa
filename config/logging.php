@@ -127,6 +127,22 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        // Canal específico para actividad de usuarios
+        'activity' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/activity.log'),
+            'level' => 'info',
+            'days' => 30,  // Mantener logs de actividad por 30 días
+        ],
+
+        // Canal específico para errores
+        'errors' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/errors.log'),
+            'level' => 'error',
+            'days' => 30,
+        ],
+
     ],
 
 ];

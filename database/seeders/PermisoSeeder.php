@@ -51,6 +51,12 @@ class PermisoSeeder extends Seeder
                 'planestrategico',
                 'asignacionpresupuestaria',
                 // Subpermisos de consolas
+            ],
+            'logs' => [
+                'ver-logs',
+                'ver-logs-dashboard',
+                'ver-logs-show',
+                'ver-logs-cleanup',
             ]
         ];
         

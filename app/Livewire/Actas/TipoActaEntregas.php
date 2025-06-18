@@ -3,8 +3,10 @@
 namespace App\Livewire\Actas;
 
 use App\Models\Actas\TipoActaEntrega;
+use App\Services\LogService;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Log;
 
 class TipoActaEntregas extends Component
 {
@@ -77,23 +79,51 @@ class TipoActaEntregas extends Component
 
     public function store()
     {
-        // Si estamos editando, ignorar la validación unique para el propio registro
+        try {
+            // Validar los campos
+            $this->validate();
+             // Si estamos editando, ignorar la validación unique para el propio registro
         if ($this->isEditing) {
             $this->rules['tipo'] = 'required|string|max:100|unique:tipo_acta_entrega,tipo,'.$this->tipoActaEntrega_id;
         }
 
-        $this->validate();
-
         TipoActaEntrega::updateOrCreate(['id' => $this->tipoActaEntrega_id], [
             'tipo' => $this->tipo,
         ]);
-
+        
+        LogService::activity(
+            $this->isEditing ? 'actualizar' : 'crear',
+            'Configuración',
+            $this->isEditing ? 'Tipo de acta de entrega actualizado correctamente.' : 'Tipo de acta de entrega creado correctamente.',
+            [
+                'tipo_acta_entrega_id' => $this->tipoActaEntrega_id,
+                'tipo' => $this->tipo,
+                'user_id' => auth()->id(),
+            ]
+        );
         session()->flash('message', $this->isEditing ? 
             'Tipo de acta de entrega actualizado correctamente.' : 
             'Tipo de acta de entrega creado correctamente.');
         
         $this->closeModal();
         $this->resetInputFields();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Manejar errores de validación
+            LogService::activity(
+                $this->isEditing ? 'actualizar' : 'crear',
+                'Configuración',
+                'Error de validación al guardar tipo de acta de entrega',
+                [
+                    'tipo_acta_entrega_id' => $this->tipoActaEntrega_id,
+                    'tipo' => $this->tipo,
+                    'error' => $e->getMessage(),
+                    'user_id' => auth()->id(),
+                ],
+                'error'
+            );
+            session()->flash('error', 'Error de validación: ' . $e->getMessage());
+            return;
+        }
     }
 
     public function resetInputFields()
@@ -131,8 +161,30 @@ class TipoActaEntregas extends Component
             }
             
             $tipoActaEntrega->delete();
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                'Tipo de acta de entrega eliminado correctamente.',
+                [
+                    'tipo_acta_entrega_id' => $this->tipoActaEntrega_id,
+                    'tipo' => $this->tipoAEliminar,
+                    'user_id' => auth()->id(),
+                ]
+            );
             session()->flash('message', 'Tipo de acta de entrega eliminado correctamente.');
         } catch (\Exception $e) {
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                'Error al eliminar tipo de acta de entrega',
+                [
+                    'tipo_acta_entrega_id' => $this->tipoActaEntrega_id,
+                    'tipo' => $this->tipoAEliminar,
+                    'error' => $e->getMessage(),
+                    'user_id' => auth()->id(),
+                ],
+                'error'
+            );
             session()->flash('error', 'Ocurrió un error al eliminar el tipo de acta de entrega.');
         }
         

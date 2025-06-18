@@ -1,6 +1,6 @@
 <x-app-layout>
     <header
-        class="fixed top-0 right-0 left-0 z-30 sm:left-64 min-h-14 flex items-center bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700"
+        class="fixed top-0 right-0 left-0 z-30 sm:left-64 min-h-14 flex items-center bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700"
         data-flux-header="">
 
         <!-- Navbar para móviles -->
@@ -119,4 +119,68 @@
             @endif
         </div>
     </div>
+      <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Fix para el problema del drawer en móvil
+        function fixDrawerBackdrop() {
+            // Identificar el backdrop creado por Flowbite
+            const drawer = document.getElementById('logo-sidebar');
+            const toggleBtn = document.getElementById('sidebarToggleBtn');
+            
+            // Crear un observador de mutaciones para detectar cambios en el DOM
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'aria-hidden') {
+                        // Cuando el drawer se cierra
+                        if (drawer.getAttribute('aria-hidden') === 'true') {
+                            // Buscar y eliminar cualquier backdrop que haya quedado
+                            const backdrops = document.querySelectorAll('[drawer-backdrop]');
+                            backdrops.forEach(backdrop => {
+                                backdrop.remove();
+                            });
+                            
+                            // También eliminar clases de overflow en el body si se agregaron
+                            document.body.classList.remove('overflow-hidden');
+                        }
+                    }
+                });
+            });
+            
+            // Observar cambios en atributos del drawer
+            if (drawer) {
+                observer.observe(drawer, { attributes: true });
+            }
+            
+            // Limpiar cualquier backdrop cuando se hace clic en cualquier lugar del documento
+            document.addEventListener('click', function(event) {
+                // Solo si el sidebar está visible (en dispositivos móviles)
+                if (window.innerWidth < 640) { // sm breakpoint es 640px
+                    const backdrops = document.querySelectorAll('[drawer-backdrop]');
+                    if (backdrops.length > 0 && !drawer.contains(event.target) && !toggleBtn.contains(event.target)) {
+                        backdrops.forEach(backdrop => {
+                            backdrop.remove();
+                        });
+                        document.body.classList.remove('overflow-hidden');
+                    }
+                }
+            });
+        }
+
+        // Ejecutar la función de corrección
+        fixDrawerBackdrop();
+        
+        // Cuando la ventana cambia de tamaño, volver a revisar
+        window.addEventListener('resize', function() {
+            // Si estamos en tamaño de escritorio y hay backdrops, eliminarlos
+            if (window.innerWidth >= 640) { // sm breakpoint
+                const backdrops = document.querySelectorAll('[drawer-backdrop]');
+                backdrops.forEach(backdrop => {
+                    backdrop.remove();
+                });
+                document.body.classList.remove('overflow-hidden');
+            }
+        });
+    });
+</script>
 </x-app-layout>
