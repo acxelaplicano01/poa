@@ -22,7 +22,7 @@
         <div class="mx-auto max-w-7xl">
             <!-- Tarjetas de estadísticas -->
             <div class="grid grid-cols-1 gap-5 mb-6 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="p-4 bg-white rounded-lg shadow sm:p-6 dark:bg-zinc-900">
+                <div class="p-4 transition-shadow shadow-sm hover:shadow-lg bg-white rounded-lg sm:p-6 dark:bg-zinc-900">
                     <div class="flex items-center">
                         <div class="p-3 mr-4 text-blue-500 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@
                     </div>
                 </div>
                 
-                <div class="p-4 bg-white rounded-lg shadow sm:p-6 dark:bg-zinc-900">
+                <div class="p-4 transition-shadow shadow-sm hover:shadow-lg bg-white rounded-lg sm:p-6 dark:bg-zinc-900">
                     <div class="flex items-center">
                         <div class="p-3 mr-4 text-green-500 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,7 +60,7 @@
                     </div>
                 </div>
                 
-                <div class="p-4 bg-white rounded-lg shadow sm:p-6 dark:bg-zinc-900">
+                <div class="p-4 transition-shadow shadow-sm hover:shadow-lg bg-white rounded-lg sm:p-6 dark:bg-zinc-900">
                     <div class="flex items-center">
                         <div class="p-3 mr-4 text-red-500 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,8 +78,8 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="p-4 bg-white rounded-lg shadow sm:p-6 dark:bg-zinc-900">
+
+                <div class="p-4 transition-shadow shadow-sm hover:shadow-lg bg-white rounded-lg sm:p-6 dark:bg-zinc-900">
                     <div class="flex items-center">
                         <div class="p-3 mr-4 text-purple-500 bg-purple-100 rounded-full dark:bg-purple-900 dark:text-purple-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

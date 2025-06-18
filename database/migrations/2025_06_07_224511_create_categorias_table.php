@@ -16,6 +16,7 @@ return new class extends Migration
                 $table->id();
                 $table->string('categoria')->nullable();
                 $table->foreignId('created_by')->nullable()->default(null)->constrained('users');
+                $table->foreignId('updated_by')->nullable()->default(null)->constrained('users');
                 $table->foreignId('deleted_by')->nullable()->default(null)->constrained('users');
            
                 $table->timestamps();
