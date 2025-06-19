@@ -30,7 +30,7 @@ return [
             [
                 'titulo' => 'Mis planificaciones',
                 'route' => 'planificar',
-                'routes' => ['planificar', 'planificar.show', 'planificar.edit', 'planificar.create'],
+                'routes' => ['planificar'],
                 'permisos' => ['planificacion.planificar'],
                 'icono' => '',
                 'breadcrumb' => true
@@ -38,29 +38,29 @@ return [
             [
                 'titulo' => 'Requerir',
                 'route' => 'requerir',
-                'routes' => ['planificar.requerir'],
+                'routes' => ['requerir'],
                 'permisos' => ['planificacion.requerir'],
                 'icono' => '',
                 'breadcrumb' => true,
-                'parent_breadcrumb' => 'planificar' // Indica el padre en la jerarquía del breadcrumb
+                //'parent_breadcrumb' => 'planificar' // Indica el padre en la jerarquía del breadcrumb
             ],
             [
                 'titulo' => 'Dar seguimiento',
                 'route' => 'seguimiento',
-                'routes' => ['planificar.seguimiento'],
+                'routes' => ['seguimiento'],
                 'permisos' => ['planificacion.seguimiento'],
                 'icono' => '',
                 'breadcrumb' => true,
-                'parent_breadcrumb' => 'planificar'
+                //'parent_breadcrumb' => 'planificar'
             ],
             [
                 'titulo' => 'Consolidado',
                 'route' => 'consolidado',
-                'routes' => ['planificar.consolidado'],
+                'routes' => ['consolidado'],
                 'permisos' => ['planificacion.consolidado'],
                 'icono' => '',
                 'breadcrumb' => true,
-                'parent_breadcrumb' => 'planificar'
+                //'parent_breadcrumb' => 'planificar'
             ]
         ]
     ],
@@ -75,7 +75,7 @@ return [
             [
                 'titulo' => 'Roles',
                 'route' => 'roles',
-                'routes' => ['roles', 'roles.show', 'roles.edit', 'roles.create'],
+                'routes' => ['roles'],
                 'permisos' => ['configuracion.roles'],
                 'icono' => '',
                 'default_route' => true,
@@ -84,7 +84,7 @@ return [
             [
                 'titulo' => 'Usuarios',
                 'route' => 'usuarios',
-                'routes' => ['usuarios', 'usuarios.show', 'usuarios.edit', 'usuarios.create'],
+                'routes' => ['usuarios'],
                 'permisos' => ['configuracion.usuarios'],
                 'icono' => '',
                 'breadcrumb' => true
@@ -92,7 +92,7 @@ return [
             [
                 'titulo' => 'Empleados',
                 'route' => 'empleados',
-                'routes' => ['empleados', 'empleados.show', 'empleados.edit', 'empleados.create'],
+                'routes' => ['empleados'],
                 'permisos' => ['configuracion.empleados'],
                 'icono' => '',
                 'breadcrumb' => true
@@ -100,7 +100,7 @@ return [
             [
                 'titulo' => 'Departamentos',
                 'route' => 'departamentos',
-                'routes' => ['departamentos', 'departamentos.show', 'departamentos.edit', 'departamentos.create'],
+                'routes' => ['departamentos'],
                 'permisos' => ['configuracion.departamentos'],
                 'icono' => '',
                 'breadcrumb' => true
@@ -108,7 +108,7 @@ return [
             [
                 'titulo' => 'Procesos de compras',
                 'route' => 'procesoscompras',
-                'routes' => ['procesoscompras', 'procesoscompras.show', 'procesoscompras.edit', 'procesoscompras.create'],
+                'routes' => ['procesoscompras'],
                 'permisos' => ['configuracion.procesoscompras'],
                 'icono' => '',
                 'breadcrumb' => true
@@ -116,7 +116,7 @@ return [
             [
                 'titulo' => 'Cubs',
                 'route' => 'cubs',
-                'routes' => ['cubs', 'cubs.show', 'cubs.edit', 'cubs.create'],
+                'routes' => ['cubs'],
                 'permisos' => ['configuracion.cubs'],
                 'icono' => '',
                 'breadcrumb' => true
@@ -229,7 +229,7 @@ return [
         'titulo' => 'Registros del Sistema',
         'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4"/>',
         'route' => 'logs.index',
-        'breadcrumb_label' => 'Visor de Logs',
+        'breadcrumb_label' => 'Registros del Sistema',
         'items' => [
             [
                 'titulo' => 'Visor de Logs',
@@ -246,7 +246,7 @@ return [
                 'permisos' => ['ver-logs-dashboard'],
                 'icono' => '',
                 'breadcrumb' => true,
-                'parent_breadcrumb' => 'logs' // Indica el padre en la jerarquía del breadcrumb
+                //'parent_breadcrumb' => 'logs' // Indica el padre en la jerarquía del breadcrumb
             ]
         ],
         'footer' => true

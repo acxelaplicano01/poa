@@ -117,8 +117,8 @@ class Usuarios extends Component
                 'Configuración',
                 "Se creó el usuario {$user->name}",
                 [
-                    'user_id' => $user->id,
-                    'email' => $user->email,
+                    'Creado por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
+                    'Usuario Creado' => $user->name . ' (' . $user->email . ')',
                     // No incluir password por seguridad
                 ]
             );
@@ -133,8 +133,17 @@ class Usuarios extends Component
                 'Configuración',
                 'Error al crear usuario',
                 [
-                    'input_name' => $this->name,
-                    'input_email' => $this->email,
+                    'input_nombre' => $this->name,
+                    'input_Correo' => $this->email,
+                    'input_profile_photo_path' => $this->profile_photo_path,
+                    'input_password' => $this->password,
+                    'selectedRoles' => $this->selectedRoles,
+                    'Creado por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
+                    'intentó_cambios' => [
+                        'nombre' => $this->name,
+                        'Correo' => $this->email,
+                        'profile_photo_path' => $this->profile_photo_path,
+                    ],
                     'error' => $e->getMessage(),
                 ],
                 'error'
@@ -170,7 +179,7 @@ class Usuarios extends Component
 
         try {
             $user = User::findOrFail($this->user->id);
-            $oldData = $this->user->only(['name', 'email']);
+            $oldData = $this->user->only(['name', 'email', 'profile_photo_path']);
 
             $user->update([
                 'name' => $this->name,
@@ -185,10 +194,10 @@ class Usuarios extends Component
                 'Configuración',
                 "Se actualizó el usuario {$this->user->name}",
                 [
-                    'user_id' => $this->user->id,
-                    'changes' => [
-                        'old' => $oldData,
-                        'new' => $user->only(['name', 'email', 'profile_photo_path']),
+                    'Actualizado por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
+                    'cambios' => [
+                        'anteriores' => $oldData,
+                        'nuevos' => $user->only(['name', 'email', 'profile_photo_path']),
                     ]
                 ]
             );
@@ -212,10 +221,10 @@ class Usuarios extends Component
                 'Configuración',
                 'Error al actualizar usuario',
                 [
-                    'user_id' => $this->user->id,
-                    'attempted_changes' => [
-                        'name' => $this->name,
-                        'email' => $this->email,
+                    'ID Usuario' => $this->user->id,
+                    'intentó_cambios' => [
+                        'nombre' => $this->name,
+                        'Correo' => $this->email,
                         'profile_photo_path' => $this->profile_photo_path,
                     ],
                     'error' => $e->getMessage(),
@@ -246,8 +255,9 @@ class Usuarios extends Component
                     'Configuración',
                     "Se eliminó el usuario {$user->name}",
                     [
-                        'deleted_user_id' => $user->id,
-                        'deleted_user_email' => $user->email,
+                        'Eliminado por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
+                        'Usuario eliminado' => $user->name . ' (' . $user->email . ')',
+                        'ID Usuario' => $user->id,
                     ]
                 );
                 // Limpiar caché de permisos
@@ -263,8 +273,8 @@ class Usuarios extends Component
                 'Configuración',
                 'Error al eliminar usuario',
                 [
-                    'user_id' => $this->IdAEliminar,
-                    'deleted_by' => Auth::user()->email,
+                    'Intento de eliminar por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
+                    'Usuario' => $user->name . ' (' . $user->email . ')',
                     'error' => $e->getMessage(),
                 ],
                 'error'

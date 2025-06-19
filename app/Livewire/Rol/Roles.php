@@ -110,11 +110,11 @@ class Roles extends Component
             LogService::activity(
                 'crear',
                 'Configuración',
-                'Creación de rol',
+                'Creación de rol: ' . $this->name,
                 [
                     'rol' => $this->name,
-                    'created_by' => Auth::user()->email,
-                    'permissions' => $role->permissions->pluck('name')
+                    'creado por' => Auth::user()->email,
+                    'permisos' => $role->permissions->pluck('name')
                 ]
             );
             session()->flash('message', 'Rol creado exitosamente.');
@@ -128,10 +128,10 @@ class Roles extends Component
                 'Configuración',
                 'Error al crear rol',
                 [
-                    'attempted_changes' => [
-                        'name' => $this->name,
-                        'description' => $this->description,
-                        'permissions' => $this->selectedPermissions
+                    'Intentó_cambios' => [
+                        'Nombre' => $this->name,
+                        'Descripción' => $this->description,
+                        'Permisos' => $this->selectedPermissions
                     ],
                     'error' => $e->getMessage(),
                 ],
@@ -181,10 +181,11 @@ class Roles extends Component
             LogService::activity(
                 'actualizar',
                 'Configuración',
-                'Actualización de rol',
-                ['rol' => $this->role->name,
-                    'updated_by' => Auth::user()->email,
-                    'permissions' => $role->permissions->pluck('name')
+                'Actualización de rol: ' . $this->role->name,
+                [
+                    'rol' => $this->role->name,
+                    'Actualizado por' =>Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
+                    'Permisos' => $role->permissions->pluck('name')
                 ]
             );
             $this->resetInputFields();
@@ -196,10 +197,11 @@ class Roles extends Component
                 'Configuración',
                 'Error al actualizar rol',
                 [
+                    'Intento de crear por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
                     'role_id' => $this->role->id,
-                    'attempted_changes' => [
-                        'name' => $this->name,
-                        'description' => $this->description,
+                    'intentó_cambios' => [
+                        'nombre' => $this->name,
+                        'descripcion' => $this->description,
                     ],
                     'error' => $e->getMessage(),
                 ],
@@ -251,7 +253,7 @@ class Roles extends Component
                     'Configuración',
                     'Eliminación de rol',
                     ['rol' => $role->name,
-                        'deleted_by' => Auth::user()->email]
+                        'eliminador por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',]
                 );
                 session()->flash('message', 'Rol eliminado correctamente!');
             } catch (\Exception $e) {
@@ -261,9 +263,10 @@ class Roles extends Component
                     'Configuración',
                     'Error al eliminar rol',
                     [
-                        'role_id' => $role->id,
-                        'attempted_changes' => [
-                            'name' => $role->name,
+                        'Intento de eliminar por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
+                        'intentó_cambios' => [
+                            'role_id' => $role->id,
+                            'nombre' => $role->name,
                         ],
                         'error' => $e->getMessage(),
                     ],

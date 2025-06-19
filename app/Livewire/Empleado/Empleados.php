@@ -9,6 +9,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Log;
+use Auth;
 
 class Empleados extends Component
 {
@@ -159,7 +160,6 @@ class Empleados extends Component
             
             // Obtener los departamentos asociados
             $this->selectedDepartamentos = $empleado->departamentos()->pluck('departamentos.id')->toArray();
-            
             $this->openModal();
         } catch (\Exception $e) {
             LogService::activity(
@@ -167,7 +167,8 @@ class Empleados extends Component
                 'Configuración',
                 'Error al cargar empleado para edición',
                 [
-                    'empleado_id' => $id,
+                    'Actualizado por' =>  Auth::user()->name . ' (' . Auth::user()->email . ')',
+                    'Empleado' => $empleado->nombre . ' ' . $empleado->apellido . ' (ID: ' . $empleado->id . ')',
                     'error' => $e->getMessage(),
                 ],
                 'error'
@@ -208,9 +209,8 @@ class Empleados extends Component
                     'Configuración',
                     "Empleado {$accion} correctamente",
                     [
-                        'empleado_id' => $empleado->id,
-                        'user_id' => auth()->id(),
-                        'action' => $accion,
+                        'Actualizado por' =>  Auth::user()->name . ' (' . Auth::user()->email . ')',
+                        'Empleado' => $empleado->nombre . ' ' . $empleado->apellido . ' (ID: ' . $empleado->id . ')',
                         'departamentos' => $this->selectedDepartamentos,
                     ]
                 );
@@ -241,9 +241,9 @@ class Empleados extends Component
                 'Configuración',
                 "Empleado {$accion} correctamente",
                 [
-                    'empleado_id' => $empleado->id,
-                    'user_id' => auth()->id(),
+                    'Creado por' =>  Auth::user()->name . ' (' . Auth::user()->email . ')',
                     'action' => $accion,
+                    'Empleado' => $empleado->nombre . ' ' . $empleado->apellido . ' (ID: ' . $empleado->id . ')',
                     'departamentos' => $this->selectedDepartamentos,
                 ]
             );
@@ -255,8 +255,8 @@ class Empleados extends Component
                 'Configuración',
                 'Error al crear empleado',
                 [
-                    'input_nombre' => $this->nombre,
-                    'input_apellido' => $this->apellido,
+                    'Nombre' => $this->nombre,
+                    'Apellido' => $this->apellido,
                     'error' => $e->getMessage(),
                 ],
                 'error'
@@ -290,8 +290,8 @@ class Empleados extends Component
                 'Configuración',
                 "Empleado eliminado correctamente",
                 [
-                    'empleado_id' => $empleado->id,
-                    'user_id' => auth()->id(),
+                    'Eliminado por' => Auth::user()->name . ' (' . Auth::user()->email . ')',
+                    'Empleado' => $empleado->nombre . ' ' . $empleado->apellido . ' (ID: ' . $empleado->id . ')',
                 ]
             );
             session()->flash('message', 'Empleado eliminado correctamente.');
@@ -301,7 +301,8 @@ class Empleados extends Component
                 'Configuración',
                 'Error al eliminar empleado',
                 [
-                    'empleado_id' => $this->empleadoToDelete,
+                    'Intentó eliminarlo' => Auth::user()->name . ' (' . Auth::user()->email . ')',
+                    'Empleado' => $empleado->nombre . ' ' . $empleado->apellido . ' (ID: ' . $empleado->id . ')',
                     'error' => $e->getMessage(),
                 ],
                 'error'
