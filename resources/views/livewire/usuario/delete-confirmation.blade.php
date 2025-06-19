@@ -1,7 +1,6 @@
 <x-confirmation-modal wire:model="confirmingDelete" maxWidth="md">
     <x-slot name="title">
         <div class="flex items-center">
-            
             <h3 class="text-lg font-medium text-zinc-900 dark:text-white">Confirmación de Eliminación</h3>
         </div>
     </x-slot>

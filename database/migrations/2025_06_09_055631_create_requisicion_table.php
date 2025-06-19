@@ -33,6 +33,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Scheme::dropIfExists('requisicion');
+        Schema::dropIfExists('requisicion');
     }
 };

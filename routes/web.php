@@ -9,10 +9,15 @@ use App\Livewire\Categoria\Categorias;
 use App\Livewire\Consolidado\Consolidado;
 use App\Livewire\Cub\Cubs;
 use App\Livewire\Departamento\Departamentos;
+use App\Livewire\EjecucionPresupuestaria\EstadosEjecucionPresupuestaria;
 use App\Livewire\Empleado\Empleados;
+use App\Livewire\GrupoGastos\Fuentes;
+use App\Livewire\GrupoGastos\GrupoGastos;
+use App\Livewire\Institucion\Instituciones;
 use App\Livewire\Planificar\Planificar;
 use App\Livewire\ProcesCompra\ProcesCompras;
 use App\Livewire\Requerir\Requerir;
+use App\Livewire\Requisicion\EstadosRequisicion;
 use App\Livewire\Requisicion\UnidadMedidas;
 use App\Livewire\Rol\Roles;
 use App\Livewire\Seguimiento\Seguimiento;
@@ -52,6 +57,21 @@ Route::middleware([
 
      Route::get('/categorias', Categorias::class)
         ->name('categorias');
+
+    Route::get('/estados-ejecucion', EstadosEjecucionPresupuestaria::class)
+        ->name('estados-ejecucion');
+
+    Route::get('/estados-requisicion', EstadosRequisicion::class)
+        ->name('estados-requisicion');
+
+     Route::get('/fuentes', Fuentes::class)
+        ->name('fuentes');
+
+    Route::get('/grupo-gastos', GrupoGastos::class)
+        ->name('grupo-gastos');
+
+    Route::get('/instituciones', Instituciones::class)
+        ->name('instituciones');
 
     Route::get('/sessions', SessionManager::class)
         ->name('sessions');

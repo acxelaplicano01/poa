@@ -1,12 +1,12 @@
 <x-confirmation-modal maxWidth="md" wire:model="isDeleteModalOpen">
     <x-slot name="title">
-        {{ __('Eliminar Categoría') }}
+        {{ __('Eliminar Fuente') }}
     </x-slot>
 
     <x-slot name="content">
         <div class="py-4">
             <div class="text-zinc-700 dark:text-zinc-300">
-                {{ __('¿Estás seguro de que deseas eliminar esta categoría? Esta acción no se puede deshacer.') }}
+                {{ __('¿Estás seguro de que deseas eliminar esta fuente? Esta acción no se puede deshacer.') }}
             </div>
         </div>
     </x-slot>
