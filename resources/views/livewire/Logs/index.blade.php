@@ -1,25 +1,7 @@
 {{-- filepath: c:\Users\acxel\Desktop\Desarrollo\Git Repos\POA\resources\views\admin\logs\index.blade.php --}}
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <h2 class="text-xl font-semibold leading-tight">
-                {{ __('Visor de Logs del Sistema') }}
-            </h2>
-            <div class="flex items-center gap-2">
-                <a href="{{ route('logs.dashboard') }}" 
-                   class="px-4 py-2 text-sm font-medium text-center text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <svg class="inline-block w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    Dashboard de Actividad
-                </a>
-            </div>
-        </div>
-    </x-slot>
-
-    <div class="py-6">
-        <div class="mx-auto max-w-7xl">
+    <div>
+        <div class="mx-auto rounded-lg mt-8 sm:mt-6 lg:mt-4 mb-6">
             <!-- Tarjetas de estadísticas -->
             <div class="grid grid-cols-1 gap-5 mb-6 sm:grid-cols-2 lg:grid-cols-4">
                 <div class="p-4 transition-shadow shadow-sm hover:shadow-lg bg-white rounded-lg sm:p-6 dark:bg-zinc-900">
@@ -195,99 +177,79 @@
             </div>
 
             <!-- Tabla de logs -->
-            <div class="overflow-hidden bg-white shadow sm:rounded-lg dark:bg-zinc-900">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
-                        <thead class="bg-gray-50 dark:bg-zinc-700">
-                            <tr>
-                                <th scope="col" class="px-4 py-3 text-xs font-medium tracking-wider text-left text-zinc-500 uppercase dark:text-zinc-300">
-                                    ID/Fecha
-                                </th>
-                                <th scope="col" class="px-4 py-3 text-xs font-medium tracking-wider text-left text-zinc-500 uppercase dark:text-zinc-300">
-                                    Usuario
-                                </th>
-                                <th scope="col" class="px-4 py-3 text-xs font-medium tracking-wider text-left text-zinc-500 uppercase dark:text-zinc-300">
-                                    Módulo
-                                </th>
-                                <th scope="col" class="px-4 py-3 text-xs font-medium tracking-wider text-left text-zinc-500 uppercase dark:text-zinc-300">
-                                    Acción
-                                </th>
-                                <th scope="col" class="px-4 py-3 text-xs font-medium tracking-wider text-left text-zinc-500 uppercase dark:text-zinc-300">
-                                    Descripción
-                                </th>
-                                <th scope="col" class="px-4 py-3 text-xs font-medium tracking-wider text-center text-zinc-500 uppercase dark:text-zinc-300">
-                                    Nivel
-                                </th>
-                                <th scope="col" class="px-4 py-3 text-xs font-medium tracking-wider text-right text-zinc-500 uppercase dark:text-zinc-300">
-                                    Acciones
-                                </th>
+            <div class="overflow-x-auto bg-white shadow sm:rounded-lg rounded-lg dark:bg-zinc-900">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
+                    <thead class="bg-gray-50 dark:bg-zinc-700">
+                        <tr>
+                            <th class="px-2 py-2 text-xs font-medium tracking-wider text-left text-zinc-500 uppercase dark:text-zinc-300">ID/Fecha</th>
+                            <th class="px-2 py-2 text-xs font-medium tracking-wider text-left text-zinc-500 uppercase dark:text-zinc-300">Usuario</th>
+                            <th class="px-2 py-2 text-xs font-medium tracking-wider text-left text-zinc-500 uppercase dark:text-zinc-300 hidden sm:table-cell">Módulo</th>
+                            <th class="px-2 py-2 text-xs font-medium tracking-wider text-left text-zinc-500 uppercase dark:text-zinc-300 hidden md:table-cell">Acción</th>
+                            <th class="px-2 py-2 text-xs font-medium tracking-wider text-left text-zinc-500 uppercase dark:text-zinc-300">Descripción</th>
+                            <th class="px-2 py-2 text-xs font-medium tracking-wider text-center text-zinc-500 uppercase dark:text-zinc-300 hidden lg:table-cell">Nivel</th>
+                            <th class="px-2 py-2 text-xs font-medium tracking-wider text-right text-zinc-500 uppercase dark:text-zinc-300">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 dark:bg-zinc-900 dark:divide-zinc-700">
+                        @forelse($logs as $log)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700">
+                                <td class="px-2 py-2 whitespace-nowrap">
+                                    <div class="text-xs font-medium text-zinc-900 dark:text-white">#{{ $log->id }}</div>
+                                    <div class="text-[10px] text-zinc-500 dark:text-zinc-400">
+                                        {{ $log->created_at->format('d/m/Y H:i:s') }}
+                                    </div>
+                                </td>
+                                <td class="px-2 py-2">
+                                    <div class="text-xs text-zinc-900 dark:text-white">{{ $log->user_name }}</div>
+                                    <div class="text-[10px] text-zinc-500 dark:text-zinc-400">{{ $log->ip_address }}</div>
+                                </td>
+                                <td class="px-2 py-2 hidden sm:table-cell">
+                                    <div class="text-xs text-zinc-900 dark:text-white">{{ $log->module }}</div>
+                                </td>
+                                <td class="px-2 py-2 hidden md:table-cell">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300">
+                                        <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            {!! $log->action_icon !!}
+                                        </svg>
+                                        {{ ucfirst($log->action) }}
+                                    </span>
+                                </td>
+                                <td class="px-2 py-2">
+                                    <div class="text-xs text-zinc-900 dark:text-white line-clamp-2">
+                                        {{ $log->description ?? 'Sin descripción' }}
+                                    </div>
+                                </td>
+                                <td class="px-2 py-2 text-center hidden lg:table-cell">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium  {{ match($log->level) {
+                                            'emergency' => 'bg-red-100 text-red-800',
+                                            'alert'     => 'bg-red-100 text-red-800',
+                                            'critical'  => 'bg-red-100 text-red-800',
+                                            'error'     => 'bg-red-100 text-red-800',
+                                            'warning'   => 'bg-yellow-100 text-yellow-800',
+                                            'notice'    => 'bg-blue-100 text-blue-800',
+                                            'info'      => 'bg-green-100 text-green-800',
+                                            'debug'     => 'bg-gray-100 text-gray-800',
+                                            default     => 'bg-gray-100 text-gray-800'
+                                        } }}">
+                                        {{ ucfirst($log->level) }}
+                                    </span>
+                                </td>
+                                <td class="px-2 py-2 text-right text-xs font-medium whitespace-nowrap">
+                                    <a href="{{ route('logs.show', $log) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                        Ver detalles
+                                    </a>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 dark:bg-zinc-900 dark:divide-zinc-700">
-                            @forelse($logs as $log)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700">
-                                    <td class="px-4 py-3 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-zinc-900 dark:text-white">#{{ $log->id }}</div>
-                                        <div class="text-xs text-zinc-500 dark:text-zinc-400">
-                                            {{ $log->created_at->format('d/m/Y H:i:s') }}
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <div class="text-sm text-zinc-900 dark:text-white">{{ $log->user_name }}</div>
-                                        <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $log->ip_address }}</div>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <div class="text-sm text-zinc-900 dark:text-white">{{ $log->module }}</div>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300">
-                                            <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                {!! $log->action_icon !!}
-                                            </svg>
-                                            {{ ucfirst($log->action) }}
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <div class="text-sm text-zinc-900 dark:text-white line-clamp-2">
-                                            {{ $log->description ?? 'Sin descripción' }}
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-3 text-center">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium  {{ match($log->level) {
-                                                'emergency' => 'bg-red-100 text-red-800',
-                                                'alert'     => 'bg-red-100 text-red-800',
-                                                'critical'  => 'bg-red-100 text-red-800',
-                                                'error'     => 'bg-red-100 text-red-800',
-                                                'warning'   => 'bg-yellow-100 text-yellow-800',
-                                                'notice'    => 'bg-blue-100 text-blue-800',
-                                                'info'      => 'bg-green-100 text-green-800',
-                                                'debug'     => 'bg-gray-100 text-gray-800',
-                                                default     => 'bg-gray-100 text-gray-800'
-                                            } }}">
-                                            {{ ucfirst($log->level) }}
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3 text-right text-sm font-medium whitespace-nowrap">
-                                        <a href="{{ route('logs.show', $log) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
-                                            Ver detalles
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
-                                        No se encontraron registros de logs que coincidan con los filtros aplicados.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Paginación -->
-                <div class="px-4 py-3 bg-white border-t border-gray-200 dark:bg-zinc-900 dark:border-zinc-700 sm:px-6">
-                    {{ $logs->links() }}
-                </div>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-2 py-8 text-center text-zinc-500 dark:text-zinc-400">
+                                    No se encontraron registros de logs que coincidan con los filtros aplicados.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+                <div class="sm:hidden text-xs text-zinc-400 px-2 py-1">Desliza la tabla para ver más columnas →</div>
             </div>
 
             <!-- Limpiar logs antiguos -->

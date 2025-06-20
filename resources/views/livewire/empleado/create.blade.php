@@ -1,5 +1,5 @@
 <!-- Modal para crear/editar empleado -->
-    <x-dialog-modal wire:model="isOpen" maxWidth="md">
+    <x-dialog-modal wire:model="isOpen" maxWidth="lg">
         <x-slot name="title">
             <div class="flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">

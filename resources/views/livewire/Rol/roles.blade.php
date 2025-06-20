@@ -1,5 +1,5 @@
 <div>
-    <div class="max-w-7xl mx-auto rounded-lg mt-8 sm:mt-6 lg:mt-4 mb-6">
+    <div class="mx-auto rounded-lg mt-8 sm:mt-6 lg:mt-4 mb-6">
         <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow sm:rounded-lg p-4 sm:p-6">
 
             @if (session()->has('message'))
