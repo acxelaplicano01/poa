@@ -49,7 +49,7 @@ class LogViewerController extends Controller
         }
 
         // Obtener logs paginados
-        $logs = $query->paginate(25)->withQueryString();
+        $logs = $query->paginate(25)->withQueryString();//
 
         // Datos para filtros
         $modules = ActivityLog::select('module')
@@ -79,10 +79,9 @@ class LogViewerController extends Controller
             'total' => ActivityLog::count(),
             'today' => ActivityLog::whereDate('created_at', today())->count(),
             'errors' => ActivityLog::where('level', 'error')->count(),
-            'users_active' => ActivityLog::select('user_id')
-                ->distinct()
-                ->whereNotNull('user_id')
-                ->count()
+            'users_active' => ActivityLog::whereNotNull('user_id')
+                 ->distinct('user_id')
+                 ->count('user_id')
         ];
 
         return view('livewire.logs.index', compact(

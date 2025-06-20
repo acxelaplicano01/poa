@@ -30,6 +30,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::view('/error/404', 'errors.404')->name('error.404');
+Route::view('/error/500', 'errors.500')->name('error.500');
+Route::view('/error/403', 'errors.403')->name('error.403');
+
+
 Route::get('/modulo/{module}', [ModuleRedirectController::class, 'redirectToModule'])
     ->middleware(['auth:sanctum', 'verified'])
     ->name('module.redirect');
