@@ -179,13 +179,13 @@
                     {{ config('app.name', 'Sistema') }} &copy; {{ date('Y') }}. Todos los derechos reservados.
                 </p>
                 <div class="flex space-x-4">
-                    <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                    <a href="https://chat.whatsapp.com/CnEA4qNlOBoLK1Hh8NKsKI" title="Soporte Técnico" target="_blank" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                         <span class="sr-only">Soporte Técnico</span>
                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4v3c0 .6.4 1 1 1h.5c.2 0 .5-.1.7-.3l3.7-3.7H20c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H13.9l-2.5 2.5V16H4V4h16v12z"/>
                         </svg>
                     </a>
-                    <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                    <a href="#" title="Estado del Sistema" target="_blank" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                         <span class="sr-only">Estado del Sistema</span>
                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
