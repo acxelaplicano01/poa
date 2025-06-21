@@ -60,38 +60,38 @@ function findFirstAccessibleRoute($module)
 {
    $user = auth()->user();
    $moduleConfig = config('rutas.' . $module, []);
-   
+
    // Si es super-admin o no hay config, usar la ruta principal
    if (!$user || !isset($moduleConfig['items']) || empty($moduleConfig['items'])) {
       return isset($moduleConfig['route']) ? $moduleConfig['route'] : 'dashboard';
    }
-   
+
    if ($user->hasRole('super-admin')) {
       return $moduleConfig['route'];
    }
-   
+
    // Primero buscar en items always_visible
    foreach ($moduleConfig['items'] as $item) {
       if (isset($item['always_visible']) && $item['always_visible'] && isset($item['route'])) {
          return $item['route'];
       }
    }
-   
+
    // Luego buscar en items donde tenga permiso
    foreach ($moduleConfig['items'] as $item) {
       // Si no tiene permisos, es accesible
       if (!isset($item['permisos']) || empty($item['permisos'])) {
          return $item['route'];
       }
-      
+
       // Verificar si tiene alguno de los permisos requeridos
-      foreach ((array)$item['permisos'] as $permiso) {
+      foreach ((array) $item['permisos'] as $permiso) {
          if ($user->can($permiso)) {
             return $item['route'];
          }
       }
    }
-   
+
    // Si ningún item es accesible, retornar la ruta principal como fallback
    return $moduleConfig['route'];
 }
@@ -158,12 +158,14 @@ $moduleConfig = config('rutas', []);
                   class="flex items-center w-full p-1 text-sm text-zinc-900 rounded-lg dark:text-white hover:bg-zinc-800/5 dark:hover:bg-white/[7%] group">
                   <div class="flex items-center">
                      @if (Auth::user()->profile_photo_path)
-                        <img class="w-8 h-8 rounded-lg object-cover mr-2"
-                           src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="{{ Auth::user()->name }}">
-                     @else
-                        <img class="w-8 h-8 rounded-lg object-cover mr-2"
-                           src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}&amp;color=fff&amp;background=6366f1"
+                        <img class="w-8 h-8 rounded-lg object-cover mr-2" src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}"
                            alt="{{ Auth::user()->name }}">
+                     @else
+                        <div class="flex-shrink-0 mr-3">
+                           <div class="h-8 w-8 rounded-lg bg-indigo-700 flex items-center justify-center">
+                              <span class="text-white text-xs font-bold">{{ substr(Auth::user()->name ?? 'U', 0, 2) }}</span>
+                           </div>
+                        </div>
                      @endif
                      <div>
                         <span class="text-base font-medium">{{ Auth::user()->name }}</span>

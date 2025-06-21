@@ -1,4 +1,3 @@
-
 <header wire:ignore
     class="fixed top-0 right-0 left-0 z-30 sm:left-64 min-h-14 flex items-center bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700"
     data-flux-header="">
@@ -45,8 +44,8 @@
 
     <!-- Contenedor principal para alineación de elementos -->
     <div class="flex items-center justify-end flex-1 px-4 lg:px-6">
-        <!-- Navegación de escritorio con ítems del módulo actual -->
-        <nav class="flex items-center gap-1 py-3 overflow-x-auto overflow-y-hidden">
+        <!-- Navegación de escritorio con ítems del módulo actual - SÓLO VISIBLE EN PANTALLAS GRANDES -->
+        <nav class="hidden lg:flex items-center gap-1 py-3 overflow-x-auto overflow-y-hidden">
             @php
                 $currentModule = 'dashboard'; // Valor por defecto
 

@@ -1,4 +1,4 @@
-<x-dialog-modal wire:model="isOpen">
+<x-dialog-modal maxWidth="lg" wire:model="isOpen">
     <x-slot name="title">
         <div class="flex justify-between items-center">
             <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">{{ $isEditing ? 'Editar' : 'Nuevo' }} Rol

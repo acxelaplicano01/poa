@@ -34,22 +34,22 @@
                         </div>
                         <div class="w-full sm:w-auto">
                             <x-select id="perPage" wire:model.live="perPage" :options="[
-        ['value' => '10', 'text' => '10 por página'],
-        ['value' => '25', 'text' => '25 por página'],
-        ['value' => '50', 'text' => '50 por página'],
-        ['value' => '100', 'text' => '100 por página'],
-    ]" class="w-full" />
+                                ['value' => '10', 'text' => '10 por página'],
+                                ['value' => '25', 'text' => '25 por página'],
+                                ['value' => '50', 'text' => '50 por página'],
+                                ['value' => '100', 'text' => '100 por página'],
+                            ]" class="w-full" />
                         </div>
                     </div>
                 </div>
 
                 <x-table sort-field="{{ $sortField }}" sort-direction="{{ $sortDirection }}" :columns="[
-        ['key' => 'user', 'label' => 'Usuario', 'sortable' => true],
-        ['key' => 'ip_address', 'label' => 'Dirección IP', 'sortable' => true],
-        ['key' => 'browser', 'label' => 'Navegador'],
-        ['key' => 'last_activity', 'label' => 'Última actividad', 'sortable' => true],
-        ['key' => 'actions', 'label' => 'Acciones', 'class' => 'text-right'],
-    ]" empty-message="No hay sesiones activas" class="mt-6">
+                        ['key' => 'user', 'label' => 'Usuario', 'sortable' => true],
+                        ['key' => 'ip_address', 'label' => 'Dirección IP', 'sortable' => true],
+                        ['key' => 'browser', 'label' => 'Navegador'],
+                        ['key' => 'last_activity', 'label' => 'Última actividad', 'sortable' => true],
+                        ['key' => 'actions', 'label' => 'Acciones', 'class' => 'text-right'],
+                    ]" empty-message="No hay sesiones activas" class="mt-6">
                     <x-slot name="desktop">
                         @forelse($sessions as $session)
                             <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
@@ -58,9 +58,9 @@
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 mr-3">
                                                 <div
-                                                    class="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 flex items-center justify-center">
+                                                    class="h-8 w-8 rounded-lg bg-indigo-700 flex items-center justify-center">
                                                     <span
-                                                        class="text-white text-xs font-bold">{{ substr($session->name ?? 'U', 0, 1) }}</span>
+                                                        class="text-white text-xs font-bold">{{ substr($session->name ?? 'CX', 0, 2) }}</span>
                                                 </div>
                                             </div>
                                             <div>
@@ -251,9 +251,9 @@
                                 @if($session->user_id)
                                     <div class="flex items-center mb-2">
                                         <div
-                                            class="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 flex items-center justify-center mr-2">
+                                            class="h-8 w-8 rounded-full bg-indigo-700 flex items-center justify-center mr-2">
                                             <span
-                                                class="text-white text-xs font-bold">{{ substr($session->name ?? 'U', 0, 1) }}</span>
+                                                class="text-white text-xs font-bold">{{ substr($session->name ?? 'CX', 0, 2) }}</span>
                                         </div>
                                         <div>
                                             <div class="font-medium text-zinc-900 dark:text-zinc-200">
@@ -379,9 +379,9 @@
                             @if($sessionDetails->user_id)
                                 <div class="flex-shrink-0 mr-3">
                                     <div
-                                        class="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 flex items-center justify-center">
+                                        class="h-8 w-8 rounded-lg bg-indigo-700 flex items-center justify-center">
                                         <span
-                                            class="text-white text-xs font-bold">{{ substr($sessionDetails->name ?? 'U', 0, 1) }}</span>
+                                            class="text-white text-xs font-bold">{{ substr($sessionDetails->name ?? 'CX', 0, 2) }}</span>
                                     </div>
                                 </div>
                                 <div>
