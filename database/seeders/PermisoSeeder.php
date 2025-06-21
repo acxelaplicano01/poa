@@ -53,10 +53,10 @@ class PermisoSeeder extends Seeder
                 // Subpermisos de consolas
             ],
             'logs' => [
-                'ver-logs',
-                'ver-logs-dashboard',
-                'ver-logs-show',
-                'ver-logs-cleanup',
+                'logs',
+                'logsdashboard',
+                'logsshow',
+                'logscleanup',
             ]
         ];
         
@@ -75,9 +75,6 @@ class PermisoSeeder extends Seeder
         
         // Otros permisos que no siguen la estructura jerárquica
         $otherPermissions = [
-            'admin-admin-permiso',
-            'admin-admin-configuracion',
-            'admin-admin-dashboard',
             // Cualquier otro permiso que no siga el formato de módulo
         ];
         

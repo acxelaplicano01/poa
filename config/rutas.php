@@ -228,22 +228,22 @@ return [
     'logs' => [
         'titulo' => 'Registros del Sistema',
         'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4"/>',
-        'route' => 'logs.index',
+        'route' => 'logs',
         'breadcrumb_label' => 'Registros del Sistema',
         'items' => [
             [
                 'titulo' => 'Visor de Logs',
-                'route' => 'logs.index',
-                'routes' => ['logs.index'],
-                'permisos' => ['ver-logs'],
+                'route' => 'logs',
+                'routes' => ['logs'],
+                'permisos' => ['logs.logs'],
                 'icono' => '',
                 'breadcrumb' => true
             ],
             [
                 'titulo' => 'Dashboard de Logs',
-                'route' => 'logs.dashboard',
-                'routes' => ['logs.dashboard'],
-                'permisos' => ['ver-logs-dashboard'],
+                'route' => 'logsdashboard',
+                'routes' => ['logsdashboard'],
+                'permisos' => ['logs.logsdashboard'],
                 'icono' => '',
                 'breadcrumb' => true,
                 //'parent_breadcrumb' => 'logs' // Indica el padre en la jerarquía del breadcrumb

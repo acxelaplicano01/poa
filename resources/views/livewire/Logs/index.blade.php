@@ -84,7 +84,7 @@
             <!-- Panel de filtros -->
             <div class="p-4 mb-6 bg-white rounded-lg shadow sm:p-6 dark:bg-zinc-900">
                 <h3 class="mb-4 text-lg font-medium text-zinc-900 dark:text-white">Filtrar logs</h3>
-                <form action="{{ route('logs.index') }}" method="GET" class="space-y-4">
+                <form action="{{ route('logs') }}" method="GET" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 text-zinc-900 dark:text-zinc-300">
                         <div>
                             <label for="module" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Módulo</label>
@@ -169,7 +169,7 @@
                             Aplicar filtros
                         </button>
                         
-                        <a href="{{ route('logs.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+                        <a href="{{ route('logs') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
                             Limpiar filtros
                         </a>
                     </div>
@@ -253,13 +253,13 @@
             </div>
 
             <!-- Limpiar logs antiguos -->
-            @can('admin')
+            @can('logs.logscleanup')
                 <div class="mt-6 p-4 bg-white rounded-lg shadow sm:p-6 dark:bg-zinc-900">
                     <h3 class="text-lg font-medium text-zinc-900 dark:text-white">Mantenimiento de logs</h3>
                     <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                         Elimina logs antiguos para mantener la base de datos optimizada.
                     </p>
-                    <form action="{{ route('logs.cleanup') }}" method="POST" class="mt-5">
+                    <form action="{{ route('cleanup') }}" method="POST" class="mt-5">
                         @csrf
                         <div class="flex items-end gap-4">
                             <div>

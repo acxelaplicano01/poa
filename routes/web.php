@@ -135,11 +135,22 @@ Route::middleware([
     });
 
     // Rutas para el visor de logs (protegidas por middleware)
-    Route::middleware(['auth', 'can:ver-logs'])->prefix('logs')->name('logs.')->group(function () {
-        Route::get('/', [LogViewerController::class, 'index'])->name('index');
-        Route::get('/dashboard', [LogViewerController::class, 'dashboard'])->name('dashboard');
-        Route::get('/{log}', [LogViewerController::class, 'show'])->name('show');
-        Route::post('/cleanup', [LogViewerController::class, 'cleanup'])->name('cleanup');
+     Route::middleware(['auth', CheckModuleAccess::class.':logs'])->group(function () {
+        Route::get('/logs', [LogViewerController::class, 'index'])
+        ->name('logs')
+        ->middleware('can:logs.logs');
+
+        Route::get('/logs/dashboard', [LogViewerController::class, 'dashboard'])
+        ->name('logsdashboard')
+        ->middleware('can:logs.logsdashboard');
+
+        Route::get('/logs/{log}', [LogViewerController::class, 'show'])
+        ->name('logs.show')
+        ->middleware('can:logs.logsshow');
+
+        Route::post('/logs/cleanup', [LogViewerController::class, 'cleanup'])
+        ->name('cleanup')
+        ->middleware('can:logs.logscleanup');
     });
 
 });
