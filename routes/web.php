@@ -46,10 +46,13 @@ Route::middleware([
 ])->group(function () {
 
     // Ruta para el dashboard
-     Route::get('/dashboard', function () {return view('dashboard');})
-    ->name('dashboard');
+    Route::get('/dashboard', function () {
+        return view('dashboard'); })
+        ->name('dashboard');
 
-    Route::get('/trimestres', Trimestres::class)->name('trimestres');
+    //Falta meter estas rutas a su modulo correspondiente
+    Route::get('/trimestres', Trimestres::class)
+        ->name('trimestres');
 
     Route::get('/tipoactividades', TipoActividades::class)
         ->name('tipoactividades');
@@ -60,7 +63,7 @@ Route::middleware([
     Route::get('/unidad-medidas', UnidadMedidas::class)
         ->name('unidad-medidas');
 
-     Route::get('/categorias', Categorias::class)
+    Route::get('/categorias', Categorias::class)
         ->name('categorias');
 
     Route::get('/estados-ejecucion', EstadosEjecucionPresupuestaria::class)
@@ -69,7 +72,7 @@ Route::middleware([
     Route::get('/estados-requisicion', EstadosRequisicion::class)
         ->name('estados-requisicion');
 
-     Route::get('/fuentes', Fuentes::class)
+    Route::get('/fuentes', Fuentes::class)
         ->name('fuentes');
 
     Route::get('/grupo-gastos', GrupoGastos::class)
@@ -81,76 +84,72 @@ Route::middleware([
     Route::get('/sessions', SessionManager::class)
         ->name('sessions');
 
-    
 
     // Rutas del módulo de configuración
-    Route::middleware(['auth', CheckModuleAccess::class.':configuracion'])->group(function () {
-        
+    Route::middleware(['auth', CheckModuleAccess::class . ':configuracion'])->group(function () {
+
         Route::get('/configuracion/roles', Roles::class)
-        ->name('roles')
-        ->middleware('can:configuracion.roles');
+            ->name('roles')
+            ->middleware('can:configuracion.roles');
 
         Route::get('/configuracion/usuarios', Usuarios::class)
-        ->name('usuarios')
-        ->middleware('can:configuracion.usuarios');
+            ->name('usuarios')
+            ->middleware('can:configuracion.usuarios');
 
         Route::get('/configuracion/empleados', Empleados::class)
-        ->name('empleados')
-        ->middleware('can:configuracion.empleados');
+            ->name('empleados')
+            ->middleware('can:configuracion.empleados');
 
         Route::get('/configuracion/departamentos', Departamentos::class)
-        ->name('departamentos')
-        ->middleware('can:configuracion.departamentos');
+            ->name('departamentos')
+            ->middleware('can:configuracion.departamentos');
 
         Route::get('/configuracion/procesoscompras', ProcesCompras::class)
-        ->name('procesoscompras')
-        ->middleware('can:configuracion.procesoscompras');
+            ->name('procesoscompras')
+            ->middleware('can:configuracion.procesoscompras');
 
         Route::get('/configuracion/cubs', Cubs::class)
-        ->name('cubs')
-        ->middleware('can:configuracion.cubs');
-
-        
+            ->name('cubs')
+            ->middleware('can:configuracion.cubs');
     });
 
     // Rutas del módulo de planificacion
-    Route::middleware(['auth', CheckModuleAccess::class.':planificacion'])->group(function () {
-        
+    Route::middleware(['auth', CheckModuleAccess::class . ':planificacion'])->group(function () {
+
         Route::get('/planificacion/planificar', Planificar::class)
-        ->name('planificar')
-        ->middleware('can:planificacion.planificar');
+            ->name('planificar')
+            ->middleware('can:planificacion.planificar');
 
         Route::get('/planificacion/requerir', Requerir::class)
-        ->name('requerir')
-        ->middleware('can:planificacion.requerir');
+            ->name('requerir')
+            ->middleware('can:planificacion.requerir');
 
         Route::get('/planificacion/seguimiento', Seguimiento::class)
-        ->name('seguimiento')
-        ->middleware('can:planificacion.seguimiento');
+            ->name('seguimiento')
+            ->middleware('can:planificacion.seguimiento');
 
         Route::get('/planificacion/consolidado', Consolidado::class)
-        ->name('consolidado')
-        ->middleware('can:planificacion.consolidado');
-        
+            ->name('consolidado')
+            ->middleware('can:planificacion.consolidado');
     });
 
     // Rutas para el visor de logs (protegidas por middleware)
-     Route::middleware(['auth', CheckModuleAccess::class.':logs'])->group(function () {
+    Route::middleware(['auth', CheckModuleAccess::class . ':logs'])->group(function () {
         Route::get('/logs', [LogViewerController::class, 'index'])
-        ->name('logs')
-        ->middleware('can:logs.logs');
+            ->name('logs')
+            ->middleware('can:logs.logs');
 
         Route::get('/logs/dashboard', [LogViewerController::class, 'dashboard'])
-        ->name('logsdashboard')
-        ->middleware('can:logs.logsdashboard');
+            ->name('logsdashboard')
+            ->middleware('can:logs.logsdashboard');
 
         Route::get('/logs/{log}', [LogViewerController::class, 'show'])
-        ->name('logs.show')
-        ->middleware('can:logs.logsshow');
+            ->name('logs.show')
+            ->middleware('can:logs.logsshow');
 
         Route::post('/logs/cleanup', [LogViewerController::class, 'cleanup'])
-        ->name('cleanup')
-        ->middleware('can:logs.logscleanup');
+            ->name('cleanup')
+            ->middleware('can:logs.logscleanup');
     });
 
 });
