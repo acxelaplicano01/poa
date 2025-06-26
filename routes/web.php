@@ -81,8 +81,6 @@ Route::middleware([
     Route::get('/instituciones', Instituciones::class)
         ->name('instituciones');
 
-    Route::get('/sessions', SessionManager::class)
-        ->name('sessions');
 
 
     // Rutas del módulo de configuración
@@ -133,7 +131,7 @@ Route::middleware([
             ->middleware('can:planificacion.consolidado');
     });
 
-    // Rutas para el visor de logs (protegidas por middleware)
+    // Rutas para el visor de logs
     Route::middleware(['auth', CheckModuleAccess::class . ':logs'])->group(function () {
         Route::get('/logs', [LogViewerController::class, 'index'])
             ->name('logs')
@@ -142,6 +140,10 @@ Route::middleware([
         Route::get('/logs/dashboard', [LogViewerController::class, 'dashboard'])
             ->name('logsdashboard')
             ->middleware('can:logs.logsdashboard');
+
+        Route::get('/logs/sessions', SessionManager::class)
+            ->name('sessions')
+            ->middleware('can:logs.sessions');
 
         Route::get('/logs/{log}', [LogViewerController::class, 'show'])
             ->name('logs.show')

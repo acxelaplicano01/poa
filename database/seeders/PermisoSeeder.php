@@ -57,6 +57,7 @@ class PermisoSeeder extends Seeder
                 'logsdashboard',
                 'logsshow',
                 'logscleanup',
+                'sessions'
             ]
         ];
         

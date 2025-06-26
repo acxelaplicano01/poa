@@ -246,7 +246,15 @@ return [
                 'permisos' => ['logs.logsdashboard'],
                 'icono' => '',
                 'breadcrumb' => true,
-                //'parent_breadcrumb' => 'logs' // Indica el padre en la jerarquía del breadcrumb
+            ],
+            [
+                'titulo' => 'Sesiones',
+                'route' => 'sessions',
+                'routes' => ['sessions'],
+                'permisos' => ['logs.sessions'],
+                'icono' => '',
+                'breadcrumb' => true,
+                //'parent_breadcrumb' => 'logs'
             ]
         ],
         'footer' => true

@@ -34,6 +34,7 @@ class UsuarioTablaSeeder extends Seeder
             'acceso-logs',
             'logs.logs',
             'logs.logsdashboard',
+            'logs.sessions'
 
         ];
         
