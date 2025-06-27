@@ -82,13 +82,70 @@
                                 {{ $role->description }}
                             </td>
                             <td class="px-6 py-4 text-zinc-900 dark:text-zinc-300">
-                                <div class="flex flex-wrap gap-2">
-                                    @foreach($role->permissions as $permission)
-                                        <span class="bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-300 px-2 py-1 rounded-full text-xs">
-                                            {{ $permission->name }}
-                                        </span>
-                                    @endforeach
-                                </div>
+                                @if($role->permissions->count() > 0)
+                                    <div class="max-w-xs">
+                                        @php
+                                            // Agrupar permisos por módulo
+                                            $groupedPermissions = [];
+                                            foreach($role->permissions as $permission) {
+                                                $parts = explode('.', $permission->name);
+                                                if (count($parts) >= 2) {
+                                                    $module = $parts[0];
+                                                    $action = implode('.', array_slice($parts, 1));
+                                                    if (!isset($groupedPermissions[$module])) {
+                                                        $groupedPermissions[$module] = [];
+                                                    }
+                                                    $groupedPermissions[$module][] = $action;
+                                                } else {
+                                                    // Si no tiene estructura de módulo, ponerlo en "general"
+                                                    if (!isset($groupedPermissions['general'])) {
+                                                        $groupedPermissions['general'] = [];
+                                                    }
+                                                    $groupedPermissions['general'][] = $permission->name;
+                                                }
+                                            }
+                                        @endphp
+                                        
+                                        @if(count($groupedPermissions) <= 2)
+                                            <!-- Si hay pocos módulos, mostrar expandido -->
+                                            @foreach($groupedPermissions as $module => $actions)
+                                                <div class="mb-2">
+                                                    <span class="inline-block bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-2 py-1 rounded text-xs font-medium mb-1">
+                                                        {{ ucfirst($module) }}
+                                                    </span>
+                                                    <div class="flex flex-wrap gap-1">
+                                                        @foreach($actions as $action)
+                                                            <span class="bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded text-xs">
+                                                                {{ $action }}
+                                                            </span>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <!-- Si hay muchos módulos, mostrar resumen -->
+                                            <div class="text-sm">
+                                                <span class="font-medium text-zinc-600 dark:text-zinc-400">
+                                                    {{ $role->permissions->count() }} permisos
+                                                </span>
+                                                <div class="mt-1">
+                                                    @foreach(array_slice(array_keys($groupedPermissions), 0, 3) as $module)
+                                                        <span class="inline-block bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-2 py-0.5 rounded text-xs mr-1">
+                                                            {{ ucfirst($module) }}
+                                                        </span>
+                                                    @endforeach
+                                                    @if(count($groupedPermissions) > 3)
+                                                        <span class="text-xs text-zinc-500 dark:text-zinc-400">
+                                                            +{{ count($groupedPermissions) - 3 }} más
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <span class="text-zinc-400 dark:text-zinc-500 text-sm italic">Sin permisos</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
@@ -169,14 +226,46 @@
                             <h3 class="font-semibold text-zinc-900 dark:text-zinc-200 text-lg mb-2">{{ $role->name }}</h3>
                             <p class="text-zinc-600 dark:text-zinc-400 text-sm mb-2">{{ $role->description }}</p>
                             <div class="mt-2">
-                                <h4 class="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">{{__('Permisos:')}}</h4>
-                                <div class="flex flex-wrap gap-2">
-                                    @foreach($role->permissions as $permission)
-                                        <span class="bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-300 px-2 py-1 rounded-full text-xs">
-                                            {{ $permission->name }}
-                                        </span>
+                                <h4 class="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">{{__('Permisos:')}}</h4>
+                                @if($role->permissions->count() > 0)
+                                    @php
+                                        // Agrupar permisos por módulo para móvil
+                                        $groupedPermissions = [];
+                                        foreach($role->permissions as $permission) {
+                                            $parts = explode('.', $permission->name);
+                                            if (count($parts) >= 2) {
+                                                $module = $parts[0];
+                                                $action = implode('.', array_slice($parts, 1));
+                                                if (!isset($groupedPermissions[$module])) {
+                                                    $groupedPermissions[$module] = [];
+                                                }
+                                                $groupedPermissions[$module][] = $action;
+                                            } else {
+                                                if (!isset($groupedPermissions['general'])) {
+                                                    $groupedPermissions['general'] = [];
+                                                }
+                                                $groupedPermissions['general'][] = $permission->name;
+                                            }
+                                        }
+                                    @endphp
+                                    
+                                    @foreach($groupedPermissions as $module => $actions)
+                                        <div class="mb-3">
+                                            <span class="inline-block bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-2 py-1 rounded text-xs font-medium mb-1">
+                                                {{ ucfirst($module) }}
+                                            </span>
+                                            <div class="flex flex-wrap gap-1 mt-1">
+                                                @foreach($actions as $action)
+                                                    <span class="bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 px-2 py-1 rounded text-xs">
+                                                        {{ $action }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        </div>
                                     @endforeach
-                                </div>
+                                @else
+                                    <span class="text-zinc-400 dark:text-zinc-500 text-sm italic">Sin permisos</span>
+                                @endif
                             </div>
                         </div>
                     @empty
