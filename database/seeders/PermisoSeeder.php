@@ -55,6 +55,7 @@ class PermisoSeeder extends Seeder
                 'visor' => ['ver', 'filtrar', 'exportar'],
                 'dashboard' => ['ver', 'analizar'],
                 'mantenimiento' => ['limpiar', 'configurar'],
+                'sessions' => ['ver', 'gestionar'],
             ]
         ];
         
