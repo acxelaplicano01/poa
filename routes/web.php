@@ -10,6 +10,8 @@ use App\Livewire\Consolidado\Consolidado;
 use App\Livewire\Cub\Cubs;
 use App\Livewire\Departamento\Departamentos;
 use App\Livewire\EjecucionPresupuestaria\EstadosEjecucionPresupuestaria;
+use App\Livewire\Consola\AsignacionPresupuestaria;
+use App\Livewire\Consola\PlanEstrategicoInstitucional;
 use App\Livewire\Empleado\Empleados;
 use App\Livewire\GrupoGastos\Fuentes;
 use App\Livewire\GrupoGastos\GrupoGastos;
@@ -138,6 +140,18 @@ Route::middleware([
         Route::get('/planificacion/consolidado', Consolidado::class)
             ->name('consolidado')
             ->middleware('can:planificacion.consolidado.ver');
+    });
+
+    //Rutas del módulo de consolas
+    Route::middleware(['auth', CheckModuleAccess::class . ':consola'])->group(function () {
+
+        Route::get('/consola/planestrategicoinstitucional', PlanEstrategicoInstitucional::class)
+            ->name('planestrategicoinstitucional')
+            ->middleware('can:consola.planestrategicoinstitucional.ver');
+
+        Route::get('/consola/asignacionpresupuestaria', asignacionpresupuestaria::class)
+            ->name('asignacionpresupuestaria')
+            ->middleware('can:consola.asignacionpresupuestaria.ver');
     });
 
     // Rutas para el visor de logs

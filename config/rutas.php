@@ -141,92 +141,19 @@ return [
         'footer' => true
     ],
 
-    // Los módulos comentados se mantienen así pero con la estructura mejorada para breadcrumbs
-    /* 'gestion' => [
-        'titulo' => 'Gestión Administrativa',
-        'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3z" />',
-        'route' => 'gestionadministrativa',
-        'breadcrumb_label' => 'Gestión Administrativa',
-        'items' => [
-            [
-                'titulo' => 'Gestion Administrativa',
-                'route' => 'gestionadministrativa',
-                'routes' => ['gestionadministrativa'],
-                'permisos' => ['gestionadministrativa.gestionadministrativa'],
-                'icono' => '',
-                'breadcrumb' => true
-            ],
-            [
-                'titulo' => 'Configuración',
-                'route' => 'configuracion',
-                'routes' => ['configuracion'],
-                'permisos' => ['gestionadministrativa.configuracion'],
-                'icono' => '',
-                'breadcrumb' => true
-            ],
-            [
-                'titulo' => 'Plan Anual de Compras',
-                'route' => 'plananualcompras',
-                'routes' => ['plananualcompras'],
-                'permisos' => ['gestionadministrativa.plananualcompras'],
-                'icono' => '',
-                'breadcrumb' => true
-            ],
-        ]
-    ],
-
-    'reportes' => [
-        'titulo' => 'Reportes',
-        'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3z" />',
-        'route' => 'reportegeneral',
-        'breadcrumb_label' => 'Reportes y Estadísticas',
-        'items' => [
-            [
-                'titulo' => 'Reporte general',
-                'route' => 'reportegeneral',
-                'routes' => ['reportegeneral'],
-                'permisos' => ['reportes.reportegeneral'],
-                'icono' => '',
-                'breadcrumb' => true
-            ],
-            [
-                'titulo' => 'Resumen trimestral',
-                'route' => 'resumentrimestral',
-                'routes' => ['resumentrimestral'],
-                'permisos' => ['reportes.resumentrimestral'],
-                'icono' => '',
-                'breadcrumb' => true
-            ],
-            [
-                'titulo' => 'Consolidado',
-                'route' => 'consolidado',
-                'routes' => ['consolidado'],
-                'permisos' => ['reportes.consolidado'],
-                'icono' => '',
-                'breadcrumb' => true
-            ],
-            [
-                'titulo' => 'Recursos planificados',
-                'route' => 'recursosplanificados',
-                'routes' => ['recursosplanificados'],
-                'permisos' => ['reportes.recursosplanificados'],
-                'icono' => '',
-                'breadcrumb' => true
-            ],
-        ]
-    ],
-
+    // Módulo de Consola de Administración
     'consola' => [
         'titulo' => 'Consola',
-        'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3z" />',
-        'route' => 'consola',
+        'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15v4m6-6v6m6-4v4m6-6v6M3 11l6-5 6 5 5.5-5.5"/>',
+        'route' => 'planestrategicoinstitucional', // Ruta principal del módulo
+        'permisos_modulo' => 'acceso-consola', // Permiso padre del módulo
         'breadcrumb_label' => 'Consola de Administración',
         'items' => [
             [
                 'titulo' => 'Plan estratégico institucional',
-                'route' => 'planestrategico',
-                'routes' => ['planestrategico'],
-                'permisos' => ['consola.planestrategico'],
+                'route' => 'planestrategicoinstitucional',
+                'routes' => ['planestrategicoinstitucional'],
+                'permisos' => ['consola.planestrategicoinstitucional.ver'],
                 'icono' => '',
                 'breadcrumb' => true
             ],
@@ -234,12 +161,12 @@ return [
                 'titulo' => 'Asignación presupuestaria',
                 'route' => 'asignacionpresupuestaria',
                 'routes' => ['asignacionpresupuestaria'],
-                'permisos' => ['consola.asignacionpresupuestaria'],
+                'permisos' => ['consola.asignacionpresupuestaria.ver'],
                 'icono' => '',
                 'breadcrumb' => true
             ],
         ]
-    ] */
+    ],
 
     'logs' => [
         'titulo' => 'Registros del Sistema',

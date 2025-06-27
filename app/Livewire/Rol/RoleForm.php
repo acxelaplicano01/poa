@@ -116,7 +116,7 @@ class RoleForm extends Component
 
                 // Log de la actividad
                 LogService::activity(
-                    'update',
+                    'actualizar',
                     'roles',
                     'Rol actualizado: ' . $this->name,
                     [
@@ -141,7 +141,7 @@ class RoleForm extends Component
 
                 // Log de la actividad
                 LogService::activity(
-                    'create',
+                    'crear',
                     'roles',
                     'Rol creado: ' . $this->name,
                     [

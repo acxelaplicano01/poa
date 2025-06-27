@@ -48,7 +48,7 @@ class PermisoSeeder extends Seeder
                 'recursosplanificados' => ['ver', 'generar', 'exportar'],
             ],
             'consola' => [
-                'planestrategico' => ['ver', 'crear', 'editar', 'aprobar'],
+                'planestrategicoinstitucional' => ['ver', 'crear', 'editar', 'aprobar'],
                 'asignacionpresupuestaria' => ['ver', 'crear', 'editar', 'aprobar'],
             ],
             'logs' => [
