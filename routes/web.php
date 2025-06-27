@@ -152,7 +152,7 @@ Route::middleware([
 
         Route::get('/logs/sessions', SessionManager::class)
             ->name('sessions')
-            ->middleware('can:logs.sessions');
+            ->middleware('can:logs.sessions.ver');
 
         Route::get('/logs/{log}', [LogViewerController::class, 'show'])
             ->name('logs.show')

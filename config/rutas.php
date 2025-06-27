@@ -252,7 +252,7 @@ return [
                 'titulo' => 'Visor de Logs',
                 'route' => 'logs',
                 'routes' => ['logs'],
-                'permisos' => ['logs.visor.ver', 'logs.visor.filtrar', 'logs.visor.exportar'],
+                'permisos' => ['logs.visor.ver'],
                 'icono' => '',
                 'breadcrumb' => true
             ],
@@ -260,7 +260,7 @@ return [
                 'titulo' => 'Dashboard de Logs',
                 'route' => 'logsdashboard',
                 'routes' => ['logsdashboard'],
-                'permisos' => ['logs.dashboard.ver', 'logs.dashboard.analizar'],
+                'permisos' => ['logs.dashboard.ver'],
                 'icono' => '',
                 'breadcrumb' => true,
             ],
@@ -268,7 +268,7 @@ return [
                 'titulo' => 'Sesiones',
                 'route' => 'sessions',
                 'routes' => ['sessions'],
-                'permisos' => ['logs.sessions'],
+                'permisos' => ['logs.sessions.ver'],
                 'icono' => '',
                 'breadcrumb' => true,
                 //'parent_breadcrumb' => 'logs'

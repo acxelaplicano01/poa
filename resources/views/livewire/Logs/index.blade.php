@@ -253,7 +253,7 @@
             </div>
 
             <!-- Limpiar logs antiguos -->
-            @can('logs.logscleanup')
+            @can('logs.mantenimiento.limpiar')
                 <div class="mt-6 p-4 bg-white rounded-lg shadow sm:p-6 dark:bg-zinc-900">
                     <h3 class="text-lg font-medium text-zinc-900 dark:text-white">Mantenimiento de logs</h3>
                     <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
