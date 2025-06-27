@@ -70,6 +70,30 @@
                 if (isset($item['routes']) && is_array($item['routes'])) {
                     $isActive = in_array($currentRoute, $item['routes']);
                 }
+                
+                // Si no está activo, verificar rutas anidadas (como roles.create desde roles)
+                if (!$isActive && isset($item['route']) && strpos($currentRoute, '.') !== false) {
+                    $routeParts = explode('.', $currentRoute);
+                    $actionLabels = ['create', 'edit', 'show', 'delete'];
+                    
+                    // Si la última parte es una acción conocida
+                    $lastPart = end($routeParts);
+                    if (in_array($lastPart, $actionLabels)) {
+                        // Construir la ruta padre (quitar la última parte)
+                        $parentRouteParts = array_slice($routeParts, 0, -1);
+                        $parentRoute = implode('.', $parentRouteParts);
+                        
+                        // Verificar si la ruta padre coincide con este ítem
+                        if ($item['route'] === $parentRoute) {
+                            $isActive = true;
+                        }
+                        
+                        // También verificar si está en el array de rutas del ítem
+                        if (isset($item['routes']) && is_array($item['routes']) && in_array($parentRoute, $item['routes'])) {
+                            $isActive = true;
+                        }
+                    }
+                }
             @endphp
             
             <x-navbar-link 

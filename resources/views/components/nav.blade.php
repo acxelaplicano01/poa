@@ -24,12 +24,66 @@
 
                 // Detectar el módulo actual basado en la ruta actual
                 $currentRoute = request()->route() ? request()->route()->getName() : '';
+                $found = false;
+                
                 foreach (config('rutas') as $moduleKey => $moduleData) {
+                    if ($found) break;
+                    
+                    // Si el módulo tiene una ruta directa y coincide con la actual
+                    if (isset($moduleData['route']) && $currentRoute == $moduleData['route']) {
+                        $currentModule = $moduleKey;
+                        $found = true;
+                        break;
+                    }
+                    
                     if (isset($moduleData['items'])) {
                         foreach ($moduleData['items'] as $item) {
                             if (isset($item['routes']) && is_array($item['routes']) && in_array($currentRoute, $item['routes'])) {
                                 $currentModule = $moduleKey;
-                                break 2;
+                                $found = true;
+                                break;
+                            }
+                            
+                            // Verificar si hay una ruta individual del item
+                            if (isset($item['route']) && $currentRoute == $item['route']) {
+                                $currentModule = $moduleKey;
+                                $found = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Si no se encontró, verificar rutas anidadas (como roles.create, roles.edit, etc.)
+                if (!$found && strpos($currentRoute, '.') !== false) {
+                    $routeParts = explode('.', $currentRoute);
+                    $actionLabels = ['create', 'edit', 'show', 'delete'];
+                    
+                    // Si la última parte es una acción conocida
+                    $lastPart = end($routeParts);
+                    if (in_array($lastPart, $actionLabels)) {
+                        // Construir la ruta padre (quitar la última parte)
+                        $parentRouteParts = array_slice($routeParts, 0, -1);
+                        $parentRoute = implode('.', $parentRouteParts);
+                        
+                        // Buscar la ruta padre en la configuración
+                        foreach (config('rutas') as $moduleKey => $moduleData) {
+                            if ($found) break;
+                            if (isset($moduleData['items']) && is_array($moduleData['items'])) {
+                                foreach ($moduleData['items'] as $item) {
+                                    // Verificar en el array de rutas
+                                    if (isset($item['routes']) && is_array($item['routes']) && in_array($parentRoute, $item['routes'])) {
+                                        $currentModule = $moduleKey;
+                                        $found = true;
+                                        break;
+                                    }
+                                    // Verificar la ruta individual
+                                    if (isset($item['route']) && $item['route'] === $parentRoute) {
+                                        $currentModule = $moduleKey;
+                                        $found = true;
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
@@ -51,12 +105,66 @@
 
                 // Detectar el módulo actual basado en la ruta actual
                 $currentRoute = request()->route() ? request()->route()->getName() : '';
+                $found = false;
+                
                 foreach (config('rutas') as $moduleKey => $moduleData) {
+                    if ($found) break;
+                    
+                    // Si el módulo tiene una ruta directa y coincide con la actual
+                    if (isset($moduleData['route']) && $currentRoute == $moduleData['route']) {
+                        $currentModule = $moduleKey;
+                        $found = true;
+                        break;
+                    }
+                    
                     if (isset($moduleData['items'])) {
                         foreach ($moduleData['items'] as $item) {
                             if (isset($item['routes']) && is_array($item['routes']) && in_array($currentRoute, $item['routes'])) {
                                 $currentModule = $moduleKey;
-                                break 2;
+                                $found = true;
+                                break;
+                            }
+                            
+                            // Verificar si hay una ruta individual del item
+                            if (isset($item['route']) && $currentRoute == $item['route']) {
+                                $currentModule = $moduleKey;
+                                $found = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Si no se encontró, verificar rutas anidadas (como roles.create, roles.edit, etc.)
+                if (!$found && strpos($currentRoute, '.') !== false) {
+                    $routeParts = explode('.', $currentRoute);
+                    $actionLabels = ['create', 'edit', 'show', 'delete'];
+                    
+                    // Si la última parte es una acción conocida
+                    $lastPart = end($routeParts);
+                    if (in_array($lastPart, $actionLabels)) {
+                        // Construir la ruta padre (quitar la última parte)
+                        $parentRouteParts = array_slice($routeParts, 0, -1);
+                        $parentRoute = implode('.', $parentRouteParts);
+                        
+                        // Buscar la ruta padre en la configuración
+                        foreach (config('rutas') as $moduleKey => $moduleData) {
+                            if ($found) break;
+                            if (isset($moduleData['items']) && is_array($moduleData['items'])) {
+                                foreach ($moduleData['items'] as $item) {
+                                    // Verificar en el array de rutas
+                                    if (isset($item['routes']) && is_array($item['routes']) && in_array($parentRoute, $item['routes'])) {
+                                        $currentModule = $moduleKey;
+                                        $found = true;
+                                        break;
+                                    }
+                                    // Verificar la ruta individual
+                                    if (isset($item['route']) && $item['route'] === $parentRoute) {
+                                        $currentModule = $moduleKey;
+                                        $found = true;
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }

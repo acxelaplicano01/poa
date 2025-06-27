@@ -44,12 +44,14 @@
                 <x-label for="roles" value="{{ __('Roles') }}" />
                 <div class="mt-2 grid grid-cols-1 gap-3 max-h-60 overflow-y-auto p-2 border border-zinc-200 dark:border-zinc-700 rounded-md">
                     @forelse($roles ?? [] as $role)
+                        @if(is_object($role))
                         <div class="py-1">
                             <x-toggle wire:model="selectedRoles" 
                                 value="{{ $role->id }}">
                                 {{ $role->name }}
                             </x-toggle>
                         </div>
+                        @endif
                     @empty
                         <p class="text-zinc-500 dark:text-zinc-400">No hay roles disponibles</p>
                     @endforelse

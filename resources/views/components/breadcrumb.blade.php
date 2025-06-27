@@ -25,6 +25,57 @@
         }
     }
     
+    // Detectar rutas anidadas (como roles.create, roles.edit, etc.)
+    $isNestedRoute = false;
+    $parentRoute = null;
+    $actionLabel = null;
+    
+    if (!$moduleKey && strpos($currentRoute, '.') !== false) {
+        $routeParts = explode('.', $currentRoute);
+        $actionLabels = [
+            'create' => 'Crear',
+            'edit' => 'Editar',
+            'show' => 'Ver',
+            'delete' => 'Eliminar',
+        ];
+        
+        // Si la última parte es una acción conocida
+        $lastPart = end($routeParts);
+        if (isset($actionLabels[$lastPart])) {
+            $isNestedRoute = true;
+            $actionLabel = $actionLabels[$lastPart];
+            
+            // Construir la ruta padre (quitar la última parte)
+            $parentRouteParts = array_slice($routeParts, 0, -1);
+            $parentRoute = implode('.', $parentRouteParts);
+            
+            // Buscar la ruta padre en la configuración
+            $found = false;
+            foreach (config('rutas') as $mk => $moduleData) {
+                if ($found) break;
+                if (isset($moduleData['items'])) {
+                    foreach ($moduleData['items'] as $ik => $item) {
+                        if (isset($item['routes']) && is_array($item['routes']) && in_array($parentRoute, $item['routes'])) {
+                            $moduleKey = $mk;
+                            $itemKey = $ik;
+                            $moduleIcon = $moduleData['icono'] ?? null;
+                            $found = true;
+                            break;
+                        }
+                        // También verificar si la ruta padre coincide directamente con la ruta del item
+                        if (isset($item['route']) && $item['route'] === $parentRoute) {
+                            $moduleKey = $mk;
+                            $itemKey = $ik;
+                            $moduleIcon = $moduleData['icono'] ?? null;
+                            $found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     // Si encontramos el módulo y el ítem, construir la ruta de breadcrumb
     if ($moduleKey && isset(config('rutas')[$moduleKey])) {
         $module = config('rutas')[$moduleKey];
@@ -55,56 +106,81 @@
                 }
             }
             
-            // Añadir el ítem actual
+            // Añadir el ítem principal
+            $itemUrl = null;
+            if ($isNestedRoute && isset($item['route'])) {
+                // Si es una ruta anidada, el ítem principal debe tener enlace a su lista
+                $itemUrl = route($item['route']);
+            } elseif (!$isNestedRoute && isset($item['route'])) {
+                // Si no es una ruta anidada, no tiene enlace (es la página actual)
+                $itemUrl = null;
+            }
+            
             $breadcrumbItems[] = [
                 'label' => $item['titulo'],
-                'url' => null, // El ítem actual no tiene enlace
+                'url' => $itemUrl,
                 'icon' => $item['icono'] ?? null
             ];
             
-            // Detectar acciones específicas (show, edit, create)
-            $actionLabels = [
-                'show' => 'Ver',
-                'edit' => 'Editar',
-                'create' => 'Crear',
-            ];
-            
-            $routeParts = explode('.', $currentRoute);
-            $lastPart = end($routeParts);
-            
-            if (isset($actionLabels[$lastPart])) {
-                $breadcrumbItems[count($breadcrumbItems) - 1]['url'] = route($item['route']); // El ítem principal ahora tiene enlace
+            // Si es una ruta anidada, añadir la acción
+            if ($isNestedRoute && $actionLabel) {
                 $breadcrumbItems[] = [
-                    'label' => $actionLabels[$lastPart],
-                    'url' => null,
+                    'label' => $actionLabel . ' ' . $item['titulo'],
+                    'url' => null, // La acción actual no tiene enlace
                     'icon' => null
                 ];
             }
         }
     } else {
-        // Fallback: mostrar al menos el nombre de la ruta formateado
+        // Fallback: construir breadcrumb basado en la estructura de la ruta
         $routeParts = explode('.', $currentRoute);
-        if (count($routeParts) > 1) {
-            $breadcrumbItems[] = [
-                'label' => ucfirst($routeParts[count($routeParts) - 2]),
-                'url' => null,
-                'icon' => null
-            ];
-            
+        
+        if (count($routeParts) >= 2) {
             $actionLabels = [
-                'show' => 'Ver',
-                'edit' => 'Editar',
                 'create' => 'Crear',
+                'edit' => 'Editar',
+                'show' => 'Ver',
+                'delete' => 'Eliminar',
                 'index' => 'Lista',
             ];
             
-            $lastPart = end($routeParts);
-            if (isset($actionLabels[$lastPart])) {
+            // Primer nivel (ej: configuracion, planificacion)
+            if (count($routeParts) >= 1) {
                 $breadcrumbItems[] = [
-                    'label' => $actionLabels[$lastPart],
+                    'label' => ucfirst($routeParts[0]),
                     'url' => null,
                     'icon' => null
                 ];
+            }
+            
+            // Segundo nivel (ej: roles, usuarios)
+            if (count($routeParts) >= 2) {
+                $secondLevel = $routeParts[1];
+                $lastPart = end($routeParts);
+                
+                // Si el último elemento es una acción y hay al menos 3 partes
+                if (count($routeParts) >= 3 && isset($actionLabels[$lastPart])) {
+                    // El segundo nivel tiene enlace
+                    $breadcrumbItems[] = [
+                        'label' => ucfirst($secondLevel),
+                        'url' => null, // Se podría construir la ruta base si fuera necesario
+                        'icon' => null
+                    ];
+                    
+                    // Añadir la acción
+                    $breadcrumbItems[] = [
+                        'label' => $actionLabels[$lastPart] . ' ' . ucfirst($secondLevel),
+                        'url' => null,
+                        'icon' => null
+                    ];
+                } else {
+                    // El segundo nivel es la página actual
+                    $breadcrumbItems[] = [
+                        'label' => ucfirst($secondLevel),
+                        'url' => null,
+                        'icon' => null
+                    ];
+                }
             }
         } elseif (!empty($routeParts[0])) {
             $breadcrumbItems[] = [

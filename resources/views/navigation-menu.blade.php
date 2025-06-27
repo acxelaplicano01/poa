@@ -18,6 +18,39 @@ function isActiveModule($module)
                return true;
             }
          }
+         
+         // Verificar si hay una ruta individual del item
+         if (isset($item['route']) && $currentRoute == $item['route']) {
+            return true;
+         }
+      }
+   }
+
+   // Verificar rutas anidadas (como roles.create, roles.edit, etc.)
+   if (strpos($currentRoute, '.') !== false) {
+      $routeParts = explode('.', $currentRoute);
+      $actionLabels = ['create', 'edit', 'show', 'delete'];
+      
+      // Si la última parte es una acción conocida
+      $lastPart = end($routeParts);
+      if (in_array($lastPart, $actionLabels)) {
+         // Construir la ruta padre (quitar la última parte)
+         $parentRouteParts = array_slice($routeParts, 0, -1);
+         $parentRoute = implode('.', $parentRouteParts);
+         
+         // Buscar la ruta padre en la configuración del módulo
+         if (isset($moduleConfig['items']) && is_array($moduleConfig['items'])) {
+            foreach ($moduleConfig['items'] as $item) {
+               // Verificar en el array de rutas
+               if (isset($item['routes']) && is_array($item['routes']) && in_array($parentRoute, $item['routes'])) {
+                  return true;
+               }
+               // Verificar la ruta individual
+               if (isset($item['route']) && $item['route'] === $parentRoute) {
+                  return true;
+               }
+            }
+         }
       }
    }
 
