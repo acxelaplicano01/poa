@@ -42,18 +42,16 @@
             
             <div>
                 <x-label for="roles" value="{{ __('Roles') }}" />
-                <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto p-2 border border-zinc-200 dark:border-zinc-700 rounded-md">
+                <div class="mt-2 grid grid-cols-1 gap-3 max-h-60 overflow-y-auto p-2 border border-zinc-200 dark:border-zinc-700 rounded-md">
                     @forelse($roles ?? [] as $role)
-                        <label class="flex items-center">
-                            <x-checkbox type="checkbox"
-                                wire:model="selectedRoles" 
-                                value="{{ $role->id }}" 
-                                class="form-checkbox"
-                            />
-                            <span class="ml-2 text-zinc-700 dark:text-zinc-300">{{ $role->name }}</span>
-                        </label>
+                        <div class="py-1">
+                            <x-toggle wire:model="selectedRoles" 
+                                value="{{ $role->id }}">
+                                {{ $role->name }}
+                            </x-toggle>
+                        </div>
                     @empty
-                        <p class="text-zinc-500 dark:text-zinc-400 col-span-2">No hay roles disponibles</p>
+                        <p class="text-zinc-500 dark:text-zinc-400">No hay roles disponibles</p>
                     @endforelse
                 </div>
                 @error('selectedRoles') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror

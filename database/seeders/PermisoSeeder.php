@@ -16,70 +16,89 @@ class PermisoSeeder extends Seeder
         // Resetear roles y permisos en caché
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         
-        // Permisos organizados por módulo
+        // Estructura jerárquica de permisos de 3 niveles
+        // Nivel 1: Módulo padre (acceso-{modulo})
+        // Nivel 2: Funcionalidad ({modulo}.{funcionalidad})
+        // Nivel 3: Acciones ({modulo}.{funcionalidad}.{accion})
+        
         $modulePermissions = [
             'configuracion' => [
-                'roles',
-                'usuarios',
-                'empleados',
-                'departamentos',
-                'procesoscompras',
-                'cubs',
-                // Agregar más subpermisos aquí
+                'roles' => ['ver', 'crear', 'editar', 'eliminar'],
+                'usuarios' => ['ver', 'crear', 'editar', 'eliminar'],
+                'empleados' => ['ver', 'crear', 'editar', 'eliminar'],
+                'departamentos' => ['ver', 'crear', 'editar', 'eliminar'],
+                'procesoscompras' => ['ver', 'crear', 'editar', 'eliminar'],
+                'cubs' => ['ver', 'crear', 'editar', 'eliminar'],
             ],
             'planificacion' => [
-                'planificar',
-                'requerir',
-                'seguimiento',
-                'consolidado',
-                // Agregar más subpermisos aquí
+                'planificar' => ['ver', 'crear', 'editar'],
+                'requerir' => ['ver', 'crear', 'editar'],
+                'seguimiento' => ['ver', 'editar'],
+                'consolidado' => ['ver', 'generar'],
             ],
             'gestion' => [
-                'gestionadministrativa',
-                'configuracion',
-                'plananualcompras',
-                // Agregar más subpermisos aquí
+                'gestionadministrativa' => ['ver', 'crear', 'editar'],
+                'configuracion' => ['ver', 'editar'],
+                'plananualcompras' => ['ver', 'crear', 'editar', 'aprobar'],
             ],
             'reportes' => [
-                'reportegeneral',
-                'resumentrimestral',
-                'consolidado',
-                'recursosplanificados',
-                // Subpermisos de reportes
+                'reportegeneral' => ['ver', 'generar', 'exportar'],
+                'resumentrimestral' => ['ver', 'generar', 'exportar'],
+                'consolidado' => ['ver', 'generar'],
+                'recursosplanificados' => ['ver', 'generar', 'exportar'],
             ],
-            'consolas' => [
-                'planestrategico',
-                'asignacionpresupuestaria',
-                // Subpermisos de consolas
+            'consola' => [
+                'planestrategico' => ['ver', 'crear', 'editar', 'aprobar'],
+                'asignacionpresupuestaria' => ['ver', 'crear', 'editar', 'aprobar'],
             ],
             'logs' => [
-                'logs',
-                'logsdashboard',
-                'logsshow',
-                'logscleanup',
+                'visor' => ['ver', 'filtrar', 'exportar'],
+                'dashboard' => ['ver', 'analizar'],
+                'mantenimiento' => ['limpiar', 'configurar'],
             ]
         ];
         
-        // Permisos de acceso a módulos (estos son los permisos principales)
+        // 1. Crear permisos de acceso a módulos (Nivel 1)
         $modules = array_keys($modulePermissions);
         foreach ($modules as $module) {
-            Permission::firstOrCreate(['name' => "acceso-{$module}", 'guard_name' => 'web']);
+            Permission::firstOrCreate([
+                'name' => "acceso-{$module}", 
+                'guard_name' => 'web'
+            ]);
         }
         
-        // Permisos específicos por módulo (estos son los subpermisos)
-        foreach ($modulePermissions as $module => $permissions) {
-            foreach ($permissions as $permission) {
-                Permission::firstOrCreate(['name' => "{$module}.{$permission}", 'guard_name' => 'web']);
+        // 2. Crear permisos específicos por funcionalidad y acción (Niveles 2 y 3)
+        foreach ($modulePermissions as $module => $functionalities) {
+            foreach ($functionalities as $functionality => $actions) {
+                // Crear permiso de funcionalidad (Nivel 2) - opcional
+                // Permission::firstOrCreate([
+                //     'name' => "{$module}.{$functionality}", 
+                //     'guard_name' => 'web'
+                // ]);
+                
+                // Crear permisos de acciones específicas (Nivel 3)
+                foreach ($actions as $action) {
+                    Permission::firstOrCreate([
+                        'name' => "{$module}.{$functionality}.{$action}", 
+                        'guard_name' => 'web'
+                    ]);
+                }
             }
         }
         
-        // Otros permisos que no siguen la estructura jerárquica
+        // 3. Otros permisos independientes que no siguen la estructura jerárquica
         $otherPermissions = [
-            // Cualquier otro permiso que no siga el formato de módulo
+            'dashboard.ver', // Acceso al dashboard principal
+            // Agregar aquí otros permisos que no sigan la estructura modular
         ];
         
         foreach ($otherPermissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+            Permission::firstOrCreate([
+                'name' => $permission, 
+                'guard_name' => 'web'
+            ]);
         }
+        
+        $this->command->info('Permisos creados exitosamente con estructura jerárquica de 3 niveles.');
     }
 }

@@ -20,6 +20,7 @@ use App\Livewire\Requerir\Requerir;
 use App\Livewire\Requisicion\EstadosRequisicion;
 use App\Livewire\Requisicion\UnidadMedidas;
 use App\Livewire\Rol\Roles;
+use App\Livewire\Rol\RoleForm;
 use App\Livewire\Seguimiento\Seguimiento;
 use App\Livewire\Actividad\TipoActividades;
 use App\Livewire\Mes\Trimestres;
@@ -90,27 +91,35 @@ Route::middleware([
 
         Route::get('/configuracion/roles', Roles::class)
             ->name('roles')
-            ->middleware('can:configuracion.roles');
+            ->middleware('can:configuracion.roles.ver');
+
+        Route::get('/configuracion/roles/crear', RoleForm::class)
+            ->name('roles.create')
+            ->middleware('can:configuracion.roles.crear');
+
+        Route::get('/configuracion/roles/{roleId}/editar', RoleForm::class)
+            ->name('roles.edit')
+            ->middleware('can:configuracion.roles.editar');
 
         Route::get('/configuracion/usuarios', Usuarios::class)
             ->name('usuarios')
-            ->middleware('can:configuracion.usuarios');
+            ->middleware('can:configuracion.usuarios.ver');
 
         Route::get('/configuracion/empleados', Empleados::class)
             ->name('empleados')
-            ->middleware('can:configuracion.empleados');
+            ->middleware('can:configuracion.empleados.ver');
 
         Route::get('/configuracion/departamentos', Departamentos::class)
             ->name('departamentos')
-            ->middleware('can:configuracion.departamentos');
+            ->middleware('can:configuracion.departamentos.ver');
 
         Route::get('/configuracion/procesoscompras', ProcesCompras::class)
             ->name('procesoscompras')
-            ->middleware('can:configuracion.procesoscompras');
+            ->middleware('can:configuracion.procesoscompras.ver');
 
         Route::get('/configuracion/cubs', Cubs::class)
             ->name('cubs')
-            ->middleware('can:configuracion.cubs');
+            ->middleware('can:configuracion.cubs.ver');
     });
 
     // Rutas del módulo de planificacion
@@ -118,38 +127,38 @@ Route::middleware([
 
         Route::get('/planificacion/planificar', Planificar::class)
             ->name('planificar')
-            ->middleware('can:planificacion.planificar');
+            ->middleware('can:planificacion.planificar.ver');
 
         Route::get('/planificacion/requerir', Requerir::class)
             ->name('requerir')
-            ->middleware('can:planificacion.requerir');
+            ->middleware('can:planificacion.requerir.ver');
 
         Route::get('/planificacion/seguimiento', Seguimiento::class)
             ->name('seguimiento')
-            ->middleware('can:planificacion.seguimiento');
+            ->middleware('can:planificacion.seguimiento.ver');
 
         Route::get('/planificacion/consolidado', Consolidado::class)
             ->name('consolidado')
-            ->middleware('can:planificacion.consolidado');
+            ->middleware('can:planificacion.consolidado.ver');
     });
 
     // Rutas para el visor de logs (protegidas por middleware)
     Route::middleware(['auth', CheckModuleAccess::class . ':logs'])->group(function () {
         Route::get('/logs', [LogViewerController::class, 'index'])
             ->name('logs')
-            ->middleware('can:logs.logs');
+            ->middleware('can:logs.visor.ver');
 
         Route::get('/logs/dashboard', [LogViewerController::class, 'dashboard'])
             ->name('logsdashboard')
-            ->middleware('can:logs.logsdashboard');
+            ->middleware('can:logs.dashboard.ver');
 
         Route::get('/logs/{log}', [LogViewerController::class, 'show'])
             ->name('logs.show')
-            ->middleware('can:logs.logsshow');
+            ->middleware('can:logs.visor.ver');
 
         Route::post('/logs/cleanup', [LogViewerController::class, 'cleanup'])
             ->name('cleanup')
-            ->middleware('can:logs.logscleanup');
+            ->middleware('can:logs.mantenimiento.limpiar');
     });
 
 });
