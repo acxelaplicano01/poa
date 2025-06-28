@@ -27,15 +27,8 @@ class UsuarioTablaSeeder extends Seeder
         // Crear permisos específicos para los módulos si no existen
         $modulePermissions = [
             'acceso-configuracion',
-            'configuracion.roles',
-            'configuracion.usuarios',
             'acceso-planificacion',
-            'planificacion.planificar',
             'acceso-logs',
-            'logs.logs',
-            'logs.logsdashboard',
-            'logs.sessions'
-
         ];
         
         foreach ($modulePermissions as $permName) {

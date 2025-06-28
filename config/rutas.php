@@ -147,7 +147,7 @@ return [
         'icono' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15v4m6-6v6m6-4v4m6-6v6M3 11l6-5 6 5 5.5-5.5"/>',
         'route' => 'planestrategicoinstitucional', // Ruta principal del módulo
         'permisos_modulo' => 'acceso-consola', // Permiso padre del módulo
-        'breadcrumb_label' => 'Consola de Administración',
+        'breadcrumb_label' => 'Consola',
         'items' => [
             [
                 'titulo' => 'Plan estratégico institucional',

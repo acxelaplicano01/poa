@@ -71,7 +71,7 @@ class Roles extends Component
 
             // Log de la actividad
             LogService::activity(
-                'delete',
+                'eliminar',
                 'roles',
                 'Rol eliminado: ' . $roleName,
                 [

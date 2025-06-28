@@ -13,8 +13,12 @@ class PlanEstrategicoInstitucional extends Component
 
     public $search = '';
     public $showModal = false;
+    public $showDeleteModal = false;
+    public $peiToDelete = null;
     public $isEditing = false;
     public $peiId;
+    public $sortField = 'id';
+    public $sortDirection = 'asc';
 
     // Propiedades del formulario
     public $name = '';
@@ -26,7 +30,7 @@ class PlanEstrategicoInstitucional extends Component
         'name' => 'required|string|max:255',
         'initialYear' => 'required|integer|min:2000|max:2050',
         'finalYear' => 'required|integer|min:2000|max:2050|gte:initialYear',
-        'idInstitucion' => 'required|exists:instituciones,id',
+        'idInstitucion' => 'required|exists:institucions,id',
     ];
 
     protected $messages = [
@@ -49,6 +53,17 @@ class PlanEstrategicoInstitucional extends Component
         $this->resetPage();
     }
 
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+        $this->sortField = $field;
+        $this->resetPage();
+    }
+
     public function render()
     {
         $peis = Pei::with('institucion')
@@ -58,12 +73,12 @@ class PlanEstrategicoInstitucional extends Component
                           $q->where('nombre', 'like', '%' . $this->search . '%');
                       });
             })
-            ->orderBy('created_at', 'desc')
+            ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 
         $instituciones = Institucion::orderBy('nombre')->get();
 
-        return view('livewire.consola.plan-estrategico-institucional', [
+        return view('livewire.consola.pei.plan-estrategico-institucional', [
             'peis' => $peis,
             'instituciones' => $instituciones
         ])->layout('layouts.app');
@@ -92,20 +107,28 @@ class PlanEstrategicoInstitucional extends Component
     {
         $this->validate();
 
+        // Validación adicional para años
+        if ($this->initialYear && $this->finalYear) {
+            if ($this->finalYear < $this->initialYear) {
+                $this->addError('finalYear', 'El año final debe ser mayor o igual al año inicial.');
+                return;
+            }
+        }
+
         if ($this->isEditing) {
             $pei = Pei::findOrFail($this->peiId);
             $pei->update([
                 'name' => $this->name,
-                'initialYear' => $this->initialYear,
-                'finalYear' => $this->finalYear,
+                'initialYear' => (int) $this->initialYear,
+                'finalYear' => (int) $this->finalYear,
                 'idInstitucion' => $this->idInstitucion,
             ]);
             session()->flash('message', 'PEI actualizado correctamente.');
         } else {
             Pei::create([
                 'name' => $this->name,
-                'initialYear' => $this->initialYear,
-                'finalYear' => $this->finalYear,
+                'initialYear' => (int) $this->initialYear,
+                'finalYear' => (int) $this->finalYear,
                 'idInstitucion' => $this->idInstitucion,
             ]);
             session()->flash('message', 'PEI creado correctamente.');
@@ -116,16 +139,32 @@ class PlanEstrategicoInstitucional extends Component
 
     public function delete($id)
     {
-        $pei = Pei::findOrFail($id);
-        
-        // Verificar si tiene dimensiones asociadas
-        if ($pei->dimensions()->count() > 0) {
-            session()->flash('error', 'No se puede eliminar el PEI porque tiene dimensiones asociadas.');
+        $this->peiToDelete = Pei::findOrFail($id);
+        $this->showDeleteModal = true;
+    }
+
+    public function confirmDelete()
+    {
+        if (!$this->peiToDelete) {
             return;
         }
 
-        $pei->delete();
+        // Verificar si tiene dimensiones asociadas
+        if ($this->peiToDelete->dimensions()->count() > 0) {
+            session()->flash('error', 'No se puede eliminar el PEI porque tiene dimensiones asociadas.');
+            $this->closeDeleteModal();
+            return;
+        }
+
+        $this->peiToDelete->delete();
         session()->flash('message', 'PEI eliminado correctamente.');
+        $this->closeDeleteModal();
+    }
+
+    public function closeDeleteModal()
+    {
+        $this->showDeleteModal = false;
+        $this->peiToDelete = null;
     }
 
     public function closeModal()
@@ -142,5 +181,27 @@ class PlanEstrategicoInstitucional extends Component
         $this->initialYear = '';
         $this->finalYear = '';
         $this->idInstitucion = '';
+    }
+
+    // Validación en tiempo real para el año inicial
+    public function updatedInitialYear()
+    {
+        $this->validateOnly('initialYear');
+        
+        // Si hay año final, validar que sea coherente
+        if ($this->finalYear && $this->initialYear && $this->finalYear < $this->initialYear) {
+            $this->addError('finalYear', 'El año final debe ser mayor o igual al año inicial.');
+        }
+    }
+
+    // Validación en tiempo real para el año final
+    public function updatedFinalYear()
+    {
+        $this->validateOnly('finalYear');
+        
+        // Validar que sea mayor o igual al año inicial
+        if ($this->initialYear && $this->finalYear && $this->finalYear < $this->initialYear) {
+            $this->addError('finalYear', 'El año final debe ser mayor o igual al año inicial.');
+        }
     }
 }

@@ -1,7 +1,7 @@
 @props([
     'disabled' => false,
     'options' => [],
-    'placeholder' => 'Seleccionar...',
+    'placeholder' => '',
     'selected' => null,
     'textKey' => 'text',
     'valueKey' => 'value',

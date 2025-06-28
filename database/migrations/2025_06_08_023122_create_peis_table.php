@@ -13,8 +13,8 @@ return new class extends Migration
             Schema::create('peis', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
-                $table->date('initialYear');
-                $table->date('finalYear');
+                $table->year('initialYear');
+                $table->year('finalYear');
       
                 $table->foreignId('idInstitucion')
                       ->constrained('institucions')
