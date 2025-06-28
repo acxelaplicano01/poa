@@ -17,7 +17,7 @@ class Categorias extends Component
     public $sortField = 'id';
     public $sortDirection = 'desc';
     public $isModalOpen = false;
-    public $isDeleteModalOpen = false;
+    public $showDeleteModal = false;
     public $categoriaToDelete;
 
     protected $rules = [
@@ -86,20 +86,22 @@ class Categorias extends Component
 
     public function confirmDelete($id)
     {
-        $this->categoriaToDelete = $id;
-        $this->isDeleteModalOpen = true;
+        $this->categoriaToDelete = Categoria::findOrFail($id);
+        $this->showDeleteModal = true;
     }
 
     public function delete()
     {
         try {
-            Categoria::findOrFail($this->categoriaToDelete)->delete();
-            session()->flash('message', 'Categoría eliminada correctamente.');
+            if ($this->categoriaToDelete) {
+                $this->categoriaToDelete->delete();
+                session()->flash('message', 'Categoría eliminada correctamente.');
+            }
         } catch (\Exception $e) {
             session()->flash('error', 'No se pudo eliminar la categoría.');
         }
         
-        $this->isDeleteModalOpen = false;
+        $this->closeDeleteModal();
     }
 
     public function closeModal()
@@ -110,7 +112,8 @@ class Categorias extends Component
 
     public function closeDeleteModal()
     {
-        $this->isDeleteModalOpen = false;
+        $this->showDeleteModal = false;
+        $this->categoriaToDelete = null;
     }
 
     public function render()

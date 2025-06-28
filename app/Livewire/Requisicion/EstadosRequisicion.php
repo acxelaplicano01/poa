@@ -17,7 +17,7 @@ class EstadosRequisicion extends Component
     public $sortField = 'id';
     public $sortDirection = 'desc';
     public $isModalOpen = false;
-    public $isDeleteModalOpen = false;
+    public $showDeleteModal = false;
     public $estadoToDelete;
 
     protected $rules = [
@@ -86,20 +86,22 @@ class EstadosRequisicion extends Component
 
     public function confirmDelete($id)
     {
-        $this->estadoToDelete = $id;
-        $this->isDeleteModalOpen = true;
+        $this->estadoToDelete = EstadoRequisicion::findOrFail($id);
+        $this->showDeleteModal = true;
     }
 
     public function delete()
     {
         try {
-            EstadoRequisicion::findOrFail($this->estadoToDelete)->delete();
-            session()->flash('message', 'Estado eliminado correctamente.');
+            if ($this->estadoToDelete) {
+                $this->estadoToDelete->delete();
+                session()->flash('message', 'Estado eliminado correctamente.');
+            }
         } catch (\Exception $e) {
             session()->flash('error', 'No se pudo eliminar el estado.');
         }
         
-        $this->isDeleteModalOpen = false;
+        $this->closeDeleteModal();
     }
 
     public function closeModal()
@@ -110,7 +112,8 @@ class EstadosRequisicion extends Component
 
     public function closeDeleteModal()
     {
-        $this->isDeleteModalOpen = false;
+        $this->showDeleteModal = false;
+        $this->estadoToDelete = null;
     }
 
     public function render()

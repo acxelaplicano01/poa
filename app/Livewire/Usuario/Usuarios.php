@@ -25,7 +25,6 @@ class Usuarios extends Component
     public $roles;
     public $isOpen = false;
     public $showDeleteModal = false;
-    public $confirmingDelete = false;
     public $IdAEliminar;
     public $nombreAEliminar;
     public $profile_photo_path;
@@ -238,35 +237,31 @@ class Usuarios extends Component
     public function delete()
     {
         try {
-            // Verificar si se está confirmando la eliminación
-            if ($this->confirmingDelete) {
-                $user = User::find($this->IdAEliminar);
+            $user = User::find($this->IdAEliminar);
 
-                if (!$user) {
-                    session()->flash('error', 'Usuario no encontrado.');
-                    $this->confirmingDelete = false;
-                    return;
-                }
-
-                $user->forceDelete();
-                // Registrar log de eliminación
-                LogService::activity(
-                    'eliminar',
-                    'Configuración',
-                    "Se eliminó el usuario {$user->name}",
-                    [
-                        'Eliminado por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
-                        'Usuario eliminado' => $user->name . ' (' . $user->email . ')',
-                        'ID Usuario' => $user->id,
-                    ]
-                );
-                // Limpiar caché de permisos
-                app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-                // Refrescar permisos para todos los usuarios con este rol
-
-                session()->flash('message', 'usuario eliminado correctamente!');
-                $this->confirmingDelete = false;
+            if (!$user) {
+                session()->flash('error', 'Usuario no encontrado.');
+                $this->closeDeleteModal();
+                return;
             }
+
+            $user->forceDelete();
+            // Registrar log de eliminación
+            LogService::activity(
+                'eliminar',
+                'Configuración',
+                "Se eliminó el usuario {$user->name}",
+                [
+                    'Eliminado por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
+                    'Usuario eliminado' => $user->name . ' (' . $user->email . ')',
+                    'ID Usuario' => $user->id,
+                ]
+            );
+            // Limpiar caché de permisos
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+            session()->flash('message', 'usuario eliminado correctamente!');
+            $this->closeDeleteModal();
         } catch (\Exception $e) {
             LogService::activity(
                 'eliminar',
@@ -274,12 +269,13 @@ class Usuarios extends Component
                 'Error al eliminar usuario',
                 [
                     'Intento de eliminar por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
-                    'Usuario' => $user->name . ' (' . $user->email . ')',
+                    'Usuario' => $this->nombreAEliminar,
                     'error' => $e->getMessage(),
                 ],
                 'error'
             );
             session()->flash('error', 'Error al eliminar el usuario: ' . $e->getMessage());
+            $this->closeDeleteModal();
         }
     }
 
@@ -294,12 +290,19 @@ class Usuarios extends Component
 
         $this->IdAEliminar = $id;
         $this->nombreAEliminar = $user->name . ' ' . $user->email;
-        $this->confirmingDelete = true;
+        $this->showDeleteModal = true;
     }
 
     public function closeModal()
     {
         $this->isOpen = false;
+    }
+
+    public function closeDeleteModal()
+    {
+        $this->showDeleteModal = false;
+        $this->IdAEliminar = null;
+        $this->nombreAEliminar = null;
     }
 
     private function resetInputFields()

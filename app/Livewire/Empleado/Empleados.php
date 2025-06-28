@@ -18,7 +18,7 @@ class Empleados extends Component
     // Propiedades para control de UI
     public $isOpen = false;
     public $isEditing = false;
-    public $confirmingDelete = false;
+    public $showDeleteModal = false;
     public $errorMessage = '';
     public $showErrorModal = false;
     public $perPage = 10; //numero de paginas por empleados
@@ -268,15 +268,16 @@ class Empleados extends Component
     // Confirmar eliminación
     public function confirmDelete($id)
     {
-        $this->empleadoToDelete = $id;
-        $this->confirmingDelete = true;
+        $empleado = Empleado::findOrFail($id);
+        $this->empleadoToDelete = $empleado;
+        $this->showDeleteModal = true;
     }
 
     // Eliminar empleado
     public function delete()
     {
         try {
-            $empleado = Empleado::findOrFail($this->empleadoToDelete);
+            $empleado = $this->empleadoToDelete;
             
             // Eliminar relaciones primero
             $empleado->departamentos()->detach();
@@ -284,7 +285,7 @@ class Empleados extends Component
             // Luego eliminar el empleado
             $empleado->delete();
             
-            $this->confirmingDelete = false;
+            $this->closeDeleteModal();
             LogService::activity(
                 'eliminar',
                 'Configuración',
@@ -302,13 +303,19 @@ class Empleados extends Component
                 'Error al eliminar empleado',
                 [
                     'Intentó eliminarlo' => Auth::user()->name . ' (' . Auth::user()->email . ')',
-                    'Empleado' => $empleado->nombre . ' ' . $empleado->apellido . ' (ID: ' . $empleado->id . ')',
+                    'Empleado' => $this->empleadoToDelete ? $this->empleadoToDelete->nombre . ' ' . $this->empleadoToDelete->apellido . ' (ID: ' . $this->empleadoToDelete->id . ')' : 'Desconocido',
                     'error' => $e->getMessage(),
                 ],
                 'error'
             );
             $this->showError('Error al eliminar el empleado: ' . $e->getMessage());
         }
+    }
+
+    public function closeDeleteModal()
+    {
+        $this->showDeleteModal = false;
+        $this->empleadoToDelete = null;
     }
 
     // Añadir departamento a la selección

@@ -15,7 +15,7 @@ class Roles extends Component
     
     public $search = '';
     public $perPage = 10; // Número de roles por página
-    public $confirmingDelete = false;
+    public $showDeleteModal = false;
     public $IdAEliminar;
     public $nombreAEliminar;
 
@@ -51,7 +51,7 @@ class Roles extends Component
         $role = Role::findOrFail($id);
         $this->IdAEliminar = $id;
         $this->nombreAEliminar = $role->name;
-        $this->confirmingDelete = true;
+        $this->showDeleteModal = true;
     }
 
     public function delete()
@@ -63,7 +63,7 @@ class Roles extends Component
             // Verificar si el rol tiene usuarios asignados
             if ($role->users()->count() > 0) {
                 session()->flash('error', 'No se puede eliminar el rol porque tiene usuarios asignados.');
-                $this->confirmingDelete = false;
+                $this->showDeleteModal = false;
                 return;
             }
 
@@ -81,7 +81,7 @@ class Roles extends Component
             );
 
             session()->flash('message', 'Rol eliminado exitosamente.');
-            $this->confirmingDelete = false;
+            $this->showDeleteModal = false;
             $this->IdAEliminar = null;
             $this->nombreAEliminar = null;
 
@@ -94,13 +94,13 @@ class Roles extends Component
             ]);
 
             session()->flash('error', 'Error al eliminar el rol. Por favor, inténtelo de nuevo.');
-            $this->confirmingDelete = false;
+            $this->showDeleteModal = false;
         }
     }
 
     public function cancelDelete()
     {
-        $this->confirmingDelete = false;
+        $this->showDeleteModal = false;
         $this->IdAEliminar = null;
         $this->nombreAEliminar = null;
     }

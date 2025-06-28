@@ -18,7 +18,7 @@ class GrupoGastos extends Component
     public $sortField = 'id';
     public $sortDirection = 'desc';
     public $isModalOpen = false;
-    public $isDeleteModalOpen = false;
+    public $showDeleteModal = false;
     public $grupoGastoToDelete;
 
     protected $rules = [
@@ -98,20 +98,22 @@ class GrupoGastos extends Component
 
     public function confirmDelete($id)
     {
-        $this->grupoGastoToDelete = $id;
-        $this->isDeleteModalOpen = true;
+        $this->grupoGastoToDelete = GrupoGasto::findOrFail($id);
+        $this->showDeleteModal = true;
     }
 
     public function delete()
     {
         try {
-            GrupoGasto::findOrFail($this->grupoGastoToDelete)->delete();
-            session()->flash('message', 'Grupo de gastos eliminado correctamente.');
+            if ($this->grupoGastoToDelete) {
+                $this->grupoGastoToDelete->delete();
+                session()->flash('message', 'Grupo de gastos eliminado correctamente.');
+            }
         } catch (\Exception $e) {
             session()->flash('error', 'No se pudo eliminar el grupo de gastos.');
         }
         
-        $this->isDeleteModalOpen = false;
+        $this->closeDeleteModal();
     }
 
     public function closeModal()
@@ -122,7 +124,8 @@ class GrupoGastos extends Component
 
     public function closeDeleteModal()
     {
-        $this->isDeleteModalOpen = false;
+        $this->showDeleteModal = false;
+        $this->grupoGastoToDelete = null;
     }
 
     public function render()

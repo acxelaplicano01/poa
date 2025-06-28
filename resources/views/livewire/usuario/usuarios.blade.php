@@ -208,8 +208,8 @@
     @endif
 
     <!-- Modal para crear/editar Usuario -->
-    @include('livewire.Usuario.create')
+    @include('livewire.usuario.create')
 
     <!-- Modal de confirmación para eliminar -->
-    @include('livewire.Usuario.delete-confirmation')
+    @include('livewire.usuario.delete-confirmation')
 </div>

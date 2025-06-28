@@ -17,7 +17,7 @@ class EstadosEjecucionPresupuestaria extends Component
     public $sortField = 'id';
     public $sortDirection = 'desc';
     public $isModalOpen = false;
-    public $isDeleteModalOpen = false;
+    public $showDeleteModal = false;
     public $estadoToDelete;
 
     protected $rules = [
@@ -86,20 +86,22 @@ class EstadosEjecucionPresupuestaria extends Component
 
     public function confirmDelete($id)
     {
-        $this->estadoToDelete = $id;
-        $this->isDeleteModalOpen = true;
+        $this->estadoToDelete = EstadoEjecucionPresupuestaria::findOrFail($id);
+        $this->showDeleteModal = true;
     }
 
     public function delete()
     {
         try {
-            EstadoEjecucionPresupuestaria::findOrFail($this->estadoToDelete)->delete();
-            session()->flash('message', 'Estado eliminado correctamente.');
+            if ($this->estadoToDelete) {
+                $this->estadoToDelete->delete();
+                session()->flash('message', 'Estado eliminado correctamente.');
+            }
         } catch (\Exception $e) {
             session()->flash('error', 'No se pudo eliminar el estado.');
         }
         
-        $this->isDeleteModalOpen = false;
+        $this->closeDeleteModal();
     }
 
     public function closeModal()
@@ -110,7 +112,8 @@ class EstadosEjecucionPresupuestaria extends Component
 
     public function closeDeleteModal()
     {
-        $this->isDeleteModalOpen = false;
+        $this->showDeleteModal = false;
+        $this->estadoToDelete = null;
     }
 
     public function render()

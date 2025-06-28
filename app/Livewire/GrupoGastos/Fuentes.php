@@ -18,7 +18,7 @@ class Fuentes extends Component
     public $sortField = 'id';
     public $sortDirection = 'desc';
     public $isModalOpen = false;
-    public $isDeleteModalOpen = false;
+    public $showDeleteModal = false;
     public $fuenteToDelete;
 
     protected $rules = [
@@ -102,20 +102,22 @@ class Fuentes extends Component
 
     public function confirmDelete($id)
     {
-        $this->fuenteToDelete = $id;
-        $this->isDeleteModalOpen = true;
+        $this->fuenteToDelete = Fuente::findOrFail($id);
+        $this->showDeleteModal = true;
     }
 
     public function delete()
     {
         try {
-            Fuente::findOrFail($this->fuenteToDelete)->delete();
-            session()->flash('message', 'Fuente eliminada correctamente.');
+            if ($this->fuenteToDelete) {
+                $this->fuenteToDelete->delete();
+                session()->flash('message', 'Fuente eliminada correctamente.');
+            }
         } catch (\Exception $e) {
             session()->flash('error', 'No se pudo eliminar la fuente.');
         }
         
-        $this->isDeleteModalOpen = false;
+        $this->closeDeleteModal();
     }
 
     public function closeModal()
@@ -126,7 +128,8 @@ class Fuentes extends Component
 
     public function closeDeleteModal()
     {
-        $this->isDeleteModalOpen = false;
+        $this->showDeleteModal = false;
+        $this->fuenteToDelete = null;
     }
 
     public function render()

@@ -254,34 +254,7 @@
 
             <!-- Limpiar logs antiguos -->
             @can('logs.mantenimiento.limpiar')
-                <div class="mt-6 p-4 bg-white rounded-lg shadow sm:p-6 dark:bg-zinc-900">
-                    <h3 class="text-lg font-medium text-zinc-900 dark:text-white">Mantenimiento de logs</h3>
-                    <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                        Elimina logs antiguos para mantener la base de datos optimizada.
-                    </p>
-                    <form action="{{ route('cleanup') }}" method="POST" class="mt-5">
-                        @csrf
-                        <div class="flex items-end gap-4">
-                            <div>
-                                <label for="days" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                                    Eliminar logs más antiguos que
-                                </label>
-                                <div class="mt-1">
-                                    <x-input type="number" min="1" step="1" name="days" id="days" value="30" 
-                                           class="block w-24 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-zinc-700 dark:border-zinc-600"/>
-                                </div>
-                            </div>
-                            <div class="pb-px">
-                                <span class="text-zinc-700 dark:text-zinc-300">días</span>
-                            </div>
-                            <div>
-                                <x-danger-button type="submit" onclick="return confirm('¿Estás seguro de eliminar los logs antiguos? Esta acción no se puede deshacer.')">
-                                    Limpiar logs
-                                </x-danger-button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                @livewire('logs.log-maintenance')
             @endcan
         </div>
     </div>

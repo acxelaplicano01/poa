@@ -18,7 +18,7 @@ class Instituciones extends Component
     public $sortField = 'id';
     public $sortDirection = 'desc';
     public $isModalOpen = false;
-    public $isDeleteModalOpen = false;
+    public $showDeleteModal = false;
     public $institucionToDelete;
 
     protected $rules = [
@@ -91,20 +91,22 @@ class Instituciones extends Component
 
     public function confirmDelete($id)
     {
-        $this->institucionToDelete = $id;
-        $this->isDeleteModalOpen = true;
+        $this->institucionToDelete = Institucion::findOrFail($id);
+        $this->showDeleteModal = true;
     }
 
     public function delete()
     {
         try {
-            Institucion::findOrFail($this->institucionToDelete)->delete();
-            session()->flash('message', 'Institución eliminada correctamente.');
+            if ($this->institucionToDelete) {
+                $this->institucionToDelete->delete();
+                session()->flash('message', 'Institución eliminada correctamente.');
+            }
         } catch (\Exception $e) {
             session()->flash('error', 'No se pudo eliminar la institución.');
         }
         
-        $this->isDeleteModalOpen = false;
+        $this->closeDeleteModal();
     }
 
     public function closeModal()
@@ -115,7 +117,8 @@ class Instituciones extends Component
 
     public function closeDeleteModal()
     {
-        $this->isDeleteModalOpen = false;
+        $this->showDeleteModal = false;
+        $this->institucionToDelete = null;
     }
 
     public function render()

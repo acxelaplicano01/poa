@@ -1,26 +1,11 @@
-<x-confirmation-modal wire:model="confirmingDelete" maxWidth="md">
-    <x-slot name="title">
-        <div class="flex items-center">
-            <h3 class="text-lg font-medium text-zinc-900 dark:text-white">Eliminar Rol</h3>
-        </div>
-    </x-slot>
-
-    <x-slot name="content">
-        <p class="text-sm text-zinc-600 dark:text-zinc-400">
-            ¿Estás seguro que deseas eliminar el rol: <span class="font-semibold">{{ $nombreAEliminar }}</span>? 
-            Esta acción no se puede deshacer.
-        </p>
-    </x-slot>
-
-    <x-slot name="footer">
-        <div class="flex justify-end gap-x-4">
-            <x-secondary-button wire:click="$set('confirmingDelete', false)" wire:loading.attr="disabled">
-                Cancelar
-            </x-secondary-button>
-
-            <x-danger-button wire:click="delete" wire:loading.attr="disabled">
-                Eliminar
-            </x-danger-button>
-        </div>
-    </x-slot>
-</x-confirmation-modal>
+<x-elegant-delete-modal 
+    wire:model="showDeleteModal"
+    title="Confirmar Eliminación"
+    message="¿Estás seguro de que deseas eliminar este rol?"
+    entity-name="{{ $nombreAEliminar }}"
+    entity-details="Todos los permisos y asignaciones del rol serán eliminados"
+    confirm-method="delete"
+    cancel-method="cancelDelete"
+    confirm-text="Eliminar Rol"
+    cancel-text="Cancelar"
+/>
