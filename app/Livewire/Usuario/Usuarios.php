@@ -25,6 +25,8 @@ class Usuarios extends Component
     public $roles;
     public $isOpen = false;
     public $showDeleteModal = false;
+    public $errorMessage = '';
+    public $showErrorModal = false;
     public $IdAEliminar;
     public $nombreAEliminar;
     public $profile_photo_path;
@@ -147,7 +149,7 @@ class Usuarios extends Component
                 ],
                 'error'
             );
-            session()->flash('error', 'Error al crear el usuario: ' . $e->getMessage());
+            $this->showError('Error al crear el usuario: ' . $e->getMessage());
         }
     }
 
@@ -230,7 +232,7 @@ class Usuarios extends Component
                 ],
                 'error'
             );
-            session()->flash('error', 'Error al actualizar el usuario: ' . $e->getMessage());
+            $this->showError('Error al actualizar el usuario: ' . $e->getMessage());
         }
     }
 
@@ -240,7 +242,7 @@ class Usuarios extends Component
             $user = User::find($this->IdAEliminar);
 
             if (!$user) {
-                session()->flash('error', 'Usuario no encontrado.');
+                $this->showError('Usuario no encontrado.');
                 $this->closeDeleteModal();
                 return;
             }
@@ -274,7 +276,7 @@ class Usuarios extends Component
                 ],
                 'error'
             );
-            session()->flash('error', 'Error al eliminar el usuario: ' . $e->getMessage());
+            $this->showError('Error al eliminar el usuario: ' . $e->getMessage());
             $this->closeDeleteModal();
         }
     }
@@ -284,7 +286,7 @@ class Usuarios extends Component
         $user = User::find($id);
 
         if (!$user) {
-            session()->flash('error', 'usuario no encontrado.');
+            $this->showError('Usuario no encontrado.');
             return;
         }
 
@@ -303,6 +305,19 @@ class Usuarios extends Component
         $this->showDeleteModal = false;
         $this->IdAEliminar = null;
         $this->nombreAEliminar = null;
+    }
+
+    // Mostrar error en modal
+    public function showError($message)
+    {
+        $this->errorMessage = $message;
+        $this->showErrorModal = true;
+    }
+
+    // Ocultar modal de error
+    public function hideError()
+    {
+        $this->showErrorModal = false;
     }
 
     private function resetInputFields()

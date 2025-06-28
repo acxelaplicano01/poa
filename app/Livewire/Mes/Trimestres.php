@@ -25,6 +25,8 @@ class Trimestres extends Component
     // Propiedades para datos del formulario
     public $trimestre_id;
     public $trimestre;
+    public $errorMessage = '';
+    public $showErrorModal = false;
 
     // Reglas de validación
     protected $rules = [
@@ -166,8 +168,20 @@ class Trimestres extends Component
                 ],
                 'error'
             );
-            session()->flash('error', 'Error al crear el trimestre: ' . $e->getMessage());
+            session()->flash('error', 'Error al eliminar el trimestre: ' . $e->getMessage());
         }
+    }
+
+    public function showError($message)
+    {
+        $this->errorMessage = $message;
+        $this->showErrorModal = true;
+    }
+
+    public function hideError()
+    {
+        $this->showErrorModal = false;
+        $this->errorMessage = '';
     }
 
     // Método para cancelar la eliminación

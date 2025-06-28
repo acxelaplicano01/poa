@@ -20,6 +20,8 @@ class GrupoGastos extends Component
     public $isModalOpen = false;
     public $showDeleteModal = false;
     public $grupoGastoToDelete;
+    public $errorMessage = '';
+    public $showErrorModal = false;
 
     protected $rules = [
         'nombre' => 'required|min:3|max:100',
@@ -83,23 +85,31 @@ class GrupoGastos extends Component
             $this->isModalOpen = false;
             $this->resetInputFields();
         } catch (\Exception $e) {
-            session()->flash('error', 'Error al guardar: ' . $e->getMessage());
+            $this->showError('Error al guardar: ' . $e->getMessage());
         }
     }
     public function edit($id)
     {
-        $grupoGasto = GrupoGasto::findOrFail($id);
-        $this->grupoGastoId = $id;
-        $this->nombre = $grupoGasto->nombre;
-        $this->identificador = $grupoGasto->identificador;
-        
-        $this->isModalOpen = true;
+        try {
+            $grupoGasto = GrupoGasto::findOrFail($id);
+            $this->grupoGastoId = $id;
+            $this->nombre = $grupoGasto->nombre;
+            $this->identificador = $grupoGasto->identificador;
+            
+            $this->isModalOpen = true;
+        } catch (\Exception $e) {
+            $this->showError('Error al cargar el grupo de gastos: ' . $e->getMessage());
+        }
     }
 
     public function confirmDelete($id)
     {
-        $this->grupoGastoToDelete = GrupoGasto::findOrFail($id);
-        $this->showDeleteModal = true;
+        try {
+            $this->grupoGastoToDelete = GrupoGasto::findOrFail($id);
+            $this->showDeleteModal = true;
+        } catch (\Exception $e) {
+            $this->showError('Error al cargar el grupo de gastos: ' . $e->getMessage());
+        }
     }
 
     public function delete()
@@ -110,7 +120,7 @@ class GrupoGastos extends Component
                 session()->flash('message', 'Grupo de gastos eliminado correctamente.');
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'No se pudo eliminar el grupo de gastos.');
+            $this->showError('No se pudo eliminar el grupo de gastos: ' . $e->getMessage());
         }
         
         $this->closeDeleteModal();
@@ -126,6 +136,18 @@ class GrupoGastos extends Component
     {
         $this->showDeleteModal = false;
         $this->grupoGastoToDelete = null;
+    }
+
+    public function showError($message)
+    {
+        $this->errorMessage = $message;
+        $this->showErrorModal = true;
+    }
+
+    public function hideError()
+    {
+        $this->showErrorModal = false;
+        $this->errorMessage = '';
     }
 
     public function render()

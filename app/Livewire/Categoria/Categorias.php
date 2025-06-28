@@ -18,6 +18,8 @@ class Categorias extends Component
     public $sortDirection = 'desc';
     public $isModalOpen = false;
     public $showDeleteModal = false;
+    public $errorMessage = '';
+    public $showErrorModal = false;
     public $categoriaToDelete;
 
     protected $rules = [
@@ -114,6 +116,19 @@ class Categorias extends Component
     {
         $this->showDeleteModal = false;
         $this->categoriaToDelete = null;
+    }
+
+    // Mostrar error en modal
+    public function showError($message)
+    {
+        $this->errorMessage = $message;
+        $this->showErrorModal = true;
+    }
+
+    // Ocultar modal de error
+    public function hideError()
+    {
+        $this->showErrorModal = false;
     }
 
     public function render()

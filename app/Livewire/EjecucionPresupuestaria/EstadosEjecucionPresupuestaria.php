@@ -19,6 +19,8 @@ class EstadosEjecucionPresupuestaria extends Component
     public $isModalOpen = false;
     public $showDeleteModal = false;
     public $estadoToDelete;
+    public $errorMessage = '';
+    public $showErrorModal = false;
 
     protected $rules = [
         'estado' => 'required|min:3|max:100',
@@ -63,31 +65,43 @@ class EstadosEjecucionPresupuestaria extends Component
     {
         $this->validate();
 
-        EstadoEjecucionPresupuestaria::updateOrCreate(['id' => $this->estadoId], [
-            'estado' => $this->estado
-        ]);
+        try {
+            EstadoEjecucionPresupuestaria::updateOrCreate(['id' => $this->estadoId], [
+                'estado' => $this->estado
+            ]);
 
-        session()->flash('message', $this->estadoId 
-            ? 'Estado actualizado correctamente.' 
-            : 'Estado creado correctamente.');
+            session()->flash('message', $this->estadoId 
+                ? 'Estado actualizado correctamente.' 
+                : 'Estado creado correctamente.');
 
-        $this->isModalOpen = false;
-        $this->resetInputFields();
+            $this->isModalOpen = false;
+            $this->resetInputFields();
+        } catch (\Exception $e) {
+            $this->showError('Error al guardar el estado: ' . $e->getMessage());
+        }
     }
 
     public function edit($id)
     {
-        $estado = EstadoEjecucionPresupuestaria::findOrFail($id);
-        $this->estadoId = $id;
-        $this->estado = $estado->estado;
-        
-        $this->isModalOpen = true;
+        try {
+            $estado = EstadoEjecucionPresupuestaria::findOrFail($id);
+            $this->estadoId = $id;
+            $this->estado = $estado->estado;
+            
+            $this->isModalOpen = true;
+        } catch (\Exception $e) {
+            $this->showError('Error al cargar el estado: ' . $e->getMessage());
+        }
     }
 
     public function confirmDelete($id)
     {
-        $this->estadoToDelete = EstadoEjecucionPresupuestaria::findOrFail($id);
-        $this->showDeleteModal = true;
+        try {
+            $this->estadoToDelete = EstadoEjecucionPresupuestaria::findOrFail($id);
+            $this->showDeleteModal = true;
+        } catch (\Exception $e) {
+            $this->showError('Error al cargar el estado: ' . $e->getMessage());
+        }
     }
 
     public function delete()
@@ -98,7 +112,7 @@ class EstadosEjecucionPresupuestaria extends Component
                 session()->flash('message', 'Estado eliminado correctamente.');
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'No se pudo eliminar el estado.');
+            $this->showError('No se pudo eliminar el estado: ' . $e->getMessage());
         }
         
         $this->closeDeleteModal();
@@ -114,6 +128,18 @@ class EstadosEjecucionPresupuestaria extends Component
     {
         $this->showDeleteModal = false;
         $this->estadoToDelete = null;
+    }
+
+    public function showError($message)
+    {
+        $this->errorMessage = $message;
+        $this->showErrorModal = true;
+    }
+
+    public function hideError()
+    {
+        $this->showErrorModal = false;
+        $this->errorMessage = '';
     }
 
     public function render()

@@ -6,6 +6,12 @@
                     <p class="font-medium">{{ session('message') }}</p>
                 </div>
             @endif
+
+            @if (session()->has('error'))
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md" role="alert">
+                    <p class="font-medium">{{ session('error') }}</p>
+                </div>
+            @endif
             <div class="mb-6">
                 <!-- Filtros y búsqueda -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">

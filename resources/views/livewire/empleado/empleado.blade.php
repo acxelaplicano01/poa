@@ -8,6 +8,12 @@
                 </div>
             @endif
 
+            @if (session()->has('error'))
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md" role="alert">
+                    <p class="font-medium">{{ session('error') }}</p>
+                </div>
+            @endif
+
             <div class="mb-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <h2 class="text-xl font-semibold text-zinc-800 dark:text-zinc-200">
@@ -197,7 +203,7 @@
     @include('livewire.empleado.create')
 
     <!-- modal para errores-->
-    @include('livewire.empleado.modalError')
+    @include('livewire.empleado.error-modal')
 
     <!-- Modal de confirmación para eliminar -->
     @include('livewire.empleado.delete-confirmation')

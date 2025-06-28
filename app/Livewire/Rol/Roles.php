@@ -16,6 +16,8 @@ class Roles extends Component
     public $search = '';
     public $perPage = 10; // Número de roles por página
     public $showDeleteModal = false;
+    public $errorMessage = '';
+    public $showErrorModal = false;
     public $IdAEliminar;
     public $nombreAEliminar;
 
@@ -62,7 +64,7 @@ class Roles extends Component
             
             // Verificar si el rol tiene usuarios asignados
             if ($role->users()->count() > 0) {
-                session()->flash('error', 'No se puede eliminar el rol porque tiene usuarios asignados.');
+                $this->showError('No se puede eliminar el rol porque tiene usuarios asignados.');
                 $this->showDeleteModal = false;
                 return;
             }
@@ -93,7 +95,7 @@ class Roles extends Component
                 'stack_trace' => $e->getTraceAsString()
             ]);
 
-            session()->flash('error', 'Error al eliminar el rol. Por favor, inténtelo de nuevo.');
+            $this->showError('Error al eliminar el rol. Por favor, inténtelo de nuevo.');
             $this->showDeleteModal = false;
         }
     }
@@ -103,6 +105,19 @@ class Roles extends Component
         $this->showDeleteModal = false;
         $this->IdAEliminar = null;
         $this->nombreAEliminar = null;
+    }
+
+    // Mostrar error en modal
+    public function showError($message)
+    {
+        $this->errorMessage = $message;
+        $this->showErrorModal = true;
+    }
+
+    // Ocultar modal de error
+    public function hideError()
+    {
+        $this->showErrorModal = false;
     }
 
     public function sortBy($field)
