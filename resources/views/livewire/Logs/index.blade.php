@@ -250,6 +250,9 @@
                     </tbody>
                 </table>
                 <div class="sm:hidden text-xs text-zinc-400 px-2 py-1">Desliza la tabla para ver más columnas →</div>
+                <div class="px-4 py-3 bg-white border-t border-gray-200 dark:bg-zinc-900 dark:border-zinc-700 sm:px-6">
+                    {{ $logs->links() }}
+                </div>
             </div>
 
             <!-- Limpiar logs antiguos -->

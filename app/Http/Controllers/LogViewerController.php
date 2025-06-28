@@ -49,7 +49,7 @@ class LogViewerController extends Controller
         }
 
         // Obtener logs paginados
-        $logs = $query->paginate(25)->withQueryString();//
+        $logs = $query->paginate(15)->withQueryString();
 
         // Datos para filtros
         $modules = ActivityLog::select('module')

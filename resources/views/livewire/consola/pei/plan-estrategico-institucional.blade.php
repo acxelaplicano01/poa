@@ -29,6 +29,19 @@
                             </svg>
                         </div>
                     </div>
+                    <div class="w-full sm:w-auto">
+                        <x-select 
+                            id="perPage" 
+                            wire:model.live="perPage"
+                            :options="[
+                                ['value' => '10', 'text' => '10 por página'],
+                                ['value' => '25', 'text' => '25 por página'],
+                                ['value' => '50', 'text' => '50 por página'],
+                                ['value' => '100', 'text' => '100 por página'],
+                            ]"
+                            class="w-full"
+                        />
+                    </div>
                      @can('consola.planestrategicoinstitucional.crear')
                     <button wire:click="create" 
                         class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-800 dark:border-indigo-700 dark:text-white dark:hover:bg-indigo-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-700 dark:focus:bg-indigo-900 active:bg-zinc-900 dark:active:bg-indigo-800 focus:outline-none focus:ring-2 dark:focus:ring-indigo-500 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-indigo-800 transition ease-in-out duration-150">

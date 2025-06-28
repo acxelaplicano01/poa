@@ -1,6 +1,6 @@
 <x-app-layout>
-    <div class="py-6">
-        <div class="mx-auto sm:px-6 lg:px-8">
+    <div>
+        <div class=" mx-auto rounded-lg mt-8 sm:mt-6 lg:mt-4 mb-6">
             <div class="overflow-hidden bg-white shadow sm:rounded-lg dark:bg-zinc-900">
                 <div class="px-4 py-5 sm:px-6">
                     <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">

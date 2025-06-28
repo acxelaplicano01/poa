@@ -12,6 +12,7 @@ class PlanEstrategicoInstitucional extends Component
     use WithPagination;
 
     public $search = '';
+    public $perPage = 10;
     public $showModal = false;
     public $showDeleteModal = false;
     public $peiToDelete = null;
@@ -47,7 +48,7 @@ class PlanEstrategicoInstitucional extends Component
         'idInstitucion.required' => 'La institución es obligatoria.',
         'idInstitucion.exists' => 'La institución seleccionada no existe.',
     ];
-
+    
     public function updatingSearch()
     {
         $this->resetPage();
@@ -74,7 +75,7 @@ class PlanEstrategicoInstitucional extends Component
                       });
             })
             ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         $instituciones = Institucion::orderBy('nombre')->get();
 
