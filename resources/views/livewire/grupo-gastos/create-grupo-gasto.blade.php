@@ -7,13 +7,13 @@
         <div class="space-y-4">
             <div>
                 <x-label for="nombre" :value="__('Nombre')" />
-                <x-input id="nombre" type="text" class="mt-1 block w-full" wire:model="nombre" />
+                <x-input id="nombre" type="text" class="mt-1 block w-full" wire:model="nombre" placeholder="Ingrese el nombre del grupo de gastos" />
                 <x-input-error for="nombre" class="mt-2" />
             </div>
 
             <div>
                 <x-label for="identificador" :value="__('Identificador')" />
-                <x-input id="identificador" type="text" class="mt-1 block w-full" wire:model="identificador" />
+                <x-input id="identificador" type="text" class="mt-1 block w-full" wire:model="identificador" placeholder="Ingrese el identificador del grupo de gastos" />
                 <x-input-error for="identificador" class="mt-2" />
                 <div class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                     {{ __('El identificador debe ser único y se utilizará como código de referencia.') }}

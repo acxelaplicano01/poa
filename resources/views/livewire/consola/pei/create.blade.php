@@ -20,7 +20,7 @@
             <form wire:submit="save" id="pei-form">
                 <div class="mb-4">
                     <x-label for="name" value="{{ __('Nombre del PEI') }}" />
-                    <x-input wire:model="name" id="name" class="block mt-1 w-full" type="text" />
+                    <x-input wire:model="name" id="name" class="block mt-1 w-full" type="text" placeholder="Ingrese el nombre del PEI" />
                     <x-input-error for="name" class="mt-2" />
                 </div>
 

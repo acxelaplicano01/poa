@@ -7,7 +7,7 @@
         <div class="space-y-4">
             <div>
                 <x-label for="nombre" :value="__('Nombre')" />
-                <x-input id="nombre" type="text" class="mt-1 block w-full" wire:model="nombre" />
+                <x-input id="nombre" type="text" class="mt-1 block w-full" wire:model="nombre" placeholder="Ingrese el nombre de la institución"/>
                 <x-input-error for="nombre" class="mt-2" />
             </div>
 

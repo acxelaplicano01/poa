@@ -7,7 +7,7 @@
         <div class="space-y-4">
             <div>
                 <x-label for="estado" :value="__('Estado de Ejecución Presupuestaria')" />
-                <x-input id="estado" type="text" class="mt-1 block w-full" wire:model="estado" />
+                <x-input id="estado" type="text" class="mt-1 block w-full" wire:model="estado" placeholder="Ingrese el estado de ejecución presupuestaria" />
                 <x-input-error for="estado" class="mt-2" />
             </div>
         </div>

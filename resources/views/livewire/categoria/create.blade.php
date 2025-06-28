@@ -7,7 +7,7 @@
         <div class="space-y-4">
             <div>
                 <x-label for="categoria" :value="__('Nombre de la categoría')" />
-                <x-input id="categoria" type="text" class="mt-1 block w-full" wire:model="categoria" />
+                <x-input id="categoria" type="text" class="mt-1 block w-full" wire:model="categoria" placeholder="Ingrese el nombre de la categoría" />
                 <x-input-error for="categoria" class="mt-2" />
             </div>
         </div>

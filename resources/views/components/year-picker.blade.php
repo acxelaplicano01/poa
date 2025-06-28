@@ -71,7 +71,7 @@ $currentYear = date('Y');
             x-model="selectedYear"
             type="text"
             id="{{ $id }}"
-            {{ $attributes->merge(['class' => 'w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 shadow-sm py-2 pl-3 pr-10']) }}
+            {{ $attributes->merge(['class' => 'w-full rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 focus:border-indigo-500 dark:focus:border-zinc-600 focus:ring-indigo-500 dark:focus:ring-zinc-600 shadow-sm py-2 pl-3 pr-10']) }}
             placeholder="Seleccionar año"
             pattern="[0-9]{4}"
             maxlength="4"
@@ -81,7 +81,7 @@ $currentYear = date('Y');
         <div class="absolute inset-y-0 right-0 flex items-center px-2">
             <button 
                 type="button" 
-                class="h-full px-1 text-gray-400 focus:outline-none"
+                class="h-full px-1 text-zinc-400 focus:outline-none"
                 @click="showPicker = !showPicker"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -96,15 +96,15 @@ $currentYear = date('Y');
         x-show="showPicker"
         x-cloak
         style="position: absolute; top: -230px; left: 0; z-index: 9999;"
-        class="w-64 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden"
+        class="w-64 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden"
     >
         <!-- Header con navegación por décadas -->
-        <div class="bg-gray-50 dark:bg-gray-700 px-4 py-2 flex justify-between items-center">
+        <div class="bg-zinc-50 dark:bg-zinc-700 px-4 py-2 flex justify-between items-center">
             <button 
                 type="button"
                 @click="previousDecade()" 
                 @click.stop
-                class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+                class="text-zinc-600 dark:text-zinc-300 hover:text-zinc-800 dark:hover:text-zinc-100"
                 :disabled="currentDecade <= minYear"
                 :class="{ 'opacity-50 cursor-not-allowed': currentDecade <= minYear }"
             >
@@ -112,12 +112,12 @@ $currentYear = date('Y');
                     <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
             </button>
-            <span x-text="currentDecade + ' - ' + (currentDecade + 9)" class="font-semibold text-gray-800 dark:text-gray-200"></span>
+            <span x-text="currentDecade + ' - ' + (currentDecade + 9)" class="font-semibold text-zinc-800 dark:text-zinc-200"></span>
             <button 
                 type="button"
                 @click="nextDecade()"
                 @click.stop
-                class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+                class="text-zinc-600 dark:text-zinc-300 hover:text-zinc-800 dark:hover:text-zinc-100"
                 :disabled="currentDecade + 10 > maxYear"
                 :class="{ 'opacity-50 cursor-not-allowed': currentDecade + 10 > maxYear }"
             >
@@ -137,19 +137,19 @@ $currentYear = date('Y');
                     class="px-2 py-1 rounded text-sm font-medium transition-colors"
                     :class="year == selectedYear 
                         ? 'bg-indigo-600 text-white' 
-                        : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'"
+                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200'"
                     x-text="year"
                 ></button>
             </template>
         </div>
         
         <!-- Footer con acciones -->
-        <div class="bg-gray-50 dark:bg-gray-700 px-4 py-2 flex justify-between">
+        <div class="bg-zinc-50 dark:bg-zinc-700 px-4 py-2 flex justify-between">
             <button 
                 type="button"
                 @click="selectYear(currentYear)"
                 @click.stop 
-                class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
+                class="text-sm text-indigo-600 dark:text-zinc-400 hover:text-indigo-800 dark:hover:text-zinc-300 font-medium"
             >
                 Hoy
             </button>
@@ -157,7 +157,7 @@ $currentYear = date('Y');
                 type="button"
                 @click="showPicker = false"
                 @click.stop 
-                class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 font-medium"
+                class="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 font-medium"
             >
                 Cancelar
             </button>

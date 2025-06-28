@@ -7,7 +7,7 @@
         <div class="space-y-4">
             <div>
                 <x-label for="estado" :value="__('Estado de Requisición')" />
-                <x-input id="estado" type="text" class="mt-1 block w-full" wire:model="estado" />
+                <x-input id="estado" type="text" class="mt-1 block w-full" wire:model="estado" placeholder="Ingrese el estado de requisición"/>
                 <x-input-error for="estado" class="mt-2" />
             </div>
         </div>

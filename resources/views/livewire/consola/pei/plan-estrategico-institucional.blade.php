@@ -29,6 +29,7 @@
                             </svg>
                         </div>
                     </div>
+                     @can('consola.planestrategicoinstitucional.crear')
                     <button wire:click="create" 
                         class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-800 dark:border-indigo-700 dark:text-white dark:hover:bg-indigo-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-700 dark:focus:bg-indigo-900 active:bg-zinc-900 dark:active:bg-indigo-800 focus:outline-none focus:ring-2 dark:focus:ring-indigo-500 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-indigo-800 transition ease-in-out duration-150">
                         <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -37,6 +38,7 @@
                         </svg>
                         {{ __('Nuevo PEI') }}
                     </button>
+                    @endcan
                 </div>
             </div>
 
@@ -76,6 +78,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
+                                     @can('consola.planestrategicoinstitucional.editar')
                                     <button wire:click="edit({{ $pei->id }})"
                                         class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                                         title="Editar">
@@ -87,6 +90,8 @@
                                                 clip-rule="evenodd" />
                                         </svg>
                                     </button>
+                                    @endcan
+                                     @can('consola.planestrategicoinstitucional.eliminar')
                                     <button wire:click="delete({{ $pei->id }})"
                                         class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                                         title="Eliminar">
@@ -97,6 +102,7 @@
                                                 clip-rule="evenodd" />
                                         </svg>
                                     </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>
