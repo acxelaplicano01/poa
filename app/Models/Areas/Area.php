@@ -4,6 +4,7 @@ namespace App\Models\Areas;
 use App\Models\BaseModel;
 use App\Models\Objetivos\Objetivo;
 use App\Models\Dimension\Dimension;
+use App\Models\Resultados\Resultado;
 use App\Models\Poa\Pei;
 
 class Area extends BaseModel
