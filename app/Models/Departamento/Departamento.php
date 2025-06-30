@@ -15,7 +15,6 @@ class Departamento extends BaseModel
         'estructura',
         'tipo',
         'idUnidadEjecutora',
-        // Los campos de auditoría ya están en BaseModel
     ];
 
     // Relación con UnidadEjecutora
@@ -24,9 +23,11 @@ class Departamento extends BaseModel
         return $this->belongsTo(UnidadEjecutora::class, 'idUnidadEjecutora');
     }
 
-    // Relación con Empleados
-      public function empleados()
+    // Corregir la relación con empleados - debe coincidir con la del modelo Empleado
+    public function empleados()
     {
-        return $this->belongsToMany(Empleado::class, 'empleado_departamento');
+        return $this->belongsToMany(Empleado::class, 'empleado_deptos', 'idDepto', 'idEmpleado')
+                    ->withTimestamps()
+                    ->withPivot(['created_by', 'updated_by', 'deleted_by']);
     }
 }

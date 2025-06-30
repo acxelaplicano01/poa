@@ -49,7 +49,7 @@
                             </h4>
                             @if($entityDetails || $entity)
                                 <p class="text-sm text-zinc-500 dark:text-zinc-400">
-                                    {{ $entityDetails ?: ($entity ? ($entity->email ?? $entity->descripcion ?? $entity->detalle ?? $entity->dni ?? 'N/A') : '') }}
+                                    {{ $entityDetails ?: ($entity ? ($entity->email ?? $entity->descripcion ?? $entity->detalle ?? $entity->dni ?? '') : '') }}
                                 </p>
                             @endif
                         </div>
