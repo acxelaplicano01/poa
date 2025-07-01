@@ -147,9 +147,9 @@ Route::middleware([
 
         Route::get('/consola/planestrategicoinstitucional', PlanEstrategicoInstitucional::class)
             ->name('planestrategicoinstitucional')
-            ->middleware('can:consola.planestrategicoinstitucional.ver');
+            ->middleware('can:consola.planestrategicoinstitucional.ver'); 
 
-        Route::get('/consola/asignacionpresupuestaria', asignacionpresupuestaria::class)
+        Route::get('/consola/asignacionpresupuestaria', AsignacionPresupuestaria::class)
             ->name('asignacionpresupuestaria')
             ->middleware('can:consola.asignacionpresupuestaria.ver');
     });

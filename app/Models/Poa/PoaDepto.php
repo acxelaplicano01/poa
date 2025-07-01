@@ -12,7 +12,7 @@ class PoaDepto extends BaseModel
     protected $fillable = [
         'isActive',
         'idPoa',
-        'idDeptartamento',
+        'idDepartamento',
         // Los campos de auditoría ya están en BaseModel
     ];
 

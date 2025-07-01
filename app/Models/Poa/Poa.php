@@ -34,6 +34,6 @@ class Poa extends BaseModel
     // Relación con PoaDeptos
     public function poaDeptos()
     {
-        return $this->hasMany(PoaDepto::class, 'idPoaUE');
+        return $this->hasMany(PoaDepto::class, 'idPoa');
     }
 }
