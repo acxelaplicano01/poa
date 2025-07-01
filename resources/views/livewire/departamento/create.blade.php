@@ -1,4 +1,4 @@
-    <x-modal wire:model="showModal" maxWidth="2xl">
+    <x-modal wire:model="showModal" maxWidth="lg">
         <div class="px-6 py-4">
             <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
                 {{ $isEditing ? 'Editar Departamento' : 'Crear Nuevo Departamento' }}

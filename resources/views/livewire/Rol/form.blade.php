@@ -24,7 +24,7 @@
                         {{ $isEditing ? 'Modifica los datos del rol y sus permisos.' : 'Crea un nuevo rol y asigna los permisos correspondientes.' }}
                     </p>
                 </div>
-                <div class="flex items-center space-x-3">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <x-secondary-button wire:click="cancel" type="button">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -311,7 +311,7 @@
 
         <!-- Footer fijo -->
         <div class="sticky bottom-0 bg-white dark:bg-zinc-800 px-6 py-4 border-t border-zinc-200 dark:border-zinc-700">
-            <div class="flex justify-between items-center">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <div class="text-sm text-zinc-600 dark:text-zinc-400">
                     <span id="selectedCount">0</span> permisos seleccionados
                 </div>
