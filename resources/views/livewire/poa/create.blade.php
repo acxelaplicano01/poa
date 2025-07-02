@@ -1,19 +1,16 @@
-<x-modal wire:model="showModal" maxWidth="2xl">
+<x-modal 
+    wire:model="showModal" 
+    maxWidth="xl"
+    x-on:close="$wire.closeModal()"
+>
     <div x-data="{
-        techos: @entangle('techos'),
+        techos: $wire.entangle('techos').live,
         get totalTechos() {
             return this.techos.reduce((sum, techo) => sum + (parseFloat(techo.monto) || 0), 0).toFixed(2);
-        },
-        getDisponiblesFuentes(currentIndex) {
-            // Obtener fuentes ya seleccionadas
-            const fuentesSeleccionadas = this.techos
-                .map((techo, i) => i !== currentIndex && techo.idFuente ? techo.idFuente : null)
-                .filter(id => id !== null);
-            
-            // Retorna true si la fuente no está seleccionada en otros techos
-            return (fuente) => !fuentesSeleccionadas.includes(fuente.value);
         }
-    }" class="px-6 py-4">
+    }" 
+    class="px-6 py-4"
+>
         <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
             {{ $isEditing ? 'Editar POA' : 'Crear Nuevo POA' }}
         </h3>
@@ -64,9 +61,6 @@
                             </h4>
                             <div class="flex items-center mt-1">
                                 <p class="text-sm text-zinc-500 dark:text-zinc-400">Máximo 3 techos presupuestarios</p>
-                                <span class="ml-3 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
-                                    Total asignado: <span x-text="new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalTechos)"></span>
-                                </span>
                             </div>
                         </div>
                         <x-button type="button" wire:click="addTecho" variant="secondary" size="sm" 
@@ -119,14 +113,13 @@
                                 <div>
                                     <x-label for="techos.{{ $index }}.monto" value="{{ __('Monto') }}" class="mb-2" />
                                     <x-input 
-                                        wire:model.defer="techos.{{ $index }}.monto" 
-                                        x-on:input="techos[{{ $index }}].monto = $event.target.value"
+                                        x-model="techos[{{ $index }}].monto"
                                         id="techos.{{ $index }}.monto" 
                                         type="number" 
                                         step="0.01" 
                                         min="0" 
                                         placeholder="0.00" 
-                                        class="mt-1 block w-full" 
+                                        class="mt-1 block w-full"
                                     />
                                     <x-input-error for="techos.{{ $index }}.monto" class="mt-2" />
                                 </div>

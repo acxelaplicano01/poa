@@ -60,8 +60,7 @@ class AsignacionPresupuestaria extends Component
 
     public function mount()
     {
-        $this->anio = date('Y');
-        $this->initializeTechos();
+        $this->resetForm(); // Esto ya establece el año y los techos iniciales
     }
 
     private function initializeTechos()
@@ -144,6 +143,7 @@ class AsignacionPresupuestaria extends Component
     {
         $this->resetForm();
         $this->isEditing = false;
+        $this->resetValidation();
         $this->showModal = true;
     }
 
@@ -272,10 +272,11 @@ class AsignacionPresupuestaria extends Component
     {
         $this->poaId = null;
         $this->name = '';
-        $this->anio = '';
+        $this->anio = date('Y');
         $this->idInstitucion = '';
         $this->idUE = '';
-        $this->initializeTechos();
+        $this->techos = []; // Limpia completamente el array de techos
+        $this->initializeTechos(); // Inicializa con un techo vacío
     }
 
     public function clearFilters()
