@@ -57,8 +57,11 @@
                 @if($poas->count() > 0)
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
                         @foreach($poas as $poa)
-                            <div class="bg-gradient-to-br from-indigo-700 to-purple-700 dark:from-indigo-900 dark:to-purple-900 rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200">
-                                <div class="p-5">
+                            <div class="bg-gradient-to-br from-indigo-700 to-purple-700 dark:from-indigo-900 dark:to-purple-900 rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200 cursor-pointer relative group p-5">
+                                <div wire:click="gestionarTechoDepto({{ $poa->id }}, {{ $poa->idUE }})">
+                                    <div class="absolute top-2 right-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        Gestionar Techos Depto
+                                    </div>
                                     <div class="flex items-center justify-between">
                                         <h3 class="text-6xl font-extrabold">{{ $poa->anio }}</h3>
                                         <span class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">
@@ -99,6 +102,7 @@
                                         <div class="bg-white h-2 rounded-full" style="width: {{ ($poa->techoUes->count() > 0 && $poa->poa_deptos_count > 0) ? '100' : (($poa->techoUes->count() > 0 || $poa->poa_deptos_count > 0) ? '60' : '25') }}%"></div>
                                     </div>
                                     
+                                </div>
                                     <div class="mt-5 flex space-x-2">
                                         <button wire:click="edit({{ $poa->id }})" 
                                             class="flex-1 flex items-center justify-center px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-zinc-900 font-medium rounded-md transition-colors text-sm">
@@ -115,7 +119,6 @@
                                             </svg>
                                         </button>
                                     </div>
-                                </div>
                             </div>
                         @endforeach
                     </div>

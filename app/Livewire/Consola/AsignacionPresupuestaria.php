@@ -355,4 +355,19 @@ class AsignacionPresupuestaria extends Component
         
         return $options;
     }
+
+    /**
+     * Navega al CRUD de TechoDepto para el POA seleccionado
+     *
+     * @param int $poaId
+     * @param int $idUE
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function gestionarTechoDepto($poaId, $idUE)
+    {
+        return redirect()->route('techo-deptos', [
+            'idPoa' => $poaId, 
+            'idUE' => $idUE
+        ]);
+    }
 }

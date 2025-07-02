@@ -78,6 +78,9 @@ Route::middleware([
     Route::get('/fuentes', Fuentes::class)
         ->name('fuentes');
 
+    Route::get('/techo-deptos', App\Livewire\TechoDeptos\GestionTechoDeptos::class)
+        ->name('techo-deptos');
+
     Route::get('/grupo-gastos', GrupoGastos::class)
         ->name('grupo-gastos');
 
