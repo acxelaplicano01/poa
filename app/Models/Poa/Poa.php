@@ -36,4 +36,16 @@ class Poa extends BaseModel
     {
         return $this->hasMany(PoaDepto::class, 'idPoa');
     }
+
+    // Relación con TechoUe
+    public function techoUe()
+    {
+        return $this->hasOne(\App\Models\TechoUes\TechoUe::class, 'idPoa');
+    }
+
+    // Relación con múltiples TechoUes
+    public function techoUes()
+    {
+        return $this->hasMany(\App\Models\TechoUes\TechoUe::class, 'idPoa');
+    }
 }

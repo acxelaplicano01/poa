@@ -39,4 +39,9 @@ class TechoUe extends BaseModel
     {
         return $this->hasMany(TechoDepto::class, 'idTechoUE');
     }
+
+    public function grupoGasto()
+    {
+        return $this->belongsTo(\App\Models\GrupoGastos\GrupoGasto::class, 'idGrupo');
+    }
 }

@@ -60,16 +60,10 @@
                             <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200">
                                 <div class="p-5">
                                     <div class="flex items-center justify-between">
-                                        <h3 class="text-3xl font-extrabold">{{ $poa->anio }}</h3>
+                                        <h3 class="text-6xl font-extrabold">{{ $poa->anio }}</h3>
                                         <span class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">
                                             Activo
                                         </span>
-                                    </div>
-                                    
-                                    <div class="mt-3">
-                                        <h4 class="text-lg font-semibold truncate" title="{{ $poa->name }}">
-                                            {{ $poa->name }}
-                                        </h4>
                                     </div>
                                     
                                     <div class="mt-4 flex flex-col space-y-2 text-sm text-indigo-50">
@@ -86,13 +80,23 @@
                                             </span>
                                         </div>
                                         <div class="flex items-center justify-between">
+                                            <span>Presupuesto:</span>
+                                            <span class="font-semibold">
+                                                @if($poa->techoUes->count() > 0)
+                                                    {{ number_format($poa->techoUes->sum('monto'), 2) }}
+                                                @else
+                                                    No asignado
+                                                @endif
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
                                             <span>Departamentos:</span>
                                             <span class="font-semibold">{{ $poa->poa_deptos_count ?? 0 }}</span>
                                         </div>
                                     </div>
                                     
                                     <div class="mt-3 w-full bg-indigo-200 bg-opacity-30 rounded-full h-2">
-                                        <div class="bg-white h-2 rounded-full" style="width: {{ $poa->poa_deptos_count > 0 ? '100' : '25' }}%"></div>
+                                        <div class="bg-white h-2 rounded-full" style="width: {{ ($poa->techoUes->count() > 0 && $poa->poa_deptos_count > 0) ? '100' : (($poa->techoUes->count() > 0 || $poa->poa_deptos_count > 0) ? '60' : '25') }}%"></div>
                                     </div>
                                     
                                     <div class="mt-5 flex space-x-2">

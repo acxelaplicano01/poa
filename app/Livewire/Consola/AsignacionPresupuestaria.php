@@ -7,6 +7,9 @@ use Livewire\WithPagination;
 use App\Models\Poa\Poa;
 use App\Models\Instituciones\Institucion;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
+use App\Models\TechoUes\TechoUe;
+use App\Models\GrupoGastos\GrupoGasto;
+use App\Models\GrupoGastos\Fuente;
 
 class AsignacionPresupuestaria extends Component
 {
@@ -27,17 +30,19 @@ class AsignacionPresupuestaria extends Component
     public $anio = '';
     public $idInstitucion = '';
     public $idUE = '';
+    
+    // Propiedades para múltiples Techos UE
+    public $techos = [];
 
     protected $rules = [
-        'name' => 'required|string|max:255',
         'anio' => 'required|integer|min:2020|max:2050',
         'idInstitucion' => 'required|exists:institucions,id',
         'idUE' => 'required|exists:unidad_ejecutora,id',
+        'techos.*.monto' => 'required|numeric|min:0',
+        'techos.*.idFuente' => 'required|exists:fuente,id',
     ];
 
     protected $messages = [
-        'name.required' => 'El nombre es obligatorio.',
-        'name.max' => 'El nombre no puede exceder 255 caracteres.',
         'anio.required' => 'El año es obligatorio.',
         'anio.integer' => 'El año debe ser un número.',
         'anio.min' => 'El año debe ser mayor a 2020.',
@@ -46,11 +51,30 @@ class AsignacionPresupuestaria extends Component
         'idInstitucion.exists' => 'La institución seleccionada no existe.',
         'idUE.required' => 'La unidad ejecutora es obligatoria.',
         'idUE.exists' => 'La unidad ejecutora seleccionada no existe.',
+        'techos.*.monto.required' => 'El monto es obligatorio.',
+        'techos.*.monto.numeric' => 'El monto debe ser un número.',
+        'techos.*.monto.min' => 'El monto debe ser mayor o igual a 0.',
+        'techos.*.idFuente.required' => 'La fuente de financiamiento es obligatoria.',
+        'techos.*.idFuente.exists' => 'La fuente de financiamiento seleccionada no existe.',
     ];
 
     public function mount()
     {
         $this->anio = date('Y');
+        $this->initializeTechos();
+    }
+
+    private function initializeTechos()
+    {
+        // Inicializar con al menos un techo vacío
+        if (empty($this->techos)) {
+            $this->techos = [
+                [
+                    'monto' => '',
+                    'idFuente' => ''
+                ]
+            ];
+        }
     }
 
     public function updatingSearch()
@@ -76,7 +100,7 @@ class AsignacionPresupuestaria extends Component
 
     public function render()
     {
-        $poas = Poa::with(['institucion', 'unidadEjecutora'])
+        $poas = Poa::with(['institucion', 'unidadEjecutora', 'techoUes.grupoGasto', 'techoUes.fuente'])
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('anio', 'like', '%' . $this->search . '%')
@@ -96,6 +120,8 @@ class AsignacionPresupuestaria extends Component
 
         $instituciones = Institucion::orderBy('nombre')->get();
         $unidadesEjecutoras = UnidadEjecutora::orderBy('name')->get();
+        $grupoGastos = GrupoGasto::orderBy('nombre')->get();
+        $fuentes = Fuente::orderBy('nombre')->get();
         
         // Obtener años únicos para el filtro
         $anios = Poa::select('anio')
@@ -108,6 +134,8 @@ class AsignacionPresupuestaria extends Component
             'poas' => $poas,
             'instituciones' => $instituciones,
             'unidadesEjecutoras' => $unidadesEjecutoras,
+            'grupoGastos' => $grupoGastos,
+            'fuentes' => $fuentes,
             'anios' => $anios
         ])->layout('layouts.app');
     }
@@ -127,6 +155,21 @@ class AsignacionPresupuestaria extends Component
         $this->anio = $poa->anio;
         $this->idInstitucion = $poa->idInstitucion;
         $this->idUE = $poa->idUE;
+        
+        // Cargar múltiples techos si existen
+        $techosExistentes = TechoUe::where('idPoa', $poa->id)->get();
+        if ($techosExistentes->count() > 0) {
+            $this->techos = $techosExistentes->map(function($techo) {
+                return [
+                    'id' => $techo->id,
+                    'monto' => $techo->monto,
+                    'idFuente' => $techo->idFuente
+                ];
+            })->toArray();
+        } else {
+            $this->initializeTechos();
+        }
+        
         $this->isEditing = true;
         $this->showModal = true;
     }
@@ -143,14 +186,44 @@ class AsignacionPresupuestaria extends Component
                 'idInstitucion' => $this->idInstitucion,
                 'idUE' => $this->idUE,
             ]);
+            
+            // Eliminar techos existentes y crear los nuevos
+            TechoUe::where('idPoa', $poa->id)->delete();
+            
+            foreach ($this->techos as $techo) {
+                if (!empty($techo['monto']) && !empty($techo['idFuente'])) {
+                    TechoUe::create([
+                        'monto' => $techo['monto'],
+                        'idUE' => $this->idUE,
+                        'idPoa' => $poa->id,
+                        'idGrupo' => null, // Campo mantenido como null ya que existe en la base de datos
+                        'idFuente' => $techo['idFuente'],
+                    ]);
+                }
+            }
+            
             session()->flash('message', 'POA actualizado correctamente.');
         } else {
-            Poa::create([
+            $poa = Poa::create([
                 'name' => $this->name,
                 'anio' => $this->anio,
                 'idInstitucion' => $this->idInstitucion,
                 'idUE' => $this->idUE,
             ]);
+            
+            // Crear múltiples TechoUe
+            foreach ($this->techos as $techo) {
+                if (!empty($techo['monto']) && !empty($techo['idFuente'])) {
+                    TechoUe::create([
+                        'monto' => $techo['monto'],
+                        'idUE' => $this->idUE,
+                        'idPoa' => $poa->id,
+                        'idGrupo' => null, // Campo mantenido como null ya que existe en la base de datos
+                        'idFuente' => $techo['idFuente'],
+                    ]);
+                }
+            }
+            
             session()->flash('message', 'POA creado correctamente.');
         }
 
@@ -183,6 +256,8 @@ class AsignacionPresupuestaria extends Component
     {
         $this->showDeleteModal = false;
         $this->poaToDelete = null;
+        session()->forget('error'); // Limpiar mensaje de error si existe
+
     }
 
     public function closeModal()
@@ -190,15 +265,17 @@ class AsignacionPresupuestaria extends Component
         $this->showModal = false;
         $this->resetForm();
         $this->resetValidation();
+        session()->forget('error'); // Limpiar mensaje de error si existe
     }
 
     private function resetForm()
     {
         $this->poaId = null;
         $this->name = '';
-        $this->anio = date('Y');
+        $this->anio = '';
         $this->idInstitucion = '';
         $this->idUE = '';
+        $this->initializeTechos();
     }
 
     public function clearFilters()
@@ -206,5 +283,75 @@ class AsignacionPresupuestaria extends Component
         $this->search = '';
         $this->filtroAnio = 'todos';
         $this->resetPage();
+    }
+
+    public function addTecho()
+    {
+        // Limitar a un máximo de 3 techos presupuestarios
+        if (count($this->techos) < 3) {
+            $this->techos[] = [
+                'monto' => '',
+                'idFuente' => ''
+            ];
+        } else {
+            session()->flash('error', 'No se pueden agregar más de 3 techos presupuestarios.');
+        }
+    }
+
+    public function removeTecho($index)
+    {
+        if (count($this->techos) > 1) {
+            unset($this->techos[$index]);
+            $this->techos = array_values($this->techos); // Reindexar
+        }
+    }
+    
+    /**
+     * Calcula el total de los techos presupuestarios.
+     * 
+     * @return float
+     */
+    public function getTotalTechosProperty()
+    {
+        return array_reduce($this->techos, function ($carry, $techo) {
+            $monto = !empty($techo['monto']) ? (float)$techo['monto'] : 0;
+            return $carry + $monto;
+        }, 0);
+    }
+
+    /**
+     * Obtiene las fuentes disponibles para un techo específico
+     * excluyendo las que ya están seleccionadas en otros techos
+     * 
+     * @param int $currentIndex
+     * @return array
+     */
+    public function getFuentesDisponibles($currentIndex)
+    {
+        // Todas las fuentes de financiamiento
+        $allFuentes = Fuente::orderBy('nombre')->get();
+        
+        // Fuentes ya seleccionadas en otros techos
+        $fuentesSeleccionadas = collect($this->techos)
+            ->filter(function ($techo, $index) use ($currentIndex) {
+                return $index != $currentIndex && !empty($techo['idFuente']);
+            })
+            ->pluck('idFuente')
+            ->toArray();
+        
+        // Fuente actualmente seleccionada en este techo
+        $currentFuente = $this->techos[$currentIndex]['idFuente'] ?? null;
+        
+        // Agregar la opción "Seleccione una fuente"
+        $options = [['value' => '', 'text' => 'Seleccione una fuente']];
+        
+        // Filtrar las fuentes para mostrar solo las no seleccionadas o la que ya está seleccionada en este techo
+        foreach ($allFuentes as $fuente) {
+            if (!in_array($fuente->id, $fuentesSeleccionadas) || $fuente->id == $currentFuente) {
+                $options[] = ['value' => $fuente->id, 'text' => $fuente->nombre];
+            }
+        }
+        
+        return $options;
     }
 }

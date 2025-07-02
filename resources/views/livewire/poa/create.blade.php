@@ -1,90 +1,170 @@
-
-    <x-modal wire:model="showModal" maxWidth="2xl">
-        <div class="px-6 py-4">
-            <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-                {{ $isEditing ? 'Editar POA' : 'Crear Nuevo POA' }}
-            </h3>
+<x-modal wire:model="showModal" maxWidth="2xl">
+    <div x-data="{
+        techos: @entangle('techos'),
+        get totalTechos() {
+            return this.techos.reduce((sum, techo) => sum + (parseFloat(techo.monto) || 0), 0).toFixed(2);
+        },
+        getDisponiblesFuentes(currentIndex) {
+            // Obtener fuentes ya seleccionadas
+            const fuentesSeleccionadas = this.techos
+                .map((techo, i) => i !== currentIndex && techo.idFuente ? techo.idFuente : null)
+                .filter(id => id !== null);
             
-            <form wire:submit="save">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Nombre del POA -->
-                    <div class="md:col-span-2">
-                        <x-label for="name" value="{{ __('Nombre del POA') }}" class="mb-2" />
-                        <x-input wire:model="name" id="name" type="text" placeholder="Ej: POA 2024 - Plan Operativo Anual" class="mt-1 block w-full" />
-                        <x-input-error for="name" class="mt-2" />
-                    </div>
-
-                    <!-- Año -->
-                    <div>
-                        <x-label for="anio" value="{{ __('Año') }}" class="mb-2" />
-                        <x-year-picker 
-                            id="anio" 
-                            wire:model="anio"
-                            class="mt-1 block w-full"
-                        />
-                        <x-input-error for="anio" class="mt-2" />
-                    </div>
-
-                    <!-- Institución -->
-                    <div>
-                        <x-label for="idInstitucion" value="{{ __('Institución') }}" class="mb-2" />
-                        <x-select 
-                            id="idInstitucion" 
-                            wire:model="idInstitucion"
-                            :options="$instituciones->map(fn($institucion) => ['value' => $institucion->id, 'text' => $institucion->nombre])->prepend(['value' => '', 'text' => 'Seleccione una institución'])->toArray()"
-                            class="mt-1 block w-full"
-                        />
-                        <x-input-error for="idInstitucion" class="mt-2" />
-                    </div>
-
-                    <!-- Unidad Ejecutora -->
-                    <div class="md:col-span-2">
-                        <x-label for="idUE" value="{{ __('Unidad Ejecutora') }}" class="mb-2" />
-                        <x-select 
-                            id="idUE" 
-                            wire:model="idUE"
-                            :options="$unidadesEjecutoras->map(fn($ue) => ['value' => $ue->id, 'text' => $ue->name])->prepend(['value' => '', 'text' => 'Seleccione una unidad ejecutora'])->toArray()"
-                            class="mt-1 block w-full"
-                        />
-                        <x-input-error for="idUE" class="mt-2" />
-                    </div>
+            // Retorna true si la fuente no está seleccionada en otros techos
+            return (fuente) => !fuentesSeleccionadas.includes(fuente.value);
+        }
+    }" class="px-6 py-4">
+        <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
+            {{ $isEditing ? 'Editar POA' : 'Crear Nuevo POA' }}
+        </h3>
+        
+        <form wire:submit.prevent="save">            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Año -->
+                <div>
+                    <x-label for="anio" value="{{ __('Año') }}" class="mb-2" />
+                    <x-year-picker 
+                        id="anio" 
+                        wire:model="anio"
+                        class="mt-1 block w-full"
+                    />
+                    <x-input-error for="anio" class="mt-2" />
                 </div>
 
-                <!-- Información adicional -->
-                <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                <!-- Institución -->
+                <div>
+                    <x-label for="idInstitucion" value="{{ __('Institución') }}" class="mb-2" />
+                    <x-select 
+                        id="idInstitucion" 
+                        wire:model="idInstitucion"
+                        :options="$instituciones->map(fn($institucion) => ['value' => $institucion->id, 'text' => $institucion->nombre])->prepend(['value' => '', 'text' => 'Seleccione una institución'])->toArray()"
+                        class="mt-1 block w-full"
+                    />
+                    <x-input-error for="idInstitucion" class="mt-2" />
+                </div>
+
+                <!-- Unidad Ejecutora -->
+                <div class="md:col-span-2">
+                    <x-label for="idUE" value="{{ __('Unidad Ejecutora') }}" class="mb-2" />
+                    <x-select 
+                        id="idUE" 
+                        wire:model="idUE"
+                        :options="$unidadesEjecutoras->map(fn($ue) => ['value' => $ue->id, 'text' => $ue->name])->prepend(['value' => '', 'text' => 'Seleccione una unidad ejecutora'])->toArray()"
+                        class="mt-1 block w-full"
+                    />
+                    <x-input-error for="idUE" class="mt-2" />
+                </div>
+
+                <!-- Título para Techo Presupuestario -->
+                <div class="md:col-span-2 mt-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h4 class="text-lg font-medium text-zinc-900 dark:text-zinc-100 border-b border-zinc-200 dark:border-zinc-700 pb-2">
+                                Techos Presupuestarios
+                            </h4>
+                            <div class="flex items-center mt-1">
+                                <p class="text-sm text-zinc-500 dark:text-zinc-400">Máximo 3 techos presupuestarios</p>
+                                <span class="ml-3 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                                    Total asignado: <span x-text="new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalTechos)"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <x-button type="button" wire:click="addTecho" variant="secondary" size="sm" 
+                            :disabled="count($techos) >= 3">
+                            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm text-blue-700 dark:text-blue-200">
-                                <strong>Información:</strong> El POA (Plan Operativo Anual) es el documento que establece las actividades, metas y recursos necesarios para el funcionamiento de la institución durante un año específico.
-                            </p>
-                        </div>
+                            Agregar Techo
+                        </x-button>
                     </div>
+                    @if (session()->has('error'))
+                        <div class="text-sm text-red-600 mb-3">
+                            {{ session('error') }}
+                        </div>
+                    @endif
                 </div>
 
-                <!-- Botones -->
-                <div class="flex justify-end mt-6 space-x-3">
-                    <x-secondary-button wire:click="closeModal" type="button">
-                        {{ __('Cancelar') }}
-                    </x-secondary-button>
-                    
-                    <x-button type="submit" wire:loading.attr="disabled" class="flex items-center">
-                        <svg wire:loading wire:target="save" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span wire:loading.remove wire:target="save">
-                            {{ $isEditing ? __('Actualizar') : __('Crear') }}
-                        </span>
-                        <span wire:loading wire:target="save">
-                            {{ $isEditing ? __('Actualizando...') : __('Creando...') }}
-                        </span>
-                    </x-button>
+                <!-- Techos Presupuestarios Dinámicos -->
+                <div class="md:col-span-2">
+                    @foreach($techos as $index => $techo)
+                        <div class="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-4 bg-zinc-50 dark:bg-zinc-800/50">
+                            <div class="flex items-center justify-between mb-3">
+                                <h5 class="font-medium text-zinc-900 dark:text-zinc-100">
+                                    Techo Presupuestario {{ $index + 1 }}
+                                </h5>
+                                @if(count($techos) > 1)
+                                    <button type="button" wire:click="removeTecho({{ $index }})" 
+                                        class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                @endif
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                <!-- Fuente de Financiamiento -->
+                                <div>
+                                    <x-label for="techos.{{ $index }}.idFuente" value="{{ __('Fuente') }}" class="mb-2" />
+                                    <x-select 
+                                        id="techos.{{ $index }}.idFuente" 
+                                        wire:model.live="techos.{{ $index }}.idFuente"
+                                        :options="$this->getFuentesDisponibles($index)"
+                                        class="mt-1 block w-full"
+                                    />
+                                    <x-input-error for="techos.{{ $index }}.idFuente" class="mt-2" />
+                                </div>
+                                <!-- Monto -->
+                                <div>
+                                    <x-label for="techos.{{ $index }}.monto" value="{{ __('Monto') }}" class="mb-2" />
+                                    <x-input 
+                                        wire:model.defer="techos.{{ $index }}.monto" 
+                                        x-on:input="techos[{{ $index }}].monto = $event.target.value"
+                                        id="techos.{{ $index }}.monto" 
+                                        type="number" 
+                                        step="0.01" 
+                                        min="0" 
+                                        placeholder="0.00" 
+                                        class="mt-1 block w-full" 
+                                    />
+                                    <x-input-error for="techos.{{ $index }}.monto" class="mt-2" />
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
-            </form>
-        </div>
-    </x-modal>
+            </div>
+            
+            <!-- Resumen de Presupuesto -->
+            <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
+                <h4 class="font-medium text-blue-800 dark:text-blue-300 mb-2">Resumen de Presupuesto</h4>
+                <div class="flex justify-between items-center">
+                    <span class="text-blue-700 dark:text-blue-400">Total asignado:</span>
+                    <span class="text-lg font-bold text-blue-800 dark:text-blue-300" x-text="new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalTechos)"></span>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex justify-end mt-6 space-x-3">
+                <x-secondary-button wire:click="closeModal" type="button">
+                    {{ __('Cancelar') }}
+                </x-secondary-button>
+                
+                <x-button type="submit" wire:loading.attr="disabled" class="flex items-center">
+                    <svg wire:loading wire:target="save" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span wire:loading.remove wire:target="save">
+                        {{ $isEditing ? __('Actualizar') : __('Crear') }}
+                    </span>
+                    <span wire:loading wire:target="save">
+                        {{ $isEditing ? __('Actualizando...') : __('Creando...') }}
+                    </span>
+                </x-button>
+            </div>
+            
+        </form>
+    </div>
+</x-modal>
