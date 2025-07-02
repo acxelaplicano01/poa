@@ -57,11 +57,11 @@
                 @if($poas->count() > 0)
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
                         @foreach($poas as $poa)
-                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200">
+                            <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200">
                                 <div class="p-5">
                                     <div class="flex items-center justify-between">
                                         <h3 class="text-3xl font-extrabold">{{ $poa->anio }}</h3>
-                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">
                                             Activo
                                         </span>
                                     </div>
@@ -72,7 +72,7 @@
                                         </h4>
                                     </div>
                                     
-                                    <div class="mt-4 flex flex-col space-y-2 text-sm text-blue-50">
+                                    <div class="mt-4 flex flex-col space-y-2 text-sm text-indigo-50">
                                         <div class="flex items-center justify-between">
                                             <span>Institución:</span>
                                             <span class="font-semibold truncate ml-2" title="{{ $poa->institucion->nombre ?? 'N/A' }}">
@@ -91,7 +91,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="mt-3 w-full bg-blue-200 bg-opacity-30 rounded-full h-2">
+                                    <div class="mt-3 w-full bg-indigo-200 bg-opacity-30 rounded-full h-2">
                                         <div class="bg-white h-2 rounded-full" style="width: {{ $poa->poa_deptos_count > 0 ? '100' : '25' }}%"></div>
                                     </div>
                                     
@@ -118,7 +118,7 @@
                 @else
                     <div class="text-center py-12">
                         <div class="max-w-md mx-auto">
-                            <div class="mx-auto h-16 w-16 text-blue-400 mb-6">
+                            <div class="mx-auto h-16 w-16 text-indigo-400 mb-6">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                                     <path stroke-linecap="round" stroke-linejoin="round" 
                                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -135,7 +135,7 @@
                                     <x-button wire:click="clearFilters" variant="secondary">
                                         Limpiar filtros
                                     </x-button>
-                                    <x-button wire:click="create()" class="inline-flex bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
+                                    <x-button wire:click="create()" class="inline-flex bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700">
                                         <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -151,7 +151,7 @@
                                 <p class="text-zinc-500 dark:text-zinc-400 mb-8">
                                     Comienza creando tu primer Plan Operativo Anual para gestionar tus proyectos y presupuestos.
                                 </p>
-                                <x-button wire:click="create()" class="inline-flex bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
+                                <x-button wire:click="create()" class="inline-flex bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700">
                                     <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

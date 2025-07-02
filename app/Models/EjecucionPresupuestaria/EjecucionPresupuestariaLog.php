@@ -4,7 +4,7 @@ namespace App\Models\EjecucionPresupuestaria;
 use App\Models\BaseModel;
 use App\Models\EjecucionPresupuestaria\EjecucionPresupuestaria;
 
-class EjecucionPresupuestariaLogs extends BaseModel
+class EjecucionPresupuestariaLog extends BaseModel
 {
     protected $table = 'ejecucion_presupuestaria_logs';
 
