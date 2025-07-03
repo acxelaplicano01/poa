@@ -6,7 +6,7 @@
             <div class="mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-700">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                     <div>
-                        <a href="{{ route('asignacionpresupuestaria') }}" class="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:underline mb-2">
+                        <a href="{{ route('asignacionpresupuestaria') }}" class="inline-flex items-center text-indigo-600 dark:text-indigo-400  mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                             </svg>
@@ -74,7 +74,7 @@
                             wire:click="setActiveTab('sin-asignar')"
                             class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {{ $activeTab === 'sin-asignar' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300' }}">
                             Departamentos sin Techo
-                            <span class="ml-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 py-0.5 px-2.5 rounded-full text-xs font-medium">
+                            <span class="ml-2 bg-yellow-100 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100 py-0.5 px-2.5 rounded-full text-xs font-medium">
                                 {{ $departamentosSinTecho->count() }}
                             </span>
                         </button>
@@ -82,7 +82,7 @@
                             wire:click="setActiveTab('con-asignacion')"
                             class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {{ $activeTab === 'con-asignacion' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300' }}">
                             Departamentos con Techo
-                            <span class="ml-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 py-0.5 px-2.5 rounded-full text-xs font-medium">
+                            <span class="ml-2 bg-green-100 dark:bg-green-800 text-green-900 dark:text-green-100 py-0.5 px-2.5 rounded-full text-xs font-medium">
                                 {{ $departamentosConTecho->count() }}
                             </span>
                         </button>

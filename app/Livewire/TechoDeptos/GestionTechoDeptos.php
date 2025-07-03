@@ -176,10 +176,8 @@ class GestionTechoDeptos extends Component
     {
         if ($porcentaje >= 100) {
             return ['clase' => 'bg-red-500', 'texto' => 'Agotado', 'color' => 'text-red-700'];
-        } elseif ($porcentaje >= 80) {
-            return ['clase' => 'bg-yellow-500', 'texto' => 'Crítico', 'color' => 'text-yellow-700'];
-        } elseif ($porcentaje >= 50) {
-            return ['clase' => 'bg-blue-500', 'texto' => 'En uso', 'color' => 'text-blue-700'];
+        } elseif ($porcentaje >= 20) {
+            return ['clase' => 'bg-yellow-500', 'texto' => 'Poco recurso', 'color' => 'text-yellow-700'];
         } else {
             return ['clase' => 'bg-green-500', 'texto' => 'Disponible', 'color' => 'text-green-700'];
         }
