@@ -1,19 +1,11 @@
-<x-confirmation-modal wire:model="showDeleteModal">
-    <x-slot name="title">
-        Eliminar Techo Departamental
-    </x-slot>
-
-    <x-slot name="content">
-        ¿Está seguro que desea eliminar este techo departamental? Esta acción no se puede deshacer.
-    </x-slot>
-
-    <x-slot name="footer">
-        <x-secondary-button wire:click="closeDeleteModal">
-            {{ __('Cancelar') }}
-        </x-secondary-button>
-
-        <x-danger-button class="ml-3" wire:click="delete" wire:loading.attr="disabled">
-            {{ __('Eliminar') }}
-        </x-danger-button>
-    </x-slot>
-</x-confirmation-modal>
+<x-elegant-delete-modal 
+    wire:model="showDeleteModal"
+    title="Confirmar Eliminación"
+    message="¿Estás seguro de que deseas eliminar esta asignación presupuestaria?"
+    entity-name="{{ $techoDeptoToDelete?->departamento?->name ?? 'Techo Departamental' }}"
+    entity-details="Se eliminará la asignación de {{ number_format($techoDeptoToDelete?->monto ?? 0, 2) }} del departamento {{ $techoDeptoToDelete?->departamento?->name ?? '' }}"
+    confirm-method="delete"
+    cancel-method="closeDeleteModal"
+    confirm-text="Eliminar Asignación"
+    cancel-text="Cancelar"
+/>

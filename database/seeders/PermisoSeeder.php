@@ -50,6 +50,8 @@ class PermisoSeeder extends Seeder
             'consola' => [
                 'planestrategicoinstitucional' => ['ver', 'crear', 'editar', 'eliminar'],
                 'asignacionpresupuestaria' => ['ver', 'crear', 'editar', 'eliminar'],
+                'techo-deptos' => ['ver', 'crear', 'editar', 'eliminar', 'asignar'],
+                
             ],
             'logs' => [
                 'visor' => ['ver', 'filtrar', 'exportar'],
