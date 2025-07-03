@@ -103,22 +103,27 @@ class GestionTechoDeptos extends Component
     public function render()
     {
         // Obtener todos los departamentos de la UE
-        $todosDepartamentos = Departamento::where('idUnidadEjecutora', $this->idUE)
-            ->orderBy('name')
-            ->get();
+        $todosDepartamentosQuery = Departamento::where('idUnidadEjecutora', $this->idUE);
+        
+        // Aplicar filtro de búsqueda si existe
+        if ($this->search) {
+            $todosDepartamentosQuery->where('name', 'like', '%' . $this->search . '%');
+        }
+        
+        $todosDepartamentos = $todosDepartamentosQuery->orderBy('name')->get();
 
         // Obtener IDs de departamentos que ya tienen techos asignados
-        $departamentosConTecho = TechoDepto::where('idPoa', $this->idPoa)
+        $departamentosConTechoIds = TechoDepto::where('idPoa', $this->idPoa)
             ->where('idUE', $this->idUE)
             ->pluck('idDepartamento')
             ->unique();
 
-        // Separar departamentos con y sin techos
-        $departamentosSinTecho = $todosDepartamentos->whereNotIn('id', $departamentosConTecho);
-        $departamentosConTechoData = $todosDepartamentos->whereIn('id', $departamentosConTecho);
+        // Separar departamentos con y sin techos (aplicando el filtro de búsqueda)
+        $departamentosSinTecho = $todosDepartamentos->whereNotIn('id', $departamentosConTechoIds);
+        $departamentosConTechoData = $todosDepartamentos->whereIn('id', $departamentosConTechoIds);
 
         // Obtener techos departamentales con relaciones
-        $techoDeptos = TechoDepto::with(['departamento', 'techoUE.fuente'])
+        $techoDeptos = TechoDepto::with(['departamento', 'techoUE'])
             ->where('idPoa', $this->idPoa)
             ->where('idUE', $this->idUE)
             ->when($this->search, function ($query) {
@@ -176,7 +181,7 @@ class GestionTechoDeptos extends Component
     {
         if ($porcentaje >= 100) {
             return ['clase' => 'bg-red-500', 'texto' => 'Agotado', 'color' => 'text-red-700'];
-        } elseif ($porcentaje >= 20) {
+        } elseif ($porcentaje >= 60) {
             return ['clase' => 'bg-yellow-500', 'texto' => 'Poco recurso', 'color' => 'text-yellow-700'];
         } else {
             return ['clase' => 'bg-green-500', 'texto' => 'Disponible', 'color' => 'text-green-700'];
