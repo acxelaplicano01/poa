@@ -154,7 +154,7 @@ Route::middleware([
             ->name('asignacionpresupuestaria')
             ->middleware('can:consola.asignacionpresupuestaria.ver');
 
-        Route::get('/techo-deptos', GestionTechoDeptos::class)
+        Route::get('/consola/techo-deptos', GestionTechoDeptos::class)
             ->name('techo-deptos')
             ->middleware('can:consola.techo-deptos.ver');
     });
