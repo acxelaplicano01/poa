@@ -92,14 +92,24 @@
                                                 @endif
                                             </span>
                                         </div>
-                                        <div class="flex items-center justify-between">
-                                            <span>Departamentos:</span>
-                                            <span class="font-semibold">{{ $poa->poa_deptos_count ?? 0 }}</span>
-                                        </div>
+                                        
                                     </div>
                                     
-                                    <div class="mt-3 w-full bg-indigo-200 bg-opacity-30 rounded-full h-2">
-                                        <div class="bg-white h-2 rounded-full" style="width: {{ ($poa->techoUes->count() > 0 && $poa->poa_deptos_count > 0) ? '100' : (($poa->techoUes->count() > 0 || $poa->poa_deptos_count > 0) ? '60' : '25') }}%"></div>
+                                    <!-- Barra de progreso mejorada -->
+                                    <div class="mt-3 space-y-2">
+                                        <div class="flex items-center justify-between text-xs text-indigo-50">
+                                            <span>Progreso de Asignación</span>
+                                            <span class="font-semibold">{{ $poa->progreso_departamentos['porcentaje'] }}%</span>
+                                        </div>
+                                        <div class="w-full bg-indigo-200 bg-opacity-30 rounded-full h-2 overflow-hidden">
+                                            <div class="h-2 rounded-full transition-all duration-300 {{ $poa->progreso_departamentos['color'] }}" 
+                                                 style="width: {{ $poa->progreso_departamentos['porcentaje'] }}%"
+                                                 title="Departamentos con presupuesto: {{ $poa->progreso_departamentos['departamentos_con_presupuesto'] }}/{{ $poa->progreso_departamentos['total_departamentos'] }}">
+                                            </div>
+                                        </div>
+                                        <div class="text-xs text-indigo-50 opacity-75">
+                                            {{ $poa->progreso_departamentos['departamentos_con_presupuesto'] }} de {{ $poa->progreso_departamentos['total_departamentos'] }} departamentos con presupuesto
+                                        </div>
                                     </div>
                                     
                                 </div>

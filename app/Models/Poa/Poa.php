@@ -5,6 +5,7 @@ use App\Models\BaseModel;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\Instituciones\Institucion;
 use App\Models\Poa\PoaDepto;
+use App\Models\TechoUes\TechoUe;
 
 
 class Poa extends BaseModel
@@ -40,12 +41,18 @@ class Poa extends BaseModel
     // Relación con TechoUe
     public function techoUe()
     {
-        return $this->hasOne(\App\Models\TechoUes\TechoUe::class, 'idPoa');
+        return $this->hasOne(TechoUe::class, 'idPoa');
     }
 
     // Relación con múltiples TechoUes
     public function techoUes()
     {
-        return $this->hasMany(\App\Models\TechoUes\TechoUe::class, 'idPoa');
+        return $this->hasMany(TechoUe::class, 'idPoa');
+    }
+
+    // Relación con TechoDeptos
+    public function techoDeptos()
+    {
+        return $this->hasMany(\App\Models\TechoUes\TechoDepto::class, 'idPoa');
     }
 }

@@ -6,7 +6,7 @@
             
             <form wire:submit.prevent="save">            
                 <!-- Departamento -->
-                @if($idDepartamento && $isEditing)
+                @if($idDepartamento && !$isEditing)
                     <!-- Departamento preseleccionado (solo lectura) -->
                     <div class="mb-6">
                         <x-label value="{{ __('Departamento Seleccionado') }}" class="mb-2" />

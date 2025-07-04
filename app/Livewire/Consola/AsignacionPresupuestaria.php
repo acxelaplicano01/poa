@@ -117,6 +117,11 @@ class AsignacionPresupuestaria extends Component
             ->orderBy($this->sortField, $this->sortDirection)
              ->paginate(12);
 
+        // Calcular progreso de departamentos para cada POA
+        foreach ($poas as $poa) {
+            $poa->progreso_departamentos = $this->calcularProgresoDepartamentos($poa);
+        }
+
         $instituciones = Institucion::orderBy('nombre')->get();
         $unidadesEjecutoras = UnidadEjecutora::orderBy('name')->get();
         $grupoGastos = GrupoGasto::orderBy('nombre')->get();
@@ -354,6 +359,53 @@ class AsignacionPresupuestaria extends Component
         }
         
         return $options;
+    }
+
+    /**
+     * Calcula el progreso de departamentos para un POA específico
+     * Mide: porcentaje de departamentos con presupuesto asignado vs total de departamentos de la UE
+     *
+     * @param Poa $poa
+     * @return array
+     */
+    private function calcularProgresoDepartamentos($poa)
+    {
+        // Obtener el total de departamentos de la UE
+        $totalDepartamentos = $poa->unidadEjecutora->departamentos()->count();
+        
+        // Si no hay departamentos, el progreso es 0
+        if ($totalDepartamentos == 0) {
+            return [
+                'porcentaje' => 0,
+                'departamentos_con_presupuesto' => 0,
+                'total_departamentos' => 0,
+                'color' => 'bg-red-500'
+            ];
+        }
+        
+        // Contar departamentos con presupuesto asignado
+        $departamentosConPresupuesto = $poa->techoDeptos()
+            ->where('monto', '>', 0)
+            ->distinct('idDepartamento')
+            ->count('idDepartamento');
+        
+        // Calcular porcentaje
+        $porcentaje = round(($departamentosConPresupuesto / $totalDepartamentos) * 100);
+        
+        // Determinar color según el porcentaje
+        $color = 'bg-red-500'; // Rojo por defecto
+        if ($porcentaje >= 65) {
+            $color = 'bg-green-500'; // Verde para 65% o más
+        } elseif ($porcentaje >= 30) {
+            $color = 'bg-yellow-500'; // Amarillo para 30-64%
+        }
+        
+        return [
+            'porcentaje' => $porcentaje,
+            'departamentos_con_presupuesto' => $departamentosConPresupuesto,
+            'total_departamentos' => $totalDepartamentos,
+            'color' => $color
+        ];
     }
 
     /**
