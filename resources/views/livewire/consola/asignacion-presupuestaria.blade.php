@@ -4,13 +4,23 @@
 
             @if (session()->has('message'))
                 <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md" role="alert">
-                    <p class="font-medium">{{ session('message') }}</p>
+                    <div class="flex justify-between items-center">
+                        <p class="font-medium">{{ session('message') }}</p>
+                        <button wire:click="clearMessages" class="text-green-500 hover:text-green-700 font-bold text-lg ml-4">
+                            ×
+                        </button>
+                    </div>
                 </div>
             @endif
 
             @if (session()->has('error'))
                 <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md" role="alert">
-                    <p class="font-medium">{{ session('error') }}</p>
+                    <div class="flex justify-between items-center">
+                        <p class="font-medium">{{ session('error') }}</p>
+                        <button wire:click="clearMessages" class="text-red-500 hover:text-red-700 font-bold text-lg ml-4">
+                            ×
+                        </button>
+                    </div>
                 </div>
             @endif
 

@@ -8,6 +8,7 @@ use App\Models\Poa\Poa;
 use App\Models\Instituciones\Institucion;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\TechoUes\TechoUe;
+use App\Models\TechoUes\TechoDepto;
 use App\Models\GrupoGastos\GrupoGasto;
 use App\Models\GrupoGastos\Fuente;
 
@@ -192,20 +193,8 @@ class AsignacionPresupuestaria extends Component
                 'idUE' => $this->idUE,
             ]);
             
-            // Eliminar techos existentes y crear los nuevos
-            TechoUe::where('idPoa', $poa->id)->delete();
-            
-            foreach ($this->techos as $techo) {
-                if (!empty($techo['monto']) && !empty($techo['idFuente'])) {
-                    TechoUe::create([
-                        'monto' => $techo['monto'],
-                        'idUE' => $this->idUE,
-                        'idPoa' => $poa->id,
-                        'idGrupo' => null, // Campo mantenido como null ya que existe en la base de datos
-                        'idFuente' => $techo['idFuente'],
-                    ]);
-                }
-            }
+            // Actualizar techos preservando las relaciones existentes
+            $this->updateTechosPreservandoRelaciones($poa);
             
             session()->flash('message', 'POA actualizado correctamente.');
         } else {
@@ -261,8 +250,7 @@ class AsignacionPresupuestaria extends Component
     {
         $this->showDeleteModal = false;
         $this->poaToDelete = null;
-        session()->forget('error'); // Limpiar mensaje de error si existe
-
+        session()->forget(['error', 'warning']); // Limpiar mensajes de error y advertencia
     }
 
     public function closeModal()
@@ -270,7 +258,8 @@ class AsignacionPresupuestaria extends Component
         $this->showModal = false;
         $this->resetForm();
         $this->resetValidation();
-        session()->forget('error'); // Limpiar mensaje de error si existe
+        // Solo limpiar errores, mantener advertencias para que el usuario las vea
+        session()->forget('error');
     }
 
     private function resetForm()
@@ -307,6 +296,28 @@ class AsignacionPresupuestaria extends Component
     public function removeTecho($index)
     {
         if (count($this->techos) > 1) {
+            $techoAEliminar = $this->techos[$index] ?? null;
+            
+            // Si estamos editando y el techo tiene ID (es decir, ya existe en la BD)
+            if ($this->isEditing && isset($techoAEliminar['id'])) {
+                // Verificar si tiene TechoDepto asociados
+                $tieneTechoDeptos = TechoDepto::where('idTechoUE', $techoAEliminar['id'])->exists();
+                
+                if ($tieneTechoDeptos) {
+                    // Obtener el nombre de la fuente para el mensaje
+                    $techoUe = TechoUe::with('fuente')->find($techoAEliminar['id']);
+                    $nombreFuente = $techoUe->fuente->nombre ?? 'Sin nombre';
+                    
+                    // Mostrar advertencia y no eliminar
+                    session()->flash('warning', 
+                        'No se puede eliminar el techo de la fuente "' . $nombreFuente . 
+                        '" porque tiene asignaciones departamentales. Primero elimine las asignaciones departamentales.'
+                    );
+                    return; // No eliminar el techo
+                }
+            }
+            
+            // Si no tiene asignaciones o es un techo nuevo, proceder con la eliminación
             unset($this->techos[$index]);
             $this->techos = array_values($this->techos); // Reindexar
         }
@@ -419,5 +430,76 @@ class AsignacionPresupuestaria extends Component
     {
         // Usamos query string de forma explícita
         return redirect()->to(route('techo-deptos') . "?idPoa={$poaId}&idUE={$idUE}");
+    }
+    
+    /**
+     * Actualiza los techos preservando las relaciones existentes con TechoDepto
+     * 
+     * @param Poa $poa
+     * @return bool Retorna true si hubo advertencias
+     */
+    private function updateTechosPreservandoRelaciones($poa)
+    {
+        // Obtener techos existentes
+        $techosExistentes = TechoUe::where('idPoa', $poa->id)->get()->keyBy('id');
+        
+        // Procesar techos del formulario
+        $techosFormulario = collect($this->techos)->filter(function($techo) {
+            return !empty($techo['monto']) && !empty($techo['idFuente']);
+        });
+        
+        $techosActualizados = collect();
+        
+        // Actualizar o crear techos según corresponda
+        foreach ($techosFormulario as $index => $techoData) {
+            $techoId = $techoData['id'] ?? null;
+            
+            if ($techoId && $techosExistentes->has($techoId)) {
+                // Actualizar techo existente
+                $techoExistente = $techosExistentes->get($techoId);
+                $techoExistente->update([
+                    'monto' => $techoData['monto'],
+                    'idFuente' => $techoData['idFuente'],
+                    'idUE' => $this->idUE,
+                ]);
+                $techosActualizados->put($techoId, $techoExistente);
+            } else {
+                // Crear nuevo techo
+                $nuevoTecho = TechoUe::create([
+                    'monto' => $techoData['monto'],
+                    'idUE' => $this->idUE,
+                    'idPoa' => $poa->id,
+                    'idGrupo' => null,
+                    'idFuente' => $techoData['idFuente'],
+                ]);
+                $techosActualizados->put($nuevoTecho->id, $nuevoTecho);
+            }
+        }
+        
+        // Eliminar techos que ya no están en el formulario
+        // Solo eliminar si no tienen asignaciones departamentales
+        $idsAEliminar = $techosExistentes->keys()->diff($techosActualizados->keys());
+        foreach ($idsAEliminar as $id) {
+            $techoAEliminar = $techosExistentes->get($id);
+            
+            // Verificar si tiene TechoDepto asociados
+            $tieneTechoDeptos = TechoDepto::where('idTechoUE', $id)->exists();
+            
+            if (!$tieneTechoDeptos) {
+                // Solo eliminar si no tiene asignaciones departamentales
+                $techoAEliminar->delete();
+            }
+            // Si tiene asignaciones, no eliminar (la advertencia ya se mostró en removeTecho)
+        }
+        
+        return false; // Ya no manejamos advertencias aquí
+    }
+    
+    /**
+     * Limpia todos los mensajes de sesión
+     */
+    public function clearMessages()
+    {
+        session()->forget(['message', 'error', 'warning']);
     }
 }
