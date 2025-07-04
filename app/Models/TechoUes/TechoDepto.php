@@ -41,7 +41,7 @@ class TechoDepto extends BaseModel
 
     public function poaDepto()
     {
-        return $this->belongsTo(PoaDepto::class, 'idPoaDepto');
+        return $this->belongsTo(PoaDepto::class, foreignKey: 'idPoaDepto');
     }
 
     public function techoUE()

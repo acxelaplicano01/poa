@@ -1,11 +1,11 @@
 <x-elegant-delete-modal 
     wire:model="showDeleteModal"
     title="Confirmar Eliminación"
-    message="¿Estás seguro de que deseas eliminar esta asignación presupuestaria?"
-    entity-name="{{ $techoDeptoToDelete?->departamento?->name ?? 'Techo Departamental' }}"
-    entity-details="Se eliminará la asignación de {{ number_format($techoDeptoToDelete?->monto ?? 0, 2) }} del departamento {{ $techoDeptoToDelete?->departamento?->name ?? '' }}"
+    message="¿Estás seguro de que deseas eliminar todas las asignaciones presupuestarias de este departamento?"
+    entity-name="{{ $techoDeptoToDelete?->departamento?->name ?? 'Departamento' }}"
+    entity-details="Se eliminarán todas las asignaciones presupuestarias del departamento {{ $techoDeptoToDelete?->departamento?->name ?? '' }} desde todas las fuentes de financiamiento."
     confirm-method="delete"
     cancel-method="closeDeleteModal"
-    confirm-text="Eliminar Asignación"
+    confirm-text="Eliminar Asignaciones"
     cancel-text="Cancelar"
 />
