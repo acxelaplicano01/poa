@@ -209,6 +209,7 @@ class GestionTechoDeptos extends Component
 
             $resumen[] = [
                 'fuente' => $techoUE->fuente->nombre ?? 'Sin fuente',
+                'identificador' => $techoUE->fuente->identificador ?? 'Sin identificador',
                 'montoTotal' => $techoUE->monto,
                 'montoAsignado' => $montoAsignado,
                 'montoDisponible' => $montoDisponible,

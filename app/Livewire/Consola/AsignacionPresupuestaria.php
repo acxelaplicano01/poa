@@ -349,7 +349,7 @@ class AsignacionPresupuestaria extends Component
         // Filtrar las fuentes para mostrar solo las no seleccionadas o la que ya está seleccionada en este techo
         foreach ($allFuentes as $fuente) {
             if (!in_array($fuente->id, $fuentesSeleccionadas) || $fuente->id == $currentFuente) {
-                $options[] = ['value' => $fuente->id, 'text' => $fuente->nombre];
+                $options[] = ['value' => $fuente->id, 'text' => $fuente->identificador . ' - ' . $fuente->nombre];
             }
         }
         

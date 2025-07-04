@@ -135,7 +135,7 @@
                                     <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-6 hover:shadow-lg transition-shadow duration-200">
                                         <div class="flex items-center justify-between mb-4">
                                             <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                                                {{ $fuente['fuente'] }}
+                                                 {{ $fuente['identificador'] }} - {{ $fuente['fuente'] }}
                                             </h3>
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $fuente['estado']['clase'] }} text-white">
                                                 {{ $fuente['estado']['texto'] }}

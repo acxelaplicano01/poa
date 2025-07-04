@@ -6,7 +6,7 @@
             
             <form wire:submit.prevent="save">            
                 <!-- Departamento -->
-                @if($idDepartamento && !$isEditing)
+                @if($idDepartamento && $isEditing)
                     <!-- Departamento preseleccionado (solo lectura) -->
                     <div class="mb-6">
                         <x-label value="{{ __('Departamento Seleccionado') }}" class="mb-2" />
@@ -62,7 +62,7 @@
                                             </div>
                                             <div>
                                                 <h4 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                                                    {{ $techoUe->fuente->nombre ?? 'Sin fuente' }}
+                                                   {{ $techoUe->fuente->identificador ?? 'Sin identificador' }} - {{ $techoUe->fuente->nombre ?? 'Sin fuente' }}
                                                 </h4>
                                                 <p class="text-xs text-zinc-500 dark:text-zinc-400">
                                                     Total: {{ number_format($techoUe->monto, 2) }}
