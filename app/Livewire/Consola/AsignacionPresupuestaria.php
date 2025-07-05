@@ -250,7 +250,6 @@ class AsignacionPresupuestaria extends Component
     {
         $this->showDeleteModal = false;
         $this->poaToDelete = null;
-        session()->forget(['error', 'warning']); // Limpiar mensajes de error y advertencia
     }
 
     public function closeModal()
