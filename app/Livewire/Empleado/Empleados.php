@@ -4,6 +4,7 @@ namespace App\Livewire\Empleado;
 
 use App\Models\Departamento\Departamento;
 use App\Models\Empleados\Empleado;
+use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Services\LogService;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -38,6 +39,7 @@ class Empleados extends Component
     public $direccion;
     public $selectedDepartamentos = [];
     public $departamentos = [];
+    public $unidadesEjecutoras = [];
     public $empleadoToDelete;
     public $idUnidadEjecutora;
 
@@ -56,7 +58,7 @@ class Empleados extends Component
             'direccion' => 'required|string|max:255',
             'sexo' => 'required|string|max:10|in:M,F', // M para Masculino, F para Femenino
             'selectedDepartamentos' => 'required|array|min:1',
-            'idUnidadEjecutora' => 'nullable|exists:unidad_ejecutora,id', 
+            'idUnidadEjecutora' => 'required|exists:unidad_ejecutora,id', 
         ];
     }
 
@@ -86,14 +88,35 @@ class Empleados extends Component
     // Inicialización del componente
     public function mount()
     {
-        $this->idUnidadEjecutora = 1;
+        $this->loadUnidadesEjecutoras();
         $this->loadDepartamentos();
     }
 
-    // Cargar departamentos disponibles
+    // Cargar unidades ejecutoras disponibles
+    public function loadUnidadesEjecutoras()
+    {
+        $this->unidadesEjecutoras = UnidadEjecutora::select('id', 'name')->orderBy('name')->get()->toArray();
+    }
+
+    // Cargar departamentos disponibles (filtrados por unidad ejecutora)
     public function loadDepartamentos()
     {
-        $this->departamentos = Departamento::select('id', 'name')->orderBy('name')->get()->toArray();
+        if ($this->idUnidadEjecutora) {
+            $this->departamentos = Departamento::where('idUnidadEjecutora', $this->idUnidadEjecutora)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get()
+                ->toArray();
+        } else {
+            $this->departamentos = [];
+        }
+    }
+
+    // Listener para cuando cambie la unidad ejecutora
+    public function updatedIdUnidadEjecutora()
+    {
+        $this->selectedDepartamentos = []; // Limpiar departamentos seleccionados
+        $this->loadDepartamentos(); // Cargar departamentos de la nueva UE
     }
 
     // Renderizar la vista
@@ -122,11 +145,11 @@ class Empleados extends Component
         }
         
         $empleados = $query->paginate($this->perPage);
-        $departamentos = Departamento::orderBy('name')->get();
+        $unidadesEjecutoras = UnidadEjecutora::orderBy('name')->get();
         
         return view('livewire.empleado.empleado', [
             'empleados' => $empleados,
-            'departamentos' => $departamentos,
+            'unidadesEjecutoras' => $unidadesEjecutoras,
         ])->layout('layouts.app');
     }
 
@@ -134,7 +157,6 @@ class Empleados extends Component
     public function create()
     {
         $this->isEditing = false;
-        $this->idUnidadEjecutora = 1;
         $this->resetInputFields();
         $this->openModal();
     }
@@ -160,6 +182,10 @@ class Empleados extends Component
             
             // Obtener los departamentos asociados
             $this->selectedDepartamentos = $empleado->departamentos()->pluck('departamentos.id')->toArray();
+            
+            // Cargar departamentos de la unidad ejecutora seleccionada
+            $this->loadDepartamentos();
+            
             $this->openModal();
         } catch (\Exception $e) {
             LogService::activity(

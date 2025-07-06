@@ -5,7 +5,7 @@
                 <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">
                     {{ $isEditing ? 'Editar Empleado' : 'Crear Empleado' }}
                 </h3>
-                <button wire:click="closeModal" type="button"
+                <button type="button" wire:click="closeModal"
                     class="text-zinc-400 bg-transparent hover:bg-zinc-200 hover:text-zinc-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-zinc-600 dark:hover:text-white">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"
@@ -84,11 +84,13 @@
                 </div>
                 <div>
                     <x-label for="idUnidadEjecutora" value="Unidad Ejecutora" />
-                    <select id="idUnidadEjecutora" wire:model="idUnidadEjecutora"
-                        class="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                        <option value="">Seleccione una unidad ejecutora</option>
-                        <option value="{{1}}">Ni modo</option>
-                    </select>
+                    <x-select 
+                        id="idUnidadEjecutora" 
+                        wire:model.live="idUnidadEjecutora"
+                        :options="collect($unidadesEjecutoras)->map(fn($ue) => ['value' => $ue['id'], 'text' => $ue['name']])->prepend(['value' => '', 'text' => 'Seleccione una unidad ejecutora'])->toArray()"
+                        :has-error="$errors->has('idUnidadEjecutora')"
+                        class="mt-1"
+                    />
                     @error('idUnidadEjecutora') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <!-- Selector de departamentos con buscador integrado y lista hacia arriba -->
@@ -104,90 +106,113 @@
                     }
                 }" class="relative">
                     <x-label for="departamentos" value="Departamentos" />
-                    <div class="mt-1 relative">
-                        <!-- Input de búsqueda como selector principal -->
-                        <div class="relative">
-                            <x-input
-                                x-model="search"
-                                @focus="open = true"
-                                @input="open = true"
-                                type="text"
-                                placeholder="{{ count($selectedDepartamentos) > 0 ? count($selectedDepartamentos) . ' departamento(s) seleccionado(s)' : 'Buscar y seleccionar departamentos...' }}"
-                                class="block w-full"
-                                @keydown.escape.prevent="open = false"
-                                @click="open = !open; $event.stopPropagation();"
-                            />
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-2">
-                                <button type="button" @click="open = !open; $event.stopPropagation();"
-                                    class="text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 focus:outline-none">
-                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
+                    
+                    <!-- Mensaje informativo cuando no hay unidad ejecutora seleccionada -->
+                    @if(!$idUnidadEjecutora)
+                        <div class="mt-1 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+                            <div class="flex items-center">
+                                <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="text-sm text-yellow-800 dark:text-yellow-200">
+                                    Seleccione una unidad ejecutora para ver los departamentos disponibles
+                                </span>
                             </div>
                         </div>
-
-                        <!-- Lista desplegable de departamentos (ahora aparece arriba) -->
-                        <div x-show="open" @click.away="open = false"
-                            class="absolute bottom-full mb-1 w-full z-50 bg-white border dark:border-zinc-700 dark:bg-zinc-800 shadow-lg rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm"
-                            x-transition:enter="transition ease-out duration-100"
-                            x-transition:enter-start="transform opacity-0 scale-95"
-                            x-transition:enter-end="transform opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
-                            x-transition:leave-start="transform opacity-100 scale-100"
-                            x-transition:leave-end="transform opacity-0 scale-95">
-                            
-                            <!-- Lista de departamentos filtrados -->
-                            <div class="max-h-60 overflow-y-auto">
-                                <template x-for="departamento in filteredDepartamentos" :key="departamento.id">
-                                    <button type="button" @click="$wire.addDepartamento(departamento.id); search = '';"
-                                        class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700"
-                                        :class="{ 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-900 dark:text-indigo-200': $wire.selectedDepartamentos.includes(departamento.id), 'text-zinc-900 dark:text-zinc-300': !$wire.selectedDepartamentos.includes(departamento.id) }">
-                                        <span x-text="departamento.name"></span>
+                    @else
+                        <!-- Contenedor del selector de departamentos -->
+                        <div class="mt-1 relative">
+                            <!-- Input de búsqueda como selector principal -->
+                            <div class="relative">
+                                <x-input
+                                    x-model="search"
+                                    @focus="open = true"
+                                    @input="open = true"
+                                    type="text"
+                                    placeholder="{{ count($selectedDepartamentos) > 0 ? count($selectedDepartamentos) . ' departamento(s) seleccionado(s)' : 'Buscar y seleccionar departamentos...' }}"
+                                    class="block w-full"
+                                    @keydown.escape.prevent="open = false"
+                                    @click="open = !open; $event.stopPropagation();"
+                                />
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <button type="button" @click="open = !open; $event.stopPropagation();"
+                                        class="text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 focus:outline-none">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                        </svg>
                                     </button>
-                                </template>
+                                </div>
+                            </div>
+
+                            <!-- Lista desplegable de departamentos (ahora aparece arriba) -->
+                            <div x-show="open" @click.away="open = false"
+                                class="absolute bottom-full mb-1 w-full z-50 bg-white border dark:border-zinc-700 dark:bg-zinc-800 shadow-lg rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95">
                                 
-                                <!-- Mensaje cuando no hay resultados -->
-                                <div 
-                                    x-show="filteredDepartamentos.length === 0" 
-                                    class="px-4 py-2 text-sm text-zinc-500 dark:text-zinc-400 text-center">
-                                    No se encontraron departamentos
+                                <!-- Lista de departamentos filtrados -->
+                                <div class="max-h-60 overflow-y-auto">
+                                    <template x-for="departamento in filteredDepartamentos" :key="departamento.id">
+                                        <button type="button" @click="$wire.addDepartamento(departamento.id); search = '';"
+                                            class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                                            :class="{ 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-900 dark:text-indigo-200': $wire.selectedDepartamentos.includes(departamento.id), 'text-zinc-900 dark:text-zinc-300': !$wire.selectedDepartamentos.includes(departamento.id) }">
+                                            <span x-text="departamento.name"></span>
+                                        </button>
+                                    </template>
+                                    
+                                    <!-- Mensaje cuando no hay resultados -->
+                                    <div 
+                                        x-show="filteredDepartamentos.length === 0" 
+                                        class="px-4 py-2 text-sm text-zinc-500 dark:text-zinc-400 text-center">
+                                        No se encontraron departamentos
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Mostrar departamentos seleccionados como tags -->
-                    <div class="mt-3">
-                        <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                            Departamentos seleccionados:
-                        </p>
-                        <div class="flex flex-wrap gap-2">
-                            @forelse($selectedDepartamentos as $index => $deptId)
-                                @php
-                                    $dept = collect($departamentos)->firstWhere('id', $deptId);
-                                @endphp
-                                @if($dept)
-                                    <div
-                                        class="inline-flex items-center px-2 py-1 rounded-md text-sm bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
-                                        <span>{{ $dept['name'] }}</span>
-                                        <button type="button" wire:click="removeDepartamento({{ $index }})"
-                                            class="ml-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M6 18L18 6M6 6l12 12"></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                @endif
-                            @empty
-                                <p class="text-sm text-zinc-500 dark:text-zinc-400 italic">
-                                    Ningún departamento seleccionado
-                                </p>
-                            @endforelse
+                        <!-- Mostrar departamentos seleccionados como tags -->
+                        <div class="mt-3">
+                            <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                                Departamentos seleccionados:
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                @forelse($selectedDepartamentos as $index => $deptId)
+                                    @php
+                                        $dept = collect($departamentos)->firstWhere('id', $deptId);
+                                    @endphp
+                                    @if($dept)
+                                        <div
+                                            class="inline-flex items-center px-2 py-1 rounded-md text-sm bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
+                                            <span>{{ $dept['name'] }}</span>
+                                            <button 
+                                                type="button" 
+                                                wire:click="removeDepartamento({{ $index }})"
+                                                loadingTarget="removeDepartamento({{ $index }})"
+                                                loadingText=""
+                                                variant="ghost"
+                                                size="sm"
+                                                class="ml-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 p-0">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    @endif
+                                @empty
+                                    <p class="text-sm text-zinc-500 dark:text-zinc-400 italic">
+                                        Ningún departamento seleccionado
+                                    </p>
+                                @endforelse
+                            </div>
                         </div>
-                    </div>
+                    @endif
+                    
                     @error('selectedDepartamentos') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
             </form>
