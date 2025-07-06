@@ -67,9 +67,9 @@
                             id="sexo" 
                             wire:model="sexo"
                             :options="[
-                                ['value' => 'M', 'text' => 'Masculino'],
-                                ['value' => 'F', 'text' => 'Femenino'],
-                            ]"
+        ['value' => 'M', 'text' => 'Masculino'],
+        ['value' => 'F', 'text' => 'Femenino'],
+    ]"
                             :placeholder="'Seleccione el sexo'"
                             :has-error="$errors->has('sexo')"
                             class="mt-1"
@@ -182,7 +182,7 @@
                             <div class="flex flex-wrap gap-2">
                                 @forelse($selectedDepartamentos as $index => $deptId)
                                     @php
-                                        $dept = collect($departamentos)->firstWhere('id', $deptId);
+        $dept = collect($departamentos)->firstWhere('id', $deptId);
                                     @endphp
                                     @if($dept)
                                         <div
@@ -220,13 +220,13 @@
 
         <x-slot name="footer">
             <div class="flex justify-end gap-x-4">
-                <x-secondary-button wire:click="closeModal">
-                    Cancelar
-                </x-secondary-button>
-
-                <x-button wire:click="store">
-                    {{ $isEditing ? 'Actualizar' : 'Guardar' }}
-                </x-button>
+                <x-spinner-secondary-button wire:click="closeModal" type="button" loadingTarget="closeModal" loadingText="Cerrando...">
+                    {{ __('Cancelar') }}
+                </x-spinner-secondary-button>
+                
+                <x-spinner-button type="submit" wire:click="store" loadingTarget="store" :loadingText="$isEditing ? 'Actualizando...' : 'Creando...'">
+                    {{ $isEditing ? __('Actualizar') : __('Crear') }}
+                </x-spinner-button>
             </div>
         </x-slot>
     </x-dialog-modal>

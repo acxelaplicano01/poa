@@ -40,14 +40,12 @@
                                 class="w-full"
                             />
                         </div>
-                        <x-button wire:click="create()" class="w-full sm:w-auto justify-center">
-                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
+                        <x-spinner-button wire:click="create()" loadingTarget="create()" :loadingText="__('Abriendo...')">
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             {{ __('Nuevo Departamento') }}
-                        </x-button>
+                        </x-spinner-button>
                     </div>
                 </div>
             </div>
@@ -57,13 +55,13 @@
                 sort-direction="{{ $sortDirection ?? 'asc' }}"
                 :show-mobile="true"
                 :columns="[
-                    ['key' => 'departamento', 'label' => 'Departamento'],
-                    ['key' => 'tipo', 'label' => 'Tipo'],
-                    ['key' => 'estructura', 'label' => 'Estructura'],
-                    ['key' => 'unidad_ejecutora', 'label' => 'Unidad Ejecutora'],
-                    ['key' => 'empleados', 'label' => 'Empleados'],
-                    ['key' => 'actions', 'label' => 'Acciones', 'class' => 'text-right'],
-                ]"
+        ['key' => 'departamento', 'label' => 'Departamento'],
+        ['key' => 'tipo', 'label' => 'Tipo'],
+        ['key' => 'estructura', 'label' => 'Estructura'],
+        ['key' => 'unidad_ejecutora', 'label' => 'Unidad Ejecutora'],
+        ['key' => 'empleados', 'label' => 'Empleados'],
+        ['key' => 'actions', 'label' => 'Acciones', 'class' => 'text-right'],
+    ]"
                 empty-message="No se encontraron departamentos"
                 class="mt-6"
             >
@@ -89,12 +87,12 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                    {{ $departamento->tipo === 'ADMINISTRATIVO' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : 
-                                       ($departamento->tipo === 'COORDINACIÓN REGIONAL' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
-                                       ($departamento->tipo === 'SECCIÓN ACADÉMICA' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                                       ($departamento->tipo === 'DEPARTAMENTO ACADÉMICO' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                                       ($departamento->tipo === 'COORDINACIÓN ACADÉMICA' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
-                                       'bg-zinc-100 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200')))) }}">
+                                    {{ $departamento->tipo === 'ADMINISTRATIVO' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+        ($departamento->tipo === 'COORDINACIÓN REGIONAL' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+            ($departamento->tipo === 'SECCIÓN ACADÉMICA' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                ($departamento->tipo === 'DEPARTAMENTO ACADÉMICO' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                    ($departamento->tipo === 'COORDINACIÓN ACADÉMICA' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
+                        'bg-zinc-100 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200')))) }}">
                                     {{ $departamento->tipo }}
                                 </span>
                             </td>
@@ -186,12 +184,12 @@
                             <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                                 Tipo: 
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                    {{ $departamento->tipo === 'ADMINISTRATIVO' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : 
-                                       ($departamento->tipo === 'COORDINACIÓN REGIONAL' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
-                                       ($departamento->tipo === 'SECCIÓN ACADÉMICA' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                                       ($departamento->tipo === 'DEPARTAMENTO ACADÉMICO' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                                       ($departamento->tipo === 'COORDINACIÓN ACADÉMICA' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
-                                       'bg-zinc-100 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200')))) }}">
+                                    {{ $departamento->tipo === 'ADMINISTRATIVO' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+        ($departamento->tipo === 'COORDINACIÓN REGIONAL' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+            ($departamento->tipo === 'SECCIÓN ACADÉMICA' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                ($departamento->tipo === 'DEPARTAMENTO ACADÉMICO' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                    ($departamento->tipo === 'COORDINACIÓN ACADÉMICA' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
+                        'bg-zinc-100 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200')))) }}">
                                     {{ $departamento->tipo }}
                                 </span>
                             </p>

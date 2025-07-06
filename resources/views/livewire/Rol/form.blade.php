@@ -25,18 +25,19 @@
                     </p>
                 </div>
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                    <x-secondary-button wire:click="cancel" type="button">
+                    <x-spinner-secondary-button wire:click="cancel" type="button" loadingTarget="cancel" loadingText="Cerrando...">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                         </svg>
-                        Cancelar
-                    </x-secondary-button>
-                    <x-button wire:click="store" type="button">
+                        {{ __('Cancelar') }}
+                    </x-spinner-secondary-button>
+                    
+                    <x-spinner-button type="submit" wire:click="store" loadingTarget="store" :loadingText="$isEditing ? 'Actualizando...' : 'Creando...'">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        {{ $isEditing ? 'Actualizar' : 'Guardar' }}
-                    </x-button>
+                        {{ $isEditing ? 'Actualizar Rol' : 'Crear Rol' }}
+                    </x-spinner-button>
                 </div>
             </div>
         </div>

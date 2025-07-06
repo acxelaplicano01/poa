@@ -3,7 +3,7 @@
     maxWidth="xl"
     x-on:close="$wire.closeModal()"
 >
-    <div x-data="{
+    <div  x-data="{
         techos: $wire.entangle('techos').live,
         get totalTechos() {
             return this.techos.reduce((sum, techo) => sum + (parseFloat(techo.monto) || 0), 0).toFixed(2);
@@ -63,13 +63,17 @@
                                 <p class="text-sm text-zinc-500 dark:text-zinc-400">Máximo 3 techos presupuestarios</p>
                             </div>
                         </div>
-                        <x-button type="button" wire:click="addTecho" variant="secondary" size="sm" 
+                        <x-spinner-secondary-button 
+                            type="button" 
+                            wire:click="addTecho" 
+                            loadingTarget="addTecho"
+                            loadingText="Agregando..."
                             :disabled="count($techos) >= 3">
                             <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             Agregar Techo
-                        </x-button>
+                        </x-spinner-secondary-button>
                     </div>
                     @if (session()->has('error'))
                         <div class="text-sm text-red-600 mb-3">
@@ -92,12 +96,16 @@
                                     Techo Presupuestario {{ $index + 1 }}
                                 </h5>
                                 @if(count($techos) > 1)
-                                    <button type="button" wire:click="removeTecho({{ $index }})" 
-                                        class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                                    <x-spinner-danger-button 
+                                        type="button" 
+                                        wire:click="removeTecho({{ $index }})"
+                                        loadingTarget="removeTecho({{ $index }})"
+                                        loadingText="Eliminando..."
+                                        class="!p-1 !bg-transparent !border-0 !text-red-600 hover:!text-red-800 dark:!text-red-400 dark:hover:!text-red-300">
                                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
-                                    </button>
+                                    </x-spinner-danger-button>
                                 @endif
                             </div>
                             
@@ -145,22 +153,20 @@
 
             <!-- Botones -->
             <div class="flex justify-end mt-6 space-x-3">
-                <x-secondary-button wire:click="closeModal" type="button">
+                <x-spinner-secondary-button 
+                    wire:click="closeModal" 
+                    type="button"
+                    loadingTarget="closeModal"
+                    loadingText="Cerrando...">
                     {{ __('Cancelar') }}
-                </x-secondary-button>
+                </x-spinner-secondary-button>
                 
-                <x-button type="submit" wire:loading.attr="disabled" class="flex items-center">
-                    <svg wire:loading wire:target="save" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span wire:loading.remove wire:target="save">
-                        {{ $isEditing ? __('Actualizar') : __('Crear') }}
-                    </span>
-                    <span wire:loading wire:target="save">
-                        {{ $isEditing ? __('Actualizando...') : __('Creando...') }}
-                    </span>
-                </x-button>
+                <x-spinner-button 
+                type="submit" 
+                loadingTarget="save" 
+                :loadingText="$isEditing ? __('Actualizando...') : __('Creando...')">
+                    {{ $isEditing ? __('Actualizar POA') : __('Crear POA') }}
+                </x-spinner-button>
             </div>
             
         </form>

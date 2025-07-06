@@ -26,9 +26,9 @@
                     <span class="text-zinc-700 dark:text-zinc-300">días</span>
                 </div>
                 <div>
-                    <x-danger-button type="button" wire:click="confirmCleanup">
+                    <x-spinner-danger-button type="button" wire:click="confirmCleanup" loadingTarget="confirmCleanup" loadingText="Abriendo...">
                         Limpiar logs
-                    </x-danger-button>
+                    </x-spinner-danger-button>
                 </div>
             </div>
         </div>

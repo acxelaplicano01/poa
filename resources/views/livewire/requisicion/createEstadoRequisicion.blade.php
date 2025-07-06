@@ -22,6 +22,22 @@
             <x-button wire:click="store" wire:loading.attr="disabled" class="ml-2">
                 {{ $estadoId ? __('Actualizar') : __('Guardar') }}
             </x-button>
+
+            <x-spinner-secondary-button 
+                wire:click="closeModal" 
+                type="button"
+                loadingTarget="closeModal"
+                loadingText="Cerrando...">
+                {{ __('Cancelar') }}
+            </x-spinner-secondary-button>
+
+            <x-spinner-button 
+                type="submit" 
+                wire:click="store"
+                loadingTarget="store" 
+                :loadingText="$estadoId ? 'Actualizando...' : 'Creando...'">
+                {{ $estadoId ? 'Actualizar Unidad' : 'Crear Unidad' }}
+            </x-spinner-button>
         </div>
     </x-slot>
 </x-dialog-modal>

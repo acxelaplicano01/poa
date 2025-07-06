@@ -38,22 +38,20 @@
                                 id="perPage" 
                                 wire:model.live="perPage"
                                 :options="[
-                                    ['value' => '10', 'text' => '10 por página'],
-                                    ['value' => '25', 'text' => '25 por página'],
-                                    ['value' => '50', 'text' => '50 por página'],
-                                    ['value' => '100', 'text' => '100 por página'],
-                                ]"
+        ['value' => '10', 'text' => '10 por página'],
+        ['value' => '25', 'text' => '25 por página'],
+        ['value' => '50', 'text' => '50 por página'],
+        ['value' => '100', 'text' => '100 por página'],
+    ]"
                                 class="w-full"
                             />
                         </div>
-                        <x-button wire:click="create" class="w-full sm:w-auto justify-center">
-                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
+                        <x-spinner-button wire:click="create()" loadingTarget="create()" :loadingText="__('Abriendo...')">
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
-                            {{ __('Nuevo tipo')}}
-                        </x-button>
+                            {{ __('Nuevo Tipo') }}
+                        </x-spinner-button>
                     </div>
                 </div>
 
@@ -190,12 +188,21 @@
 
         <x-slot name="footer">
             <div class="flex justify-end space-x-3">
-                <x-secondary-button wire:click="closeModal">
-                    Cancelar
-                </x-secondary-button>
-                <x-button wire:click="store">
-                    {{ $isEditing ? 'Actualizar' : 'Guardar' }}
-                </x-button>
+                <x-spinner-secondary-button 
+                    wire:click="closeModal" 
+                    type="button"
+                    loadingTarget="closeModal"
+                    loadingText="Cerrando...">
+                    {{ __('Cancelar') }}
+                </x-spinner-secondary-button>
+
+                <x-spinner-button 
+                    type="submit" 
+                    wire:click="store"
+                    loadingTarget="store" 
+                    :loadingText="$isEditing ? 'Actualizando...' : 'Creando...'">
+                   {{ $isEditing ? 'Actualizar' : 'Crear' }}
+                </x-spinner-button>
             </div>
         </x-slot>
     </x-dialog-modal>

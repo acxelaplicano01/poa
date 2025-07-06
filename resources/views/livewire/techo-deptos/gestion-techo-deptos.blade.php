@@ -16,8 +16,8 @@
                             Techos Presupuestarios por Departamento
                         </h2>
                         <div class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                            <p>POA: <span class="font-semibold text-zinc-700 dark:text-zinc-300">{{ $poa->anio }}</span></p>
-                            <p>Unidad Ejecutora: <span class="font-semibold text-zinc-700 dark:text-zinc-300">{{ $unidadEjecutora->name }}</span></p>
+                            <p>POA: <span class="font-semibold text-zinc-700 dark:text-zinc-300">{{ $poa->anio ?? 'N/A' }}</span></p>
+                            <p>Unidad Ejecutora: <span class="font-semibold text-zinc-700 dark:text-zinc-300">{{ $unidadEjecutora->name ?? 'N/A' }}</span></p>
                         </div>
                     </div>
 

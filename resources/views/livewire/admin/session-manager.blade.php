@@ -34,22 +34,22 @@
                         </div>
                         <div class="w-full sm:w-auto">
                             <x-select id="perPage" wire:model.live="perPage" :options="[
-                                ['value' => '10', 'text' => '10 por página'],
-                                ['value' => '25', 'text' => '25 por página'],
-                                ['value' => '50', 'text' => '50 por página'],
-                                ['value' => '100', 'text' => '100 por página'],
-                            ]" class="w-full" />
+        ['value' => '10', 'text' => '10 por página'],
+        ['value' => '25', 'text' => '25 por página'],
+        ['value' => '50', 'text' => '50 por página'],
+        ['value' => '100', 'text' => '100 por página'],
+    ]" class="w-full" />
                         </div>
                     </div>
                 </div>
 
                 <x-table sort-field="{{ $sortField }}" sort-direction="{{ $sortDirection }}" :columns="[
-                        ['key' => 'user', 'label' => 'Usuario', 'sortable' => true],
-                        ['key' => 'ip_address', 'label' => 'Dirección IP', 'sortable' => true],
-                        ['key' => 'browser', 'label' => 'Navegador'],
-                        ['key' => 'last_activity', 'label' => 'Última actividad', 'sortable' => true],
-                        ['key' => 'actions', 'label' => 'Acciones', 'class' => 'text-right'],
-                    ]" empty-message="No hay sesiones activas" class="mt-6">
+        ['key' => 'user', 'label' => 'Usuario', 'sortable' => true],
+        ['key' => 'ip_address', 'label' => 'Dirección IP', 'sortable' => true],
+        ['key' => 'browser', 'label' => 'Navegador'],
+        ['key' => 'last_activity', 'label' => 'Última actividad', 'sortable' => true],
+        ['key' => 'actions', 'label' => 'Acciones', 'class' => 'text-right'],
+    ]" empty-message="No hay sesiones activas" class="mt-6">
                     <x-slot name="desktop">
                         @forelse($sessions as $session)
                             <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
@@ -361,6 +361,22 @@
             <x-danger-button class="ml-3" wire:click="terminateSession">
                 Terminar Sesión
             </x-danger-button>
+
+            <x-spinner-secondary-button 
+                wire:click="cancelTerminate" 
+                type="button"
+                loadingTarget="cancelTerminate"
+                loadingText="Cerrando...">
+                {{ __('Cancelar') }}
+            </x-spinner-secondary-button>
+
+            <x-spinner-danger-button class="ml-3"
+                type="submit" 
+                wire:click="terminateSession"
+                loadingTarget="terminateSession" 
+                :loadingText="'Cerrando...'">
+                Terminar Sesión
+            </x-spinnerdanger--button>
         </x-slot>
     </x-confirmation-modal>
 
@@ -465,14 +481,16 @@
 
         <x-slot name="footer">
             <div class="flex justify-end">
-                <x-secondary-button wire:click="closeSessionDetailsModal">
-                    Cerrar
-                </x-secondary-button>
-
+                <x-spinner-secondary-button wire:click="closeSessionDetailsModal" type="button"
+                    loadingTarget="closeSessionDetailsModal" loadingText="Cerrando...">
+                    {{ __('Cancelar') }}
+                </x-spinner-secondary-button>
+        
                 @if($sessionDetails && !$sessionDetails->is_current_device)
-                    <x-danger-button class="ml-3" wire:click="terminateSessionFromDetails">
+                    <x-spinner-button class="ml-3" type="submit" wire:click="terminateSessionFromDetails"
+                        loadingTarget="terminateSessionFromDetails" :loadingText="'terminando...'">
                         Terminar Sesión
-                    </x-danger-button>
+                    </x-spinner-button>
                 @endif
             </div>
         </x-slot>

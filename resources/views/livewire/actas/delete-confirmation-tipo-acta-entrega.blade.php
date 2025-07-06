@@ -1,19 +1,5 @@
-@props([
-    'wire:model' => 'showDeleteModal',
-    'title' => 'Confirmar Eliminación',
-    'message' => '¿Estás seguro de que deseas eliminar este elemento?',
-    'entityName' => null,
-    'entityDetails' => null,
-    'confirmMethod' => 'confirmDelete',
-    'cancelMethod' => 'closeDeleteModal',
-    'confirmText' => 'Eliminar',
-    'cancelText' => 'Cancelar',
-    'maxWidth' => 'md',
-    'entity' => null
-])
-
-<!-- Modal de Confirmación de Eliminación -->
-<x-dialog-modal wire:model="{{ $attributes->get('wire:model', 'showDeleteModal') }}" maxWidth="{{ $maxWidth }}">
+<!-- Modal de confirmación de eliminación simple para debug -->
+<x-dialog-modal wire:model="confirmingDelete" maxWidth="md">
     <x-slot name="title">
         <div class="flex items-center">
             <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 sm:mx-0 sm:h-10 sm:w-10">
@@ -23,7 +9,7 @@
             </div>
             <div class="ml-4">
                 <h3 class="text-lg font-medium text-zinc-900 dark:text-zinc-100">
-                    {{ __($title) }}
+                    Confirmar Eliminación
                 </h3>
             </div>
         </div>
@@ -32,10 +18,10 @@
     <x-slot name="content">
         <div class="mt-2">
             <p class="text-sm text-zinc-500 dark:text-zinc-400">
-                {{ __($message) }}
+                ¿Estás seguro de que deseas eliminar este tipo de acta de entrega?
             </p>
             
-            @if($entity || $entityName)
+            @if($tipoAEliminar)
                 <div class="mt-4 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -45,13 +31,11 @@
                         </div>
                         <div class="ml-4">
                             <h4 class="text-lg font-medium text-zinc-900 dark:text-zinc-100">
-                                {{ $entity ? $entity->name ?? $entity->categoria ?? $entity->nombre ?? $entity->estado ?? $entity->title ?? ($entity->nombre && $entity->apellido ? $entity->nombre . ' ' . $entity->apellido : null) ?? $entityName : $entityName }}
+                                {{ $tipoAEliminar }}
                             </h4>
-                            @if($entityDetails || $entity)
-                                <p class="text-sm text-zinc-500 dark:text-zinc-400">
-                                    {{ $entityDetails ?: ($entity ? ($entity->email ?? $entity->descripcion ?? $entity->detalle ?? $entity->dni ?? $entity->nombre ?? '') : '') }}
-                                </p>
-                            @endif
+                            <p class="text-sm text-zinc-500 dark:text-zinc-400">
+                                Tipo de acta de entrega
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -66,7 +50,7 @@
                     </div>
                     <div class="ml-3">
                         <p class="text-sm text-yellow-700 dark:text-yellow-200">
-                            {{ __('Esta acción no se puede deshacer. Se eliminarán permanentemente todos los datos asociados.') }}
+                            Esta acción no se puede deshacer. Se eliminarán permanentemente todos los datos asociados.
                         </p>
                     </div>
                 </div>
@@ -75,12 +59,12 @@
     </x-slot>
 
     <x-slot name="footer">
-        <x-spinner-secondary-button wire:click="{{ $cancelMethod }}" loadingTarget="{{$cancelMethod}}">
-            {{ __($cancelText) }}
+        <x-spinner-secondary-button wire:click="cancelDelete" loadingTarget="cancelDelete">
+            Cancelar
         </x-spinner-secondary-button>
 
-        <x-spinner-danger-button class="ml-3" wire:click="{{ $confirmMethod }}" loadingTarget="{{$confirmMethod}}">
-            {{ __($confirmText) }}
+        <x-spinner-danger-button class="ml-3" wire:click="delete" loadingTarget="delete">
+            Eliminar Tipo de Acta
         </x-spinner-danger-button>
     </x-slot>
 </x-dialog-modal>

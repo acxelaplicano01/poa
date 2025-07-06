@@ -30,9 +30,9 @@
                         id="idInstitucion" 
                         wire:model="idInstitucion"
                         :options="array_merge(
-                            [['value' => '', 'text' => 'Seleccione una institución']],
-                            $instituciones->map(fn($inst) => ['value' => $inst->id, 'text' => $inst->nombre])->toArray()
-                        )"
+        [['value' => '', 'text' => 'Seleccione una institución']],
+        $instituciones->map(fn($inst) => ['value' => $inst->id, 'text' => $inst->nombre])->toArray()
+    )"
                         class="block mt-1 w-full"
                     />
                     <x-input-error for="idInstitucion" class="mt-2" />
@@ -71,12 +71,12 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-secondary-button wire:click="closeModal">
+            <x-spinner-secondary-button wire:click="closeModal" type="button" loadingTarget="closeModal" loadingText="Cerrando...">
                 {{ __('Cancelar') }}
-            </x-secondary-button>
-
-            <x-button class="ml-3" wire:click="save">
+            </x-spinner-secondary-button>
+            
+            <x-spinner-button class="ml-3" type="submit" wire:click="save" loadingTarget="save" :loadingText="$isEditing ? 'Actualizando...' : 'Creando...'">
                 {{ $isEditing ? __('Actualizar PEI') : __('Crear PEI') }}
-            </x-button>
+            </x-spinner-button>
         </x-slot>
     </x-dialog-modal>

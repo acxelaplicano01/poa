@@ -67,12 +67,20 @@
     </x-slot>
 
     <x-slot name="footer">
-        <x-secondary-button wire:click="closeModal" wire:loading.attr="disabled">
-            {{ __('Cancelar') }}
-        </x-secondary-button>
+        <x-spinner-secondary-button 
+                wire:click="closeModal" 
+                type="button"
+                loadingTarget="closeModal"
+                loadingText="Cerrando...">
+                {{ __('Cancelar') }}
+            </x-spinner-secondary-button>
 
-        <x-button class="ml-3" wire:click="store" wire:loading.attr="disabled">
-            {{ $cuentaMayorId ? __('Actualizar') : __('Crear') }}
-        </x-button>
+            <x-spinner-button class="ml-3"
+                type="submit" 
+                wire:click="store"
+                loadingTarget="store" 
+                :loadingText="$isEditing ? 'Actualizando...' : 'Creando...'">
+                {{ $cuentaMayorId ? __('Actualizar') : __('Crear') }}
+            </x-spinner-button>
     </x-slot>
 </x-dialog-modal>

@@ -6,9 +6,6 @@
                 <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md" role="alert">
                     <div class="flex justify-between items-center">
                         <p class="font-medium">{{ session('message') }}</p>
-                        <button wire:click="clearMessages" class="text-green-500 hover:text-green-700 font-bold text-lg ml-4">
-                            ×
-                        </button>
                     </div>
                 </div>
             @endif
@@ -17,9 +14,6 @@
                 <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md" role="alert">
                     <div class="flex justify-between items-center">
                         <p class="font-medium">{{ session('error') }}</p>
-                        <button wire:click="clearMessages" class="text-red-500 hover:text-red-700 font-bold text-lg ml-4">
-                            ×
-                        </button>
                     </div>
                 </div>
             @endif
@@ -50,14 +44,17 @@
                                 class="w-full"
                             />
                         </div>
-                        <x-button wire:click="create()" class="w-full sm:w-auto justify-center">
+                        <x-spinner-button wire:click="create()"
+                            loadingTarget="create" 
+                            :loadingText="__('Abriendo...')"
+                            class="flex w-full sm:w-auto justify-center">
                             <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 4v16m8-8H4" />
                             </svg>
                             {{ __('Nuevo POA') }}
-                        </x-button>
+                        </x-spinner-button>
                     </div>
                 </div>
             </div>

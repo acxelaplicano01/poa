@@ -22,13 +22,21 @@
 
     <x-slot name="footer">
         <div class="flex justify-end space-x-2">
-            <x-secondary-button wire:click="closeModal" wire:loading.attr="disabled">
+            <x-spinner-secondary-button 
+                wire:click="closeModal" 
+                type="button"
+                loadingTarget="closeModal"
+                loadingText="Cerrando...">
                 {{ __('Cancelar') }}
-            </x-secondary-button>
+            </x-spinner-secondary-button>
 
-            <x-button wire:click="store" wire:loading.attr="disabled" class="ml-2">
-                {{ $institucionId ? __('Actualizar') : __('Guardar') }}
-            </x-button>
+            <x-spinner-button 
+                type="submit" 
+                wire:click="store"
+                loadingTarget="store" 
+                :loadingText="$institucionId ? 'Actualizando...' : 'Creando...'">
+                {{ $institucionId ? 'Actualizar' : 'Crear' }}
+            </x-spinner-button>
         </div>
     </x-slot>
 </x-dialog-modal>

@@ -60,12 +60,13 @@
 
                 <!-- Botones del modal -->
                 <div class="flex justify-end space-x-3 mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-700">
-                    <x-secondary-button wire:click="closeModal">
+                    <x-spinner-secondary-button wire:click="closeModal" type="button" loadingTarget="closeModal" loadingText="Cerrando...">
                         {{ __('Cancelar') }}
-                    </x-secondary-button>
-                    <x-button type="submit">
-                        {{ $isEditing ? __('Actualizar') : __('Crear') }} {{ __('Departamento') }}
-                    </x-button>
+                    </x-spinner-secondary-button>
+                    
+                    <x-spinner-button type="submit" wire:click="save" loadingTarget="save" :loadingText="$isEditing ? 'Actualizando...' : 'Creando...'">
+                       {{ $isEditing ? __('Actualizar') : __('Crear') }} {{ __('Departamento') }}
+                    </x-spinner-button>
                 </div>
             </form>
         </div>

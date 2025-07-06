@@ -38,6 +38,12 @@ class TipoActaEntregas extends Component
         'tipo' => 'tipo de acta',
     ];
 
+    // Inicializar propiedades
+    public function mount()
+    {
+        $this->tipoAEliminar = '';
+    }
+
     // Método para ordenar columnas
     public function sortBy($field)
     {
@@ -135,10 +141,22 @@ class TipoActaEntregas extends Component
 
     public function confirmDelete($id)
     {
-        $tipoActaEntrega = TipoActaEntrega::findOrFail($id);
-        $this->tipoActaEntrega_id = $id;
-        $this->tipoAEliminar = $tipoActaEntrega->tipo;
-        $this->confirmingDelete = true;
+        try {
+            $tipoActaEntrega = TipoActaEntrega::findOrFail($id);
+            $this->tipoActaEntrega_id = $id;
+            $this->tipoAEliminar = $tipoActaEntrega->tipo;
+            $this->confirmingDelete = true;
+            
+            // Log para debug
+            \Log::info('confirmDelete called', [
+                'id' => $id,
+                'tipo' => $tipoActaEntrega->tipo,
+                'confirmingDelete' => $this->confirmingDelete
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error in confirmDelete: ' . $e->getMessage());
+            session()->flash('error', 'Error al preparar la eliminación.');
+        }
     }
 
     public function cancelDelete()

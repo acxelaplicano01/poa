@@ -35,21 +35,20 @@
                                 id="perPage" 
                                 wire:model.live="perPage"
                                 :options="[
-                                    ['value' => '10', 'text' => '10 por página'],
-                                    ['value' => '25', 'text' => '25 por página'],
-                                    ['value' => '50', 'text' => '50 por página'],
-                                    ['value' => '100', 'text' => '100 por página'],
-                                ]"
+        ['value' => '10', 'text' => '10 por página'],
+        ['value' => '25', 'text' => '25 por página'],
+        ['value' => '50', 'text' => '50 por página'],
+        ['value' => '100', 'text' => '100 por página'],
+    ]"
                                 class="w-full"
                             />
                     </div>
-                    <x-button wire:click="create" class="w-full sm:w-auto justify-center">
-                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
+                    <x-spinner-button wire:click="create()" loadingTarget="create()" :loadingText="__('Abriendo...')">
+                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
-                        {{ __('Nueva categoría')}}
-                    </x-button>
+                        {{ __('Nueva Categoría') }}
+                    </x-spinner-button>
                 </div>
             </div>
 
@@ -57,10 +56,10 @@
                 sort-field="{{ $sortField }}"
                 sort-direction="{{ $sortDirection }}"
                 :columns="[
-                    ['key' => 'id', 'label' => 'ID', 'sortable' => true],
-                    ['key' => 'categoria', 'label' => 'Categoría', 'sortable' => true],
-                    ['key' => 'actions', 'label' => 'Acciones'],
-                ]"
+        ['key' => 'id', 'label' => 'ID', 'sortable' => true],
+        ['key' => 'categoria', 'label' => 'Categoría', 'sortable' => true],
+        ['key' => 'actions', 'label' => 'Acciones'],
+    ]"
                 empty-message="{{ __('No se encontraron categorías')}}"
                 class="mt-6"
             >

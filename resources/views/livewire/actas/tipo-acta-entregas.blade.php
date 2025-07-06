@@ -46,14 +46,12 @@
                                 class="w-full"
                             />
                         </div>
-                        <x-button wire:click="create" class="w-full sm:w-auto justify-center">
-                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
+                        <x-spinner-button wire:click="create()" loadingTarget="create()" :loadingText="__('Abriendo...')">
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
-                            {{ __('Nuevo tipo')}}
-                        </x-button>
+                            {{ __('Nuevo Tipo') }}
+                        </x-spinner-button>
                     </div>
                 </div>
 
@@ -61,11 +59,11 @@
                     sort-field="{{ $sortField }}"
                     sort-direction="{{ $sortDirection }}"
                     :columns="[
-                        ['key' => 'id', 'label' => 'ID', 'sortable' => true],
-                        ['key' => 'tipo', 'label' => 'Tipo de Acta', 'sortable' => true],
-                        ['key' => 'created_at', 'label' => 'Creado', 'sortable' => true],
-                        ['key' => 'actions', 'label' => 'Acciones', 'class' => 'text-right'],
-                    ]"
+        ['key' => 'id', 'label' => 'ID', 'sortable' => true],
+        ['key' => 'tipo', 'label' => 'Tipo de Acta', 'sortable' => true],
+        ['key' => 'created_at', 'label' => 'Creado', 'sortable' => true],
+        ['key' => 'actions', 'label' => 'Acciones', 'class' => 'text-right'],
+    ]"
                     empty-message="No hay tipos de actas de entrega disponibles"
                     class="mt-6"
                 >
@@ -169,55 +167,9 @@
         </div>
     </div>
 
+    
     <!-- Modal para crear/editar tipo de acta de entrega -->
-    <x-dialog-modal maxWidth="md" wire:model="isOpen">
-        <x-slot name="title">
-            <h3 class="text-lg font-medium text-zinc-900 dark:text-white">
-                {{ $isEditing ? 'Editar Tipo de Acta de Entrega' : 'Nuevo Tipo de Acta de Entrega' }}
-            </h3>
-        </x-slot>
-
-        <x-slot name="content">
-            <div class="space-y-4">
-                <div>
-                    <x-label for="tipo" value="Tipo de Acta" />
-                    <x-input id="tipo" class="block mt-1 w-full" wire:model="tipo"
-                        placeholder="Ej: Acta de Recepción" />
-                    @error('tipo') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-            </div>
-        </x-slot>
-
-        <x-slot name="footer">
-            <div class="flex justify-end space-x-3">
-                <x-secondary-button wire:click="closeModal">
-                    Cancelar
-                </x-secondary-button>
-                <x-button wire:click="store">
-                    {{ $isEditing ? 'Actualizar' : 'Guardar' }}
-                </x-button>
-            </div>
-        </x-slot>
-    </x-dialog-modal>
-
-    <!-- Modal para confirmar eliminación -->
-    <x-confirmation-modal maxWidth="md" wire:model="confirmingDelete">
-        <x-slot name="title">
-            Eliminar Tipo de Acta de Entrega
-        </x-slot>
-
-        <x-slot name="content">
-            ¿Está seguro de que desea eliminar el tipo de acta <span class="font-semibold">{{ $tipoAEliminar }}</span>? Esta acción no se puede deshacer.
-        </x-slot>
-
-        <x-slot name="footer">
-            <x-secondary-button wire:click="cancelDelete">
-                Cancelar
-            </x-secondary-button>
-
-            <x-danger-button class="ml-3" wire:click="delete">
-                Eliminar
-            </x-danger-button>
-        </x-slot>
-    </x-confirmation-modal>
+    @include('livewire.actas.create')
+    <!-- Modal de confirmación de eliminación -->
+    @include('livewire.actas.delete-confirmation-tipo-acta-entrega')
 </div>
