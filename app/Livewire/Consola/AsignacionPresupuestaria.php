@@ -182,6 +182,11 @@ class AsignacionPresupuestaria extends Component
 
     public function save()
     {
+        // Validar techos en edición si es necesario
+        if (!$this->validateTechosEdicion()) {
+            return;
+        }
+        
         $this->validate();
 
         if ($this->isEditing) {
@@ -372,6 +377,62 @@ class AsignacionPresupuestaria extends Component
     }
 
     /**
+     * Obtiene el monto mínimo permitido para un techo en edición
+     * No puede ser menor al último monto asignado a este techo
+     * 
+     * @param int $techoId
+     * @return float
+     */
+    public function getMontoMinimo($techoId)
+    {
+        if (!$this->isEditing || !$techoId) {
+            return 0;
+        }
+        
+        // Obtener el monto actual del techo específico
+        $techoUe = TechoUe::find($techoId);
+        
+        if (!$techoUe) {
+            return 0;
+        }
+        
+        return (float) $techoUe->monto;
+    }
+    
+    /**
+     * Valida que los techos en edición no tengan montos menores al mínimo permitido
+     * 
+     * @return bool
+     */
+    public function validateTechosEdicion()
+    {
+        if (!$this->isEditing) {
+            return true;
+        }
+        
+        $errores = [];
+        
+        foreach ($this->techos as $index => $techo) {
+            $techoId = $techo['id'] ?? null;
+            if ($techoId) {
+                $montoMinimo = $this->getMontoMinimo($techoId);
+                $montoActual = (float) ($techo['monto'] ?? 0);
+                
+                if ($montoActual < $montoMinimo) {
+                    $errores[] = "El techo " . ($index + 1) . " no puede tener un monto menor a " . number_format($montoMinimo, 2) . " (último monto asignado)";
+                }
+            }
+        }
+        
+        if (!empty($errores)) {
+            session()->flash('error', implode('<br>', $errores));
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
      * Calcula el progreso de departamentos para un POA específico
      * Mide: porcentaje de departamentos con presupuesto asignado vs total de departamentos de la UE
      *
@@ -404,10 +465,10 @@ class AsignacionPresupuestaria extends Component
         
         // Determinar color según el porcentaje
         $color = 'bg-red-500'; // Rojo por defecto
-        if ($porcentaje >= 65) {
-            $color = 'bg-green-500'; // Verde para 65% o más
+        if ($porcentaje >= 85) {
+            $color = 'bg-green-500'; // Verde para 85% o más
         } elseif ($porcentaje >= 30) {
-            $color = 'bg-yellow-500'; // Amarillo para 30-64%
+            $color = 'bg-yellow-500'; // Amarillo para 30-84%
         }
         
         return [

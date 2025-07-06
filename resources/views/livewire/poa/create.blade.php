@@ -76,13 +76,27 @@
                         </x-spinner-secondary-button>
                     </div>
                     @if (session()->has('error'))
-                        <div class="text-sm text-red-600 mb-3">
-                            {{ session('error') }}
+                        <div class="mb-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                            <div class="flex items-center">
+                                <svg class="h-5 w-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                                <div class="text-sm text-red-700 dark:text-red-300">
+                                    {!! session('error') !!}
+                                </div>
+                            </div>
                         </div>
                     @endif
                     @if (session()->has('warning'))
-                        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-3">
-                            {{ session('warning') }}
+                        <div class="mb-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+                            <div class="flex items-center">
+                                <svg class="h-5 w-5 text-yellow-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div class="text-sm text-yellow-700 dark:text-yellow-300">
+                                    {{ session('warning') }}
+                                </div>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -108,9 +122,25 @@
                                     </x-spinner-danger-button>
                                 @endif
                             </div>
-                            
+                            @if($isEditing && isset($techo['id']))
+                                @php
+                                    $montoMinimo = $this->getMontoMinimo($techo['id']);
+                                @endphp
+                                @if($montoMinimo > 0)
+                                    <div class="mb-2 p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md">
+                                        <div class="flex items-center text-orange-700 dark:text-orange-300">
+                                            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span class="text-sm">
+                                                Mínimo permitido: {{ number_format($montoMinimo, 2) }} (último monto asignado)
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                                 <!-- Fuente de Financiamiento -->
                                 <div>
                                     <x-label for="techos.{{ $index }}.idFuente" value="{{ __('Fuente') }}" class="mb-2" />
@@ -130,13 +160,15 @@
                                         id="techos.{{ $index }}.monto" 
                                         type="number" 
                                         step="0.01" 
-                                        min="0" 
-                                        placeholder="0.00" 
+                                        min="{{ $isEditing && isset($techo['id']) ? $this->getMontoMinimo($techo['id']) : 0 }}" 
+                                        placeholder="{{ $isEditing && isset($techo['id']) && $this->getMontoMinimo($techo['id']) > 0 ? number_format($this->getMontoMinimo($techo['id']), 2) : '0.00' }}" 
                                         class="mt-1 block w-full"
+                                        x-bind:class="{ 'border-orange-300 dark:border-orange-700': {{ $isEditing && isset($techo['id']) && $this->getMontoMinimo($techo['id']) > 0 ? 'true' : 'false' }} }"
                                     />
                                     <x-input-error for="techos.{{ $index }}.monto" class="mt-2" />
                                 </div>
                             </div>
+
                         </div>
                     @endforeach
                 </div>
@@ -149,6 +181,18 @@
                     <span class="text-blue-700 dark:text-blue-400">Total asignado:</span>
                     <span class="text-lg font-bold text-blue-800 dark:text-blue-300" x-text="new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalTechos)"></span>
                 </div>
+                @if($isEditing)
+                    <div class="mt-2 pt-2 border-t border-blue-200 dark:border-blue-700">
+                        <div class="flex items-center text-blue-600 dark:text-blue-400">
+                            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-sm">
+                                Al editar, no puede asignar menos del último monto asignado a cada techo
+                            </span>
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <!-- Botones -->
