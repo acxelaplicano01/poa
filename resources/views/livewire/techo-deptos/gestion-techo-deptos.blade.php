@@ -55,7 +55,7 @@
                             wire:click="setActiveTab('resumen')"
                             class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 flex-shrink-0 {{ $activeTab === 'resumen' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300' }}">
                             <span class="flex items-center">
-                                <span class="hidden sm:inline">Resumen </span>Presupuestario
+                                <span class="hidden sm:inline">Resumen Presupuestario</span>
                                 <svg class="inline ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
@@ -65,7 +65,7 @@
                             wire:click="setActiveTab('sin-asignar')"
                             class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 flex-shrink-0 {{ $activeTab === 'sin-asignar' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300' }}">
                             <span class="flex items-center">
-                                <span class="hidden sm:inline">Departamentos </span> sin Techo
+                                <span class="hidden sm:inline">Departamentos sin Techo</span> 
                                 <span class="ml-1 sm:ml-2 bg-yellow-100 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100 py-0.5 px-1.5 sm:px-2.5 rounded-full text-xs font-medium">
                                     {{ $departamentosSinTecho->count() }}
                                 </span>
@@ -75,10 +75,20 @@
                             wire:click="setActiveTab('con-asignacion')"
                             class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 flex-shrink-0 {{ $activeTab === 'con-asignacion' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300' }}">
                             <span class="flex items-center">
-                                <span class="hidden sm:inline">Departamentos </span> con Techo
+                                <span class="hidden sm:inline">Departamentos con Techo</span> 
                                 <span class="ml-1 sm:ml-2 bg-green-100 dark:bg-green-800 text-green-900 dark:text-green-100 py-0.5 px-1.5 sm:px-2.5 rounded-full text-xs font-medium">
                                     {{ $departamentosConTecho->count() }}
                                 </span>
+                            </span>
+                        </button>
+                        <button 
+                            wire:click="setActiveTab('por-estructura')"
+                            class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 flex-shrink-0 {{ $activeTab === 'por-estructura' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300' }}">
+                            <span class="flex items-center">
+                                <span class="hidden sm:inline">Por Estructura</span>
+                                <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                                </svg>
                             </span>
                         </button>
                     </nav>
@@ -514,6 +524,134 @@
                                             Empieza asignando techos presupuestarios a los departamentos para gestionar el presupuesto.
                                         </p>
                                     @endif
+                                </div>
+                            </div>
+                        @endif
+                    @elseif($activeTab === 'por-estructura')
+                        <!-- Métricas por Estructura -->
+                        @if($metricasPorEstructura->count() > 0)
+                            <div class="space-y-6">
+                                @foreach($metricasPorEstructura as $estructura)
+                                    <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg overflow-hidden">
+                                        <!-- Header de la estructura -->
+                                        <div class="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 px-6 py-4 border-b border-zinc-200 dark:border-zinc-700">
+                                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                                <div>
+                                                    <h3 class="text-lg font-semibold text-indigo-900 dark:text-indigo-100 flex items-center">
+                                                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                                                        </svg>
+                                                        {{ $estructura['estructura'] }}
+                                                    </h3>
+                                                    <p class="text-sm text-indigo-700 dark:text-indigo-300 mt-1">
+                                                        {{ $estructura['cantidad_departamentos'] }} departamento(s) • 
+                                                        Promedio: {{ number_format($estructura['promedio_por_departamento'], 2) }}
+                                                    </p>
+                                                </div>
+                                                <div class="mt-2 sm:mt-0">
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                                        Total: {{ number_format($estructura['monto_total_asignado'], 2) }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Contenido de la estructura -->
+                                        <div class="p-6">
+                                            <!-- Fuentes utilizadas -->
+                                            <div class="mb-6">
+                                                <h4 class="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-3">Fuentes de Financiamiento</h4>
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                    @foreach($estructura['fuentes_utilizadas'] as $fuente)
+                                                        <div class="bg-zinc-50 dark:bg-zinc-900 rounded-lg p-3 border border-zinc-200 dark:border-zinc-700">
+                                                            <div class="flex items-center justify-between">
+                                                                <div>
+                                                                    <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                                                                        {{ $fuente['nombre'] }}
+                                                                    </p>
+                                                                    <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                                                                        {{ $fuente['cantidad_asignaciones'] }} asignación(es)
+                                                                    </p>
+                                                                </div>
+                                                                <span class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                                                                    {{ number_format($fuente['monto'], 2) }}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+
+                                            <!-- Departamentos -->
+                                            <div>
+                                                <h4 class="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-3">Departamentos</h4>
+                                                <div class="overflow-x-auto">
+                                                    <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+                                                        <thead class="bg-zinc-50 dark:bg-zinc-800">
+                                                            <tr>
+                                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                                                                    Departamento
+                                                                </th>
+                                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                                                                    Tipo
+                                                                </th>
+                                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                                                                    Asignaciones
+                                                                </th>
+                                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                                                                    Monto Total
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="bg-white dark:bg-zinc-900 divide-y divide-zinc-200 dark:divide-zinc-800">
+                                                            @foreach($estructura['departamentos'] as $departamento)
+                                                                <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/60">
+                                                                    <td class="px-4 py-3 whitespace-nowrap">
+                                                                        <div>
+                                                                            <div class="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                                                                                {{ $departamento['nombre'] }}
+                                                                            </div>
+                                                                            <div class="text-sm text-zinc-500 dark:text-zinc-400">
+                                                                                {{ $departamento['siglas'] }}
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
+                                                                        {{ $departamento['tipo'] ?? 'N/A' }}
+                                                                    </td>
+                                                                    <td class="px-4 py-3 whitespace-nowrap text-center">
+                                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                                                            {{ $departamento['cantidad_asignaciones'] }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                                                                        {{ number_format($departamento['monto_asignado'], 2) }}
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-12">
+                                <div class="max-w-md mx-auto">
+                                    <div class="mx-auto h-16 w-16 text-zinc-400 mb-6">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                            <path stroke-linecap="round" stroke-linejoin="round" 
+                                                d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
+                                        No hay asignaciones por estructura
+                                    </h3>
+                                    <p class="text-zinc-500 dark:text-zinc-400">
+                                        Aún no se han realizado asignaciones presupuestarias a departamentos.
+                                    </p>
                                 </div>
                             </div>
                         @endif

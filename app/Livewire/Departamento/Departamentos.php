@@ -31,7 +31,7 @@ class Departamentos extends Component
         'siglas' => 'required|string|max:10',
         'estructura' => 'nullable|string|max:255',
         'tipo' => 'required|string|max:100',
-        'idUnidadEjecutora' => 'required|exists:unidad_ejecutoras,id',
+        'idUnidadEjecutora' => 'required|exists:unidad_ejecutora,id',
     ];
 
     protected $messages = [
