@@ -178,9 +178,6 @@ class GestionTechoDeptos extends Component
 
         // Calcular resumen del presupuesto
         $resumenPresupuesto = $this->getResumenPresupuesto();
-        
-        // Calcular métricas por estructura
-        $metricasPorEstructura = $this->getMetricasPorEstructura();
 
         return view('livewire.techo-deptos.gestion-techo-deptos', [
             'techoDeptos' => $techoDeptos,
@@ -188,7 +185,6 @@ class GestionTechoDeptos extends Component
             'departamentosSinTecho' => $departamentosSinTecho,
             'departamentosConTecho' => $departamentosConTechoData,
             'resumenPresupuesto' => $resumenPresupuesto,
-            'metricasPorEstructura' => $metricasPorEstructura,
         ])->layout('layouts.app');
     }
 
@@ -526,61 +522,5 @@ class GestionTechoDeptos extends Component
     public function backToPoa()
     {
         return redirect()->route('asignacionpresupuestaria');
-    }
-
-    private function getMetricasPorEstructura()
-    {
-        // Obtener todos los techos departamentales con sus departamentos
-        $techosConDepartamentos = TechoDepto::with(['departamento', 'techoUE.fuente'])
-            ->where('idPoa', $this->idPoa)
-            ->where('idUE', $this->idUE)
-            ->get();
-
-        // Agrupar por estructura
-        $metricasPorEstructura = $techosConDepartamentos
-            ->groupBy(function ($techoDepto) {
-                return $techoDepto->departamento->estructura ?? 'Sin Estructura';
-            })
-            ->map(function ($techosPorEstructura, $estructura) {
-                $departamentosUnicos = $techosPorEstructura->pluck('departamento')->unique('id');
-                $montoTotal = $techosPorEstructura->sum('monto');
-                $cantidadDepartamentos = $departamentosUnicos->count();
-                $promedioMonto = $cantidadDepartamentos > 0 ? $montoTotal / $cantidadDepartamentos : 0;
-                
-                // Agrupar por fuente dentro de cada estructura
-                $fuentesUsadas = $techosPorEstructura
-                    ->groupBy(function ($techo) {
-                        return $techo->techoUE->fuente->nombre ?? 'Sin Fuente';
-                    })
-                    ->map(function ($techosPorFuente, $nombreFuente) {
-                        return [
-                            'nombre' => $nombreFuente,
-                            'monto' => $techosPorFuente->sum('monto'),
-                            'cantidad_asignaciones' => $techosPorFuente->count()
-                        ];
-                    });
-
-                return [
-                    'estructura' => $estructura,
-                    'cantidad_departamentos' => $cantidadDepartamentos,
-                    'monto_total_asignado' => $montoTotal,
-                    'promedio_por_departamento' => $promedioMonto,
-                    'fuentes_utilizadas' => $fuentesUsadas,
-                    'departamentos' => $departamentosUnicos->map(function ($depto) use ($techosPorEstructura) {
-                        $techosDepto = $techosPorEstructura->where('idDepartamento', $depto->id);
-                        return [
-                            'id' => $depto->id,
-                            'nombre' => $depto->name,
-                            'siglas' => $depto->siglas,
-                            'tipo' => $depto->tipo,
-                            'monto_asignado' => $techosDepto->sum('monto'),
-                            'cantidad_asignaciones' => $techosDepto->count()
-                        ];
-                    })
-                ];
-            })
-            ->sortByDesc('monto_total_asignado');
-
-        return $metricasPorEstructura;
     }
 }

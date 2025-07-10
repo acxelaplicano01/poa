@@ -54,7 +54,8 @@ class Departamentos extends Component
     public function updatedFiltroTipo()
     {
         $this->resetPage();
-    }    public function render()
+    }    
+    public function render()
     {
         $departamentos = Departamento::with(['unidadEjecutora'])
             ->when($this->search, function ($query) {
@@ -89,13 +90,15 @@ class Departamentos extends Component
 
     public function create()
     {
-        $this->resetForm();
         $this->isEditing = false;
+        $this->resetForm();
+        $this->resetValidation();
         $this->showModal = true;
     }
 
     public function edit($id)
     {
+        $this->resetValidation();
         $departamento = Departamento::findOrFail($id);
         $this->departamentoId = $departamento->id;
         $this->name = $departamento->name;
@@ -165,9 +168,9 @@ class Departamentos extends Component
 
     public function closeModal()
     {
+        $this->resetValidation();
         $this->showModal = false;
         $this->resetForm();
-        $this->resetValidation();
     }
 
     private function resetForm()
@@ -178,5 +181,6 @@ class Departamentos extends Component
         $this->estructura = '';
         $this->tipo = '';
         $this->idUnidadEjecutora = '';
+        $this->resetValidation();
     }
 }
