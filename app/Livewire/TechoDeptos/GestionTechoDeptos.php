@@ -528,6 +528,16 @@ class GestionTechoDeptos extends Component
         return redirect()->route('asignacionpresupuestaria');
     }
 
+    public function verDetalleEstructura($estructura)
+    {
+        // Redirigir a la vista de detalle de estructura con los parámetros necesarios
+        return redirect()->route('techo-deptos.detalle-estructura', [
+            'idPoa' => $this->idPoa,
+            'idUE' => $this->idUE,
+            'estructura' => urlencode($estructura)
+        ]);
+    }
+
     private function getMetricasPorEstructura()
     {
         // Obtener todos los techos departamentales con sus departamentos

@@ -16,6 +16,7 @@ use App\Livewire\Empleado\Empleados;
 use App\Livewire\GrupoGastos\Fuentes;
 use App\Livewire\GrupoGastos\GrupoGastos;
 use App\Livewire\TechoDeptos\GestionTechoDeptos;
+use App\Livewire\TechoDeptos\DetalleEstructura;
 use App\Livewire\Institucion\Instituciones;
 use App\Livewire\Planificar\Planificar;
 use App\Livewire\ProcesCompra\ProcesCompras;
@@ -154,9 +155,13 @@ Route::middleware([
             ->name('asignacionpresupuestaria')
             ->middleware('can:consola.asignacionpresupuestaria.ver');
 
-        Route::get('/consola/techo-deptos', GestionTechoDeptos::class)
-            ->name('techo-deptos')
-            ->middleware('can:consola.techo-deptos.ver');
+        Route::get('/consola/techodeptos', GestionTechoDeptos::class)
+            ->name('techodeptos')
+            ->middleware('can:consola.techodeptos.ver');
+            
+        Route::get('/consola/techodeptos/{idPoa}/{idUE}/estructura/{estructura}', DetalleEstructura::class)
+            ->name('techodeptos.detalle-estructura')
+            ->middleware('can:consola.techodeptos.ver');
     });
 
     // Rutas para el visor de logs

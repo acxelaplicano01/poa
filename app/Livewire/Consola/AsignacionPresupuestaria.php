@@ -489,7 +489,7 @@ class AsignacionPresupuestaria extends Component
     public function gestionarTechoDepto($poaId, $idUE)
     {
         // Usamos query string de forma explícita
-        return redirect()->to(route('techo-deptos') . "?idPoa={$poaId}&idUE={$idUE}");
+        return redirect()->to(route('techodeptos') . "?idPoa={$poaId}&idUE={$idUE}");
     }
     
     /**
