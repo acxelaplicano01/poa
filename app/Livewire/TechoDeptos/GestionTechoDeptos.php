@@ -531,7 +531,7 @@ class GestionTechoDeptos extends Component
     public function verDetalleEstructura($estructura)
     {
         // Redirigir a la vista de detalle de estructura con los parámetros necesarios
-        return redirect()->route('techo-deptos.detalle-estructura', [
+        return redirect()->route('techodeptos.detalle-estructura', [
             'idPoa' => $this->idPoa,
             'idUE' => $this->idUE,
             'estructura' => urlencode($estructura)

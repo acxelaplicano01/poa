@@ -155,11 +155,11 @@ Route::middleware([
             ->name('asignacionpresupuestaria')
             ->middleware('can:consola.asignacionpresupuestaria.ver');
 
-        Route::get('/consola/techodeptos', GestionTechoDeptos::class)
+        Route::get('/consola/asignacionpresupuestaria/techodeptos/{idPoa}/{idUE}', GestionTechoDeptos::class)
             ->name('techodeptos')
             ->middleware('can:consola.techodeptos.ver');
             
-        Route::get('/consola/techodeptos/{idPoa}/{idUE}/estructura/{estructura}', DetalleEstructura::class)
+        Route::get('/consola/asignacionpresupuestaria/techodeptos/{idPoa}/{idUE}/estructura/{estructura}', DetalleEstructura::class)
             ->name('techodeptos.detalle-estructura')
             ->middleware('can:consola.techodeptos.ver');
     });

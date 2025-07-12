@@ -160,7 +160,7 @@ return [
             [
                 'titulo' => 'Asignación presupuestaria',
                 'route' => 'asignacionpresupuestaria',
-                'routes' => ['asignacionpresupuestaria'],
+                'routes' => ['asignacionpresupuestaria', 'techodeptos', 'techodeptos.detalle-estructura'],
                 'permisos' => ['consola.asignacionpresupuestaria.ver'],
                 'icono' => '',
                 'breadcrumb' => true

@@ -487,10 +487,13 @@ class AsignacionPresupuestaria extends Component
      * @return \Illuminate\Http\RedirectResponse
      */
     public function gestionarTechoDepto($poaId, $idUE)
-    {
-        // Usamos query string de forma explícita
-        return redirect()->to(route('techodeptos') . "?idPoa={$poaId}&idUE={$idUE}");
-    }
+{
+    // Usar la ruta con estructura de 3 partes para mejor breadcrumb
+    return redirect()->route('techodeptos', [
+        'idPoa' => $poaId,
+        'idUE' => $idUE
+    ]);
+}
     
     /**
      * Actualiza los techos preservando las relaciones existentes con TechoDepto
