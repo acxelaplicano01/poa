@@ -14,7 +14,7 @@
                 </p>
             </div>
             <button wire:click="volver"
-                class="inline-flex items-center px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-sm text-sm font-medium text-zinc-700 dark:text-zinc-200 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-zinc-800 transition-all duration-200 self-start sm:self-center">
+                class="inline-flex items-center px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-sm text-sm font-medium text-zinc-700 dark:text-zinc-200 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-zinc-500 dark:focus:ring-offset-zinc-800 transition-all duration-200 self-start sm:self-center">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -32,8 +32,8 @@
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <div
-                            class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 dark:bg-blue-900/40 rounded-md flex items-center justify-center ring-1 ring-blue-200 dark:ring-blue-800">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-300" fill="none"
+                            class="w-6 h-6 sm:w-8 sm:h-8 bg-indigo-100 dark:bg-indigo-900/40 rounded-md flex items-center justify-center ring-1 ring-indigo-200 dark:ring-indigo-800">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 dark:text-indigo-300" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
@@ -205,7 +205,12 @@
                                                 <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                                                     <span
                                                         class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                                            {{ $departamento['tipo'] === 'operativo' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200' : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200' }}">
+                                                              {{ $departamento['tipo'] === 'ADMINISTRATIVO' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+                                                                ($departamento['tipo'] === 'COORDINACIÓN REGIONAL' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                                                                ($departamento['tipo'] === 'SECCIÓN ACADÉMICA' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                                                                ($departamento['tipo'] === 'DEPARTAMENTO ACADÉMICO' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                                                                ($departamento['tipo'] === 'COORDINACIÓN ACADÉMICA' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
+                                                                'bg-zinc-100 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200')))) }}">
                                                         {{ ucfirst($departamento['tipo'] ?? 'N/A') }}
                                                     </span>
                                                 </td>

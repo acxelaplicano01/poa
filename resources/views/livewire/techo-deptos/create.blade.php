@@ -42,14 +42,52 @@
                         Asigne montos desde las diferentes fuentes de financiamiento disponibles. Solo se crearán asignaciones para montos mayores a cero.
                     </p>
                     
+                    <!-- Total General Asignado -->
+                    @php
+                        $totalAsignado = array_sum(array_map('floatval', $montosPorFuente));
+                    @endphp
+                    <div class="mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mr-3">
+                                    <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                                        Total Asignado
+                                    </h4>
+                                    <p class="text-xs text-blue-600 dark:text-blue-300">
+                                        Suma de todas las fuentes
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-blue-900 dark:text-blue-100">
+                                    {{ number_format($totalAsignado, 2) }}
+                                </p>
+                                @if($totalAsignado > 0)
+                                    <p class="text-xs text-green-600 dark:text-green-400">
+                                        ✓ Asignación activa
+                                    </p>
+                                @else
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                                        Sin asignación
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    
                     @if(count($techoUes) > 0)
                         <div class="space-y-4">
                             @foreach($techoUes as $techoUe)
                                 @php
-        $disponibilidad = $this->getDisponibilidadFuente($techoUe->id);
-        $montoActual = floatval($montosPorFuente[$techoUe->id] ?? 0);
-        $maxMonto = $disponibilidad['disponible'] + $montoActual;
-        $minMonto = $disponibilidad['minimo'];
+                                    $disponibilidad = $this->getDisponibilidadFuente($techoUe->id);
+                                    $montoActual = floatval($montosPorFuente[$techoUe->id] ?? 0);
+                                    $maxMonto = $disponibilidad['disponible'] + $montoActual;
+                                    $minMonto = $disponibilidad['minimo'];
                                 @endphp
                                 
                                 <div class="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 bg-zinc-50 dark:bg-zinc-800/50">
