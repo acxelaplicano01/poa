@@ -23,6 +23,7 @@ use App\Livewire\ProcesCompra\ProcesCompras;
 use App\Livewire\Requerir\Requerir;
 use App\Livewire\Requisicion\EstadosRequisicion;
 use App\Livewire\Requisicion\UnidadMedidas;
+use App\Livewire\UnidadEjecutora\UnidadEjecutoras;
 use App\Livewire\Rol\Roles;
 use App\Livewire\Rol\RoleForm;
 use App\Livewire\Seguimiento\Seguimiento;
@@ -85,7 +86,9 @@ Route::middleware([
 
     Route::get('/instituciones', Instituciones::class)
         ->name('instituciones');
-
+    
+    Route::get('/unidad-ejecutora', UnidadEjecutoras::class)
+        ->name('unidad-ejecutora');
 
 
     // Rutas del módulo de configuración
