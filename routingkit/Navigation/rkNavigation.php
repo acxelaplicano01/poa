@@ -4,255 +4,312 @@ use Rk\RoutingKit\Entities\RkNavigation;
 
 return [
 
-    // Dashboard / Inicio
     RkNavigation::makeGroup('dashboard_group')
-        ->setLabel('Inicio')
         ->setDescription('Panel principal del sistema')
+        ->setLabel('Inicio')
         ->setHeroIcon('home')
         ->setItems([
+
             RkNavigation::makeSimple('dashboard')
-                ->setLabel('Panel Principal')
+                ->setParentId('dashboard_group')
+                ->setUrl('/dashboard')
                 ->setDescription('Accede al panel principal')
+                ->setLabel('Panel Principal')
                 ->setHeroIcon('home')
-                ->setEndBlock('dashboard')
+                ->setItems([])
+                ->setEndBlock('dashboard'),
         ])
         ->setEndBlock('dashboard_group'),
 
-    // Planificación
     RkNavigation::makeGroup('planificacion')
         ->setLabel('Planificación')
         ->setHeroIcon('calendar')
         ->setItems([
+
             RkNavigation::make('planificar')
-                ->setLabel('Mis planificaciones')
+                ->setParentId('planificacion')
                 ->setDescription('Visualiza tus planificaciones')
+                ->setLabel('Mis planificaciones')
                 ->setHeroIcon('document-text')
+                ->setItems([])
                 ->setEndBlock('planificar'),
 
             RkNavigation::make('requerir')
-                ->setLabel('Requerir')
+                ->setParentId('planificacion')
                 ->setDescription('Crear o gestionar requerimientos')
+                ->setLabel('Requerir')
                 ->setHeroIcon('clipboard-document')
+                ->setItems([])
                 ->setEndBlock('requerir'),
 
             RkNavigation::make('seguimiento')
-                ->setLabel('Dar seguimiento')
+                ->setParentId('planificacion')
                 ->setDescription('Seguimiento de planificaciones')
+                ->setLabel('Dar seguimiento')
                 ->setHeroIcon('eye')
+                ->setItems([])
                 ->setEndBlock('seguimiento'),
 
             RkNavigation::make('consolidado')
-                ->setLabel('Consolidado')
+                ->setParentId('planificacion')
                 ->setDescription('Genera reportes consolidados')
+                ->setLabel('Consolidado')
                 ->setHeroIcon('chart-bar-square')
+                ->setItems([])
                 ->setEndBlock('consolidado'),
         ])
         ->setEndBlock('planificacion'),
 
-    // Configuración
     RkNavigation::makeGroup('configuracion')
         ->setLabel('Configuración')
         ->setHeroIcon('cog-6-tooth')
         ->setItems([
-            
-            // Subgrupo: Gestión de Usuarios y Accesos
+
             RkNavigation::makeGroup('usuarios-accesos')
+                ->setParentId('configuracion')
                 ->setLabel('Usuarios')
                 ->setHeroIcon('user-group')
                 ->setItems([
+
                     RkNavigation::make('roles')
-                        ->setLabel('Roles')
+                        ->setParentId('usuarios-accesos')
                         ->setDescription('Gestiona roles de usuario')
+                        ->setLabel('Roles')
                         ->setHeroIcon('shield-exclamation')
+                        ->setItems([])
                         ->setEndBlock('roles'),
 
                     RkNavigation::make('usuarios')
-                        ->setLabel('Usuarios')
+                        ->setParentId('usuarios-accesos')
                         ->setDescription('Administración de usuarios')
+                        ->setLabel('Usuarios')
                         ->setHeroIcon('users')
+                        ->setItems([])
                         ->setEndBlock('usuarios'),
 
                     RkNavigation::make('empleados')
-                        ->setLabel('Empleados')
+                        ->setParentId('usuarios-accesos')
                         ->setDescription('Gestión de empleados')
+                        ->setLabel('Empleados')
                         ->setHeroIcon('identification')
+                        ->setItems([])
                         ->setEndBlock('empleados'),
                 ])
                 ->setEndBlock('usuarios-accesos'),
 
-            // Subgrupo: Estructura Organizacional
             RkNavigation::makeGroup('estructura-organizacional')
+                ->setParentId('configuracion')
                 ->setLabel('Organización')
                 ->setHeroIcon('building-office')
                 ->setItems([
+
                     RkNavigation::make('departamentos')
-                        ->setLabel('Departamentos')
+                        ->setParentId('estructura-organizacional')
                         ->setDescription('Administración de departamentos')
+                        ->setLabel('Departamentos')
                         ->setHeroIcon('building-office')
+                        ->setItems([])
                         ->setEndBlock('departamentos'),
 
                     RkNavigation::make('instituciones')
-                        ->setLabel('Instituciones')
+                        ->setParentId('estructura-organizacional')
                         ->setDescription('Gestión de instituciones')
+                        ->setLabel('Instituciones')
                         ->setHeroIcon('building-office-2')
+                        ->setItems([])
                         ->setEndBlock('instituciones'),
 
                     RkNavigation::make('cubs')
-                        ->setLabel('Cubs')
+                        ->setParentId('estructura-organizacional')
                         ->setDescription('Administración de cubs')
+                        ->setLabel('Cubs')
                         ->setHeroIcon('cube')
+                        ->setItems([])
                         ->setEndBlock('cubs'),
                 ])
                 ->setEndBlock('estructura-organizacional'),
 
-            // Subgrupo: Configuración Presupuestaria
             RkNavigation::makeGroup('config-presupuestaria')
+                ->setParentId('configuracion')
                 ->setLabel('Presupuesto')
                 ->setHeroIcon('banknotes')
                 ->setItems([
+
                     RkNavigation::make('fuentes')
-                        ->setLabel('Fuentes')
+                        ->setParentId('config-presupuestaria')
                         ->setDescription('Gestión de fuentes de financiamiento')
+                        ->setLabel('Fuentes')
                         ->setHeroIcon('currency-dollar')
+                        ->setItems([])
                         ->setEndBlock('fuentes'),
 
                     RkNavigation::make('grupo-gastos')
-                        ->setLabel('Grupos de gastos')
+                        ->setParentId('config-presupuestaria')
                         ->setDescription('Gestión de grupos de gastos')
+                        ->setLabel('Grupos de gastos')
                         ->setHeroIcon('receipt-percent')
+                        ->setItems([])
                         ->setEndBlock('grupo-gastos'),
 
                     RkNavigation::make('estados-ejecucion')
-                        ->setLabel('Estados de ejecución')
+                        ->setParentId('config-presupuestaria')
                         ->setDescription('Gestión de estados de ejecución presupuestaria')
+                        ->setLabel('Estados de ejecución')
                         ->setHeroIcon('clipboard-document-check')
+                        ->setItems([])
                         ->setEndBlock('estados-ejecucion'),
                 ])
                 ->setEndBlock('config-presupuestaria'),
 
-            // Subgrupo: Configuración de Procesos
             RkNavigation::makeGroup('config-procesos')
+                ->setParentId('configuracion')
                 ->setLabel('Procesos')
                 ->setHeroIcon('cog-8-tooth')
                 ->setItems([
+
                     RkNavigation::make('procesoscompras')
-                        ->setLabel('Compras')
+                        ->setParentId('config-procesos')
                         ->setDescription('Gestiona los procesos de compras')
+                        ->setLabel('Compras')
                         ->setHeroIcon('shopping-bag')
+                        ->setItems([])
                         ->setEndBlock('procesoscompras'),
 
                     RkNavigation::make('estados-requisicion')
-                        ->setLabel('Estados requisición')
+                        ->setParentId('config-procesos')
                         ->setDescription('Gestión de estados de requisición')
+                        ->setLabel('Estados requisición')
                         ->setHeroIcon('check-circle')
+                        ->setItems([])
                         ->setEndBlock('estados-requisicion'),
 
                     RkNavigation::make('tipo-acta-entregas')
-                        ->setLabel('Tipos acta')
+                        ->setParentId('config-procesos')
                         ->setDescription('Gestión de tipos de acta de entregas')
+                        ->setLabel('Tipos acta')
                         ->setHeroIcon('document-check')
+                        ->setItems([])
                         ->setEndBlock('tipo-acta-entregas'),
                 ])
                 ->setEndBlock('config-procesos'),
 
-            // Subgrupo: Catálogos Generales
             RkNavigation::makeGroup('catalogos-generales')
+                ->setParentId('configuracion')
                 ->setLabel('Catálogos')
                 ->setHeroIcon('squares-2x2')
                 ->setItems([
 
                     RkNavigation::make('categorias')
-                        ->setLabel('Categorías')
+                        ->setParentId('catalogos-generales')
                         ->setDescription('Gestión de categorías')
+                        ->setLabel('Categorías')
                         ->setHeroIcon('squares-plus')
+                        ->setItems([])
                         ->setEndBlock('categorias'),
 
                     RkNavigation::make('tipoactividades')
-                        ->setLabel('Tipo actividades')
+                        ->setParentId('catalogos-generales')
                         ->setDescription('Gestión de tipos de actividades')
+                        ->setLabel('Tipo actividades')
                         ->setHeroIcon('tag')
+                        ->setItems([])
                         ->setEndBlock('tipoactividades'),
 
                     RkNavigation::make('unidad-medidas')
-                        ->setLabel('Unidades medida')
+                        ->setParentId('catalogos-generales')
                         ->setDescription('Gestión de unidades de medida')
+                        ->setLabel('Unidades medida')
                         ->setHeroIcon('scale')
+                        ->setItems([])
                         ->setEndBlock('unidad-medidas'),
 
                     RkNavigation::make('trimestres')
-                        ->setLabel('Trimestres')
+                        ->setParentId('catalogos-generales')
                         ->setDescription('Gestión de trimestres')
+                        ->setLabel('Trimestres')
                         ->setHeroIcon('calendar-days')
+                        ->setItems([])
                         ->setEndBlock('trimestres'),
                 ])
                 ->setEndBlock('catalogos-generales'),
         ])
         ->setEndBlock('configuracion'),
 
-    // Consola de Administración
     RkNavigation::makeGroup('consola')
         ->setLabel('Consola')
         ->setHeroIcon('terminal')
         ->setItems([
+
             RkNavigation::make('planestrategicoinstitucional')
-                ->setLabel('Plan estratégico')
+                ->setParentId('consola')
                 ->setDescription('Visualiza y gestiona el plan estratégico')
+                ->setLabel('Plan estratégico')
                 ->setHeroIcon('document-text')
+                ->setItems([])
                 ->setEndBlock('planestrategicoinstitucional'),
 
             RkNavigation::make('asignacionpresupuestaria')
-                ->setLabel('Asignación presupuestaria')
+                ->setParentId('consola')
                 ->setDescription('Gestión de la asignación presupuestaria')
+                ->setLabel('Asignación presupuestaria')
                 ->setHeroIcon('banknotes')
+                ->setItems([])
                 ->setEndBlock('asignacionpresupuestaria'),
 
             RkNavigation::make('techodeptos')
-                ->setLabel('Techos presupuestarios')
+                ->setParentId('consola')
                 ->setDescription('Gestión de techos presupuestarios por departamento')
+                ->setLabel('Techos presupuestarios')
                 ->setHeroIcon('building-storefront')
+                ->setItems([])
                 ->setEndBlock('techodeptos'),
         ])
         ->setEndBlock('consola'),
 
-    // Sistema y Monitoreo
     RkNavigation::makeGroup('sistema-monitoreo')
         ->setLabel('Sistema')
         ->setHeroIcon('computer-desktop')
         ->setItems([
-            
-            // Subgrupo: Logs y Auditoría
+
             RkNavigation::makeGroup('logs-auditoria')
+                ->setParentId('sistema-monitoreo')
                 ->setLabel('Logs')
                 ->setHeroIcon('document-text')
                 ->setItems([
+
                     RkNavigation::make('logs')
-                        ->setLabel('Visor de Logs')
+                        ->setParentId('logs-auditoria')
                         ->setDescription('Visualiza los logs del sistema')
+                        ->setLabel('Visor de Logs')
                         ->setHeroIcon('eye')
+                        ->setItems([])
                         ->setEndBlock('logs'),
 
                     RkNavigation::make('logsdashboard')
-                        ->setLabel('Dashboard de Logs')
+                        ->setParentId('logs-auditoria')
                         ->setDescription('Resumen y métricas de logs')
+                        ->setLabel('Dashboard de Logs')
                         ->setHeroIcon('chart-pie')
+                        ->setItems([])
                         ->setEndBlock('logsdashboard'),
                 ])
                 ->setEndBlock('logs-auditoria'),
 
-            // Subgrupo: Sesiones y Seguridad
             RkNavigation::makeGroup('sesiones-seguridad')
+                ->setParentId('sistema-monitoreo')
                 ->setLabel('Seguridad')
                 ->setHeroIcon('shield-check')
                 ->setItems([
 
                     RkNavigation::make('sessions')
-                        ->setLabel('Sesiones')
+                        ->setParentId('sesiones-seguridad')
                         ->setDescription('Monitoreo de sesiones activas')
+                        ->setLabel('Sesiones')
                         ->setHeroIcon('users')
+                        ->setItems([])
                         ->setEndBlock('sessions'),
                 ])
                 ->setEndBlock('sesiones-seguridad'),
         ])
         ->setEndBlock('sistema-monitoreo'),
-
 ];
