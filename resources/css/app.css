@@ -97,16 +97,16 @@
 }
 
 @theme {
-    --color-accent: var(--color-amber-400);
-    --color-accent-content: var(--color-amber-600);
-    --color-accent-foreground: var(--color-amber-950);
+    --color-accent: var(--color-indigo-700);
+    --color-accent-content: var(--color-indigo-500);
+    --color-accent-foreground: var(--color-white);
 }
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-amber-400);
-        --color-accent-content: var(--color-amber-400);
-        --color-accent-foreground: var(--color-amber-950);
+        --color-accent: var(--color-indigo-700);
+        --color-accent-content: var(--color-indigo-500);
+        --color-accent-foreground: var(--color-white);
     }
 }
 

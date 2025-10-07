@@ -169,6 +169,15 @@ return [
                         ->setItems([])
                         ->setEndBlock('departamentos'),
 
+                    RkRoute::make('unidades-ejecutoras')
+                        ->setParentId('configuracion')
+                        ->setAccessPermission('configuracion.unidades-ejecutoras.ver')
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\UnidadEjecutora\UnidadesEjecutoras')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('unidades-ejecutoras'),
+
                     RkRoute::make('procesoscompras')
                         ->setParentId('configuracion')
                         ->setAccessPermission('configuracion.procesoscompras.ver')
@@ -244,6 +253,15 @@ return [
                         ->setItems([])
                         ->setEndBlock('planestrategicoinstitucional'),
 
+                    RkRoute::make('asignacionnacionalpresupuestaria')
+                        ->setParentId('consola')
+                        ->setAccessPermission('consola.asignacionnacionalpresupuestaria.ver')
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\Consola\AsignacionPresuNacional')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('asignacionnacionalpresupuestaria'),
+
                     RkRoute::make('asignacionpresupuestaria')
                         ->setParentId('consola')
                         ->setAccessPermission('consola.asignacionpresupuestaria.ver')
@@ -270,6 +288,15 @@ return [
                         ->setRoles(['admin_general'])
                         ->setItems([])
                         ->setEndBlock('techodeptos.detalle-estructura'),
+
+                    RkRoute::make('techonacional')
+                        ->setParentId('consola')
+                        ->setAccessPermission('consola.techonacional.ver')
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\TechoUes\GestionTechoUeNacional')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('techonacional'),
                 ])
                 ->setEndBlock('consola'),
 

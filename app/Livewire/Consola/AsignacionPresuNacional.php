@@ -12,11 +12,9 @@ use App\Models\TechoUes\TechoDepto;
 use App\Models\GrupoGastos\GrupoGasto;
 use App\Models\GrupoGastos\Fuente;
 
-class AsignacionPresupuestaria extends Component
+class AsignacionPresuNacional extends Component
 {
     use WithPagination;
-
-    protected string $layout = 'layouts.app';
 
     public $search = '';
     public $showModal = false;
@@ -32,15 +30,14 @@ class AsignacionPresupuestaria extends Component
     public $name = '';
     public $anio = '';
     public $idInstitucion = '';
-    public $idUE = '';
     
     // Propiedades para múltiples Techos UE
     public $techos = [];
 
     protected $rules = [
+        'name' => 'required|string|max:255',
         'anio' => 'required|integer|min:2020|max:2050',
         'idInstitucion' => 'required|exists:institucions,id',
-        'idUE' => 'required|exists:unidad_ejecutora,id',
         'techos.*.monto' => 'required|numeric|min:0',
         'techos.*.idFuente' => 'required|exists:fuente,id',
     ];
@@ -52,8 +49,6 @@ class AsignacionPresupuestaria extends Component
         'anio.max' => 'El año debe ser menor a 2050.',
         'idInstitucion.required' => 'La institución es obligatoria.',
         'idInstitucion.exists' => 'La institución seleccionada no existe.',
-        'idUE.required' => 'La unidad ejecutora es obligatoria.',
-        'idUE.exists' => 'La unidad ejecutora seleccionada no existe.',
         'techos.*.monto.required' => 'El monto es obligatorio.',
         'techos.*.monto.numeric' => 'El monto debe ser un número.',
         'techos.*.monto.min' => 'El monto debe ser mayor o igual a 0.',
@@ -63,7 +58,6 @@ class AsignacionPresupuestaria extends Component
 
     public function mount()
     {
-        // Inicializar el componente sin parámetros
         $this->resetForm(); // Esto ya establece el año y los techos iniciales
     }
 
@@ -101,41 +95,11 @@ class AsignacionPresupuestaria extends Component
         $this->resetPage();
     }
 
+
+
     public function render()
     {
-        // Obtener la unidad ejecutora del usuario actual a través de su empleado
-        $userUE = null;
-        $user = auth()->user()->load('empleado');
-        
-        if ($user && $user->empleado) {
-            $userUE = $user->empleado->idUnidadEjecutora;
-        }
-
-        // Debug: Log para ver qué UE tiene el usuario (comentado para producción)
-        // \Log::info('AsignacionPresupuestaria Debug', [
-        //     'user_id' => auth()->id(),
-        //     'empleado_exists' => $user && $user->empleado ? true : false,
-        //     'user_UE' => $userUE,
-        //     'empleado_data' => $user && $user->empleado ? $user->empleado->toArray() : null
-        // ]);
-
         $poas = Poa::with(['institucion', 'unidadEjecutora', 'techoUes.grupoGasto', 'techoUes.fuente'])
-            // Filtrar POAs que tengan techos asignados a UEs (no solo idUE directa)
-            ->where(function ($query) {
-                $query->whereNotNull('idUE') // POAs con UE directa
-                      ->orWhereHas('techoUes', function ($q) {
-                          $q->whereNotNull('idUE'); // O POAs con techos asignados a UEs
-                      });
-            })
-            // Filtrar solo POAs de la unidad ejecutora del usuario (si tiene UE asignada)
-            ->when($userUE, function ($query) use ($userUE) {
-                $query->where(function ($q) use ($userUE) {
-                    $q->where('idUE', $userUE) // POAs con UE directa del usuario
-                      ->orWhereHas('techoUes', function ($subQ) use ($userUE) {
-                          $subQ->where('idUE', $userUE); // O POAs con techos de la UE del usuario
-                      });
-                });
-            })
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('anio', 'like', '%' . $this->search . '%')
@@ -153,40 +117,12 @@ class AsignacionPresupuestaria extends Component
             ->orderBy($this->sortField, $this->sortDirection)
              ->paginate(12);
 
-        // Debug: Ver cuántos POAs encuentra después del filtro (comentado para producción)
-        // \Log::info('POAs encontrados después del filtro', [
-        //     'total_poas' => $poas->total(),
-        //     'poas_data' => $poas->map(function($poa) {
-        //         return [
-        //             'id' => $poa->id,
-        //             'name' => $poa->name ?: 'Sin nombre',
-        //             'idUE_directa' => $poa->idUE,
-        //             'ue_name' => $poa->unidadEjecutora->name ?? 'Sin UE directa',
-        //             'techos_con_ue' => $poa->techoUes->where('idUE', '!=', null)->count(),
-        //             'techos_detalle' => $poa->techoUes->where('idUE', '!=', null)->map(function($techo) {
-        //                 return [
-        //                     'idUE' => $techo->idUE,
-        //                     'monto' => $techo->monto,
-        //                     'ue_name' => $techo->unidadEjecutora->name ?? 'Sin nombre UE'
-        //                 ];
-        //             })->toArray()
-        //         ];
-        //     })->toArray()
-        // ]);
-
         // Calcular progreso de departamentos para cada POA
         foreach ($poas as $poa) {
             $poa->progreso_departamentos = $this->calcularProgresoDepartamentos($poa);
         }
 
         $instituciones = Institucion::orderBy('nombre')->get();
-        
-        // Filtrar unidades ejecutoras: solo mostrar la del usuario actual
-        $unidadesEjecutoras = collect();
-        if ($userUE) {
-            $unidadesEjecutoras = UnidadEjecutora::where('id', $userUE)->orderBy('name')->get();
-        }
-        
         $grupoGastos = GrupoGasto::orderBy('nombre')->get();
         $fuentes = Fuente::orderBy('nombre')->get();
         
@@ -197,10 +133,9 @@ class AsignacionPresupuestaria extends Component
             ->orderBy('anio', 'desc')
             ->pluck('anio');
 
-        return view('livewire.consola.asignacion-presupuestaria', [
+        return view('livewire.consola.asignacion-presu-nacional', [
             'poas' => $poas,
             'instituciones' => $instituciones,
-            'unidadesEjecutoras' => $unidadesEjecutoras,
             'grupoGastos' => $grupoGastos,
             'fuentes' => $fuentes,
             'anios' => $anios
@@ -213,6 +148,7 @@ class AsignacionPresupuestaria extends Component
         $this->isEditing = false;
         $this->resetValidation();
         $this->showModal = true;
+        $this->initializeTechos(); // Inicializar techos para POA nacional
     }
 
     public function edit($id)
@@ -222,12 +158,14 @@ class AsignacionPresupuestaria extends Component
         $this->name = $poa->name;
         $this->anio = $poa->anio;
         $this->idInstitucion = $poa->idInstitucion;
-        $this->idUE = $poa->idUE;
         
-        // Cargar múltiples techos si existen
-        $techosExistentes = TechoUe::where('idPoa', $poa->id)->get();
-        if ($techosExistentes->count() > 0) {
-            $this->techos = $techosExistentes->map(function($techo) {
+        // Cargar techos globales del POA nacional (sin UE específica)
+        $techosGlobales = TechoUe::where('idPoa', $poa->id)
+                                 ->whereNull('idUE') // Solo techos globales
+                                 ->get();
+        
+        if ($techosGlobales->count() > 0) {
+            $this->techos = $techosGlobales->map(function($techo) {
                 return [
                     'id' => $techo->id,
                     'monto' => $techo->monto,
@@ -244,51 +182,84 @@ class AsignacionPresupuestaria extends Component
 
     public function save()
     {
-        // Validar techos en edición si es necesario
-        if (!$this->validateTechosEdicion()) {
+        try {
+            // Log para debugging
+            \Log::info('Iniciando save de POA', [
+                'name' => $this->name,
+                'anio' => $this->anio,
+                'idInstitucion' => $this->idInstitucion,
+                'techos' => $this->techos,
+                'isEditing' => $this->isEditing
+            ]);
+
+            // Validar campos básicos
+            $this->validate([
+                'name' => 'required|string|max:255',
+                'anio' => 'required|integer|min:2020|max:2050',
+                'idInstitucion' => 'required|exists:institucions,id',
+            ]);
+
+            \Log::info('Validación básica pasada');
+
+            // Validar techos solo si tienen datos
+            $techosConDatos = collect($this->techos)->filter(function($techo) {
+                return !empty($techo['monto']) || !empty($techo['idFuente']);
+            });
+
+            \Log::info('Techos con datos:', ['count' => $techosConDatos->count()]);
+
+            if ($techosConDatos->count() > 0) {
+                $this->validate([
+                    'techos.*.monto' => 'required|numeric|min:0',
+                    'techos.*.idFuente' => 'required|exists:fuente,id',
+                ]);
+                \Log::info('Validación de techos pasada');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error en save:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            session()->flash('error', 'Error al guardar: ' . $e->getMessage());
             return;
         }
-        
-        $this->validate();
 
-        if ($this->isEditing) {
-            $poa = Poa::findOrFail($this->poaId);
-            $poa->update([
-                'name' => $this->name,
-                'anio' => $this->anio,
-                'idInstitucion' => $this->idInstitucion,
-                'idUE' => $this->idUE,
-            ]);
-            
-            // Actualizar techos preservando las relaciones existentes
-            $this->updateTechosPreservandoRelaciones($poa);
-            
-            session()->flash('message', 'POA actualizado correctamente.');
-        } else {
-            $poa = Poa::create([
-                'name' => $this->name,
-                'anio' => $this->anio,
-                'idInstitucion' => $this->idInstitucion,
-                'idUE' => $this->idUE,
-            ]);
-            
-            // Crear múltiples TechoUe
-            foreach ($this->techos as $techo) {
-                if (!empty($techo['monto']) && !empty($techo['idFuente'])) {
-                    TechoUe::create([
-                        'monto' => $techo['monto'],
-                        'idUE' => $this->idUE,
-                        'idPoa' => $poa->id,
-                        'idGrupo' => null, // Campo mantenido como null ya que existe en la base de datos
-                        'idFuente' => $techo['idFuente'],
-                    ]);
-                }
+        try {
+            if ($this->isEditing) {
+                \Log::info('Editando POA existente');
+                $poa = Poa::findOrFail($this->poaId);
+                $poa->update([
+                    'name' => $this->name,
+                    'anio' => $this->anio,
+                    'idInstitucion' => $this->idInstitucion,
+                ]);
+                
+                // Actualizar techos globales del POA nacional
+                $this->actualizarTechosGlobales($poa);
+                
+                session()->flash('message', 'POA Nacional actualizado correctamente.');
+                \Log::info('POA actualizado exitosamente', ['id' => $poa->id]);
+            } else {
+                \Log::info('Creando nuevo POA');
+                // Crear POA nacional
+                $poa = Poa::create([
+                    'name' => $this->name,
+                    'anio' => $this->anio,
+                    'idInstitucion' => $this->idInstitucion,
+                    'idUE' => null, // POA nacional no tiene UE específica
+                ]);
+                
+                \Log::info('POA creado exitosamente', ['id' => $poa->id]);
+                
+                // Crear techos globales por fuente
+                $this->crearTechosGlobales($poa);
+                
+                session()->flash('message', 'POA Nacional creado correctamente con presupuesto global. Ahora puede distribuir a las unidades ejecutoras.');
             }
-            
-            session()->flash('message', 'POA creado correctamente.');
-        }
 
-        $this->closeModal();
+            $this->closeModal();
+            \Log::info('Save completado exitosamente');
+        } catch (\Exception $e) {
+            \Log::error('Error al guardar POA:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            session()->flash('error', 'Error al guardar el POA: ' . $e->getMessage());
+        }
     }
 
     public function confirmDelete($id)
@@ -328,21 +299,44 @@ class AsignacionPresupuestaria extends Component
         session()->forget('error');
     }
 
+    /**
+     * Crear techos globales para POA nacional (sin UE específica)
+     */
+    private function crearTechosGlobales($poa)
+    {
+        foreach ($this->techos as $techo) {
+            if (!empty($techo['monto']) && $techo['monto'] > 0 && !empty($techo['idFuente'])) {
+                TechoUe::create([
+                    'idPoa' => $poa->id,
+                    'idUE' => null, // Techo global, sin UE específica
+                    'idGrupo' => null,
+                    'idFuente' => $techo['idFuente'],
+                    'monto' => $techo['monto'],
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Actualizar techos globales para POA nacional
+     */
+    private function actualizarTechosGlobales($poa)
+    {
+        // Eliminar techos globales existentes
+        TechoUe::where('idPoa', $poa->id)
+               ->whereNull('idUE') // Solo techos globales
+               ->delete();
+
+        // Crear nuevos techos globales
+        $this->crearTechosGlobales($poa);
+    }
+
     private function resetForm()
     {
         $this->poaId = null;
         $this->name = '';
         $this->anio = date('Y');
         $this->idInstitucion = '';
-        
-        // Pre-seleccionar automáticamente la unidad ejecutora del usuario
-        $user = auth()->user();
-        if ($user && $user->empleado) {
-            $this->idUE = $user->empleado->idUnidadEjecutora;
-        } else {
-            $this->idUE = '';
-        }
-        
         $this->techos = []; // Limpia completamente el array de techos
         $this->initializeTechos(); // Inicializa con un techo vacío
     }
@@ -503,43 +497,50 @@ class AsignacionPresupuestaria extends Component
     }
 
     /**
-     * Calcula el progreso de departamentos para un POA específico
-     * Mide: porcentaje de departamentos con presupuesto asignado vs total de departamentos
+     * Calcula el progreso de asignaciones a unidades ejecutoras para un POA nacional
+     * Mide: porcentaje de UEs con presupuesto asignado vs total de UEs
      *
      * @param Poa $poa
      * @return array
      */
     private function calcularProgresoDepartamentos($poa)
     {
-        // Determinar si es un POA de UE específica o institucional
-        if ($poa->unidadEjecutora) {
-            // POA de UE específica: contar solo departamentos de esa UE
-            $totalDepartamentos = $poa->unidadEjecutora->departamentos()->count();
-        } else {
-            // POA institucional: contar departamentos de todas las UEs de la institución
-            $totalDepartamentos = \App\Models\Departamento\Departamento::whereHas('unidadEjecutora', function($query) use ($poa) {
-                $query->where('idInstitucion', $poa->idInstitucion);
-            })->count();
-        }
+        // Para POA nacional, calculamos el progreso de UEs en lugar de departamentos
+        return $this->calcularProgresoUnidadesEjecutoras($poa);
+    }
+
+    /**
+     * Calcula el progreso de asignaciones a unidades ejecutoras para un POA nacional
+     * Mide: porcentaje de UEs con presupuesto asignado vs total de UEs
+     *
+     * @param Poa $poa
+     * @return array
+     */
+    private function calcularProgresoUnidadesEjecutoras($poa)
+    {
+        // Obtener el total de unidades ejecutoras
+        $totalUEs = UnidadEjecutora::count();
         
-        // Si no hay departamentos, el progreso es 0
-        if ($totalDepartamentos == 0) {
+        // Si no hay UEs, el progreso es 0
+        if ($totalUEs == 0) {
             return [
                 'porcentaje' => 0,
-                'departamentos_con_presupuesto' => 0,
-                'total_departamentos' => 0,
+                'departamentos_con_presupuesto' => 0, // Mantener nombre para compatibilidad
+                'total_departamentos' => 0, // Mantener nombre para compatibilidad
+                'ues_con_presupuesto' => 0,
+                'total_ues' => 0,
                 'color' => 'bg-red-500'
             ];
         }
         
-        // Contar departamentos con presupuesto asignado en este POA
-        $departamentosConPresupuesto = $poa->techoDeptos()
+        // Contar UEs con presupuesto asignado (techos con monto > 0)
+        $uesConPresupuesto = TechoUe::where('idPoa', $poa->id)
             ->where('monto', '>', 0)
-            ->distinct('idDepartamento')
-            ->count('idDepartamento');
+            ->distinct('idUE')
+            ->count('idUE');
         
         // Calcular porcentaje
-        $porcentaje = round(($departamentosConPresupuesto / $totalDepartamentos) * 100);
+        $porcentaje = round(($uesConPresupuesto / $totalUEs) * 100);
         
         // Determinar color según el porcentaje
         $color = 'bg-red-500'; // Rojo por defecto
@@ -551,10 +552,27 @@ class AsignacionPresupuestaria extends Component
         
         return [
             'porcentaje' => $porcentaje,
-            'departamentos_con_presupuesto' => $departamentosConPresupuesto,
-            'total_departamentos' => $totalDepartamentos,
+            'departamentos_con_presupuesto' => $uesConPresupuesto, // Mantener nombre para compatibilidad
+            'total_departamentos' => $totalUEs, // Mantener nombre para compatibilidad
+            'ues_con_presupuesto' => $uesConPresupuesto,
+            'total_ues' => $totalUEs,
             'color' => $color
         ];
+    }
+
+    /**
+     * Navega al CRUD de TechoUE Nacional para el POA seleccionado
+     * Aquí se gestionan las asignaciones a nivel de unidades ejecutoras
+     *
+     * @param int $poaId
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function gestionarTechoUeNacional($poaId)
+    {
+        // Redirigir a la gestión de techos a nivel nacional (todas las UEs)
+        return redirect()->route('techonacional', [
+            'idPoa' => $poaId
+        ]);
     }
 
     /**
@@ -564,31 +582,8 @@ class AsignacionPresupuestaria extends Component
      * @param int $idUE
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function gestionarTechoDepto($poaId, $idUE = null)
+    public function gestionarTechoDepto($poaId, $idUE)
     {
-        // Validar que los parámetros existan
-        if (!$poaId) {
-            session()->flash('error', 'POA no especificado para gestionar techos departamentales.');
-            return redirect()->back();
-        }
-
-        // Si no se proporciona idUE, intentar obtenerlo del POA
-        if (!$idUE) {
-            $poa = Poa::with('techoUes.unidadEjecutora')->find($poaId);
-            if (!$poa) {
-                session()->flash('error', 'POA no encontrado.');
-                return redirect()->back();
-            }
-
-            // Obtener UE directa o desde techos
-            $idUE = $poa->idUE ?? $poa->techoUes->whereNotNull('idUE')->first()?->idUE;
-            
-            if (!$idUE) {
-                session()->flash('error', 'Este POA no tiene una Unidad Ejecutora asignada.');
-                return redirect()->back();
-            }
-        }
-        
         // Usar la ruta con estructura de 3 partes para mejor breadcrumb
         return redirect()->route('techodeptos', [
             'idPoa' => $poaId,
@@ -624,14 +619,13 @@ class AsignacionPresupuestaria extends Component
                 $techoExistente->update([
                     'monto' => $techoData['monto'],
                     'idFuente' => $techoData['idFuente'],
-                    'idUE' => $this->idUE,
                 ]);
                 $techosActualizados->put($techoId, $techoExistente);
             } else {
                 // Crear nuevo techo
                 $nuevoTecho = TechoUe::create([
                     'monto' => $techoData['monto'],
-                    'idUE' => $this->idUE,
+                    'idUE' => null,
                     'idPoa' => $poa->id,
                     'idGrupo' => null,
                     'idFuente' => $techoData['idFuente'],
@@ -659,6 +653,98 @@ class AsignacionPresupuestaria extends Component
         return false; // Ya no manejamos advertencias aquí
     }
     
+    /**
+     * Crea asignaciones automáticas a todas las unidades ejecutoras
+     * Similar a como se asigna a departamentos en la asignación regular
+     * 
+     * @param Poa $poa
+     * @return void
+     */
+    private function crearAsignacionesUnidadesEjecutoras($poa)
+    {
+        // Obtener todas las unidades ejecutoras activas
+        $unidadesEjecutoras = UnidadEjecutora::all();
+        
+        // Obtener los techos creados para este POA
+        $techosCreados = TechoUe::where('idPoa', $poa->id)->get();
+        
+        // Para cada unidad ejecutora, crear asignaciones basadas en los techos del POA
+        foreach ($unidadesEjecutoras as $ue) {
+            
+            // Crear techos para esta UE basados en los techos del POA original
+            foreach ($techosCreados as $techoOriginal) {
+                TechoUe::create([
+                    'monto' => 0, // Inicialmente sin monto asignado
+                    'idUE' => $ue->id,
+                    'idPoa' => $poa->id,
+                    'idGrupo' => $techoOriginal->idGrupo,
+                    'idFuente' => $techoOriginal->idFuente,
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Actualiza las asignaciones a todas las unidades ejecutoras cuando se edita un POA
+     * 
+     * @param Poa $poa
+     * @return void
+     */
+    private function actualizarAsignacionesUnidadesEjecutoras($poa)
+    {
+        // Obtener todas las unidades ejecutoras
+        $unidadesEjecutoras = UnidadEjecutora::all();
+        
+        // Obtener los techos actualizados del POA principal
+        $techosActualizados = TechoUe::where('idPoa', $poa->id)
+            ->whereNull('idUE')
+            ->get();
+        
+        // Para cada unidad ejecutora
+        foreach ($unidadesEjecutoras as $ue) {
+            
+            // Obtener techos existentes de esta UE para este POA
+            $techosExistentesUE = TechoUe::where('idPoa', $poa->id)
+                ->where('idUE', $ue->id)
+                ->get()
+                ->keyBy('idFuente');
+            
+            // Sincronizar con los techos del POA principal
+            foreach ($techosActualizados as $techoActualizado) {
+                if ($techosExistentesUE->has($techoActualizado->idFuente)) {
+                    // Ya existe, mantener el monto actual pero actualizar otros campos si es necesario
+                    $techoExistente = $techosExistentesUE->get($techoActualizado->idFuente);
+                    $techoExistente->update([
+                        'idGrupo' => $techoActualizado->idGrupo,
+                        // Mantener el monto existente
+                    ]);
+                } else {
+                    // No existe, crear nuevo techo para esta UE
+                    TechoUe::create([
+                        'monto' => 0, // Inicialmente sin monto
+                        'idUE' => $ue->id,
+                        'idPoa' => $poa->id,
+                        'idGrupo' => $techoActualizado->idGrupo,
+                        'idFuente' => $techoActualizado->idFuente,
+                    ]);
+                }
+            }
+            
+            // Eliminar techos que ya no existen en el POA principal
+            $fuentesActualizadas = $techosActualizados->pluck('idFuente')->toArray();
+            $techosAEliminar = $techosExistentesUE->filter(function($techo) use ($fuentesActualizadas) {
+                return !in_array($techo->idFuente, $fuentesActualizadas);
+            });
+            
+            foreach ($techosAEliminar as $techoAEliminar) {
+                // Solo eliminar si no tiene asignaciones departamentales
+                if ($techoAEliminar->techoDeptos()->count() == 0) {
+                    $techoAEliminar->delete();
+                }
+            }
+        }
+    }
+
     /**
      * Limpia todos los mensajes de sesión
      */

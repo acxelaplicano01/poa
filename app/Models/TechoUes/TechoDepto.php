@@ -46,7 +46,7 @@ class TechoDepto extends BaseModel
 
     public function techoUE()
     {
-        return $this->belongsTo(TechoUE::class, 'idTechoUE');
+        return $this->belongsTo(TechoUe::class, 'idTechoUE');
     }
 
     public function grupoGasto()

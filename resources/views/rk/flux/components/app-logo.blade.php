@@ -1,6 +1,11 @@
-<div class="flex aspect-square size-8 items-center justify-center rounded-md bg-accent-content text-accent-foreground">
-    <x-rk.flux::components.app-logo-icon class="size-5 fill-current text-white dark:text-black" />
-</div>
-<div class="ms-1 grid flex-1 text-start text-sm">
-    <span class="mb-0.5 truncate leading-tight font-semibold">Laravel Starter Kit</span>
+<div class="flex items-center justify-start rtl:justify-end">
+  <a href="/dashboard" class="flex ms-2 md:me-24">
+    <!-- Logo para modo claro -->
+    <img src="{{ asset('Logo/poav2_grey.png') }}" alt="Logo" height="80px" width="80px" class="dark:hidden" />
+
+    <!-- Logo para modo oscuro -->
+    <img src="{{ asset('Logo/poav2.webp') }}" alt="Logo" height="80px" width="80px" class="hidden dark:block" />
+
+    <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white"></span>
+  </a>
 </div>

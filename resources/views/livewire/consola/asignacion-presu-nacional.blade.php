@@ -44,7 +44,17 @@
                                 class="w-full"
                             />
                         </div>
-                       
+                        <x-spinner-button wire:click="create()"
+                            loadingTarget="create" 
+                            :loadingText="__('Abriendo...')"
+                            class="flex w-full sm:w-auto justify-center">
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            {{ __('Nuevo POA') }}
+                        </x-spinner-button>
                     </div>
                 </div>
             </div>
@@ -54,15 +64,10 @@
                 @if($poas->count() > 0)
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
                         @foreach($poas as $poa)
-                            @php
-                                // Obtener la UE: directa del POA o desde el primer techo asignado
-                                $ueId = $poa->idUE ?? $poa->techoUes->whereNotNull('idUE')->first()?->idUE;
-                                $ueNombre = $poa->unidadEjecutora->name ?? $poa->techoUes->whereNotNull('idUE')->first()?->unidadEjecutora?->name ?? 'N/A';
-                            @endphp
                             <div class="bg-gradient-to-br from-indigo-700 to-purple-700 dark:from-indigo-900 dark:to-purple-900 rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200 cursor-pointer relative group p-5">
-                                <div wire:click="gestionarTechoDepto({{ $poa->id }}, {{ $ueId }})">
+                                <div wire:click="gestionarTechoUeNacional({{ $poa->id }})">
                                     <div class="absolute top-2 right-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Gestionar Techos Depto
+                                        Gestionar Presupuesto UEs
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <h3 class="text-6xl font-extrabold">{{ $poa->anio }}</h3>
@@ -78,21 +83,17 @@
                                                 {{ Str::limit($poa->institucion->nombre ?? 'N/A', 15) }}
                                             </span>
                                         </div>
-                                        <div class="flex items-center justify-between">
-                                            <span>Unidad Ejecutora:</span>
-                                            <span class="font-semibold truncate ml-2" title="{{ $ueNombre }}">
-                                                {{ Str::limit($ueNombre, 15) }}
-                                            </span>
-                                        </div>
+                                        
                                         <div class="flex items-center justify-between">
                                             <span>Presupuesto:</span>
                                             <span class="font-semibold">
                                                 @php
-                                                    // Calcular presupuesto solo de la UE específica
-                                                    $presupuestoUE = $ueId ? $poa->techoUes->where('idUE', $ueId)->sum('monto') : 0;
+                                                    // Sumar solo techos globales (sin UE específica)
+                                                    $techosGlobales = $poa->techoUes->whereNull('idUE');
+                                                    $totalGlobal = $techosGlobales->sum('monto');
                                                 @endphp
-                                                @if($presupuestoUE > 0)
-                                                   L. {{ number_format($presupuestoUE, 2) }}
+                                                @if($totalGlobal > 0)
+                                                    L. {{ number_format($totalGlobal, 2) }} 
                                                 @else
                                                     No asignado
                                                 @endif
@@ -114,11 +115,27 @@
                                             </div>
                                         </div>
                                         <div class="text-xs text-indigo-50 opacity-75">
-                                            {{ $poa->progreso_departamentos['departamentos_con_presupuesto'] }} de {{ $poa->progreso_departamentos['total_departamentos'] }} departamentos con presupuesto
+                                            {{ $poa->progreso_departamentos['departamentos_con_presupuesto'] }} de {{ $poa->progreso_departamentos['total_departamentos'] }} unidades ejecutoras con presupuesto
                                         </div>
                                     </div>
                                     
                                 </div>
+                                    <div class="mt-5 flex space-x-2">
+                                        <button wire:click="edit({{ $poa->id }})" 
+                                            class="flex-1 flex items-center justify-center px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-zinc-900 font-medium rounded-md transition-colors text-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                                                <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span>Editar</span>
+                                        </button>
+                                        <button wire:click="confirmDelete({{ $poa->id }})" 
+                                            class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-md transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
                             </div>
                         @endforeach
                     </div>
@@ -180,4 +197,7 @@
             @endif
         </div>
     </div>
+
+    @include('livewire.poa.poa-nacional.create')
+    @include('livewire.poa.poa-nacional.delete-confirmation')
 </div>

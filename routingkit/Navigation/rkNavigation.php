@@ -111,6 +111,14 @@ return [
                         ->setItems([])
                         ->setEndBlock('departamentos'),
 
+                    RkNavigation::make('unidades-ejecutoras')
+                        ->setParentId('estructura-organizacional')
+                        ->setDescription('Gestión de unidades ejecutoras')
+                        ->setLabel('Unidades Ejecutoras')
+                        ->setHeroIcon('building-library')
+                        ->setItems([])
+                        ->setEndBlock('unidades-ejecutoras'),
+
                     RkNavigation::make('instituciones')
                         ->setParentId('estructura-organizacional')
                         ->setDescription('Gestión de instituciones')
@@ -248,6 +256,14 @@ return [
                 ->setItems([])
                 ->setEndBlock('planestrategicoinstitucional'),
 
+            RkNavigation::make('asignacionnacionalpresupuestaria')
+                ->setParentId('consola')
+                ->setDescription('Gestión de la asignación presupuestaria nacional')
+                ->setLabel('Asignación nacional')
+                ->setHeroIcon('flag')
+                ->setItems([])
+                ->setEndBlock('asignacionnacionalpresupuestaria'),
+
             RkNavigation::make('asignacionpresupuestaria')
                 ->setParentId('consola')
                 ->setDescription('Gestión de la asignación presupuestaria')
@@ -263,6 +279,14 @@ return [
                 ->setHeroIcon('building-storefront')
                 ->setItems([])
                 ->setEndBlock('techodeptos'),
+
+            RkNavigation::make('techonacional')
+                ->setParentId('consola')
+                ->setDescription('Gestión de techos presupuestarios por Unidades Ejecutoras')
+                ->setLabel('Techos presupuestarios UE')
+                ->setHeroIcon('building-storefront')
+                ->setItems([])
+                ->setEndBlock('techonacional'),
         ])
         ->setEndBlock('consola'),
 

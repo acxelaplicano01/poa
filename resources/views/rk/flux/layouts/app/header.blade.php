@@ -6,7 +6,7 @@
 
     $footerItems = $footerQuery->get();
 
-   
+
 
     $configNode = $footerQuery->getSubBranch('settings_group')->first();
 
@@ -29,11 +29,11 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 
 <head>
-    
+
 
     @include('rk.flux.partials.head')
 
-      @fluxAppearance
+    @fluxAppearance
 </head>
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
@@ -108,6 +108,15 @@
                         {{ __('Log Out') }}
                     </flux:menu.item>
                 </form>
+                <section class="w-full">
+                    <flux:menu.separator />
+                    <flux:radio.group x-data variant="segmented" x-model="$flux.appearance">
+                        <flux:radio value="light" icon="sun">{{ __('Light') }}</flux:radio>
+                        <flux:radio value="dark" icon="moon">{{ __('Dark') }}</flux:radio>
+                        <flux:radio value="system" icon="computer-desktop">{{ __('System') }}</flux:radio>
+                    </flux:radio.group>
+                </section>
+
             </flux:menu>
         </flux:dropdown>
     </flux:header>
@@ -148,8 +157,8 @@
 
         <!-- Desktop User Menu -->
         <flux:dropdown class="hidden lg:block" position="bottom" align="start">
-            <flux:profile :email="auth()->user()->email"  :name="auth()->user()->firts_name" :initials="auth()->user()->initials()"
-                icon="chevrons-up-down" />
+            <flux:profile :email="auth()->user()->email" :name="auth()->user()->firts_name"
+                :initials="auth()->user()->initials()" icon="chevrons-up-down" />
 
             <flux:menu class="w-[220px]">
                 <flux:menu.radio.group>
@@ -160,7 +169,7 @@
                                     class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                     {{ auth()->user()->initials() }}
                                 </span>
-                            
+
                             </span>
 
                             <div class="grid flex-1 text-start text-sm leading-tight">
@@ -196,8 +205,8 @@
     </flux:header>
     {{ $slot }}
 
-   
-  @fluxScripts
+
+    @fluxScripts
 </body>
 
 </html>

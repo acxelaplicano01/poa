@@ -1,6 +1,6 @@
 <?php
 
-// use App\Http\Controllers\LogViewerController;
+// use App\Http\Controllers\LivewireController;
 // use App\Http\Controllers\ModuleRedirectController;
 // use App\Http\Middleware\CheckModuleAccess;
 // use App\Livewire\Actas\TipoActaEntregas;
@@ -43,6 +43,30 @@ Route::get('/dashboard', function () {
 })
     ->middleware(['auth:sanctum', 'verified'])
     ->name('dashboard');
+
+Route::get('/debug-poas', function () {
+    $poas = \App\Models\Poa\Poa::with('techoUes')->get();
+    $debugInfo = [];
+    foreach ($poas as $poa) {
+        $debugInfo[] = [
+            'poa' => $poa->name . ' (' . $poa->anio . ')',
+            'id' => $poa->id,
+            'techos_count' => $poa->techoUes->count(),
+            'total_monto' => $poa->techoUes->sum('monto'),
+            'techos_details' => $poa->techoUes->map(function($techo) {
+                return [
+                    'id' => $techo->id,
+                    'monto' => $techo->monto,
+                    'idUE' => $techo->idUE,
+                    'idFuente' => $techo->idFuente,
+                    'idGrupo' => $techo->idGrupo,
+                ];
+            })
+        ];
+    }
+    
+    return response()->json($debugInfo);
+});
 
 // Route::view('/error/404', 'errors.404')->name('error.404');
 // Route::view('/error/500', 'errors.500')->name('error.500');
@@ -197,3 +221,10 @@ Route::get('/dashboard', function () {
 //     });
 
 // });
+
+// Ruta temporal para techonacional con parámetro
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/techonacional/{idPoa}', \App\Livewire\TechoUes\GestionTechoUeNacional::class)
+        ->name('techonacional')
+        ->middleware('can:consola.techonacional.ver');
+});

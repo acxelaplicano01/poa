@@ -67,6 +67,12 @@ class GestionTechoDeptos extends Component
             $this->loadDepartamentos();
             $this->loadTechoUes();
             
+            // Verificar que la UE tenga techos asignados
+            if ($this->techoUes->isEmpty()) {
+                session()->flash('error', 'Esta Unidad Ejecutora no tiene techos presupuestarios asignados. Debe asignar techos a la UE antes de poder distribuirlos a departamentos.');
+                return redirect()->route('gestion-techo-ue-nacional', ['idPoa' => $this->idPoa]);
+            }
+            
             // Inicializar montos por fuente
             $this->initializeMontosPorFuente();
         } else {

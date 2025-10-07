@@ -74,6 +74,11 @@ class User extends Authenticatable
         return \Spatie\Permission\Models\Role::find($this->active_role_id);
     }
 
+    // Relación con empleado
+    public function empleado()
+    {
+        return $this->belongsTo(\App\Models\Empleados\Empleado::class, 'idEmpleado');
+    }
 
      /**
      * Get the user's initials
@@ -83,7 +88,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 2))
             ->implode('');
     }
 }
