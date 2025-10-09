@@ -158,14 +158,6 @@
                                 <p class="text-zinc-500 dark:text-zinc-400 mb-8">
                                     Comienza creando tu primer Plan Operativo Anual para gestionar tus proyectos y presupuestos.
                                 </p>
-                                <x-button wire:click="create()" class="inline-flex bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700">
-                                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    Crear POA
-                                </x-button>
                             @endif
                         </div>
                     </div>

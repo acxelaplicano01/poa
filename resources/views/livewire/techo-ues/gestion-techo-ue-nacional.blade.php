@@ -117,19 +117,19 @@
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         <div class="text-center">
                                             <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                                                L. {{ number_format($totalGeneral / 1000000, 1) }}M
+                                                L. {{ number_format($totalGeneral, 2) }}
                                             </div>
                                             <div class="text-sm text-zinc-500 dark:text-zinc-400">Techo Total</div>
                                         </div>
                                         <div class="text-center">
                                             <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-                                                L. {{ number_format($asignadoGeneral / 1000000, 1) }}M
+                                                L. {{ number_format($asignadoGeneral, 2) }}
                                             </div>
                                             <div class="text-sm text-zinc-500 dark:text-zinc-400">Asignado a UEs</div>
                                         </div>
                                         <div class="text-center">
                                             <div class="text-2xl font-bold {{ $disponibleGeneral > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                                L. {{ number_format($disponibleGeneral / 1000000, 1) }}M
+                                                L. {{ number_format($disponibleGeneral, 2) }}
                                             </div>
                                             <div class="text-sm text-zinc-500 dark:text-zinc-400">Disponible</div>
                                         </div>
@@ -178,7 +178,7 @@
                                             <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-6 hover:shadow-lg transition-shadow duration-200">
                                                 <div class="flex items-center justify-between mb-4">
                                                     <h4 class="text-md font-semibold text-zinc-900 dark:text-zinc-100 truncate" title="{{ $fuente->nombre }}">
-                                                        {{ Str::limit($fuente->nombre, 25) }}
+                                                        {{ $fuente->identificador }} - {{ Str::limit($fuente->nombre, 25) }}
                                                     </h4>
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $estadoClase }} text-white">
                                                         {{ $estadoTexto }}
@@ -189,21 +189,21 @@
                                                     <div class="flex justify-between items-center">
                                                         <span class="text-sm text-zinc-500 dark:text-zinc-400">Techo Global:</span>
                                                         <span class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                                                            L. {{ number_format($techoGlobal, 0) }}
+                                                            L. {{ number_format($techoGlobal, 2) }}
                                                         </span>
                                                     </div>
                                                     
                                                     <div class="flex justify-between items-center">
                                                         <span class="text-sm text-zinc-500 dark:text-zinc-400">Asignado a UEs:</span>
                                                         <span class="text-sm font-semibold {{ $colorTexto }}">
-                                                            L. {{ number_format($asignadoUE, 0) }}
+                                                            L. {{ number_format($asignadoUE, 2) }}
                                                         </span>
                                                     </div>
                                                     
                                                     <div class="flex justify-between items-center">
                                                         <span class="text-sm text-zinc-500 dark:text-zinc-400">Disponible:</span>
                                                         <span class="text-sm font-semibold {{ $disponible > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                                            L. {{ number_format($disponible, 0) }}
+                                                            L. {{ number_format($disponible, 2) }}
                                                         </span>
                                                     </div>
                                                     

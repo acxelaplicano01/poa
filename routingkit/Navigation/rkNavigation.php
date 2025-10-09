@@ -260,7 +260,7 @@ return [
                 ->setParentId('consola')
                 ->setDescription('Gestión de la asignación presupuestaria nacional')
                 ->setLabel('Asignación nacional')
-                ->setHeroIcon('flag')
+                ->setHeroIcon('chart-pie')
                 ->setItems([])
                 ->setEndBlock('asignacionnacionalpresupuestaria'),
 
@@ -284,7 +284,7 @@ return [
                 ->setParentId('consola')
                 ->setDescription('Gestión de techos presupuestarios por Unidades Ejecutoras')
                 ->setLabel('Techos presupuestarios UE')
-                ->setHeroIcon('building-storefront')
+                ->setHeroIcon('arrow-trending-up')
                 ->setItems([])
                 ->setEndBlock('techonacional'),
         ])

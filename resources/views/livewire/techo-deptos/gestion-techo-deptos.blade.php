@@ -115,19 +115,19 @@
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <div class="text-center">
                                         <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                                            {{ number_format($totalGeneral, 0) }}
+                                            {{ number_format($totalGeneral, 2) }}
                                         </div>
                                         <div class="text-sm text-zinc-500 dark:text-zinc-400">Techo</div>
                                     </div>
                                     <div class="text-center">
                                         <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                                            {{ number_format($asignadoGeneral, 0) }}
+                                            {{ number_format($asignadoGeneral, 2) }}
                                         </div>
                                         <div class="text-sm text-zinc-500 dark:text-zinc-400">Asignado</div>
                                     </div>
                                     <div class="text-center">
                                         <div class="text-2xl font-bold {{ $disponibleGeneral > 0 ? 'text-green-600' : 'text-red-600' }}">
-                                            {{ number_format($disponibleGeneral, 0) }}
+                                            {{ number_format($disponibleGeneral, 2) }}
                                         </div>
                                         <div class="text-sm text-zinc-500 dark:text-zinc-400">Disponible</div>
                                     </div>
@@ -145,7 +145,7 @@
                                     <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-6 hover:shadow-lg transition-shadow duration-200">
                                         <div class="flex items-center justify-between mb-4">
                                             <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                                                 {{ $fuente['identificador'] }} - {{ $fuente['fuente'] }}
+                                                {{ $fuente['identificador'] }} - {{ $fuente['fuente'] }}
                                             </h3>
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $fuente['estado']['clase'] }} text-white">
                                                 {{ $fuente['estado']['texto'] }}
