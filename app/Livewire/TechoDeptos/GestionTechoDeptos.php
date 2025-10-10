@@ -536,12 +536,15 @@ class GestionTechoDeptos extends Component
 
     public function verDetalleEstructura($estructura)
     {
-        // Redirigir a la vista de detalle de estructura con los parámetros necesarios
-        return redirect()->route('techodeptos.detalle-estructura', [
+        // Construir URL con query parameters para el componente DetalleEstructura
+        $queryParams = http_build_query([
             'idPoa' => $this->idPoa,
             'idUE' => $this->idUE,
-            'estructura' => urlencode($estructura)
+            'estructura' => $estructura
         ]);
+        
+        // Redirigir a la ruta del detalle de estructura con query parameters
+        return redirect()->to(route('techodeptos.detalle-estructura') . '?' . $queryParams);
     }
 
     private function getMetricasPorEstructura()

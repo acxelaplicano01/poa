@@ -124,12 +124,12 @@ class GestionTechoUeNacional extends Component
 
             // Calcular resumen por fuente de financiamiento
             $resumenPorFuente = $techoUesConTecho->groupBy(function($techo) {
-                    return $techo->fuente ? $techo->fuente->nombre : 'Sin fuente';
+                    return $techo->fuente ? $techo->fuente->identificador . " - " . $techo->fuente->nombre : 'Sin fuente';
                 })
-                ->map(function($grupo) {
+                ->map(function($fuente) {
                     return [
-                        'cantidad' => $grupo->count(),
-                        'monto' => $grupo->sum('monto')
+                        'cantidad' => $fuente->count(),
+                        'monto' => $fuente->sum('monto')
                     ];
                 });
         }

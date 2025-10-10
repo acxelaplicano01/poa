@@ -1,38 +1,39 @@
-<x-modal wire:model="showModal" maxWidth="lg">
+ <!-- Modal para Crear/Editar Techo -->
+    <x-modal wire:model="showModal" maxWidth="lg">
         <div class="px-6 py-4">
             <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-                {{ $isEditing ? 'Editar Techos Departamentales' : 'Crear Nuevos Techos Departamentales' }}
+                {{ $isEditing ? 'Editar Techo Presupuestario' : 'Crear Techo Presupuestario' }}
             </h3>
             
             <form wire:submit.prevent="save">            
-                <!-- Departamento -->
-                @if($idDepartamento && !$isEditing)
-                    <!-- Departamento preseleccionado (solo lectura) -->
+                <!-- Selector de Unidad Ejecutora -->
+                @if($idUnidadEjecutora && !$isEditing)
+                    <!-- UE preseleccionada (solo lectura) -->
                     <div class="mb-6">
-                        <x-label value="{{ __('Departamento Seleccionado') }}" class="mb-2" />
+                        <x-label value="{{ __('Unidad Ejecutora Seleccionada') }}" class="mb-2" />
                         <div class="p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-md">
                             <div class="flex items-center">
                                 <svg class="h-5 w-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h6m-6 4h6m-6 4h6" />
                                 </svg>
                                 <span class="text-sm font-medium text-indigo-900 dark:text-indigo-100">
-                                    {{ collect($departamentos)->firstWhere('id', $idDepartamento)?->name ?? 'Departamento seleccionado' }}
+                                    {{ collect($unidadesEjecutoras)->firstWhere('id', $idUnidadEjecutora)?->name ?? 'Unidad Ejecutora seleccionada' }}
                                 </span>
                             </div>
                         </div>
                     </div>
                 @else
-                    <!-- Select de departamento (para modo edición o creación libre) -->
+                    <!-- Select de UE (para modo edición o creación libre) -->
                     <div class="mb-6">
-                        <x-label for="idDepartamento" value="{{ __('Departamento') }}" class="mb-2" />
+                        <x-label for="idUnidadEjecutora" value="{{ __('Unidad Ejecutora') }}" class="mb-2" />
                         <x-select 
-                            id="idDepartamento" 
-                            wire:model.live="idDepartamento"
-                            :options="collect($departamentos)->map(fn($depto) => ['value' => $depto->id, 'text' => $depto->name])->prepend(['value' => '', 'text' => 'Seleccione un departamento'])->toArray()"
+                            id="idUnidadEjecutora" 
+                            wire:model.live="idUnidadEjecutora"
+                            :options="collect($unidadesEjecutoras)->map(fn($ue) => ['value' => $ue->id, 'text' => $ue->name . ' (' . ($ue->descripcion ?? 'Sin descripción') . ')'])->prepend(['value' => '', 'text' => 'Seleccione una unidad ejecutora'])->toArray()"
                             class="mt-1 block w-full"
                             :disabled="$isEditing"
                         />
-                        <x-input-error for="idDepartamento" class="mt-2" />
+                        <x-input-error for="idUnidadEjecutora" class="mt-2" />
                     </div>
                 @endif
 
@@ -49,44 +50,17 @@
                     @endphp
                     <div class="mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mr-3">
-                                    <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h4 class="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                                        Total Asignado
-                                    </h4>
-                                    <p class="text-xs text-blue-600 dark:text-blue-300">
-                                        Suma de todas las fuentes
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-lg font-bold text-blue-900 dark:text-blue-100">
-                                    {{ number_format($totalAsignado, 2) }}
-                                </p>
-                                @if($totalAsignado > 0)
-                                    <p class="text-xs text-green-600 dark:text-green-400">
-                                        ✓ Asignación activa
-                                    </p>
-                                @else
-                                    <p class="text-xs text-zinc-500 dark:text-zinc-400">
-                                        Sin asignación
-                                    </p>
-                                @endif
-                            </div>
+                            <span class="text-sm font-medium text-blue-900 dark:text-blue-100">Total a Asignar:</span>
+                            <span class="text-lg font-bold text-blue-900 dark:text-blue-100">L. {{ number_format($totalAsignado, 2) }} </span>
                         </div>
                     </div>
-                    
-                    @if(count($techoUes) > 0)
+
+                    @if(count($fuentes) > 0)
                         <div class="space-y-4">
-                            @foreach($techoUes as $techoUe)
+                            @foreach($fuentes as $fuente)
                                 @php
-                                    $disponibilidad = $this->getDisponibilidadFuente($techoUe->id);
-                                    $montoActual = floatval($montosPorFuente[$techoUe->id] ?? 0);
+                                    $disponibilidad = $this->getDisponibilidadFuente($fuente->id);
+                                    $montoActual = floatval($montosPorFuente[$fuente->id] ?? 0);
                                     $maxMonto = $disponibilidad['disponible'] + $montoActual;
                                     $minMonto = $disponibilidad['minimo'];
                                 @endphp
@@ -101,10 +75,10 @@
                                             </div>
                                             <div>
                                                 <h4 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                                                   {{ $techoUe->fuente->identificador ?? 'Sin identificador' }} - {{ $techoUe->fuente->nombre ?? 'Sin fuente' }}
+                                                   {{ $fuente->nombre ?? 'Sin fuente' }}
                                                 </h4>
                                                 <p class="text-xs text-zinc-500 dark:text-zinc-400">
-                                                    Total: {{ number_format($techoUe->monto, 2) }}
+                                                    Total: {{ number_format($disponibilidad['total'], 2) }}
                                                 </p>
                                             </div>
                                         </div>
@@ -125,14 +99,14 @@
                                     </div>
                                     
                                     <div class="flex items-center space-x-3">
-                                        <x-label for="monto_{{ $techoUe->id }}" value="Monto a asignar" class="text-sm whitespace-nowrap" />
+                                        <x-label for="monto_{{ $fuente->id }}" value="Monto a asignar" class="text-sm whitespace-nowrap" />
                                         <x-input 
-                                            id="monto_{{ $techoUe->id }}" 
+                                            id="monto_{{ $fuente->id }}" 
                                             type="number"
                                             step="0.01"
                                             min="{{ $minMonto }}"
                                             max="{{ $maxMonto }}"
-                                            wire:model.live="montosPorFuente.{{ $techoUe->id }}"
+                                            wire:model.live="montosPorFuente.{{ $fuente->id }}"
                                             class="flex-1"
                                             placeholder="{{ $minMonto > 0 ? number_format($minMonto, 2) : '0.00' }}"
                                         />
@@ -141,7 +115,7 @@
                                     @if($maxMonto <= 0)
                                         <div class="mt-2 flex items-center text-red-600 dark:text-red-400">
                                             <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                                             </svg>
                                             <span class="text-xs">Presupuesto agotado</span>
                                         </div>
@@ -168,7 +142,7 @@
                                 No hay fuentes disponibles
                             </h3>
                             <p class="text-zinc-500 dark:text-zinc-400">
-                                Debe configurar techos de unidad ejecutora primero.
+                                Debe configurar techos globales primero.
                             </p>
                         </div>
                     @endif
@@ -176,12 +150,12 @@
 
                 <!-- Botones -->
                 <div class="flex justify-end mt-6 space-x-3">
-                    <x-spinner-secondary-button wire:click="closeModal" type="button" loadingTarget="closeModal" loadingText="Cerrando...">
+                    <x-spinner-secondary-button wire:click="$set('showModal', false)" type="button" loadingTarget="closeModal" loadingText="Cerrando...">
                         {{ __('Cancelar') }}
                     </x-spinner-secondary-button>
                     
                     <x-spinner-button type="submit" wire:click="save" loadingTarget="save" :loadingText="$isEditing ? 'Actualizando...' : 'Creando...'">
-                        {{ $isEditing ? 'Actualizar Asignación' : 'Crear Asignación' }}
+                        {{ $isEditing ? 'Actualizar Techo' : 'Crear Techo' }}
                     </x-spinner-button>
                 </div>
             </form>
