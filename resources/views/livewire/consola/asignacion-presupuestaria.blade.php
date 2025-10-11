@@ -156,7 +156,7 @@
                                     No hay POAs disponibles
                                 </h3>
                                 <p class="text-zinc-500 dark:text-zinc-400 mb-8">
-                                    Comienza creando tu primer Plan Operativo Anual para gestionar tus proyectos y presupuestos.
+                                    Espera a que se le asigne techo a tu unidad ejecutora para gestionar tus proyectos y presupuestos.
                                 </p>
                             @endif
                         </div>

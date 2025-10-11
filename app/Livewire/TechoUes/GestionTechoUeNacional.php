@@ -249,13 +249,73 @@ class GestionTechoUeNacional extends Component
 
     private function updateTechoUe()
     {
-        // Eliminar techos existentes para esta UE
-        TechoUe::where('idPoa', $this->idPoa)
-               ->where('idUE', $this->idUnidadEjecutora)
-               ->delete();
+        // Obtener techos existentes para esta UE
+        $techosExistentes = TechoUe::where('idPoa', $this->idPoa)
+                                  ->where('idUE', $this->idUnidadEjecutora)
+                                  ->get()
+                                  ->keyBy('idFuente');
 
-        // Crear nuevos techos
-        $this->createTechoUe();
+        $fuentesNuevas = [];
+        
+        // Procesar montos por fuente
+        foreach ($this->montosPorFuente as $idFuente => $monto) {
+            $montoFloat = floatval($monto);
+            if ($montoFloat > 0) {
+                $fuentesNuevas[] = $idFuente;
+                
+                if ($techosExistentes->has($idFuente)) {
+                    // Actualizar techo existente - PRESERVA LAS RELACIONES CON TECHOS DEPARTAMENTALES
+                    $techoExistente = $techosExistentes[$idFuente];
+                    $techoExistente->update([
+                        'monto' => $montoFloat,
+                    ]);
+                } else {
+                    // Crear nuevo techo
+                    TechoUe::create([
+                        'idPoa' => $this->idPoa,
+                        'idUE' => $this->idUnidadEjecutora,
+                        'idGrupo' => null,
+                        'idFuente' => $idFuente,
+                        'monto' => $montoFloat,
+                    ]);
+                }
+            }
+        }
+        
+        // Solo eliminar techos que ya no están en los montos por fuente Y que no tienen departamentos asignados
+        $fuentesAEliminar = $techosExistentes->keys()->diff($fuentesNuevas);
+        if ($fuentesAEliminar->isNotEmpty()) {
+            // Verificar cuales tienen departamentos asignados antes de eliminar
+            $techosConDepartamentos = TechoUe::where('idPoa', $this->idPoa)
+                   ->where('idUE', $this->idUnidadEjecutora)
+                   ->whereIn('idFuente', $fuentesAEliminar)
+                   ->whereHas('techoDeptos')
+                   ->get();
+                   
+            if ($techosConDepartamentos->isNotEmpty()) {
+                // Si hay techos con departamentos, solo actualizar a monto 0 en lugar de eliminar
+                foreach ($techosConDepartamentos as $techo) {
+                    $techo->update(['monto' => 0]);
+                }
+                
+                // Eliminar solo los que NO tienen departamentos
+                $idsTechosConDepartamentos = $techosConDepartamentos->pluck('idFuente');
+                $fuentesSinDepartamentos = collect($fuentesAEliminar)->diff($idsTechosConDepartamentos);
+                
+                if ($fuentesSinDepartamentos->isNotEmpty()) {
+                    TechoUe::where('idPoa', $this->idPoa)
+                           ->where('idUE', $this->idUnidadEjecutora)
+                           ->whereIn('idFuente', $fuentesSinDepartamentos)
+                           ->delete();
+                }
+            } else {
+                // Si ningún techo tiene departamentos, eliminar normalmente
+                TechoUe::where('idPoa', $this->idPoa)
+                       ->where('idUE', $this->idUnidadEjecutora)
+                       ->whereIn('idFuente', $fuentesAEliminar)
+                       ->delete();
+            }
+        }
     }
 
     public function edit($idUnidadEjecutora)
