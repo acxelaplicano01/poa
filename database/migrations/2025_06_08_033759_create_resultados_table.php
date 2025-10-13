@@ -19,7 +19,8 @@ return new class extends Migration
                 $table->foreignId('idArea')->constrained('areas')->onDelete('cascade');
                 $table->foreignId('idObjetivos')->constrained('objetivos')->onDelete('cascade');
                 $table->foreignId('idDimension')->constrained('dimensions')->onDelete('cascade');
-                $table->foreignId('idPei')->constrained('peis')->onDelete('cascade');
+                
+                //$table->foreignId('idPei')->constrained('peis')->onDelete('cascade');
 
                 $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
                 $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
