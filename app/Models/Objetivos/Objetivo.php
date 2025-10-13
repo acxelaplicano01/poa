@@ -6,6 +6,7 @@ use App\Models\Dimension\Dimension;
 use App\Models\Poa\Pei;
 use App\Models\Areas\Area;
 use App\Models\Resultados\Resultado;
+use App\Models\Poa\PeiElemento;
 
 class Objetivo extends BaseModel
 {
@@ -41,5 +42,11 @@ class Objetivo extends BaseModel
     public function resultados()
     {
         return $this->hasMany(Resultado::class, 'idObjetivos');
+    }
+
+    // Relación polimórfica con PeiElemento
+    public function peiElementos()
+    {
+        return $this->morphMany(PeiElemento::class, 'elemento');
     }
 }
