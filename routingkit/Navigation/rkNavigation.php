@@ -261,7 +261,13 @@ return [
                 ->setDescription('Gestión de la asignación presupuestaria nacional')
                 ->setLabel('Asignación nacional')
                 ->setHeroIcon('chart-pie')
-                ->setItems([])
+                ->setItems([
+                    RkNavigation::make('techonacional')
+                        ->setDescription('Gestión de techos presupuestarios por Unidades Ejecutoras')
+                        ->setLabel('Techos presupuestarios UE')
+                        ->setHeroIcon('arrow-trending-up')
+                        ->setEndBlock('techonacional'),
+                ])
                 ->setEndBlock('asignacionnacionalpresupuestaria'),
 
             RkNavigation::make('asignacionpresupuestaria')
@@ -269,9 +275,20 @@ return [
                 ->setDescription('Gestión de la asignación presupuestaria')
                 ->setLabel('Asignación presupuestaria')
                 ->setHeroIcon('banknotes')
-                ->setItems([])
+                ->setItems([
+                    RkNavigation::make('techodeptos')
+                        ->setDescription('Gestión de techos presupuestarios por departamento')
+                        ->setLabel('Techos presupuestarios')
+                        ->setHeroIcon('building-storefront')
+                        ->setItems([
+                            RkNavigation::make('techodeptos.detalle-estructura')
+                                ->setLabel('Detalle de estructura')
+                                ->setDescription('Detalle de asignaciones a departamentos por estructura')
+                        ])
+                        ->setEndBlock('techodeptos'),
+                ])
                 ->setEndBlock('asignacionpresupuestaria'),
-
+            /*
             RkNavigation::make('techodeptos')
                 ->setParentId('consola')
                 ->setDescription('Gestión de techos presupuestarios por departamento')
@@ -286,7 +303,7 @@ return [
                 ->setLabel('Techos presupuestarios UE')
                 ->setHeroIcon('arrow-trending-up')
                 ->setItems([])
-                ->setEndBlock('techonacional'),
+                ->setEndBlock('techonacional'), */
         ])
         ->setEndBlock('consola'),
 

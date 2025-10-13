@@ -156,18 +156,14 @@
                                                 $porcentajeUsado = $techoGlobal > 0 ? ($asignadoUE / $techoGlobal) * 100 : 0;
                                                 
                                                 // Determinar estado y color
-                                                if ($porcentajeUsado >= 95) {
+                                                if ($porcentajeUsado >= 100) {
                                                     $estadoClase = 'bg-red-500';
-                                                    $estadoTexto = 'Crítico';
+                                                    $estadoTexto = 'Agotado';
                                                     $colorTexto = 'text-red-600 dark:text-red-400';
-                                                } elseif ($porcentajeUsado >= 80) {
+                                                } elseif ($porcentajeUsado >= 60) {
                                                     $estadoClase = 'bg-yellow-500';
-                                                    $estadoTexto = 'Alerta';
+                                                    $estadoTexto = 'Poco recurso';
                                                     $colorTexto = 'text-yellow-600 dark:text-yellow-400';
-                                                } elseif ($porcentajeUsado >= 50) {
-                                                    $estadoClase = 'bg-blue-500';
-                                                    $estadoTexto = 'En Uso';
-                                                    $colorTexto = 'text-blue-600 dark:text-blue-400';
                                                 } else {
                                                     $estadoClase = 'bg-green-500';
                                                     $estadoTexto = 'Disponible';
