@@ -16,6 +16,8 @@ class AsignacionPresupuestaria extends Component
 {
     use WithPagination;
 
+    protected string $layout = 'layouts.app';
+
     public $search = '';
     public $showModal = false;
     public $showDeleteModal = false;
@@ -61,6 +63,7 @@ class AsignacionPresupuestaria extends Component
 
     public function mount()
     {
+        // Inicializar el componente sin parámetros
         $this->resetForm(); // Esto ya establece el año y los techos iniciales
     }
 
@@ -100,7 +103,39 @@ class AsignacionPresupuestaria extends Component
 
     public function render()
     {
+        // Obtener la unidad ejecutora del usuario actual a través de su empleado
+        $userUE = null;
+        $user = auth()->user()->load('empleado');
+        
+        if ($user && $user->empleado) {
+            $userUE = $user->empleado->idUnidadEjecutora;
+        }
+
+        // Debug: Log para ver qué UE tiene el usuario (comentado para producción)
+        // \Log::info('AsignacionPresupuestaria Debug', [
+        //     'user_id' => auth()->id(),
+        //     'empleado_exists' => $user && $user->empleado ? true : false,
+        //     'user_UE' => $userUE,
+        //     'empleado_data' => $user && $user->empleado ? $user->empleado->toArray() : null
+        // ]);
+
         $poas = Poa::with(['institucion', 'unidadEjecutora', 'techoUes.grupoGasto', 'techoUes.fuente'])
+            // Filtrar POAs que tengan techos asignados a UEs (no solo idUE directa)
+            ->where(function ($query) {
+                $query->whereNotNull('idUE') // POAs con UE directa
+                      ->orWhereHas('techoUes', function ($q) {
+                          $q->whereNotNull('idUE'); // O POAs con techos asignados a UEs
+                      });
+            })
+            // Filtrar solo POAs de la unidad ejecutora del usuario (si tiene UE asignada)
+            ->when($userUE, function ($query) use ($userUE) {
+                $query->where(function ($q) use ($userUE) {
+                    $q->where('idUE', $userUE) // POAs con UE directa del usuario
+                      ->orWhereHas('techoUes', function ($subQ) use ($userUE) {
+                          $subQ->where('idUE', $userUE); // O POAs con techos de la UE del usuario
+                      });
+                });
+            })
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('anio', 'like', '%' . $this->search . '%')
@@ -118,13 +153,40 @@ class AsignacionPresupuestaria extends Component
             ->orderBy($this->sortField, $this->sortDirection)
              ->paginate(12);
 
+        // Debug: Ver cuántos POAs encuentra después del filtro (comentado para producción)
+        // \Log::info('POAs encontrados después del filtro', [
+        //     'total_poas' => $poas->total(),
+        //     'poas_data' => $poas->map(function($poa) {
+        //         return [
+        //             'id' => $poa->id,
+        //             'name' => $poa->name ?: 'Sin nombre',
+        //             'idUE_directa' => $poa->idUE,
+        //             'ue_name' => $poa->unidadEjecutora->name ?? 'Sin UE directa',
+        //             'techos_con_ue' => $poa->techoUes->where('idUE', '!=', null)->count(),
+        //             'techos_detalle' => $poa->techoUes->where('idUE', '!=', null)->map(function($techo) {
+        //                 return [
+        //                     'idUE' => $techo->idUE,
+        //                     'monto' => $techo->monto,
+        //                     'ue_name' => $techo->unidadEjecutora->name ?? 'Sin nombre UE'
+        //                 ];
+        //             })->toArray()
+        //         ];
+        //     })->toArray()
+        // ]);
+
         // Calcular progreso de departamentos para cada POA
         foreach ($poas as $poa) {
             $poa->progreso_departamentos = $this->calcularProgresoDepartamentos($poa);
         }
 
         $instituciones = Institucion::orderBy('nombre')->get();
-        $unidadesEjecutoras = UnidadEjecutora::orderBy('name')->get();
+        
+        // Filtrar unidades ejecutoras: solo mostrar la del usuario actual
+        $unidadesEjecutoras = collect();
+        if ($userUE) {
+            $unidadesEjecutoras = UnidadEjecutora::where('id', $userUE)->orderBy('name')->get();
+        }
+        
         $grupoGastos = GrupoGasto::orderBy('nombre')->get();
         $fuentes = Fuente::orderBy('nombre')->get();
         
@@ -272,7 +334,15 @@ class AsignacionPresupuestaria extends Component
         $this->name = '';
         $this->anio = date('Y');
         $this->idInstitucion = '';
-        $this->idUE = '';
+        
+        // Pre-seleccionar automáticamente la unidad ejecutora del usuario
+        $user = auth()->user();
+        if ($user && $user->empleado) {
+            $this->idUE = $user->empleado->idUnidadEjecutora;
+        } else {
+            $this->idUE = '';
+        }
+        
         $this->techos = []; // Limpia completamente el array de techos
         $this->initializeTechos(); // Inicializa con un techo vacío
     }
@@ -434,15 +504,23 @@ class AsignacionPresupuestaria extends Component
 
     /**
      * Calcula el progreso de departamentos para un POA específico
-     * Mide: porcentaje de departamentos con presupuesto asignado vs total de departamentos de la UE
+     * Mide: porcentaje de departamentos con presupuesto asignado vs total de departamentos
      *
      * @param Poa $poa
      * @return array
      */
     private function calcularProgresoDepartamentos($poa)
     {
-        // Obtener el total de departamentos de la UE
-        $totalDepartamentos = $poa->unidadEjecutora->departamentos()->count();
+        // Determinar si es un POA de UE específica o institucional
+        if ($poa->unidadEjecutora) {
+            // POA de UE específica: contar solo departamentos de esa UE
+            $totalDepartamentos = $poa->unidadEjecutora->departamentos()->count();
+        } else {
+            // POA institucional: contar departamentos de todas las UEs de la institución
+            $totalDepartamentos = \App\Models\Departamento\Departamento::whereHas('unidadEjecutora', function($query) use ($poa) {
+                $query->where('idInstitucion', $poa->idInstitucion);
+            })->count();
+        }
         
         // Si no hay departamentos, el progreso es 0
         if ($totalDepartamentos == 0) {
@@ -454,7 +532,7 @@ class AsignacionPresupuestaria extends Component
             ];
         }
         
-        // Contar departamentos con presupuesto asignado
+        // Contar departamentos con presupuesto asignado en este POA
         $departamentosConPresupuesto = $poa->techoDeptos()
             ->where('monto', '>', 0)
             ->distinct('idDepartamento')
@@ -486,14 +564,37 @@ class AsignacionPresupuestaria extends Component
      * @param int $idUE
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function gestionarTechoDepto($poaId, $idUE)
-{
-    // Usar la ruta con estructura de 3 partes para mejor breadcrumb
-    return redirect()->route('techodeptos', [
-        'idPoa' => $poaId,
-        'idUE' => $idUE
-    ]);
-}
+    public function gestionarTechoDepto($poaId, $idUE = null)
+    {
+        // Validar que los parámetros existan
+        if (!$poaId) {
+            session()->flash('error', 'POA no especificado para gestionar techos departamentales.');
+            return redirect()->back();
+        }
+
+        // Si no se proporciona idUE, intentar obtenerlo del POA
+        if (!$idUE) {
+            $poa = Poa::with('techoUes.unidadEjecutora')->find($poaId);
+            if (!$poa) {
+                session()->flash('error', 'POA no encontrado.');
+                return redirect()->back();
+            }
+
+            // Obtener UE directa o desde techos
+            $idUE = $poa->idUE ?? $poa->techoUes->whereNotNull('idUE')->first()?->idUE;
+            
+            if (!$idUE) {
+                session()->flash('error', 'Este POA no tiene una Unidad Ejecutora asignada.');
+                return redirect()->back();
+            }
+        }
+        
+        // Usar la ruta con estructura de 3 partes para mejor breadcrumb
+        return redirect()->route('techodeptos', [
+            'idPoa' => $poaId,
+            'idUE' => $idUE
+        ]);
+    }
     
     /**
      * Actualiza los techos preservando las relaciones existentes con TechoDepto

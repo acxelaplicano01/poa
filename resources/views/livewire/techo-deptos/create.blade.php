@@ -30,6 +30,7 @@
                             wire:model.live="idDepartamento"
                             :options="collect($departamentos)->map(fn($depto) => ['value' => $depto->id, 'text' => $depto->name])->prepend(['value' => '', 'text' => 'Seleccione un departamento'])->toArray()"
                             class="mt-1 block w-full"
+                            :disabled="$isEditing"
                         />
                         <x-input-error for="idDepartamento" class="mt-2" />
                     </div>

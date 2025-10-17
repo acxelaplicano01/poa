@@ -67,6 +67,12 @@ class GestionTechoDeptos extends Component
             $this->loadDepartamentos();
             $this->loadTechoUes();
             
+            // Verificar que la UE tenga techos asignados
+            if ($this->techoUes->isEmpty()) {
+                session()->flash('error', 'Esta Unidad Ejecutora no tiene techos presupuestarios asignados. Debe asignar techos a la UE antes de poder distribuirlos a departamentos.');
+                return redirect()->route('gestion-techo-ue-nacional', ['idPoa' => $this->idPoa]);
+            }
+            
             // Inicializar montos por fuente
             $this->initializeMontosPorFuente();
         } else {
@@ -530,12 +536,15 @@ class GestionTechoDeptos extends Component
 
     public function verDetalleEstructura($estructura)
     {
-        // Redirigir a la vista de detalle de estructura con los parámetros necesarios
-        return redirect()->route('techodeptos.detalle-estructura', [
+        // Construir URL con query parameters para el componente DetalleEstructura
+        $queryParams = http_build_query([
             'idPoa' => $this->idPoa,
             'idUE' => $this->idUE,
-            'estructura' => urlencode($estructura)
+            'estructura' => $estructura
         ]);
+        
+        // Redirigir a la ruta del detalle de estructura con query parameters
+        return redirect()->to(route('techodeptos.detalle-estructura') . '?' . $queryParams);
     }
 
     private function getMetricasPorEstructura()

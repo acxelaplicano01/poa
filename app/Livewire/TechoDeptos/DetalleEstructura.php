@@ -17,11 +17,27 @@ class DetalleEstructura extends Component
     public $detalleEstructura;
     public $activeTab = 'departamentos';
 
-    public function mount($idPoa, $idUE, $estructura)
+    protected $queryString = [
+        'idPoa' => ['except' => ''],
+        'idUE' => ['except' => ''],
+        'estructura' => ['except' => '']
+    ];
+
+    public function mount($idPoa = null, $idUE = null, $estructura = null)
     {
-        $this->idPoa = $idPoa;
-        $this->idUE = $idUE;
-        $this->estructura = urldecode($estructura);
+        // Si los parámetros vienen desde la ruta, los usamos
+        // Si no, Livewire los tomará automáticamente desde queryString
+        if ($idPoa) $this->idPoa = $idPoa;
+        if ($idUE) $this->idUE = $idUE;
+        if ($estructura) $this->estructura = urldecode($estructura);
+        
+        // Validar que tenemos todos los parámetros necesarios
+        if (!$this->idPoa || !$this->idUE || !$this->estructura) {
+            abort(404, 'Parámetros requeridos faltantes: idPoa, idUE, estructura');
+        }
+        
+        // Decodificar estructura si viene URL encoded
+        $this->estructura = urldecode($this->estructura);
         
         // Cargar POA y Unidad Ejecutora
         $this->poa = Poa::findOrFail($this->idPoa);
@@ -29,6 +45,37 @@ class DetalleEstructura extends Component
         
         // Cargar el detalle de la estructura
         $this->loadDetalleEstructura();
+    }
+
+    // Este método se llama cuando alguna propiedad de queryString cambia
+    public function updatedIdPoa()
+    {
+        $this->loadComponentData();
+    }
+
+    public function updatedIdUE()
+    {
+        $this->loadComponentData();
+    }
+
+    public function updatedEstructura()
+    {
+        $this->loadComponentData();
+    }
+
+    private function loadComponentData()
+    {
+        // Solo cargar si tenemos todos los parámetros
+        if ($this->idPoa && $this->idUE && $this->estructura) {
+            try {
+                $this->poa = Poa::findOrFail($this->idPoa);
+                $this->unidadEjecutora = UnidadEjecutora::findOrFail($this->idUE);
+                $this->loadDetalleEstructura();
+            } catch (\Exception $e) {
+                // Manejar errores si los IDs no existen
+                session()->flash('error', 'Error al cargar los datos: ' . $e->getMessage());
+            }
+        }
     }
 
     public function loadDetalleEstructura()

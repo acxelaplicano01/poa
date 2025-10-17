@@ -58,12 +58,7 @@
                     <div class="flex-shrink-0">
                         <div
                             class="w-6 h-6 sm:w-8 sm:h-8 bg-green-100 dark:bg-green-900/40 rounded-md flex items-center justify-center ring-1 ring-green-200 dark:ring-green-800">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-300" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1">
-                                </path>
-                            </svg>
+                            <p class="text-green-600 dark:text-green-300">L</p>
                         </div>
                     </div>
                     <div class="ml-2 sm:ml-4 min-w-0 flex-1">

@@ -115,19 +115,19 @@
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <div class="text-center">
                                         <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                                            {{ number_format($totalGeneral, 0) }}
+                                            {{ number_format($totalGeneral, 2) }}
                                         </div>
                                         <div class="text-sm text-zinc-500 dark:text-zinc-400">Techo</div>
                                     </div>
                                     <div class="text-center">
                                         <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                                            {{ number_format($asignadoGeneral, 0) }}
+                                            {{ number_format($asignadoGeneral, 2) }}
                                         </div>
                                         <div class="text-sm text-zinc-500 dark:text-zinc-400">Asignado</div>
                                     </div>
                                     <div class="text-center">
                                         <div class="text-2xl font-bold {{ $disponibleGeneral > 0 ? 'text-green-600' : 'text-red-600' }}">
-                                            {{ number_format($disponibleGeneral, 0) }}
+                                            {{ number_format($disponibleGeneral, 2) }}
                                         </div>
                                         <div class="text-sm text-zinc-500 dark:text-zinc-400">Disponible</div>
                                     </div>
@@ -145,7 +145,7 @@
                                     <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-6 hover:shadow-lg transition-shadow duration-200">
                                         <div class="flex items-center justify-between mb-4">
                                             <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                                                 {{ $fuente['identificador'] }} - {{ $fuente['fuente'] }}
+                                                {{ $fuente['identificador'] }} - {{ $fuente['fuente'] }}
                                             </h3>
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $fuente['estado']['clase'] }} text-white">
                                                 {{ $fuente['estado']['texto'] }}
@@ -391,7 +391,7 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                                 <div class="flex justify-center space-x-2">
                                                     <button wire:click="editDepartment({{ $departamentoId }})"
-                                                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                             fill="currentColor">
                                                             <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
@@ -401,7 +401,7 @@
                                                         </svg>
                                                     </button>
                                                     <button wire:click="confirmDeleteDepartment({{ $departamentoId }})"
-                                                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 cursor-pointer">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                             fill="currentColor">
                                                             <path fill-rule="evenodd"
@@ -586,8 +586,8 @@
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                        <button 
-                                                            wire:click="verDetalleEstructura('{{ $estructura['estructura'] }}')"
+                                                        <button  
+                                                            wire:click="verDetalleEstructura('{{ $estructura['estructura']}}')"
                                                             class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900 dark:text-indigo-200 dark:hover:bg-indigo-800 transition-colors duration-150">
                                                             <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

@@ -17,6 +17,19 @@
         
         <form wire:submit.prevent="save">            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Nombre del POA -->
+                <div class="md:col-span-2">
+                    <x-label for="name" value="{{ __('Nombre del POA') }}" class="mb-2" />
+                    <x-input 
+                        id="name" 
+                        wire:model="name"
+                        type="text"
+                        placeholder="Ingrese el nombre del POA Nacional"
+                        class="mt-1 block w-full"
+                    />
+                    <x-input-error for="name" class="mt-2" />
+                </div>
+
                 <!-- Año -->
                 <div>
                     <x-label for="anio" value="{{ __('Año') }}" class="mb-2" />
@@ -40,16 +53,25 @@
                     <x-input-error for="idInstitucion" class="mt-2" />
                 </div>
 
-                <!-- Unidad Ejecutora -->
+                <!-- Nota informativa sobre UEs -->
                 <div class="md:col-span-2">
-                    <x-label for="idUE" value="{{ __('Unidad Ejecutora') }}" class="mb-2" />
-                    <x-select 
-                        id="idUE" 
-                        wire:model="idUE"
-                        :options="$unidadesEjecutoras->map(fn($ue) => ['value' => $ue->id, 'text' => $ue->name])->prepend(['value' => '', 'text' => 'Seleccione una unidad ejecutora'])->toArray()"
-                        class="mt-1 block w-full"
-                    />
-                    <x-input-error for="idUE" class="mt-2" />
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-blue-500 dark:text-blue-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">
+                                    POA Nacional - Gestión Centralizada
+                                </h3>
+                                <div class="mt-2 text-sm text-blue-700 dark:text-blue-400">
+                                    <p>Este POA permitirá gestionar presupuesto para todas las unidades ejecutoras de la institución de forma centralizada. La asignación específica a cada UE se realizará después de crear el POA.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Título para Techo Presupuestario -->

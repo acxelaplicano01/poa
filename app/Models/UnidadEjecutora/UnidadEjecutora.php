@@ -28,4 +28,16 @@ class UnidadEjecutora extends BaseModel
     {
         return $this->hasMany(Departamento::class, 'idUnidadEjecutora');
     }
+
+    // Relación con TechoUes
+    public function techoUes()
+    {
+        return $this->hasMany(\App\Models\TechoUes\TechoUe::class, 'idUE');
+    }
+
+    // Relación con Empleados
+    public function empleados()
+    {
+        return $this->hasMany(\App\Models\Empleados\Empleado::class, 'idUnidadEjecutora');
+    }
 }

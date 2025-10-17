@@ -10,6 +10,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -71,5 +72,23 @@ class User extends Authenticatable
     public function getActiveRoleAttribute()
     {
         return \Spatie\Permission\Models\Role::find($this->active_role_id);
+    }
+
+    // Relación con empleado
+    public function empleado()
+    {
+        return $this->belongsTo(\App\Models\Empleados\Empleado::class, 'idEmpleado');
+    }
+
+     /**
+     * Get the user's initials
+     */
+    public function initials(): string
+    {
+        return Str::of($this->name)
+            ->explode(' ')
+            ->take(2)
+            ->map(fn($word) => Str::substr($word, 0, 2))
+            ->implode('');
     }
 }
