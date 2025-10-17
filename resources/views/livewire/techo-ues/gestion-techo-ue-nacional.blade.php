@@ -98,20 +98,20 @@
                                     </h3>
                                     
                                     @php
-                                        $totalGeneral = 0;
-                                        $asignadoGeneral = 0;
-                                        $disponibleGeneral = 0;
-                                        
-                                        foreach($fuentes as $fuente) {
-                                            $techoGlobal = $poa->techoUes->where('fuente.id', $fuente->id)->whereNull('idUE')->sum('monto');
-                                            $asignadoUE = $poa->techoUes->where('fuente.id', $fuente->id)->whereNotNull('idUE')->sum('monto');
-                                            
-                                            $totalGeneral += $techoGlobal;
-                                            $asignadoGeneral += $asignadoUE;
-                                        }
-                                        
-                                        $disponibleGeneral = $totalGeneral - $asignadoGeneral;
-                                        $porcentajeGeneral = $totalGeneral > 0 ? ($asignadoGeneral / $totalGeneral) * 100 : 0;
+        $totalGeneral = 0;
+        $asignadoGeneral = 0;
+        $disponibleGeneral = 0;
+
+        foreach ($fuentes as $fuente) {
+            $techoGlobal = $poa->techoUes->where('fuente.id', $fuente->id)->whereNull('idUE')->sum('monto');
+            $asignadoUE = $poa->techoUes->where('fuente.id', $fuente->id)->whereNotNull('idUE')->sum('monto');
+
+            $totalGeneral += $techoGlobal;
+            $asignadoGeneral += $asignadoUE;
+        }
+
+        $disponibleGeneral = $totalGeneral - $asignadoGeneral;
+        $porcentajeGeneral = $totalGeneral > 0 ? ($asignadoGeneral / $totalGeneral) * 100 : 0;
                                     @endphp
                                     
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -150,25 +150,25 @@
                                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         @foreach($fuentes as $fuente)
                                             @php
-                                                $techoGlobal = $poa->techoUes->where('fuente.id', $fuente->id)->whereNull('idUE')->sum('monto');
-                                                $asignadoUE = $poa->techoUes->where('fuente.id', $fuente->id)->whereNotNull('idUE')->sum('monto');
-                                                $disponible = $techoGlobal - $asignadoUE;
-                                                $porcentajeUsado = $techoGlobal > 0 ? ($asignadoUE / $techoGlobal) * 100 : 0;
-                                                
-                                                // Determinar estado y color
-                                                if ($porcentajeUsado >= 100) {
-                                                    $estadoClase = 'bg-red-500';
-                                                    $estadoTexto = 'Agotado';
-                                                    $colorTexto = 'text-red-600 dark:text-red-400';
-                                                } elseif ($porcentajeUsado >= 60) {
-                                                    $estadoClase = 'bg-yellow-500';
-                                                    $estadoTexto = 'Poco recurso';
-                                                    $colorTexto = 'text-yellow-600 dark:text-yellow-400';
-                                                } else {
-                                                    $estadoClase = 'bg-green-500';
-                                                    $estadoTexto = 'Disponible';
-                                                    $colorTexto = 'text-green-600 dark:text-green-400';
-                                                }
+            $techoGlobal = $poa->techoUes->where('fuente.id', $fuente->id)->whereNull('idUE')->sum('monto');
+            $asignadoUE = $poa->techoUes->where('fuente.id', $fuente->id)->whereNotNull('idUE')->sum('monto');
+            $disponible = $techoGlobal - $asignadoUE;
+            $porcentajeUsado = $techoGlobal > 0 ? ($asignadoUE / $techoGlobal) * 100 : 0;
+
+            // Determinar estado y color
+            if ($porcentajeUsado >= 100) {
+                $estadoClase = 'bg-red-500';
+                $estadoTexto = 'Agotado';
+                $colorTexto = 'text-red-600 dark:text-red-400';
+            } elseif ($porcentajeUsado >= 60) {
+                $estadoClase = 'bg-yellow-500';
+                $estadoTexto = 'Poco recurso';
+                $colorTexto = 'text-yellow-600 dark:text-yellow-400';
+            } else {
+                $estadoClase = 'bg-green-500';
+                $estadoTexto = 'Disponible';
+                $colorTexto = 'text-green-600 dark:text-green-400';
+            }
                                             @endphp
                                             
                                             <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-6 hover:shadow-lg transition-shadow duration-200">
@@ -443,12 +443,21 @@
                                                         </td>
                                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                                             <button wire:click="edit({{ $idUe }})"
-                                                                class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
-                                                                Editar
+                                                                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                                                                    <path fill-rule="evenodd"
+                                                                        d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                                                        clip-rule="evenodd" />
+                                                                </svg>
                                                             </button>
                                                             <button wire:click="eliminarTodosLosTechos({{ $idUe }})"
-                                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                                                                Eliminar
+                                                                class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 cursor-pointer">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd"
+                                                                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                                                        clip-rule="evenodd" />
+                                                                </svg>
                                                             </button>
                                                         </td>
                                                     </tr>
