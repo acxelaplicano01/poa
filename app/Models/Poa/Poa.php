@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Models\Poa;
+use App\Models\BaseModel;
+use App\Models\UnidadEjecutora\UnidadEjecutora;
+use App\Models\Instituciones\Institucion;
+use App\Models\Poa\PoaDepto;
+use App\Models\TechoUes\TechoUe;
+
+
+class Poa extends BaseModel
+{
+    protected $table = 'poas';
+
+    protected $fillable = [
+        'name',
+        'anio',
+        'idInstitucion',
+        'idUE',
+        // Los campos de auditoría ya están en BaseModel
+    ];
+
+    // Relación con Institucion
+    public function institucion()
+    {
+        return $this->belongsTo(Institucion::class, 'idInstitucion');
+    }
+
+    // Relación con Unidad Ejecutora
+    public function unidadEjecutora()
+    {
+        return $this->belongsTo(UnidadEjecutora::class, 'idUE');
+    }
+
+    // Relación con PoaDeptos
+    public function poaDeptos()
+    {
+        return $this->hasMany(PoaDepto::class, 'idPoa');
+    }
+
+    // Relación con TechoUe
+    public function techoUe()
+    {
+        return $this->hasOne(TechoUe::class, 'idPoa');
+    }
+
+    // Relación con múltiples TechoUes
+    public function techoUes()
+    {
+        return $this->hasMany(TechoUe::class, 'idPoa');
+    }
+
+    // Relación con TechoDeptos
+    public function techoDeptos()
+    {
+        return $this->hasMany(\App\Models\TechoUes\TechoDepto::class, 'idPoa');
+    }
+}

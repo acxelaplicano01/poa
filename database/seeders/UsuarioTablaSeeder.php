@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class UsuarioTablaSeeder extends Seeder
 {
@@ -13,10 +15,37 @@ class UsuarioTablaSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate([
-            'name' => 'root', 
-            'email' => 'admin@gmail.com',
-            'password' => bcrypt('12345678')
-        ]);
+        // Crear el usuario administrador
+        $user = User::updateOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'root', 
+                'password' => bcrypt('12345678')
+            ]
+        );
+        
+        // Crear permisos específicos para los módulos si no existen
+        $modulePermissions = [
+            'acceso-configuracion',
+            'acceso-planificacion',
+            'acceso-logs',
+        ];
+        
+        foreach ($modulePermissions as $permName) {
+            Permission::firstOrCreate(['name' => $permName, 'guard_name' => 'web']);
+        }
+        
+        // Crear el rol super-admin
+        $role = Role::firstOrCreate(
+            ['name' => 'super-admin', 'guard_name' => 'web'],
+            ['description' => 'Super Administrador']
+        );
+         
+        // Asignar todos los permisos al rol
+        $permissions = Permission::pluck('id','id')->all();
+        $role->syncPermissions($permissions);
+         
+        // Asignar el rol al usuario
+        $user->assignRole([$role->id]);
     }
 }

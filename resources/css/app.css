@@ -1,12 +1,143 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@import "flowbite/src/themes/default";
-@plugin "flowbite/plugin";
-@source "../node_modules/flowbite";
-@source "../node_modules/flowbite";
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@import "flowbite/src/themes/default";
+@plugin "flowbite/plugin";
+
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../node_modules/flowbite";
+
+@layer base {
+    /* Estilos globales para barras de desplazamiento */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply bg-zinc-300 rounded-[10px];
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-zinc-400;
+    }
+
+    ::-webkit-scrollbar-track {
+        @apply bg-white rounded-[10px];
+    }
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: theme('colors.zinc.300') theme('colors.white');
+    }
+
+    .dark ::-webkit-scrollbar-thumb {
+        @apply bg-zinc-600;
+    }
+
+    .dark ::-webkit-scrollbar-track {
+        @apply bg-zinc-800;
+    }
+
+    .dark * {
+        scrollbar-width: thin;
+        scrollbar-color: theme('colors.zinc.600') theme('colors.zinc.800');
+    }
+}
+
+@layer utilities {
+    .scrollbar-hidden {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+
 [x-cloak] {
     display: none;
 }
+
+
+
+
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Re-assign Flux's gray of choice... */
+@theme {
+    --color-zinc-50: var(--color-neutral-50);
+    --color-zinc-100: var(--color-neutral-100);
+    --color-zinc-200: var(--color-neutral-200);
+    --color-zinc-300: var(--color-neutral-300);
+    --color-zinc-400: var(--color-neutral-400);
+    --color-zinc-500: var(--color-neutral-500);
+    --color-zinc-600: var(--color-neutral-600);
+    --color-zinc-700: var(--color-neutral-700);
+    --color-zinc-800: var(--color-neutral-800);
+    --color-zinc-900: var(--color-neutral-900);
+    --color-zinc-950: var(--color-neutral-950);
+}
+
+@theme {
+    --color-accent: var(--color-indigo-700);
+    --color-accent-content: var(--color-indigo-500);
+    --color-accent-foreground: var(--color-white);
+}
+
+@layer theme {
+    .dark {
+        --color-accent: var(--color-indigo-700);
+        --color-accent-content: var(--color-indigo-500);
+        --color-accent-foreground: var(--color-white);
+    }
+}
+
+@layer base {
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+
+
+
+/* \[:where(&)\]:size-4 {
+    @apply size-4;
+} */
