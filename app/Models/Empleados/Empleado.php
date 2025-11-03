@@ -19,15 +19,20 @@ class Empleado extends BaseModel
         'telefono',
         'fechaNacimiento',
         'sexo',
-        'user_id',
         'idUnidadEjecutora',
         // Los campos de auditoría ya están en BaseModel
     ];
 
-    // Relación con usuario
+    // Relación con usuarios (un empleado puede tener uno o varios usuarios)
+    public function users()
+    {
+        return $this->hasMany(User::class, 'idEmpleado');
+    }
+    
+    // Relación con el usuario principal (si solo tiene uno)
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->hasOne(User::class, 'idEmpleado');
     }
 
     // Relación con Unidad Ejecutora

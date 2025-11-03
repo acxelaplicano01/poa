@@ -32,6 +32,7 @@ class Usuarios extends Component
     public $profile_photo_path;
     public $sortField = 'id';
     public $sortDirection = 'asc';
+    public $idEmpleado = null;
 
     protected $rules = [
         'name' => 'required',
@@ -51,7 +52,7 @@ class Usuarios extends Component
     public function render()
     {
         $query = User::query()
-            ->with('roles')  // Pre-cargar relación de roles para mejor rendimiento
+            ->with(['roles', 'empleado'])  // Pre-cargar relación de roles y empleado para mejor rendimiento
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
@@ -64,10 +65,23 @@ class Usuarios extends Component
 
         // Obtener usuarios paginados
         $users = $query->paginate($this->perPage ?? 10);
+        
+        // Obtener lista de empleados para el select
+        // Excluir empleados que ya tienen usuario asignado (excepto el actual al editar)
+        $empleados = \App\Models\Empleados\Empleado::orderBy('nombre')->orderBy('apellido')
+            ->whereDoesntHave('user', function($query) {
+                // Si estamos editando, permitir el empleado actual
+                if ($this->user && $this->user->idEmpleado) {
+                    $query->where('empleados.id', '!=', $this->user->idEmpleado);
+                }
+            })
+            ->orWhere('id', $this->user->idEmpleado ?? null) // Incluir el empleado actual si existe
+            ->get();
 
         return view('livewire.Usuario.usuarios', [
             'users' => $users,
-            'roles' => $this->roles
+            'roles' => $this->roles,
+            'empleados' => $empleados
         ])->layout('layouts.app');
     }
 
@@ -88,6 +102,7 @@ class Usuarios extends Component
             'password' => 'nullable|min:8',
             'selectedRoles' => 'required|array',
             'selectedRoles.*' => 'exists:roles,id',
+            'idEmpleado' => 'nullable|exists:empleados,id',
         ]);
 
         if ($this->user) {
@@ -106,6 +121,7 @@ class Usuarios extends Component
                 'email' => $this->email,
                 'profile_photo_path' => $this->profile_photo_path,
                 'password' => Hash::make($this->password),
+                'idEmpleado' => $this->idEmpleado,
             ]);
 
 
@@ -161,6 +177,7 @@ class Usuarios extends Component
         $this->name = $user->name;
         $this->email = $user->email;
         $this->profile_photo_path = $user->profile_photo_path;
+        $this->idEmpleado = $user->idEmpleado;
         $this->selectedRoles = $user->roles->pluck('id')->toArray();
         $this->roles = Role::all();
         $this->isOpen = true;
@@ -176,17 +193,19 @@ class Usuarios extends Component
             'password' => 'nullable|min:8',
             'selectedRoles' => 'required|array',
             'selectedRoles.*' => 'exists:roles,id',
+            'idEmpleado' => 'nullable|exists:empleados,id',
         ]);
 
         try {
             $user = User::findOrFail($this->user->id);
-            $oldData = $this->user->only(['name', 'email', 'profile_photo_path']);
+            $oldData = $this->user->only(['name', 'email', 'profile_photo_path', 'idEmpleado']);
 
             $user->update([
                 'name' => $this->name,
                 'email' => $this->email,
                 'profile_photo_path' => $this->profile_photo_path,
                 'password' => $this->password ? Hash::make($this->password) : $user->password,
+                'idEmpleado' => $this->idEmpleado,
             ]);
 
             // Registrar log de actualización
@@ -198,7 +217,7 @@ class Usuarios extends Component
                     'Actualizado por' => Auth::user()->name . ' ' . '(' . Auth::user()->email . ')',
                     'cambios' => [
                         'anteriores' => $oldData,
-                        'nuevos' => $user->only(['name', 'email', 'profile_photo_path']),
+                        'nuevos' => $user->only(['name', 'email', 'profile_photo_path', 'idEmpleado']),
                     ]
                 ]
             );
