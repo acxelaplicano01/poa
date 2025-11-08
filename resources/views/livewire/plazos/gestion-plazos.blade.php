@@ -88,8 +88,13 @@
                         @forelse($plazos as $plazo)
                             <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ $plazo->poa->anio }}</div>
-                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $plazo->poa->name }}</div>
+                                    @if($plazo->poa)
+                                        <div class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ $plazo->poa->anio }}</div>
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $plazo->poa->name }}</div>
+                                    @else
+                                        <div class="text-sm font-medium text-red-600 dark:text-red-400">POA no disponible</div>
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400">Sin POA asociado</div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="text-sm text-zinc-900 dark:text-zinc-100">{{ $plazo->tipo_plazo_label }}</span>

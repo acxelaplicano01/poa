@@ -31,7 +31,13 @@ return [
                 ->setDescription('Visualiza tus planificaciones')
                 ->setLabel('Mis planificaciones')
                 ->setHeroIcon('document-text')
-                ->setItems([])
+                ->setItems([
+                    RkNavigation::make('actividades')
+                        ->setDescription('Ver y gestionar mis actividades planificadas')
+                        ->setLabel('Mis actividades')
+                        ->setHeroIcon('folder-open')
+                        ->setEndBlock('actividades'),
+                ])
                 ->setEndBlock('planificar'),
 
             RkNavigation::make('requerir')
@@ -266,6 +272,11 @@ return [
                         ->setDescription('Gestión de techos presupuestarios por Unidades Ejecutoras')
                         ->setLabel('Techos presupuestarios UE')
                         ->setHeroIcon('arrow-trending-up')
+                        ->setItems([
+                            RkNavigation::make('plazos')
+                                ->setLabel('Plazos de asignación')
+                                ->setDescription('Define y gestiona los plazos para la asignación presupuestaria nacional, departamental y planificación')
+                        ])
                         ->setEndBlock('techonacional'),
                 ])
                 ->setEndBlock('asignacionnacionalpresupuestaria'),

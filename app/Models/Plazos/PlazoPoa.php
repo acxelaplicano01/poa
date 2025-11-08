@@ -91,7 +91,10 @@ class PlazoPoa extends BaseModel
             return null; // Aún no inicia
         }
         
-        return Carbon::now()->diffInDays($this->fecha_fin, false);
+        $hoy = Carbon::now()->startOfDay();
+        $fechaFin = Carbon::parse($this->fecha_fin)->startOfDay();
+        
+        return (int) $hoy->diffInDays($fechaFin) + 1;
     }
 
     // Obtener etiqueta del tipo de plazo

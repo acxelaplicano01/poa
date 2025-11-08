@@ -161,6 +161,13 @@ class AsignacionPresuNacional extends Component
     {
         $poa = Poa::findOrFail($id);
         
+        // Validar que el POA no sea de un año anterior
+        $anioActual = now()->year;
+        if ($poa->anio < $anioActual) {
+            session()->flash('error', "No se puede editar un POA de años anteriores. El POA {$poa->anio} ya no puede ser modificado.");
+            return;
+        }
+        
         // Verificar plazo de asignación nacional
         $this->verificarPlazo($poa);
         
@@ -211,10 +218,13 @@ class AsignacionPresuNacional extends Component
 
     public function save()
     {
-        // Verificar plazo si es edición y POA está activo
+        // Verificar plazo solo si es edición, POA está activo y el año no es anterior
         if ($this->isEditing) {
             $poa = Poa::find($this->poaId);
-            if ($poa && !$poa->puedeAsignarPresupuestoNacional()) {
+            $anioActual = now()->year;
+            
+            // Solo validar plazos si el POA está activo y no es de un año anterior
+            if ($poa && $poa->activo && $poa->anio >= $anioActual && !$poa->puedeAsignarPresupuestoNacional()) {
                 session()->flash('error', $poa->getMensajeErrorPlazo('asignacion_nacional'));
                 return;
             }
@@ -320,7 +330,16 @@ class AsignacionPresuNacional extends Component
 
     public function confirmDelete($id)
     {
-        $this->poaToDelete = Poa::findOrFail($id);
+        $poa = Poa::findOrFail($id);
+        
+        // Validar que el POA no sea de un año anterior
+        $anioActual = now()->year;
+        if ($poa->anio < $anioActual) {
+            session()->flash('error', "No se puede eliminar un POA de años anteriores. El POA {$poa->anio} ya no puede ser modificado.");
+            return;
+        }
+        
+        $this->poaToDelete = $poa;
         $this->showDeleteModal = true;
     }
 
