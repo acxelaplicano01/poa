@@ -157,7 +157,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Botón de acción -->
+                                    <!-- Botón de redirección -->
                                     <div class="pt-2">
                                         <button wire:click="seleccionarPoa({{ $poaData['idPoa'] }})"
                                                 class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white {{ $poaData['isActual'] ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-zinc-600 hover:bg-zinc-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150">

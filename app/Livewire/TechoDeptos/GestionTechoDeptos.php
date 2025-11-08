@@ -40,6 +40,11 @@ class GestionTechoDeptos extends Component
     public $departamentos = [];
     public $techoUes = [];
     
+    // Estado del plazo de asignación departamental
+    public $puedeAsignarPresupuesto = false;
+    public $mensajePlazo = '';
+    public $diasRestantes = null;
+    
     protected $rules = [
         'idDepartamento' => 'required|exists:departamentos,id',
     ];
@@ -63,6 +68,9 @@ class GestionTechoDeptos extends Component
             $this->poa = Poa::findOrFail($this->idPoa);
             $this->unidadEjecutora = UnidadEjecutora::findOrFail($this->idUE);
             
+            // Verificar si se puede asignar presupuesto departamental
+            $this->verificarPlazo();
+            
             // Cargar listas para los selects
             $this->loadDepartamentos();
             $this->loadTechoUes();
@@ -78,6 +86,16 @@ class GestionTechoDeptos extends Component
         } else {
             session()->flash('error', 'Se requiere un POA y una Unidad Ejecutora para gestionar los techos por departamento.');
             return redirect()->route('asignacionpresupuestaria');
+        }
+    }
+    
+    private function verificarPlazo()
+    {
+        $this->puedeAsignarPresupuesto = $this->poa->puedeAsignarPresupuestoDepartamental();
+        $this->diasRestantes = $this->poa->getDiasRestantesAsignacionDepartamental();
+        
+        if (!$this->puedeAsignarPresupuesto) {
+            $this->mensajePlazo = $this->poa->getMensajeErrorPlazo('asignacion_departamental');
         }
     }
     
@@ -244,6 +262,12 @@ class GestionTechoDeptos extends Component
 
     public function create()
     {
+        // Verificar que se pueda asignar presupuesto
+        if (!$this->puedeAsignarPresupuesto) {
+            session()->flash('error', $this->mensajePlazo);
+            return;
+        }
+
         $this->resetForm();
         $this->isEditing = false;
         $this->initializeMontosPorFuente(); // Asegurar inicialización
@@ -252,6 +276,12 @@ class GestionTechoDeptos extends Component
 
     public function createForDepartment($departamentoId)
     {
+        // Verificar que se pueda asignar presupuesto
+        if (!$this->puedeAsignarPresupuesto) {
+            session()->flash('error', $this->mensajePlazo);
+            return;
+        }
+
         $this->resetForm();
         $this->idDepartamento = $departamentoId;
         $this->isEditing = false;
@@ -267,6 +297,12 @@ class GestionTechoDeptos extends Component
 
     public function editDepartment($departamentoId)
     {
+        // Verificar que se pueda asignar presupuesto
+        if (!$this->puedeAsignarPresupuesto) {
+            session()->flash('error', $this->mensajePlazo);
+            return;
+        }
+
         $this->resetForm();
         $this->idDepartamento = $departamentoId;
         $this->isEditing = true;

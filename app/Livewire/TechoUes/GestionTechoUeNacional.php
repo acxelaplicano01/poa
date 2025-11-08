@@ -34,6 +34,11 @@ class GestionTechoUeNacional extends Component
     // Listados para los selects
     public $unidadesEjecutoras = [];
     
+    // Estado del plazo de asignación nacional
+    public $puedeAsignarPresupuesto = false;
+    public $mensajePlazo = '';
+    public $diasRestantes = null;
+    
     public function getFuentesProperty()
     {
         // Obtener techos globales (con idUE null) del POA actual como fuentes disponibles
@@ -72,7 +77,20 @@ class GestionTechoUeNacional extends Component
         }
         
         $this->loadPoa();
+        $this->verificarPlazo();
         $this->loadUnidadesEjecutoras();
+    }
+
+    private function verificarPlazo()
+    {
+        if ($this->poa) {
+            $this->puedeAsignarPresupuesto = $this->poa->puedeAsignarPresupuestoNacional();
+            $this->diasRestantes = $this->poa->getDiasRestantesAsignacionNacional();
+            
+            if (!$this->puedeAsignarPresupuesto) {
+                $this->mensajePlazo = $this->poa->getMensajeErrorPlazo('asignacion_nacional');
+            }
+        }
     }
 
     public function loadPoa()
@@ -147,6 +165,12 @@ class GestionTechoUeNacional extends Component
 
     public function create()
     {
+        // Verificar que se pueda asignar presupuesto
+        if (!$this->puedeAsignarPresupuesto) {
+            session()->flash('error', $this->mensajePlazo);
+            return;
+        }
+
         $this->resetForm();
         $this->showModal = true;
     }
@@ -320,6 +344,12 @@ class GestionTechoUeNacional extends Component
 
     public function edit($idUnidadEjecutora)
     {
+        // Verificar que se pueda asignar presupuesto
+        if (!$this->puedeAsignarPresupuesto) {
+            session()->flash('error', $this->mensajePlazo);
+            return;
+        }
+
         $this->isEditing = true;
         $this->idUnidadEjecutora = $idUnidadEjecutora;
         

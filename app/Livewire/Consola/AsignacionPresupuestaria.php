@@ -120,6 +120,8 @@ class AsignacionPresupuestaria extends Component
         // ]);
 
         $poas = Poa::with(['institucion', 'unidadEjecutora', 'techoUes.grupoGasto', 'techoUes.fuente'])
+            // Filtrar solo POAs activos
+            ->where('activo', true)
             // Filtrar POAs que tengan techos asignados a UEs (no solo idUE directa)
             ->where(function ($query) {
                 $query->whereNotNull('idUE') // POAs con UE directa

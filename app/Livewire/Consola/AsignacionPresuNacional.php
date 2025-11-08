@@ -30,9 +30,15 @@ class AsignacionPresuNacional extends Component
     public $name = '';
     public $anio = '';
     public $idInstitucion = '';
+    public $activo = true; // Estado activo del POA
     
     // Propiedades para múltiples Techos UE
     public $techos = [];
+
+    // Estado del plazo de asignación nacional
+    public $puedeAsignarPresupuestoNacional = true; // Por defecto true ya que es la creación inicial
+    public $mensajePlazo = '';
+    public $diasRestantes = null;
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -154,10 +160,15 @@ class AsignacionPresuNacional extends Component
     public function edit($id)
     {
         $poa = Poa::findOrFail($id);
+        
+        // Verificar plazo de asignación nacional
+        $this->verificarPlazo($poa);
+        
         $this->poaId = $poa->id;
         $this->name = $poa->name;
         $this->anio = $poa->anio;
         $this->idInstitucion = $poa->idInstitucion;
+        $this->activo = $poa->activo ?? true; // Cargar estado activo
         
         // Cargar techos globales del POA nacional (sin UE específica)
         $techosGlobales = TechoUe::where('idPoa', $poa->id)
@@ -180,8 +191,35 @@ class AsignacionPresuNacional extends Component
         $this->showModal = true;
     }
 
+    private function verificarPlazo($poa)
+    {
+        // Solo verificar si el POA ya existe y está activo
+        if ($poa && $poa->activo) {
+            $this->puedeAsignarPresupuestoNacional = $poa->puedeRealizarAccion('asignacion_nacional');
+            $this->diasRestantes = $poa->getDiasRestantes('asignacion_nacional');
+            
+            if (!$this->puedeAsignarPresupuestoNacional) {
+                $this->mensajePlazo = $poa->getMensajeErrorPlazo('asignacion_nacional');
+            }
+        } else {
+            // Si el POA no existe o no está activo, permitir creación/edición
+            $this->puedeAsignarPresupuestoNacional = true;
+            $this->diasRestantes = null;
+            $this->mensajePlazo = '';
+        }
+    }
+
     public function save()
     {
+        // Verificar plazo si es edición y POA está activo
+        if ($this->isEditing) {
+            $poa = Poa::find($this->poaId);
+            if ($poa && !$poa->puedeAsignarPresupuestoNacional()) {
+                session()->flash('error', $poa->getMensajeErrorPlazo('asignacion_nacional'));
+                return;
+            }
+        }
+
         try {
             // Log para debugging
             \Log::info('Iniciando save de POA', [
@@ -191,6 +229,22 @@ class AsignacionPresuNacional extends Component
                 'techos' => $this->techos,
                 'isEditing' => $this->isEditing
             ]);
+
+            // Validación específica para creación: año debe ser actual o futuro
+            if (!$this->isEditing) {
+                $anioActual = now()->year;
+                if ($this->anio < $anioActual) {
+                    session()->flash('error', "No se pueden crear POAs con años anteriores. El año debe ser {$anioActual} o posterior.");
+                    return;
+                }
+
+                // Validar que no exista otro POA con el mismo año
+                $poaExistente = Poa::where('anio', $this->anio)->first();
+                if ($poaExistente) {
+                    session()->flash('error', "Ya existe un POA para el año {$this->anio}. No se puede crear un POA duplicado.");
+                    return;
+                }
+            }
 
             // Validar campos básicos
             $this->validate([
@@ -229,6 +283,7 @@ class AsignacionPresuNacional extends Component
                     'name' => $this->name,
                     'anio' => $this->anio,
                     'idInstitucion' => $this->idInstitucion,
+                    'activo' => $this->activo, // Actualizar estado activo
                 ]);
                 
                 // Actualizar techos globales del POA nacional
@@ -244,6 +299,7 @@ class AsignacionPresuNacional extends Component
                     'anio' => $this->anio,
                     'idInstitucion' => $this->idInstitucion,
                     'idUE' => null, // POA nacional no tiene UE específica
+                    'activo' => true, // Por defecto activo al crear
                 ]);
                 
                 \Log::info('POA creado exitosamente', ['id' => $poa->id]);
@@ -337,6 +393,7 @@ class AsignacionPresuNacional extends Component
         $this->name = '';
         $this->anio = date('Y');
         $this->idInstitucion = '';
+        $this->activo = true; // Por defecto activo
         $this->techos = []; // Limpia completamente el array de techos
         $this->initializeTechos(); // Inicializa con un techo vacío
     }

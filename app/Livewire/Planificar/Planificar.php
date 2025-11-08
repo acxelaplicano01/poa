@@ -63,6 +63,7 @@ class Planificar extends Component
 
         // Obtener todos los techos departamentales para el departamento seleccionado
         // agrupados por POA, ordenados por año descendente
+        // Solo POAs activos
         $techosDeptos = TechoDepto::with([
                 'poa',
                 'departamento',
@@ -70,6 +71,9 @@ class Planificar extends Component
                 'unidadEjecutora'
             ])
             ->where('idDepartamento', $this->departamentoSeleccionado)
+            ->whereHas('poa', function ($query) {
+                $query->where('activo', true);
+            })
             ->get()
             ->groupBy('idPoa')
             ->map(function ($techos, $idPoa) {
@@ -106,8 +110,7 @@ class Planificar extends Component
     public function seleccionarPoa($idPoa)
     {
         // Aquí puedes redirigir a una vista de detalle o abrir un modal
-        // Por ahora, simplemente emitimos un evento
-        $this->dispatch('poa-seleccionado', idPoa: $idPoa);
+        return redirect()->route('actividades', ['idPoa' => $idPoa]);
     }
 
     public function render()

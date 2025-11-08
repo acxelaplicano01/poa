@@ -211,6 +211,15 @@ return [
                         ->setItems([])
                         ->setEndBlock('planificar'),
 
+                    RkRoute::make('actividades')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('planificacion.actividades.ver')
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\Actividad\Actividades')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('actividades'),
+
                     RkRoute::make('requerir')
                         ->setParentId('planificacion')
                         ->setAccessPermission('planificacion.requerir.ver')
@@ -297,6 +306,15 @@ return [
                         ->setRoles(['admin_general'])
                         ->setItems([])
                         ->setEndBlock('techonacional'),
+
+                    RkRoute::make('plazos')
+                        ->setParentId('consola')
+                        ->setAccessPermission('consola.plazos.gestionar')
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\Plazos\GestionPlazos')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('plazos'),
                 ])
                 ->setEndBlock('consola'),
 

@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="flex justify-end mt-4 sm:mt-0">
-                        <x-button wire:click="create()" class="w-full sm:w-auto justify-center">
+                        <x-button wire:click="create()" class="w-full sm:w-auto justify-center" :disabled="!$puedeAsignarPresupuesto">
                             <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -33,6 +33,41 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Alerta de plazo --}}
+            @if(!$puedeAsignarPresupuesto && $mensajePlazo)
+                <div class="mb-4 bg-amber-100 dark:bg-amber-900/30 border border-amber-400 dark:border-amber-700 text-amber-800 dark:text-amber-300 px-4 py-3 rounded relative flex items-start" role="alert">
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <p class="font-semibold">Asignación departamental no disponible</p>
+                        <p class="text-sm mt-1">{{ $mensajePlazo }}</p>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Contador de días restantes --}}
+            @if($puedeAsignarPresupuesto && $diasRestantes !== null)
+                <div class="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 px-4 py-3 rounded-lg flex items-center justify-between" role="alert">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <div>
+                            <p class="font-semibold text-sm">Plazo de asignación departamental activo</p>
+                            <p class="text-xs mt-0.5">Puedes asignar presupuesto a departamentos</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="flex items-baseline">
+                            <span class="text-3xl font-bold">{{ $diasRestantes }}</span>
+                            <span class="text-sm ml-1">{{ $diasRestantes == 1 ? 'día' : 'días' }}</span>
+                        </div>
+                        <p class="text-xs mt-0.5">{{ $diasRestantes == 1 ? 'restante' : 'restantes' }}</p>
+                    </div>
+                </div>
+            @endif
 
             @if (session()->has('message'))
                 <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md" role="alert">
