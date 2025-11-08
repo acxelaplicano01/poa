@@ -302,14 +302,14 @@
                                                 </p>
                                             </div>
                                             <div class="flex items-center space-x-2">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                                    Sin Techo
-                                                </span>
-                                                <button 
-                                                    wire:click="createForDepartment({{ $departamento->id }})"
+                                                <x-button 
+                                                    wire:click="createForDepartment({{ $departamento->id }})" :disabled="!$puedeAsignarPresupuesto"
                                                     class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium">
+                                                     <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    </svg>
                                                     Asignar
-                                                </button>
+                                                </x-button>
                                             </div>
                                         </div>
                                     </div>

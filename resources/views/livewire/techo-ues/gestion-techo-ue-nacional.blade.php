@@ -393,13 +393,13 @@
                                                 </div>
                                             </div>
                                             <div class="mt-3 flex justify-end">
-                                                <button wire:click="crearTechoParaUe({{ $ue->id }})"
+                                                <x-button wire:click="crearTechoParaUe({{ $ue->id }})" :disabled="!$puedeAsignarPresupuesto"
                                                     class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800 transition-colors">
                                                     <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                                     </svg>
                                                     Asignar Techo
-                                                </button>
+                                                </x-button>
                                             </div>
                                         </div>
                                     @endforeach
