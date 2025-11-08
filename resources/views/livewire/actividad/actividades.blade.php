@@ -85,7 +85,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
                     <div>
                         <span class="text-indigo-700 dark:text-indigo-400 font-medium">POA:</span>
-                        <span class="text-indigo-900 dark:text-indigo-200">{{ $this->userContext['poa']->name ?? 'POA ' . $this->userContext['poa']->anio }}</span>
+                        <span class="text-indigo-900 dark:text-indigo-200">{{ $this->userContext['poa']->anio . ' - ' . $this->userContext['poa']->name ?? 'POA ' . $this->userContext['poa']->anio }}</span>
                     </div>
                     <div>
                         <span class="text-indigo-700 dark:text-indigo-400 font-medium">Departamento:</span>

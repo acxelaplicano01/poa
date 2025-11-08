@@ -304,7 +304,7 @@
                                             <div class="flex items-center space-x-2">
                                                 <x-button 
                                                     wire:click="createForDepartment({{ $departamento->id }})" :disabled="!$puedeAsignarPresupuesto"
-                                                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium">
+                                                    >
                                                      <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                                     </svg>
