@@ -103,7 +103,39 @@
             </div>
             @endif
 
-            {{-- Filtros --}}
+            {{-- Sistema de Tabs --}}
+            <div class="mt-6">
+                <!-- Tabs Header -->
+                <div class="border-b border-zinc-200 dark:border-zinc-700">
+                    <nav class="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-hide pb-px" aria-label="Tabs">
+                        <button 
+                            wire:click="setActiveTab('actividades')"
+                            class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 flex-shrink-0 {{ $activeTab === 'actividades' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300' }}">
+                            <span class="flex items-center">
+                                <svg class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                Actividades
+                            </span>
+                        </button>
+                        <button 
+                            wire:click="setActiveTab('resumen')"
+                            class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 flex-shrink-0 {{ $activeTab === 'resumen' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300' }}">
+                            <span class="flex items-center">
+                                <svg class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                                Resumen Presupuestario
+                            </span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="mt-6">
+                    @if($activeTab === 'actividades')
+                        {{-- Contenido del Tab Actividades --}}
+                        {{-- Filtros --}}
             <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Buscar</label>
@@ -272,6 +304,123 @@
                     {{ $actividades->links() }}
                 </x-slot>
             </x-table>
+
+                    @elseif($activeTab === 'resumen')
+                        {{-- Contenido del Tab Resumen Presupuestario --}}
+                        @if($resumenPresupuesto->count() > 0)
+                            <!-- Resumen General -->
+                            <div class="bg-gradient-to-r from-indigo-50 to-indigo-50 dark:from-indigo-900/20 dark:to-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-6">
+                                <h3 class="text-lg font-semibold text-indigo-900 dark:text-indigo-100 mb-4">
+                                    Resumen General del Departamento
+                                </h3>
+                                
+                                @php
+                                    $totalGeneral = $resumenPresupuesto->sum('montoTotal');
+                                    $asignadoGeneral = $resumenPresupuesto->sum('montoAsignado');
+                                    $disponibleGeneral = $resumenPresupuesto->sum('montoDisponible');
+                                    $porcentajeGeneral = $totalGeneral > 0 ? ($asignadoGeneral / $totalGeneral) * 100 : 0;
+                                @endphp
+                                
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                                            L {{ number_format($totalGeneral, 2) }}
+                                        </div>
+                                        <div class="text-sm text-zinc-500 dark:text-zinc-400">Techo Asignado</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+                                            L {{ number_format($asignadoGeneral, 2) }}
+                                        </div>
+                                        <div class="text-sm text-zinc-500 dark:text-zinc-400">En Actividades</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold {{ $disponibleGeneral > 0 ? 'text-green-600' : 'text-red-600' }} dark:{{ $disponibleGeneral > 0 ? 'text-green-400' : 'text-red-400' }}">
+                                            L {{ number_format($disponibleGeneral, 2) }}
+                                        </div>
+                                        <div class="text-sm text-zinc-500 dark:text-zinc-400">Disponible</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                                            {{ number_format($porcentajeGeneral, 1) }}%
+                                        </div>
+                                        <div class="text-sm text-zinc-500 dark:text-zinc-400">% Utilizado</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Detalle por Fuente de Financiamiento -->
+                            <div class="mt-6">
+                                <h3 class="text-lg font-semibold text-zinc-800 dark:text-zinc-200 mb-4">
+                                    Detalle por Fuente de Financiamiento
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    @foreach($resumenPresupuesto as $fuente)
+                                        <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-6 hover:shadow-lg transition-shadow duration-200">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <h4 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                                                    {{ $fuente['identificador'] }}
+                                                </h4>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $fuente['estado']['clase'] }} text-white">
+                                                    {{ $fuente['estado']['texto'] }}
+                                                </span>
+                                            </div>
+                                            
+                                            <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-4">{{ $fuente['fuente'] }}</p>
+                                            
+                                            <div class="space-y-3">
+                                                <div>
+                                                    <div class="flex justify-between items-center mb-1">
+                                                        <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Techo</span>
+                                                        <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100">L {{ number_format($fuente['montoTotal'], 2) }}</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div>
+                                                    <div class="flex justify-between items-center mb-1">
+                                                        <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Asignado</span>
+                                                        <span class="text-sm font-bold text-green-600 dark:text-green-400">L {{ number_format($fuente['montoAsignado'], 2) }}</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div>
+                                                    <div class="flex justify-between items-center mb-1">
+                                                        <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Disponible</span>
+                                                        <span class="text-sm font-bold {{ $fuente['montoDisponible'] >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                                                            L {{ number_format($fuente['montoDisponible'], 2) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mt-4">
+                                                    <div class="flex justify-between items-center mb-2">
+                                                        <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Uso del presupuesto</span>
+                                                        <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">{{ number_format($fuente['porcentajeUsado'], 1) }}%</span>
+                                                    </div>
+                                                    <div class="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2">
+                                                        <div class="{{ $fuente['estado']['clase'] }} h-2 rounded-full transition-all duration-300" 
+                                                             style="width: {{ min($fuente['porcentajeUsado'], 100) }}%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @else
+                            <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-8 text-center">
+                                <svg class="mx-auto h-12 w-12 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <h3 class="mt-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">Sin información presupuestaria</h3>
+                                <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                                    No hay techos presupuestarios asignados a este departamento.
+                                </p>
+                            </div>
+                        @endif
+                    @endif
+                </div>
+            </div>
 
         </div>
     </div>

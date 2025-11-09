@@ -57,6 +57,7 @@ class Actividades extends Component
     public $filtroEstado = '';
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
+    public $activeTab = 'actividades'; // Tab activo: 'actividades' o 'resumen'
 
     // Control de modales
     public $modalOpen = false;
@@ -365,6 +366,71 @@ class Actividades extends Component
         }
     }
 
+    public function setActiveTab($tab)
+    {
+        $this->activeTab = $tab;
+    }
+
+    private function getResumenPresupuesto()
+    {
+        if (!$this->idPoaDepto) {
+            return collect([]);
+        }
+
+        // Obtener el PoaDepto para acceder a los techos asignados
+        $poaDepto = PoaDepto::with(['techoDeptos.techoUe.fuente'])
+            ->find($this->idPoaDepto);
+
+        if (!$poaDepto) {
+            return collect([]);
+        }
+
+        $resumen = [];
+        
+        // Agrupar techos por fuente de financiamiento
+        $techosPorFuente = $poaDepto->techoDeptos->groupBy(function($techoDepto) {
+            return $techoDepto->techoUe->fuente->id ?? 'sin_fuente';
+        });
+
+        foreach ($techosPorFuente as $fuenteId => $techos) {
+            if ($fuenteId === 'sin_fuente') {
+                continue;
+            }
+
+            $fuente = $techos->first()->techoUe->fuente;
+            $montoTotal = $techos->sum('monto');
+            
+            // Por ahora, el monto asignado a actividades será 0 ya que no hay relación directa
+            // Esto se puede implementar cuando se defina cómo las actividades consumen presupuesto
+            $montoAsignado = 0;
+            $montoDisponible = $montoTotal - $montoAsignado;
+            $porcentajeUsado = $montoTotal > 0 ? ($montoAsignado / $montoTotal) * 100 : 0;
+
+            $resumen[] = [
+                'fuente' => $fuente->nombre ?? 'Sin fuente',
+                'identificador' => $fuente->identificador ?? 'Sin identificador',
+                'montoTotal' => $montoTotal,
+                'montoAsignado' => $montoAsignado,
+                'montoDisponible' => $montoDisponible,
+                'porcentajeUsado' => $porcentajeUsado,
+                'estado' => $this->getEstadoPresupuesto($porcentajeUsado),
+            ];
+        }
+
+        return collect($resumen);
+    }
+
+    private function getEstadoPresupuesto($porcentaje)
+    {
+        if ($porcentaje >= 100) {
+            return ['clase' => 'bg-red-500', 'texto' => 'Agotado', 'color' => 'text-red-700'];
+        } elseif ($porcentaje >= 60) {
+            return ['clase' => 'bg-yellow-500', 'texto' => 'Poco recurso', 'color' => 'text-yellow-700'];
+        } else {
+            return ['clase' => 'bg-green-500', 'texto' => 'Disponible', 'color' => 'text-green-700'];
+        }
+    }
+
     public function render()
     {
         if (!$this->idDeptartamento) {
@@ -377,7 +443,8 @@ class Actividades extends Component
             );
             
             return view('livewire.actividad.actividades', [
-                'actividades' => $actividadesVacias
+                'actividades' => $actividadesVacias,
+                'resumenPresupuesto' => collect([])
             ])->layout('layouts.app');
         }
 
@@ -393,8 +460,11 @@ class Actividades extends Component
             ->with(['tipo', 'departamento', 'categoria', 'resultado.dimension'])
             ->paginate(10);
 
+        $resumenPresupuesto = $this->getResumenPresupuesto();
+
         return view('livewire.actividad.actividades', [
-            'actividades' => $actividades
+            'actividades' => $actividades,
+            'resumenPresupuesto' => $resumenPresupuesto
         ])->layout('layouts.app');
     }
 }

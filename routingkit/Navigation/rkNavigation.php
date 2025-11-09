@@ -13,7 +13,7 @@ return [
             RkNavigation::makeSimple('dashboard')
                 ->setParentId('dashboard_group')
                 ->setUrl('/dashboard')
-                ->setDescription('Accede al panel principal')
+                ->setDescription('Administra estadisticas y supervisa los movimientos del sistema')
                 ->setLabel('Panel Principal')
                 ->setHeroIcon('home')
                 ->setItems([])
