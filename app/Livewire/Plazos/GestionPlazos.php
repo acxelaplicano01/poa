@@ -17,6 +17,7 @@ class GestionPlazos extends Component
     // Propiedades del formulario
     public $plazoId;
     public $tipo_plazo;
+    public $nombre_plazo;
     public $fecha_inicio;
     public $fecha_fin;
     public $idPoa;
@@ -42,6 +43,7 @@ class GestionPlazos extends Component
     {
         return [
             'tipo_plazo' => 'required|in:asignacion_nacional,asignacion_departamental,planificacion,requerimientos,seguimiento',
+            'nombre_plazo' => 'nullable|string|max:255',
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
             'idPoa' => 'required|exists:poas,id',
@@ -82,7 +84,7 @@ class GestionPlazos extends Component
 
     public function crear()
     {
-        $this->reset(['plazoId', 'tipo_plazo', 'fecha_inicio', 'fecha_fin', 'idPoa', 'activo', 'descripcion']);
+        $this->reset(['plazoId', 'tipo_plazo', 'nombre_plazo', 'fecha_inicio', 'fecha_fin', 'idPoa', 'activo', 'descripcion']);
         $this->activo = true;
         $this->isEditing = false;
         $this->modalOpen = true;
@@ -94,6 +96,7 @@ class GestionPlazos extends Component
         
         $this->plazoId = $plazo->id;
         $this->tipo_plazo = $plazo->tipo_plazo;
+        $this->nombre_plazo = $plazo->nombre_plazo;
         $this->fecha_inicio = $plazo->fecha_inicio->format('Y-m-d');
         $this->fecha_fin = $plazo->fecha_fin->format('Y-m-d');
         $this->idPoa = $plazo->idPoa;
@@ -110,10 +113,12 @@ class GestionPlazos extends Component
 
         DB::beginTransaction();
         try {
-            // Si se está activando un plazo, desactivar otros del mismo tipo para el mismo POA
-            if ($this->activo) {
+            // Si se está activando un plazo Y NO tiene nombre personalizado, 
+            // desactivar otros del mismo tipo para el mismo POA (solo los que tampoco tienen nombre personalizado)
+            if ($this->activo && empty($this->nombre_plazo)) {
                 PlazoPoa::where('idPoa', $this->idPoa)
                     ->where('tipo_plazo', $this->tipo_plazo)
+                    ->whereNull('nombre_plazo') // Solo desactivar plazos sin nombre personalizado
                     ->when($this->plazoId, function($query) {
                         $query->where('id', '!=', $this->plazoId);
                     })
@@ -122,6 +127,7 @@ class GestionPlazos extends Component
 
             $data = [
                 'tipo_plazo' => $this->tipo_plazo,
+                'nombre_plazo' => $this->nombre_plazo,
                 'fecha_inicio' => $this->fecha_inicio,
                 'fecha_fin' => $this->fecha_fin,
                 'idPoa' => $this->idPoa,
@@ -143,7 +149,7 @@ class GestionPlazos extends Component
             
             session()->flash('message', $mensaje);
             $this->modalOpen = false;
-            $this->reset(['plazoId', 'tipo_plazo', 'fecha_inicio', 'fecha_fin', 'idPoa', 'activo', 'descripcion']);
+            $this->reset(['plazoId', 'tipo_plazo', 'nombre_plazo', 'fecha_inicio', 'fecha_fin', 'idPoa', 'activo', 'descripcion']);
             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -177,10 +183,11 @@ class GestionPlazos extends Component
         try {
             $plazo = PlazoPoa::findOrFail($id);
             
-            // Si se está activando, desactivar otros del mismo tipo
-            if (!$plazo->activo) {
+            // Si se está activando y NO tiene nombre personalizado, desactivar otros del mismo tipo sin nombre personalizado
+            if (!$plazo->activo && empty($plazo->nombre_plazo)) {
                 PlazoPoa::where('idPoa', $plazo->idPoa)
                     ->where('tipo_plazo', $plazo->tipo_plazo)
+                    ->whereNull('nombre_plazo') // Solo desactivar plazos sin nombre personalizado
                     ->where('id', '!=', $id)
                     ->update(['activo' => false]);
             }

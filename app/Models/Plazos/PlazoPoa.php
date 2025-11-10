@@ -12,6 +12,7 @@ class PlazoPoa extends BaseModel
 
     protected $fillable = [
         'tipo_plazo',
+        'nombre_plazo',
         'fecha_inicio',
         'fecha_fin',
         'idPoa',
@@ -100,6 +101,12 @@ class PlazoPoa extends BaseModel
     // Obtener etiqueta del tipo de plazo
     public function getTipoPlazoLabelAttribute()
     {
+        // Si hay un nombre personalizado, usarlo
+        if ($this->nombre_plazo) {
+            return $this->nombre_plazo;
+        }
+        
+        // Si no, usar el label por defecto del tipo
         $labels = [
             self::TIPO_ASIGNACION_NACIONAL => 'Asignación Nacional',
             self::TIPO_ASIGNACION_DEPARTAMENTAL => 'Asignación Departamental',

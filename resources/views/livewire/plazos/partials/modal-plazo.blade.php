@@ -42,6 +42,21 @@
                 @error('tipo_plazo') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
             </div>
 
+            <!-- Nombre Personalizado (Opcional) -->
+            <div>
+                <label for="nombre_plazo" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                    Nombre Personalizado del Plazo (Opcional)
+                </label>
+                <input type="text" wire:model="nombre_plazo" id="nombre_plazo"
+                       class="w-full rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                       placeholder="Ej: Extensión de Planificación, Plazo Adicional de Requerimientos, etc.">
+                <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    Si proporciona un nombre personalizado, se mostrará este en lugar del tipo de plazo estándar. 
+                    Útil para crear plazos adicionales como "Extensión de Planificación".
+                </p>
+                @error('nombre_plazo') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+            </div>
+
             <!-- Fechas -->
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
@@ -75,12 +90,20 @@
             </div>
 
             <!-- Estado Activo -->
-            <div class="flex items-center">
-                <input type="checkbox" wire:model="activo" id="activo"
-                       class="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-700">
-                <label for="activo" class="ml-2 block text-sm text-zinc-700 dark:text-zinc-300">
-                    Activar este plazo (solo puede haber uno activo por tipo y POA)
-                </label>
+            <div class="flex items-start">
+                <div class="flex items-center h-5">
+                    <input type="checkbox" wire:model="activo" id="activo"
+                           class="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-700">
+                </div>
+                <div class="ml-3">
+                    <label for="activo" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        Activar este plazo
+                    </label>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                        Si activas un plazo sin nombre personalizado, se desactivarán otros plazos estándar del mismo tipo. 
+                        Los plazos personalizados pueden coexistir activos.
+                    </p>
+                </div>
             </div>
         </form>
     </x-slot>

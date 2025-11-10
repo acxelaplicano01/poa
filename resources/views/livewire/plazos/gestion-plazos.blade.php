@@ -96,8 +96,20 @@
                                         <div class="text-xs text-zinc-500 dark:text-zinc-400">Sin POA asociado</div>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm text-zinc-900 dark:text-zinc-100">{{ $plazo->tipo_plazo_label }}</span>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <span class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ $plazo->tipo_plazo_label }}</span>
+                                        @if($plazo->nombre_plazo)
+                                            <span class="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300">
+                                                Personalizado
+                                            </span>
+                                        @endif
+                                    </div>
+                                    @if(!$plazo->nombre_plazo)
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                            Plazo estándar
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-zinc-900 dark:text-zinc-100">
@@ -163,7 +175,14 @@
                         <div class="flex justify-between items-start mb-3">
                             <div>
                                 <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $plazo->poa->anio }} - {{ $plazo->poa->name }}</h3>
-                                <p class="text-sm text-zinc-600 dark:text-zinc-400">{{ $plazo->tipo_plazo_label }}</p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <p class="text-sm text-zinc-600 dark:text-zinc-400">{{ $plazo->tipo_plazo_label }}</p>
+                                    @if($plazo->nombre_plazo)
+                                        <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300">
+                                            Personalizado
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                             @if($plazo->estado === 'vigente')
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
