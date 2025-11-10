@@ -67,8 +67,15 @@ class GestionPlazos extends Component
 
     public function cargarListas()
     {
-        // Cargar POAs disponibles
+        // Obtener institución del usuario autenticado
+        $user = auth()->user();
+        $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+
+        // Cargar POAs disponibles (solo de la institución del usuario)
         $this->poas = Poa::with(['institucion', 'unidadEjecutora'])
+            ->when($userInstitucionId, function ($query) use ($userInstitucionId) {
+                $query->where('idInstitucion', $userInstitucionId);
+            })
             ->orderBy('anio', 'desc')
             ->get();
 
@@ -206,7 +213,16 @@ class GestionPlazos extends Component
 
     public function render()
     {
+        // Obtener institución del usuario autenticado
+        $user = auth()->user();
+        $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+
         $query = PlazoPoa::with(['poa.institucion', 'poa.unidadEjecutora'])
+            ->when($userInstitucionId, function ($q) use ($userInstitucionId) {
+                $q->whereHas('poa', function ($subQ) use ($userInstitucionId) {
+                    $subQ->where('idInstitucion', $userInstitucionId);
+                });
+            })
             ->orderBy('created_at', 'desc');
 
         // Aplicar filtros

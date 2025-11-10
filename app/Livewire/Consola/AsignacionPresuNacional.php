@@ -105,7 +105,27 @@ class AsignacionPresuNacional extends Component
 
     public function render()
     {
+        // Obtener institución y UE del usuario autenticado
+        $user = auth()->user();
+        $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+        $userUE = $user->empleado?->idUnidadEjecutora;
+
         $poas = Poa::with(['institucion', 'unidadEjecutora', 'techoUes.grupoGasto', 'techoUes.fuente'])
+            // Filtrar por institución del usuario
+            ->when($userInstitucionId, function ($query) use ($userInstitucionId) {
+                $query->where('idInstitucion', $userInstitucionId);
+            })
+            // Filtrar por UE del usuario si tiene una asignada
+            // Mostrar POAs sin UE (nacionales) O POAs de su UE O POAs con techos asignados a su UE
+            ->when($userUE, function ($query) use ($userUE) {
+                $query->where(function ($q) use ($userUE) {
+                    $q->whereNull('idUE') // POAs nacionales sin UE específica
+                      ->orWhere('idUE', $userUE) // POAs de su UE
+                      ->orWhereHas('techoUes', function ($subQ) use ($userUE) {
+                          $subQ->where('idUE', $userUE); // POAs con techos asignados a su UE
+                      });
+                });
+            })
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('anio', 'like', '%' . $this->search . '%')
@@ -128,12 +148,19 @@ class AsignacionPresuNacional extends Component
             $poa->progreso_departamentos = $this->calcularProgresoDepartamentos($poa);
         }
 
-        $instituciones = Institucion::orderBy('nombre')->get();
+        // Filtrar instituciones, grupos y fuentes por la institución del usuario
+        $instituciones = $userInstitucionId 
+            ? Institucion::where('id', $userInstitucionId)->orderBy('nombre')->get()
+            : Institucion::orderBy('nombre')->get();
+            
         $grupoGastos = GrupoGasto::orderBy('nombre')->get();
         $fuentes = Fuente::orderBy('nombre')->get();
         
-        // Obtener años únicos para el filtro
+        // Obtener años únicos para el filtro (solo de la institución del usuario)
         $anios = Poa::select('anio')
+            ->when($userInstitucionId, function ($query) use ($userInstitucionId) {
+                $query->where('idInstitucion', $userInstitucionId);
+            })
             ->distinct()
             ->whereNotNull('anio')
             ->orderBy('anio', 'desc')

@@ -524,16 +524,39 @@ class AsignacionPresupuestaria extends Component
      */
     private function calcularProgresoDepartamentos($poa)
     {
-        // Determinar si es un POA de UE específica o institucional
-        if ($poa->unidadEjecutora) {
-            // POA de UE específica: contar solo departamentos de esa UE
-            $totalDepartamentos = $poa->unidadEjecutora->departamentos()->count();
+        // Obtener la UE del usuario actual
+        $user = auth()->user()->load('empleado');
+        $userUE = $user && $user->empleado ? $user->empleado->idUnidadEjecutora : null;
+        
+        // Determinar qué UE usar para el cálculo
+        $ueParaCalculo = null;
+        
+        if ($userUE) {
+            // Usuario tiene UE asignada: usar esa UE
+            $ueParaCalculo = UnidadEjecutora::find($userUE);
+        } elseif ($poa->unidadEjecutora) {
+            // Usuario sin UE (admin) y POA tiene UE directa: usar esa UE
+            $ueParaCalculo = $poa->unidadEjecutora;
         } else {
-            // POA institucional: contar departamentos de todas las UEs de la institución
-            $totalDepartamentos = \App\Models\Departamento\Departamento::whereHas('unidadEjecutora', function($query) use ($poa) {
-                $query->where('idInstitucion', $poa->idInstitucion);
-            })->count();
+            // POA sin UE directa: obtener primera UE de los techos
+            $primerTechoConUE = $poa->techoUes->whereNotNull('idUE')->first();
+            if ($primerTechoConUE && $primerTechoConUE->unidadEjecutora) {
+                $ueParaCalculo = $primerTechoConUE->unidadEjecutora;
+            }
         }
+        
+        // Si no hay UE para calcular, retornar progreso 0
+        if (!$ueParaCalculo) {
+            return [
+                'porcentaje' => 0,
+                'departamentos_con_presupuesto' => 0,
+                'total_departamentos' => 0,
+                'color' => 'bg-red-500'
+            ];
+        }
+        
+        // Contar total de departamentos de la UE específica
+        $totalDepartamentos = $ueParaCalculo->departamentos()->count();
         
         // Si no hay departamentos, el progreso es 0
         if ($totalDepartamentos == 0) {
@@ -545,8 +568,12 @@ class AsignacionPresupuestaria extends Component
             ];
         }
         
-        // Contar departamentos con presupuesto asignado en este POA
+        // Contar departamentos con presupuesto asignado en este POA para la UE específica
+        // Solo contar techos que pertenecen a esta UE
         $departamentosConPresupuesto = $poa->techoDeptos()
+            ->whereHas('techoUe', function($query) use ($ueParaCalculo) {
+                $query->where('idUE', $ueParaCalculo->id);
+            })
             ->where('monto', '>', 0)
             ->distinct('idDepartamento')
             ->count('idDepartamento');
@@ -585,6 +612,10 @@ class AsignacionPresupuestaria extends Component
             return redirect()->back();
         }
 
+        // Obtener la UE del usuario actual
+        $user = auth()->user()->load('empleado');
+        $userUE = $user && $user->empleado ? $user->empleado->idUnidadEjecutora : null;
+
         // Si no se proporciona idUE, intentar obtenerlo del POA
         if (!$idUE) {
             $poa = Poa::with('techoUes.unidadEjecutora')->find($poaId);
@@ -593,13 +624,24 @@ class AsignacionPresupuestaria extends Component
                 return redirect()->back();
             }
 
-            // Obtener UE directa o desde techos
-            $idUE = $poa->idUE ?? $poa->techoUes->whereNotNull('idUE')->first()?->idUE;
+            // Si el usuario tiene UE asignada, usar esa
+            if ($userUE) {
+                $idUE = $userUE;
+            } else {
+                // Si no tiene UE, obtener UE directa o desde techos
+                $idUE = $poa->idUE ?? $poa->techoUes->whereNotNull('idUE')->first()?->idUE;
+            }
             
             if (!$idUE) {
                 session()->flash('error', 'Este POA no tiene una Unidad Ejecutora asignada.');
                 return redirect()->back();
             }
+        }
+        
+        // Validar que el usuario tenga acceso a esta UE
+        if ($userUE && $userUE != $idUE) {
+            session()->flash('error', 'No tienes permiso para gestionar esta Unidad Ejecutora.');
+            return redirect()->back();
         }
         
         // Usar la ruta con estructura de 3 partes para mejor breadcrumb

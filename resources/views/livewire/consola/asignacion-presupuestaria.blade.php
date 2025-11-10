@@ -55,9 +55,19 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
                         @foreach($poas as $poa)
                             @php
-                                // Obtener la UE: directa del POA o desde el primer techo asignado
-                                $ueId = $poa->idUE ?? $poa->techoUes->whereNotNull('idUE')->first()?->idUE;
-                                $ueNombre = $poa->unidadEjecutora->name ?? $poa->techoUes->whereNotNull('idUE')->first()?->unidadEjecutora?->name ?? 'N/A';
+                                // Obtener la UE del usuario actual
+                                $userUE = auth()->user()->empleado?->idUnidadEjecutora;
+                                
+                                // Si el usuario tiene UE, usar esa; si no, obtener del POA
+                                if ($userUE) {
+                                    $ueId = $userUE;
+                                    // Obtener el nombre de la UE del usuario
+                                    $ueNombre = auth()->user()->empleado?->unidadEjecutora?->name ?? 'N/A';
+                                } else {
+                                    // Usuario sin UE (admin): obtener UE del POA o primer techo
+                                    $ueId = $poa->idUE ?? $poa->techoUes->whereNotNull('idUE')->first()?->idUE;
+                                    $ueNombre = $poa->unidadEjecutora->name ?? $poa->techoUes->whereNotNull('idUE')->first()?->unidadEjecutora?->name ?? 'N/A';
+                                }
                                 
                                 // Determinar si es histórico (año vencido)
                                 $anioActual = (int) date('Y');

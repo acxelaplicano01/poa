@@ -95,27 +95,54 @@ class GestionTechoUeNacional extends Component
 
     public function loadPoa()
     {
-        $this->poa = Poa::with(['institucion', 'techoUes.unidadEjecutora', 'techoUes.grupoGasto'])
-            ->findOrFail($this->idPoa);
+        // Obtener institución del usuario autenticado
+        $user = auth()->user();
+        $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+
+        $query = Poa::with(['institucion', 'techoUes.unidadEjecutora', 'techoUes.grupoGasto']);
+        
+        // Filtrar por institución del usuario si aplica
+        if ($userInstitucionId) {
+            $query->where('idInstitucion', $userInstitucionId);
+        }
+        
+        $this->poa = $query->findOrFail($this->idPoa);
     }
 
     public function loadUnidadesEjecutoras()
     {
-        $this->unidadesEjecutoras = UnidadEjecutora::orderBy('name')->get();
+        // Obtener institución del usuario para mostrar todas las UEs de su institución
+        $user = auth()->user();
+        $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+        
+        // Mostrar todas las UEs de la institución del usuario
+        $this->unidadesEjecutoras = $userInstitucionId 
+            ? UnidadEjecutora::where('idInstitucion', $userInstitucionId)->orderBy('name')->get()
+            : UnidadEjecutora::orderBy('name')->get();
     }
 
     public function render()
     {
+        // Obtener institución del usuario (no filtrar por UE específica aquí)
+        $user = auth()->user();
+        $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+        
         $techoUesConTecho = collect();
         $unidadesSinTecho = collect();
         $resumenPorFuente = [];
         $totalAsignado = 0;
 
         if ($this->poa) {
-            // Obtener todas las UEs con techo asignado (excluyendo techos globales)
+            // Obtener techos asignados de TODAS las UEs de la institución
             $techoUesQuery = $this->poa->techoUes()
                 ->with(['unidadEjecutora', 'grupoGasto'])
-                ->whereNotNull('idUE'); // Excluir techos globales
+                ->whereNotNull('idUE') // Excluir techos globales
+                // Filtrar solo UEs de la institución del usuario
+                ->when($userInstitucionId, function ($query) use ($userInstitucionId) {
+                    $query->whereHas('unidadEjecutora', function ($q) use ($userInstitucionId) {
+                        $q->where('idInstitucion', $userInstitucionId);
+                    });
+                });
             
             if ($this->searchConTecho) {
                 $techoUesQuery->whereHas('unidadEjecutora', function($q) {
@@ -127,9 +154,13 @@ class GestionTechoUeNacional extends Component
             $techoUesConTecho = $techoUesQuery->get();
             $totalAsignado = $techoUesConTecho->sum('monto');
 
-            // Obtener UEs sin techo asignado
+            // Obtener UEs sin techo asignado (todas de la institución)
             $uesConTechoIds = $techoUesConTecho->pluck('idUE')->unique();
-            $unidadesSinTechoQuery = UnidadEjecutora::whereNotIn('id', $uesConTechoIds);
+            $unidadesSinTechoQuery = UnidadEjecutora::whereNotIn('id', $uesConTechoIds)
+                // Filtrar solo UEs de la institución del usuario
+                ->when($userInstitucionId, function ($query) use ($userInstitucionId) {
+                    $query->where('idInstitucion', $userInstitucionId);
+                });
             
             if ($this->searchSinTecho) {
                 $unidadesSinTechoQuery->where(function($q) {

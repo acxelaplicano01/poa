@@ -66,8 +66,34 @@ class GestionTechoDeptos extends Component
         // No recibimos los parámetros directamente en mount ya que los manejamos vía $queryString
         
         if ($this->idPoa && $this->idUE) {
-            $this->poa = Poa::findOrFail($this->idPoa);
-            $this->unidadEjecutora = UnidadEjecutora::findOrFail($this->idUE);
+            // Obtener institución del usuario autenticado
+            $user = auth()->user();
+            $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+            $userUE = $user->empleado?->idUnidadEjecutora;
+
+            try {
+                // Validar acceso al POA según institución del usuario
+                $poaQuery = Poa::query();
+                if ($userInstitucionId) {
+                    $poaQuery->where('idInstitucion', $userInstitucionId);
+                }
+                $this->poa = $poaQuery->findOrFail($this->idPoa);
+                
+                // Validar acceso a la UE según usuario
+                $ueQuery = UnidadEjecutora::where('id', $this->idUE);
+                
+                // Si el usuario tiene UE asignada, validar que sea la misma
+                if ($userUE && $userUE != $this->idUE) {
+                    session()->flash('error', 'No tienes permiso para acceder a esta Unidad Ejecutora. Solo puedes gestionar la UE asignada a tu usuario.');
+                    return redirect()->route('asignacionpresupuestaria');
+                }
+                
+                $this->unidadEjecutora = $ueQuery->findOrFail($this->idUE);
+                
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                session()->flash('error', 'No tienes acceso a este POA o Unidad Ejecutora, o no existe.');
+                return redirect()->route('asignacionpresupuestaria');
+            }
             
             // Verificar si el POA es histórico (año vencido)
             $anioActual = (int) date('Y');
