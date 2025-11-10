@@ -119,9 +119,18 @@ class AsignacionPresupuestaria extends Component
         //     'empleado_data' => $user && $user->empleado ? $user->empleado->toArray() : null
         // ]);
 
+        $anioActual = (int) date('Y');
+        
         $poas = Poa::with(['institucion', 'unidadEjecutora', 'techoUes.grupoGasto', 'techoUes.fuente'])
-            // Filtrar solo POAs activos
-            ->where('activo', true)
+            // Mostrar POAs activos O POAs inactivos solo si el año ya venció (históricos)
+            ->where(function ($query) use ($anioActual) {
+                $query->where('activo', true) // POAs activos (cualquier año)
+                      ->orWhere(function ($q) use ($anioActual) {
+                          // POAs inactivos solo si el año ya pasó (históricos)
+                          $q->where('activo', false)
+                            ->where('anio', '<', $anioActual);
+                      });
+            })
             // Filtrar POAs que tengan techos asignados a UEs (no solo idUE directa)
             ->where(function ($query) {
                 $query->whereNotNull('idUE') // POAs con UE directa
@@ -152,6 +161,8 @@ class AsignacionPresupuestaria extends Component
                 $query->where('anio', $this->filtroAnio);
             })
             ->withCount('poaDeptos')
+            // Ordenar: primero POAs del año actual, luego por campo seleccionado
+            ->orderByRaw("CASE WHEN anio >= {$anioActual} THEN 0 ELSE 1 END")
             ->orderBy($this->sortField, $this->sortDirection)
              ->paginate(12);
 

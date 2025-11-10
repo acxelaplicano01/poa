@@ -44,6 +44,7 @@ class GestionTechoDeptos extends Component
     public $puedeAsignarPresupuesto = false;
     public $mensajePlazo = '';
     public $diasRestantes = null;
+    public $esPoaHistorico = false; // Nueva propiedad para POAs históricos
     
     protected $rules = [
         'idDepartamento' => 'required|exists:departamentos,id',
@@ -68,8 +69,18 @@ class GestionTechoDeptos extends Component
             $this->poa = Poa::findOrFail($this->idPoa);
             $this->unidadEjecutora = UnidadEjecutora::findOrFail($this->idUE);
             
-            // Verificar si se puede asignar presupuesto departamental
-            $this->verificarPlazo();
+            // Verificar si el POA es histórico (año vencido)
+            $anioActual = (int) date('Y');
+            $this->esPoaHistorico = $this->poa->anio < $anioActual;
+            
+            // Si es histórico, no se puede asignar presupuesto
+            if ($this->esPoaHistorico) {
+                $this->puedeAsignarPresupuesto = false;
+                $this->mensajePlazo = 'Este POA es histórico (año ' . $this->poa->anio . '). Solo puedes consultar la información, no realizar asignaciones.';
+            } else {
+                // Verificar si se puede asignar presupuesto departamental (solo si no es histórico)
+                $this->verificarPlazo();
+            }
             
             // Cargar listas para los selects
             $this->loadDepartamentos();
