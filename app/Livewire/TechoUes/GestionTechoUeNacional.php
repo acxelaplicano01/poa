@@ -84,6 +84,9 @@ class GestionTechoUeNacional extends Component
     private function verificarPlazo()
     {
         if ($this->poa) {
+            // Desactivar automáticamente plazos vencidos
+            \App\Models\Plazos\PlazoPoa::desactivarPlazosVencidos($this->idPoa);
+            
             $this->puedeAsignarPresupuesto = $this->poa->puedeAsignarPresupuestoNacional();
             $this->diasRestantes = $this->poa->getDiasRestantesAsignacionNacional();
             
@@ -123,6 +126,12 @@ class GestionTechoUeNacional extends Component
 
     public function render()
     {
+        // Recargar POA para tener datos frescos de plazos
+        $this->poa->refresh();
+        
+        // Verificar estado del plazo en cada render
+        $this->verificarPlazo();
+        
         // Obtener institución del usuario (no filtrar por UE específica aquí)
         $user = auth()->user();
         $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;

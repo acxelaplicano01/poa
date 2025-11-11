@@ -144,4 +144,29 @@ class PlazoPoa extends BaseModel
                   ->vigente()
                   ->exists();
     }
+
+    /**
+     * Desactiva automáticamente los plazos vencidos para un POA específico
+     * Retorna la cantidad de plazos desactivados
+     */
+    public static function desactivarPlazosVencidos($idPoa = null)
+    {
+        $hoy = Carbon::now()->format('Y-m-d');
+        
+        $query = self::where('activo', true)
+                    ->where('fecha_fin', '<', $hoy);
+        
+        if ($idPoa) {
+            $query->where('idPoa', $idPoa);
+        }
+        
+        $plazosVencidos = $query->get();
+        
+        foreach ($plazosVencidos as $plazo) {
+            $plazo->activo = false;
+            $plazo->save();
+        }
+        
+        return $plazosVencidos->count();
+    }
 }

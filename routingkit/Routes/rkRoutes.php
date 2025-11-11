@@ -315,6 +315,16 @@ return [
                         ->setRoles(['admin_general'])
                         ->setItems([])
                         ->setEndBlock('plazos'),
+
+                    RkRoute::make('plazos-poa')
+                        ->setParentId('consola')
+                        ->setAccessPermission('consola.plazos.gestionar')
+                        ->setUrlMethod('get')
+                        ->setUrlPattern('plazos-poa/{idPoa}')
+                        ->setUrlController('App\Livewire\Plazos\GestionPlazosPoa')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('plazos-poa'),
                 ])
                 ->setEndBlock('consola'),
 
