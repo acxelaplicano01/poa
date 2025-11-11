@@ -273,10 +273,10 @@ return [
                         ->setLabel('Techos presupuestarios UE')
                         ->setHeroIcon('arrow-trending-up')
                         ->setItems([
-                            RkNavigation::make('plazos')
-                                ->setLabel('Plazos de asignación')
-                                ->setDescription('Define y gestiona los plazos para la asignación presupuestaria nacional, departamental y planificación')
-                        ])
+                            RkNavigation::make('plazos-poa')
+                            ->setLabel('Plazos del POA')
+                            ->setDescription('Define y gestiona los plazos para la asignación presupuestaria nacional, departamental y planificación de este POA')
+                    ])
                         ->setEndBlock('techonacional'),
                 ])
                 ->setEndBlock('asignacionnacionalpresupuestaria'),

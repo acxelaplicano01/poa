@@ -18,42 +18,6 @@
                 </div>
             @endif
 
-            {{-- Información de plazos activos --}}
-            @php
-                $poasActivos = $poas->where('activo', true);
-                $hayPlazoActivo = false;
-                $diasRestantesPlazo = null;
-                
-                foreach($poasActivos as $poa) {
-                    if($poa->puedeAsignarPresupuestoNacional()) {
-                        $hayPlazoActivo = true;
-                        $diasRestantesPlazo = $poa->getDiasRestantesAsignacionNacional();
-                        break;
-                    }
-                }
-            @endphp
-
-            @if($hayPlazoActivo && $diasRestantesPlazo !== null)
-                <div class="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 px-4 py-3 rounded-lg flex items-center justify-between" role="alert">
-                    <div class="flex items-center">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <div>
-                            <p class="font-semibold text-sm">Plazo de asignación nacional activo</p>
-                            <p class="text-xs mt-0.5">Puedes crear y modificar presupuestos nacionales</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="flex items-baseline">
-                            <span class="text-3xl font-bold">{{ $diasRestantesPlazo }}</span>
-                            <span class="text-sm ml-1">{{ $diasRestantesPlazo == 1 ? 'día' : 'días' }}</span>
-                        </div>
-                        <p class="text-xs mt-0.5">{{ $diasRestantesPlazo == 1 ? 'restante' : 'restantes' }}</p>
-                    </div>
-                </div>
-            @endif
-
             <div class="mb-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <h2 class="text-xl font-semibold text-zinc-800 dark:text-zinc-200">

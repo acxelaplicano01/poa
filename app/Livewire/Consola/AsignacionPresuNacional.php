@@ -35,8 +35,10 @@ class AsignacionPresuNacional extends Component
     // Propiedades para múltiples Techos UE
     public $techos = [];
 
-    // Estado del plazo de asignación nacional
-    public $puedeAsignarPresupuestoNacional = true; // Por defecto true ya que es la creación inicial
+    // Nota: El plazo de asignación_nacional solo aplica para asignar presupuesto a las UEs,
+    // no para asignar presupuesto de fuentes al POA. Por lo tanto, estas propiedades
+    // siempre se mantienen en valores que permiten la edición del POA.
+    public $puedeAsignarPresupuestoNacional = true;
     public $mensajePlazo = '';
     public $diasRestantes = null;
 
@@ -227,35 +229,19 @@ class AsignacionPresuNacional extends Component
 
     private function verificarPlazo($poa)
     {
-        // Solo verificar si el POA ya existe y está activo
-        if ($poa && $poa->activo) {
-            $this->puedeAsignarPresupuestoNacional = $poa->puedeRealizarAccion('asignacion_nacional');
-            $this->diasRestantes = $poa->getDiasRestantes('asignacion_nacional');
-            
-            if (!$this->puedeAsignarPresupuestoNacional) {
-                $this->mensajePlazo = $poa->getMensajeErrorPlazo('asignacion_nacional');
-            }
-        } else {
-            // Si el POA no existe o no está activo, permitir creación/edición
-            $this->puedeAsignarPresupuestoNacional = true;
-            $this->diasRestantes = null;
-            $this->mensajePlazo = '';
-        }
+        // El plazo de asignación_nacional solo aplica para asignar a las UEs, 
+        // no para asignar presupuesto de fuentes al POA
+        // Por lo tanto, siempre permitimos la edición del POA
+        $this->puedeAsignarPresupuestoNacional = true;
+        $this->diasRestantes = null;
+        $this->mensajePlazo = '';
     }
 
     public function save()
     {
-        // Verificar plazo solo si es edición, POA está activo y el año no es anterior
-        if ($this->isEditing) {
-            $poa = Poa::find($this->poaId);
-            $anioActual = now()->year;
-            
-            // Solo validar plazos si el POA está activo y no es de un año anterior
-            if ($poa && $poa->activo && $poa->anio >= $anioActual && !$poa->puedeAsignarPresupuestoNacional()) {
-                session()->flash('error', $poa->getMensajeErrorPlazo('asignacion_nacional'));
-                return;
-            }
-        }
+        // El plazo de asignación_nacional solo aplica para asignar a las UEs,
+        // no para asignar presupuesto de fuentes al POA
+        // Por lo tanto, no validamos plazos aquí
 
         try {
             // Log para debugging
