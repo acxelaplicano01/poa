@@ -253,7 +253,15 @@ return [
                 ->setDescription('Visualiza y gestiona el plan estratégico')
                 ->setLabel('Plan estratégico')
                 ->setHeroIcon('document-text')
-                ->setItems([])
+                ->setItems([
+                    RkNavigation::make('dimensiones')
+                        ->setParentId('consola')
+                        ->setDescription('Gestión de Dimensiones')
+                        ->setLabel('Dimensiones')
+                        ->setHeroIcon('square-3-stack-3d')
+                        ->setEndBlock('dimensiones'),
+
+                ])
                 ->setEndBlock('planestrategicoinstitucional'),
 
             RkNavigation::make('asignacionnacionalpresupuestaria')

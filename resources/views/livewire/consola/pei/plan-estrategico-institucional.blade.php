@@ -83,9 +83,9 @@
                                 {{ $pei->periodo ?? 'N/A' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
+                                <a href="{{ route('dimensiones', ['pei' => $pei->id]) }}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
                                     {{ $pei->dimensions->count() }} dimensiones
-                                </span>
+                                </a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
@@ -164,9 +164,9 @@
                             <div class="mt-2">
                                 <div class="flex justify-between items-center text-sm text-zinc-500 dark:text-zinc-400">
                                     <span>Período: {{ $pei->periodo ?? 'N/A' }}</span>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
+                                    <a href="{{ route('dimensiones', ['pei' => $pei->id]) }}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
                                         {{ $pei->dimensions->count() }} dimensiones
-                                    </span>
+                                    </a>
                                 </div>
                             </div>
                         </div>

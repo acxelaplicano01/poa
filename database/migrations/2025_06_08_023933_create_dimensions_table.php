@@ -14,7 +14,7 @@ return new class extends Migration
                 $table->id();
                 $table->string('nombre');
                 $table->string('descripcion');
-                //$table->foreignId('idPei')->constrained('peis');
+                $table->foreignId('idPei')->constrained('peis');
 
                 $table->foreignId('created_by')->nullable()->constrained('users');
                 $table->foreignId('updated_by')->nullable()->constrained('users');

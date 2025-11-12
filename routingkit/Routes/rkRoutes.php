@@ -250,7 +250,17 @@ return [
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Consola\PlanEstrategicoInstitucional')
                         ->setRoles(['admin_general'])
-                        ->setItems([])
+                        ->setItems([
+                                    RkRoute::make('dimensiones')
+                                ->setParentId('consola')
+                                ->setAccessPermission('consola.dimensiones.ver')
+                                ->setUrlMethod('get')
+                                ->setUrlController('App\Livewire\Consola\Dimensiones\Dimension')
+                                ->setRoles(['admin_general'])
+                                ->setItems([
+                                ])
+                                ->setEndBlock('dimensiones'),
+                        ])
                         ->setEndBlock('planestrategicoinstitucional'),
 
                     RkRoute::make('asignacionnacionalpresupuestaria')

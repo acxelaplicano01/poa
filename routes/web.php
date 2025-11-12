@@ -38,6 +38,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/doc', function () {
+    return view('doc');
+});
+
 Route::get('/dashboard', function () {
     return view('layouts.app');
 })
