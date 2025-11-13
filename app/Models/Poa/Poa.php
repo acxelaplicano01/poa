@@ -147,26 +147,56 @@ class Poa extends BaseModel
             return 'El POA está inactivo. No se pueden realizar acciones sobre él.';
         }
 
+        // Primero buscar plazo activo
         $plazo = $this->plazos()
             ->where('tipo_plazo', $tipoPlazo)
             ->where('activo', true)
             ->first();
 
+        // Si no hay plazo activo, buscar cualquier plazo de este tipo (incluso inactivos)
+        if (!$plazo) {
+            $plazo = $this->plazos()
+                ->where('tipo_plazo', $tipoPlazo)
+                ->orderBy('fecha_fin', 'desc') // Obtener el más reciente
+                ->first();
+        }
+
+        // Si definitivamente no existe ningún plazo configurado
         if (!$plazo) {
             return 'No hay un plazo configurado para esta acción.';
         }
 
         $hoy = now();
         
+        // Plazo aún no ha iniciado
         if ($hoy < $plazo->fecha_inicio) {
             return 'El plazo para esta acción aún no ha iniciado. Inicia el ' . \Carbon\Carbon::parse($plazo->fecha_inicio)->format('d/m/Y') . '.';
         }
 
+        // Plazo vencido
         if ($hoy > $plazo->fecha_fin) {
-            return 'El plazo para esta acción ha vencido. Venció el ' . \Carbon\Carbon::parse($plazo->fecha_fin)->format('d/m/Y') . '.';
+            $diasVencido = (int) \Carbon\Carbon::parse($plazo->fecha_fin)->diffInDays($hoy);
+            $nombrePlazo = $plazo->nombre_plazo ?: $this->getNombreTipoPlazo($tipoPlazo);
+            return 'El plazo de ' . $nombrePlazo . ' venció hace ' . $diasVencido . ($diasVencido == 1 ? ' día' : ' días') . ' (el ' . \Carbon\Carbon::parse($plazo->fecha_fin)->format('d/m/Y') . ').';
         }
 
         return 'No se puede realizar esta acción en este momento.';
+    }
+
+    /**
+     * Obtiene el nombre legible del tipo de plazo
+     */
+    private function getNombreTipoPlazo($tipoPlazo)
+    {
+        $nombres = [
+            'asignacion_nacional' => 'asignación nacional',
+            'asignacion_departamental' => 'asignación departamental',
+            'planificacion' => 'planificación',
+            'requerimientos' => 'requerimientos',
+            'seguimiento' => 'seguimiento',
+        ];
+
+        return $nombres[$tipoPlazo] ?? 'esta acción';
     }
 
     /**

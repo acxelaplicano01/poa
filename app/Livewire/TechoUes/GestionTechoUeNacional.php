@@ -39,6 +39,34 @@ class GestionTechoUeNacional extends Component
     public $mensajePlazo = '';
     public $diasRestantes = null;
     
+    // Timeline de plazos
+    public function getPlazosTimelineProperty()
+    {
+        if (!$this->poa) {
+            return collect();
+        }
+        
+        return \App\Models\Plazos\PlazoPoa::where('idPoa', $this->idPoa)
+            ->orderBy('fecha_inicio', 'asc')
+            ->get()
+            ->map(function($plazo) {
+                return [
+                    'id' => $plazo->id,
+                    'nombre' => $plazo->tipo_plazo_label,
+                    'tipo' => $plazo->tipo_plazo,
+                    'fecha_inicio' => $plazo->fecha_inicio,
+                    'fecha_fin' => $plazo->fecha_fin,
+                    'activo' => $plazo->activo,
+                    'estado' => $plazo->estado,
+                    'dias_restantes' => $plazo->diasRestantes(),
+                    'es_vigente' => $plazo->estaVigente(),
+                    'ha_vencido' => $plazo->haVencido(),
+                    'es_proximo' => $plazo->esProximo(),
+                    'descripcion' => $plazo->descripcion,
+                ];
+            });
+    }
+    
     public function getFuentesProperty()
     {
         // Obtener techos globales (con idUE null) del POA actual como fuentes disponibles
