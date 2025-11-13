@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="flex justify-end mt-4 sm:mt-0">
-                        <x-button wire:click="create()" class="w-full sm:w-auto justify-center" :disabled="!$puedeAsignarPresupuesto">
+                        <x-button wire:click="create()" class="w-full sm:w-auto justify-center {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                             <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -552,6 +552,14 @@
                                         </div>
                                     </div>
                                 </div>
+                            @else
+                                <div class="text-center py-12">
+                                    <svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">No hay plazos registrados</h3>
+                                    <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">No se han definido plazos para el POA {{ $poa->anio }}.</p>
+                                </div>
                             @endif
                         </div>
                     @elseif($activeTab === 'sin-asignar')
@@ -590,7 +598,7 @@
                                             </div>
                                             <div class="mt-3 flex justify-end">
                                                 <x-button wire:click="crearTechoParaUe({{ $ue->id }})" :disabled="!$puedeAsignarPresupuesto"
-                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800 transition-colors">
+                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-indigo-700 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-300 transition-colors {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-indigo-200 dark:hover:bg-indigo-800' }}">
                                                     <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                                     </svg>
