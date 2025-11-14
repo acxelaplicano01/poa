@@ -140,14 +140,15 @@ return [
                         ->setItems([])
                         ->setEndBlock('roles.create'),
 
-                    RkRoute::make('roles.edit')
+                   /* RkRoute::make('roles.edit')
                         ->setParentId('configuracion')
                         ->setAccessPermission('configuracion.roles.editar')
                         ->setUrlMethod('get')
+                        ->setUrlPattern('roles/{roleId}/editar')
                         ->setUrlController('App\Livewire\Rol\RoleForm')
                         ->setRoles(['admin_general'])
                         ->setItems([])
-                        ->setEndBlock('roles.edit'),
+                        ->setEndBlock('roles.edit'),*/
 
                     RkRoute::make('usuarios')
                         ->setParentId('configuracion')

@@ -24,7 +24,7 @@
 // use App\Livewire\Requisicion\EstadosRequisicion;
 // use App\Livewire\Requisicion\UnidadMedidas;
 // use App\Livewire\Rol\Roles;
-// use App\Livewire\Rol\RoleForm;
+ use App\Livewire\Rol\RoleForm;
 // use App\Livewire\Seguimiento\Seguimiento;
 // use App\Livewire\Actividad\TipoActividades;
 // use App\Livewire\Mes\Trimestres;
@@ -108,9 +108,9 @@ Route::get('/dashboard', function () {
 //             ->name('roles.create')
 //             ->middleware('can:configuracion.roles.crear');
 
-//         Route::get('/configuracion/roles/{roleId}/editar', RoleForm::class)
-//             ->name('roles.edit')
-//             ->middleware('can:configuracion.roles.editar');
+         Route::get('/configuracion/roles/{roleId}/editar', RoleForm::class)
+             ->name('roles.edit')
+             ->middleware('can:configuracion.roles.editar');
 
 //         Route::get('/configuracion/usuarios', Usuarios::class)
 //             ->name('usuarios')
