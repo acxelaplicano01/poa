@@ -234,11 +234,17 @@ class Actividades extends Component
     public function generarConIA()
     {
         $this->validate([
-            'nombreParaIA' => 'required|min:10|max:255'
+              'nombre' => 'required|min:10|max:255',
+             // 'nombreParaIA' => 'required|min:10|max:255'
         ], [
-            'nombreParaIA.required' => 'Ingrese el nombre de la actividad',
-            'nombreParaIA.min' => 'El nombre debe tener al menos 10 caracteres para generar con IA',
-            'nombreParaIA.max' => 'El nombre no puede exceder 255 caracteres'
+            'nombre.required' => 'Ingrese el nombre de la actividad',
+            'nombre.min' => 'El nombre debe tener al menos 10 caracteres para generar con IA',
+            'nombre.max' => 'El nombre no puede exceder 255 caracteres'
+
+            //'nombreParaIA.required' => 'Ingrese el nombre de la actividad',
+          //  'nombreParaIA.min' => 'El nombre debe tener al menos 10 caracteres para generar con IA',
+           // 'nombreParaIA.max' => 'El nombre no puede exceder 255 caracteres'
+       
         ]);
 
         // Verificar throttling
@@ -256,7 +262,8 @@ class Actividades extends Component
         $this->dispatch('ia-generando');
 
         try {
-            \Log::info('Iniciando generación con IA', ['nombre' => $this->nombreParaIA]);
+            //\Log::info('Iniciando generación con IA', ['nombre' => $this->nombreParaIA]);
+            \Log::info('Iniciando generación con IA', ['nombre' => $this->nombre]);
 
             // Usar el servicio de IA
             $iaService = new \App\Services\IAService();
@@ -275,7 +282,8 @@ class Actividades extends Component
 
             while ($intentoActual < $maxIntentos) {
                 try {
-                    $data = $iaService->generarActividad($this->nombreParaIA, $contextoInstitucion);
+                  //  $data = $iaService->generarActividad($this->nombreParaIA, $contextoInstitucion);
+                     $data = $iaService->generarActividad($this->nombre, $contextoInstitucion);
                     \Log::info("Respuesta de {$providerName} recibida exitosamente");
                     break; // Si fue exitoso, salir del bucle
                     
@@ -309,21 +317,21 @@ class Actividades extends Component
             \Log::info('Datos procesados correctamente', ['data' => $data, 'provider' => $providerName]);
 
             // Asignar los valores generados
-            $this->nombre = $this->nombreParaIA;
+           // $this->nombre = $this->nombreParaIA;
             $this->descripcion = $data['descripcion'] ?? '';
             $this->resultadoActividad = $data['resultadoActividad'] ?? '';
             $this->poblacion_objetivo = $data['poblacion_objetivo'] ?? '';
             $this->medio_verificacion = $data['medio_verificacion'] ?? '';
 
             // Cerrar el panel de IA
-            $this->usarIA = false;
-            $this->nombreParaIA = '';
+           // $this->usarIA = false;
+          // $this->nombreParaIA = '';
             
             // Registrar el timestamp de esta solicitud para throttling
             \Cache::put($throttleKey, now(), 60); // Guardar por 60 segundos
             
             \Log::info('Actividad generada exitosamente');
-            session()->flash('ia_success', '✨ ¡Actividad generada con IA! Revisa y ajusta los campos antes de continuar.');
+            session()->flash('ia_success', '¡Actividad generada con IA! Revisa y ajusta los campos antes de continuar.');
 
         } catch (\Exception $e) {
             \Log::error('Error en generarConIA: ' . $e->getMessage(), [
