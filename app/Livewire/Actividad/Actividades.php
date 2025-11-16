@@ -78,6 +78,11 @@ class Actividades extends Component
     public $mensajePlazo = '';
     public $diasRestantes = null;
 
+    // Propiedades para IA
+    public $usarIA = false;
+    public $generandoConIA = false;
+    public $nombreParaIA = '';
+
     protected function rules()
     {
         $rules = [
@@ -216,6 +221,126 @@ class Actividades extends Component
         $this->currentStep = 1;
         $this->resultadosPorDimension = [];
         $this->modalOpen = true;
+    }
+
+    public function toggleIA()
+    {
+        $this->usarIA = !$this->usarIA;
+        if (!$this->usarIA) {
+            $this->nombreParaIA = '';
+        }
+    }
+
+    public function generarConIA()
+    {
+        $this->validate([
+            'nombreParaIA' => 'required|min:10|max:255'
+        ], [
+            'nombreParaIA.required' => 'Ingrese el nombre de la actividad',
+            'nombreParaIA.min' => 'El nombre debe tener al menos 10 caracteres para generar con IA',
+            'nombreParaIA.max' => 'El nombre no puede exceder 255 caracteres'
+        ]);
+
+        // Verificar throttling
+        $throttleSeconds = config('ia.throttle_seconds', 30);
+        $throttleKey = 'ia_actividad_' . auth()->id();
+        $lastRequest = \Cache::get($throttleKey);
+        
+        if ($lastRequest && now()->diffInSeconds($lastRequest) < $throttleSeconds) {
+            $segundosRestantes = $throttleSeconds - now()->diffInSeconds($lastRequest);
+            session()->flash('error', "⏱️ Por favor espera {$segundosRestantes} segundos antes de generar otra actividad con IA.");
+            return;
+        }
+
+        $this->generandoConIA = true;
+        $this->dispatch('ia-generando');
+
+        try {
+            \Log::info('Iniciando generación con IA', ['nombre' => $this->nombreParaIA]);
+
+            // Usar el servicio de IA
+            $iaService = new \App\Services\IAService();
+            $providerName = $iaService->getProviderName();
+            
+            \Log::info("Generando con {$providerName}");
+
+            $contextoInstitucion = isset($this->userContext['institucion']) 
+                ? $this->userContext['institucion']->nombre 
+                : 'institución educativa';
+
+            // Intentar con reintentos en caso de rate limit
+            $maxIntentos = 3;
+            $intentoActual = 0;
+            $data = null;
+
+            while ($intentoActual < $maxIntentos) {
+                try {
+                    $data = $iaService->generarActividad($this->nombreParaIA, $contextoInstitucion);
+                    \Log::info("Respuesta de {$providerName} recibida exitosamente");
+                    break; // Si fue exitoso, salir del bucle
+                    
+                } catch (\Exception $apiException) {
+                    $intentoActual++;
+                    
+                    // Verificar si es error de rate limit
+                    if (str_contains($apiException->getMessage(), 'rate limit') || 
+                        str_contains($apiException->getMessage(), 'Rate limit') ||
+                        str_contains($apiException->getMessage(), 'quota')) {
+                        
+                        \Log::warning("Rate limit alcanzado en {$providerName}, intento {$intentoActual} de {$maxIntentos}");
+                        
+                        if ($intentoActual < $maxIntentos) {
+                            // Esperar antes de reintentar (2 segundos por cada intento)
+                            sleep(2 * $intentoActual);
+                        } else {
+                            throw new \Exception("Has alcanzado el límite de solicitudes de {$providerName}. Por favor espera 30 segundos e intenta nuevamente.");
+                        }
+                    } else {
+                        // Si no es rate limit, lanzar la excepción original
+                        throw $apiException;
+                    }
+                }
+            }
+
+            if (!$data) {
+                throw new \Exception("No se pudo obtener respuesta de {$providerName} después de múltiples intentos.");
+            }
+
+            \Log::info('Datos procesados correctamente', ['data' => $data, 'provider' => $providerName]);
+
+            // Asignar los valores generados
+            $this->nombre = $this->nombreParaIA;
+            $this->descripcion = $data['descripcion'] ?? '';
+            $this->resultadoActividad = $data['resultadoActividad'] ?? '';
+            $this->poblacion_objetivo = $data['poblacion_objetivo'] ?? '';
+            $this->medio_verificacion = $data['medio_verificacion'] ?? '';
+
+            // Cerrar el panel de IA
+            $this->usarIA = false;
+            $this->nombreParaIA = '';
+            
+            // Registrar el timestamp de esta solicitud para throttling
+            \Cache::put($throttleKey, now(), 60); // Guardar por 60 segundos
+            
+            \Log::info('Actividad generada exitosamente');
+            session()->flash('ia_success', '✨ ¡Actividad generada con IA! Revisa y ajusta los campos antes de continuar.');
+
+        } catch (\Exception $e) {
+            \Log::error('Error en generarConIA: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
+            session()->flash('error', 'Error al generar con IA: ' . $e->getMessage());
+        } finally {
+            $this->generandoConIA = false;
+        }
+    }
+
+    public function cancelarIA()
+    {
+        $this->usarIA = false;
+        $this->nombreParaIA = '';
+        $this->generandoConIA = false;
     }
 
     public function editar($id)

@@ -1,12 +1,123 @@
 {{-- Modal Crear/Editar con Pasos --}}
 <x-dialog-modal wire:model="modalOpen" maxWidth="4xl">
     <x-slot name="title">
-        {{ $actividadId ? 'Editar Actividad' : 'Nueva Actividad' }}
+        <div class="flex items-center justify-between">
+            <span>{{ $actividadId ? 'Editar Actividad' : 'Nueva Actividad' }}</span>
+            
+            {{-- Botón toggle IA (solo al crear) --}}
+            @if(!$actividadId)
+                <button 
+                    type="button"
+                    wire:click="toggleIA"
+                    class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg transition-colors {{ $usarIA ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700' }}"
+                >
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    {{ $usarIA ? 'Modo Manual' : 'Generar con IA' }}
+                </button>
+            @endif
+        </div>
     </x-slot>
 
     <x-slot name="content">
-        <form wire:submit.prevent="guardar" id="form-actividad">
-            <div class="space-y-6">
+        {{-- Panel de Generación con IA --}}
+        @if($usarIA && !$actividadId)
+            <div class="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg p-6 border-2 border-purple-200 dark:border-purple-800">
+                <div class="flex items-start space-x-4 mb-6">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">
+                            Asistente de IA para Actividades
+                        </h3>
+                        <p class="text-sm text-purple-700 dark:text-purple-300">
+                            Ingresa el nombre de la actividad y la IA generará automáticamente la descripción, resultado esperado, población objetivo y medio de verificación.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Mensaje de éxito IA --}}
+                @if(session()->has('ia_success'))
+                    <div class="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 px-4 py-3 rounded-lg mb-4 flex items-start">
+                        <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-sm">{{ session('ia_success') }}</span>
+                    </div>
+                @endif
+
+                {{-- Mensaje de error IA --}}
+                @if(session()->has('error'))
+                    <div class="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg mb-4 flex items-start">
+                        <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-sm">{{ session('error') }}</span>
+                    </div>
+                @endif
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-purple-900 dark:text-purple-100 mb-2">
+                            Nombre de la Actividad *
+                        </label>
+                        <textarea 
+                            wire:model="nombreParaIA" 
+                            rows="2" 
+                            class="w-full rounded-lg border-purple-300 dark:border-purple-700 dark:bg-gray-800 dark:text-gray-100 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                            placeholder="Ejemplo: Capacitación docente en metodologías activas de enseñanza"
+                            {{ $generandoConIA ? 'disabled' : '' }}
+                        ></textarea>
+                        @error('nombreParaIA') 
+                            <span class="text-red-600 dark:text-red-400 text-xs mt-1">{{ $message }}</span> 
+                        @enderror
+                        <p class="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                            Tip: Sé específico y claro. Mientras más detalle, mejor será el resultado.
+                        </p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button 
+                            type="button"
+                            wire:click="generarConIA" 
+                            wire:loading.attr="disabled"
+                            class="flex-1 inline-flex items-center justify-center px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            {{ $generandoConIA ? 'disabled' : '' }}
+                        >
+                            <span wire:loading.remove wire:target="generarConIA">
+                                <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                Generar Actividad
+                            </span>
+                            <span wire:loading wire:target="generarConIA" class="inline-flex items-center">
+                                <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Generando con IA...
+                            </span>
+                        </button>
+                        
+                        <button 
+                            type="button"
+                            wire:click="cancelarIA"
+                            class="px-4 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @else
+            <form wire:submit.prevent="guardar" id="form-actividad">
+                <div class="space-y-6">
 
                     {{-- Indicador de pasos --}}
                     <div class="mb-6">
@@ -168,10 +279,12 @@
                     @endif
                 </div>
             </form>
+        @endif
     </x-slot>
 
     <x-slot name="footer">
-        <div class="flex justify-between w-full">
+        @if(!$usarIA || $actividadId)
+            <div class="flex justify-between w-full">
             <div>
                 @if($currentStep > 1)
                     <x-secondary-button wire:click="previousStep">
@@ -205,5 +318,6 @@
                 @endif
             </div>
         </div>
+        @endif
     </x-slot>
 </x-dialog-modal>
