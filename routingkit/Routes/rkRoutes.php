@@ -255,7 +255,7 @@ return [
                                 ->setParentId('consola')
                                 ->setAccessPermission('consola.dimensiones.ver')
                                 ->setUrlMethod('get')
-                                ->setUrlController('App\Livewire\Consola\Dimensiones\Dimension')
+                                ->setUrlController('App\Livewire\Consola\Pei\Dimensiones\Dimension')
                                 ->setRoles(['admin_general'])
                                 ->setItems([
                                 ])

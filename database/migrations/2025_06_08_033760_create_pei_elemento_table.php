@@ -13,7 +13,7 @@ return new class extends Migration
         if (!Schema::hasTable('pei_elementos')) {
             Schema::create('pei_elementos', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('pei_id')->constrained('peis')->onDelete('cascade');
+                $table->foreignId('idPei')->constrained('peis')->onDelete('cascade');
                 $table->unsignedBigInteger('elemento_id'); // ID del elemento relacionado
                 $table->string('elemento_tipo'); // Nombre de la tabla (objetivos, resultados, areas, dimensiones)
                 $table->timestamps();

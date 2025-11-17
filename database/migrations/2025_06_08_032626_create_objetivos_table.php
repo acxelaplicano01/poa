@@ -15,9 +15,9 @@ return new class extends Migration
                 $table->text('nombre');
                 $table->text('descripcion');
                 
-                //$table->foreignId('idDimension')->constrained('dimensions');
+                $table->foreignId('idDimension')->constrained('dimensions');
                 
-                $table->foreignId('idPei')->constrained('peis');
+                //$table->foreignId('idPei')->constrained('peis');
                 $table->timestamps();
                 $table->softDeletes();
                 $table->foreignId('created_by')->nullable()->constrained('users');

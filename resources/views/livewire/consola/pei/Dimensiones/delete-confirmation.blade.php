@@ -6,6 +6,6 @@
     entityDetails=" {{ $peiToDelete?->institucion->nombre ?? 'N/A' }} • {{ $peiToDelete?->periodo ?? 'N/A' }}"
     confirm-method="confirmDelete"
     cancel-method="closeDeleteModal"
-    confirm-text="Eliminar Departamento"
+    confirm-text="Eliminar PEI"
     cancel-text="Cancelar"
 />
