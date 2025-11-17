@@ -55,20 +55,40 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
                         @foreach($poas as $poa)
                             @php
-                                // Obtener la UE: directa del POA o desde el primer techo asignado
-                                $ueId = $poa->idUE ?? $poa->techoUes->whereNotNull('idUE')->first()?->idUE;
-                                $ueNombre = $poa->unidadEjecutora->name ?? $poa->techoUes->whereNotNull('idUE')->first()?->unidadEjecutora?->name ?? 'N/A';
+                                // Obtener la UE del usuario actual
+                                $userUE = auth()->user()->empleado?->idUnidadEjecutora;
+                                
+                                // Si el usuario tiene UE, usar esa; si no, obtener del POA
+                                if ($userUE) {
+                                    $ueId = $userUE;
+                                    // Obtener el nombre de la UE del usuario
+                                    $ueNombre = auth()->user()->empleado?->unidadEjecutora?->name ?? 'N/A';
+                                } else {
+                                    // Usuario sin UE (admin): obtener UE del POA o primer techo
+                                    $ueId = $poa->idUE ?? $poa->techoUes->whereNotNull('idUE')->first()?->idUE;
+                                    $ueNombre = $poa->unidadEjecutora->name ?? $poa->techoUes->whereNotNull('idUE')->first()?->unidadEjecutora?->name ?? 'N/A';
+                                }
+                                
+                                // Determinar si es histórico (año vencido)
+                                $anioActual = (int) date('Y');
+                                $esHistorico = $poa->anio < $anioActual;
                             @endphp
-                            <div class="bg-gradient-to-br from-indigo-700 to-purple-700 dark:from-indigo-900 dark:to-purple-900 rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200 cursor-pointer relative group p-5">
+                            <div class="bg-gradient-to-br {{ $esHistorico ? 'from-zinc-500 to-zinc-600 dark:from-zinc-700 dark:to-zinc-800' : 'from-indigo-700 to-purple-700 dark:from-indigo-900 dark:to-purple-900' }} rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200 cursor-pointer relative group p-5">
                                 <div wire:click="gestionarTechoDepto({{ $poa->id }}, {{ $ueId }})">
-                                    <div class="absolute top-2 right-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Gestionar Techos Depto
+                                    <div class="absolute top-2 right-2 {{ $esHistorico ? 'bg-gray-500' : 'bg-indigo-600 hover:bg-indigo-700' }} text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {{ $esHistorico ? 'Solo lectura' : 'Gestionar Techos Depto' }}
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <h3 class="text-6xl font-extrabold">{{ $poa->anio }}</h3>
-                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">
-                                            Activo
-                                        </span>
+                                        @if($esHistorico)
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-300 text-gray-800">
+                                                Histórico
+                                            </span>
+                                        @else
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                Actual
+                                            </span>
+                                        @endif
                                     </div>
                                     
                                     <div class="mt-4 flex flex-col space-y-2 text-sm text-indigo-50">

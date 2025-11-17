@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="flex justify-end mt-4 sm:mt-0">
-                        <x-button wire:click="create()" class="w-full sm:w-auto justify-center">
+                        <x-button wire:click="create()" class="w-full sm:w-auto justify-center {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                             <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -33,6 +33,58 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Alerta de plazo o POA histórico --}}
+            @if(!$puedeAsignarPresupuesto && $mensajePlazo)
+                <div class="mb-4 {{ $esPoaHistorico ? 'bg-gray-100 dark:bg-gray-900/30 border-gray-400 dark:border-gray-700 text-gray-800 dark:text-gray-300' : 'bg-amber-100 dark:bg-amber-900/30 border-amber-400 dark:border-amber-700 text-amber-800 dark:text-amber-300' }} border px-4 py-3 rounded relative" role="alert">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start flex-1">
+                            @if($esPoaHistorico)
+                                <svg class="w-5 h-5 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            @else
+                                <svg class="w-5 h-5 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            @endif
+                            <div>
+                                <p class="font-semibold">{{ $esPoaHistorico ? 'POA Histórico - Solo Lectura' : 'Asignación departamental no disponible' }}</p>
+                                <p class="text-sm mt-1">{{ $mensajePlazo }}</p>
+                            </div>
+                        </div>
+                        <!-- <a href="{{ route('plazos') }}" class="ml-4 flex-shrink-0 px-3 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-800 text-white text-sm font-medium rounded-md transition-colors flex items-center">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Configurar Plazos
+                        </a> -->
+                    </div>
+                </div>
+            @endif
+
+            {{-- Contador de días restantes --}}
+            @if($puedeAsignarPresupuesto && $diasRestantes !== null)
+                <div class="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 px-4 py-3 rounded-lg flex items-center justify-between" role="alert">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <div>
+                            <p class="font-semibold text-sm">Plazo de asignación departamental activo</p>
+                            <p class="text-xs mt-0.5">Puedes asignar presupuesto a departamentos</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="flex items-baseline">
+                            <span class="text-3xl font-bold">{{ $diasRestantes }}</span>
+                            <span class="text-sm ml-1">{{ $diasRestantes == 1 ? 'día' : 'días' }}</span>
+                        </div>
+                        <p class="text-xs mt-0.5">{{ $diasRestantes == 1 ? 'restante' : 'restantes' }}</p>
+                    </div>
+                </div>
+            @endif
 
             @if (session()->has('message'))
                 <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md" role="alert">
@@ -256,14 +308,14 @@
                                                 </p>
                                             </div>
                                             <div class="flex items-center space-x-2">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                                    Sin Techo
-                                                </span>
-                                                <button 
-                                                    wire:click="createForDepartment({{ $departamento->id }})"
-                                                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium">
+                                                <x-button 
+                                                    wire:click="createForDepartment({{ $departamento->id }})" class="{{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto"
+                                                    >
+                                                     <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    </svg>
                                                     Asignar
-                                                </button>
+                                                </x-button>
                                             </div>
                                         </div>
                                     </div>

@@ -57,7 +57,15 @@ class Departamentos extends Component
     }    
     public function render()
     {
+        // Obtener UE del usuario autenticado
+        $user = auth()->user();
+        $userUE = $user->empleado?->idUnidadEjecutora;
+
         $departamentos = Departamento::with(['unidadEjecutora'])
+            // Filtrar por UE del usuario
+            ->when($userUE, function ($query) use ($userUE) {
+                $query->where('idUnidadEjecutora', $userUE);
+            })
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('siglas', 'like', '%' . $this->search . '%')
@@ -73,10 +81,16 @@ class Departamentos extends Component
             ->orderBy('name')
             ->paginate(10);
 
-        $unidadesEjecutoras = UnidadEjecutora::orderBy('name')->get();
+        // Filtrar UEs disponibles (solo la del usuario)
+        $unidadesEjecutoras = $userUE 
+            ? UnidadEjecutora::where('id', $userUE)->orderBy('name')->get()
+            : UnidadEjecutora::orderBy('name')->get();
         
-        // Obtener tipos únicos para el filtro
+        // Obtener tipos únicos para el filtro (solo de la UE del usuario)
         $tipos = Departamento::select('tipo')
+            ->when($userUE, function ($query) use ($userUE) {
+                $query->where('idUnidadEjecutora', $userUE);
+            })
             ->distinct()
             ->whereNotNull('tipo')
             ->pluck('tipo');
@@ -99,7 +113,16 @@ class Departamentos extends Component
     public function edit($id)
     {
         $this->resetValidation();
-        $departamento = Departamento::findOrFail($id);
+        
+        // Obtener UE del usuario para validar acceso
+        $user = auth()->user();
+        $userUE = $user->empleado?->idUnidadEjecutora;
+        
+        $departamento = Departamento::when($userUE, function ($query) use ($userUE) {
+                $query->where('idUnidadEjecutora', $userUE);
+            })
+            ->findOrFail($id);
+            
         $this->departamentoId = $departamento->id;
         $this->name = $departamento->name;
         $this->siglas = $departamento->siglas;
@@ -140,7 +163,15 @@ class Departamentos extends Component
 
     public function confirmDelete($id)
     {
-        $this->departamentoToDelete = Departamento::findOrFail($id);
+        // Obtener UE del usuario para validar acceso
+        $user = auth()->user();
+        $userUE = $user->empleado?->idUnidadEjecutora;
+        
+        $this->departamentoToDelete = Departamento::when($userUE, function ($query) use ($userUE) {
+                $query->where('idUnidadEjecutora', $userUE);
+            })
+            ->findOrFail($id);
+            
         $this->showDeleteModal = true;
     }
 

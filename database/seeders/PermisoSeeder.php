@@ -27,11 +27,13 @@ class PermisoSeeder extends Seeder
                 'usuarios' => ['ver', 'crear', 'editar', 'eliminar'],
                 'empleados' => ['ver', 'crear', 'editar', 'eliminar'],
                 'departamentos' => ['ver', 'crear', 'editar', 'eliminar'],
+                'unidades-ejecutoras' => ['ver', 'crear', 'editar', 'eliminar'],
                 'procesoscompras' => ['ver', 'crear', 'editar', 'eliminar'],
                 'cubs' => ['ver', 'crear', 'editar', 'eliminar'],
             ],
             'planificacion' => [
                 'planificar' => ['ver', 'crear', 'editar'],
+                'actividades' => ['ver', 'crear', 'editar', 'eliminar'],
                 'requerir' => ['ver', 'crear', 'editar'],
                 'seguimiento' => ['ver', 'editar'],
                 'consolidado' => ['ver', 'generar'],
@@ -53,7 +55,7 @@ class PermisoSeeder extends Seeder
                 'asignacionnacionalpresupuestaria' => ['ver', 'crear', 'editar', 'eliminar'],
                 'techodeptos' => ['ver', 'crear', 'editar', 'eliminar', 'asignar'],
                 'techonacional' => ['ver', 'crear', 'editar', 'eliminar', 'asignar'],
-                
+                'plazos' => ['gestionar', 'crear', 'editar', 'eliminar'],
             ],
             'logs' => [
                 'visor' => ['ver', 'filtrar', 'exportar'],

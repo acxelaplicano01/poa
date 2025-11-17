@@ -40,6 +40,12 @@ class GestionTechoDeptos extends Component
     public $departamentos = [];
     public $techoUes = [];
     
+    // Estado del plazo de asignación departamental
+    public $puedeAsignarPresupuesto = false;
+    public $mensajePlazo = '';
+    public $diasRestantes = null;
+    public $esPoaHistorico = false; // Nueva propiedad para POAs históricos
+    
     protected $rules = [
         'idDepartamento' => 'required|exists:departamentos,id',
     ];
@@ -60,8 +66,47 @@ class GestionTechoDeptos extends Component
         // No recibimos los parámetros directamente en mount ya que los manejamos vía $queryString
         
         if ($this->idPoa && $this->idUE) {
-            $this->poa = Poa::findOrFail($this->idPoa);
-            $this->unidadEjecutora = UnidadEjecutora::findOrFail($this->idUE);
+            // Obtener institución del usuario autenticado
+            $user = auth()->user();
+            $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+            $userUE = $user->empleado?->idUnidadEjecutora;
+
+            try {
+                // Validar acceso al POA según institución del usuario
+                $poaQuery = Poa::query();
+                if ($userInstitucionId) {
+                    $poaQuery->where('idInstitucion', $userInstitucionId);
+                }
+                $this->poa = $poaQuery->findOrFail($this->idPoa);
+                
+                // Validar acceso a la UE según usuario
+                $ueQuery = UnidadEjecutora::where('id', $this->idUE);
+                
+                // Si el usuario tiene UE asignada, validar que sea la misma
+                if ($userUE && $userUE != $this->idUE) {
+                    session()->flash('error', 'No tienes permiso para acceder a esta Unidad Ejecutora. Solo puedes gestionar la UE asignada a tu usuario.');
+                    return redirect()->route('asignacionpresupuestaria');
+                }
+                
+                $this->unidadEjecutora = $ueQuery->findOrFail($this->idUE);
+                
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                session()->flash('error', 'No tienes acceso a este POA o Unidad Ejecutora, o no existe.');
+                return redirect()->route('asignacionpresupuestaria');
+            }
+            
+            // Verificar si el POA es histórico (año vencido)
+            $anioActual = (int) date('Y');
+            $this->esPoaHistorico = $this->poa->anio < $anioActual;
+            
+            // Si es histórico, no se puede asignar presupuesto
+            if ($this->esPoaHistorico) {
+                $this->puedeAsignarPresupuesto = false;
+                $this->mensajePlazo = 'Este POA es histórico (año ' . $this->poa->anio . '). Solo puedes consultar la información, no realizar asignaciones.';
+            } else {
+                // Verificar si se puede asignar presupuesto departamental (solo si no es histórico)
+                $this->verificarPlazo();
+            }
             
             // Cargar listas para los selects
             $this->loadDepartamentos();
@@ -78,6 +123,16 @@ class GestionTechoDeptos extends Component
         } else {
             session()->flash('error', 'Se requiere un POA y una Unidad Ejecutora para gestionar los techos por departamento.');
             return redirect()->route('asignacionpresupuestaria');
+        }
+    }
+    
+    private function verificarPlazo()
+    {
+        $this->puedeAsignarPresupuesto = $this->poa->puedeAsignarPresupuestoDepartamental();
+        $this->diasRestantes = $this->poa->getDiasRestantesAsignacionDepartamental();
+        
+        if (!$this->puedeAsignarPresupuesto) {
+            $this->mensajePlazo = $this->poa->getMensajeErrorPlazo('asignacion_departamental');
         }
     }
     
@@ -244,6 +299,12 @@ class GestionTechoDeptos extends Component
 
     public function create()
     {
+        // Verificar que se pueda asignar presupuesto
+        if (!$this->puedeAsignarPresupuesto) {
+            session()->flash('error', $this->mensajePlazo);
+            return;
+        }
+
         $this->resetForm();
         $this->isEditing = false;
         $this->initializeMontosPorFuente(); // Asegurar inicialización
@@ -252,6 +313,12 @@ class GestionTechoDeptos extends Component
 
     public function createForDepartment($departamentoId)
     {
+        // Verificar que se pueda asignar presupuesto
+        if (!$this->puedeAsignarPresupuesto) {
+            session()->flash('error', $this->mensajePlazo);
+            return;
+        }
+
         $this->resetForm();
         $this->idDepartamento = $departamentoId;
         $this->isEditing = false;
@@ -267,6 +334,12 @@ class GestionTechoDeptos extends Component
 
     public function editDepartment($departamentoId)
     {
+        // Verificar que se pueda asignar presupuesto
+        if (!$this->puedeAsignarPresupuesto) {
+            session()->flash('error', $this->mensajePlazo);
+            return;
+        }
+
         $this->resetForm();
         $this->idDepartamento = $departamentoId;
         $this->isEditing = true;

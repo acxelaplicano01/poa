@@ -218,7 +218,16 @@ class UnidadesEjecutoras extends Component
 
     public function render()
     {
+        // Obtener institución del usuario autenticado
+        $user = auth()->user();
+        $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+        $userUE = $user->empleado?->idUnidadEjecutora;
+
         $unidadesEjecutoras = UnidadEjecutora::with('institucion')
+            // Filtrar por institución del usuario (solo muestra UEs de su institución)
+            ->when($userInstitucionId, function ($query) use ($userInstitucionId) {
+                $query->where('idInstitucion', $userInstitucionId);
+            })
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('descripcion', 'like', '%' . $this->search . '%')
@@ -230,7 +239,10 @@ class UnidadesEjecutoras extends Component
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
 
-        $instituciones = Institucion::orderBy('nombre')->get();
+        // Filtrar instituciones (solo la del usuario)
+        $instituciones = $userInstitucionId 
+            ? Institucion::where('id', $userInstitucionId)->orderBy('nombre')->get()
+            : Institucion::orderBy('nombre')->get();
 
         return view('livewire.unidad-ejecutora.unidades-ejecutoras', [
             'unidadesEjecutoras' => $unidadesEjecutoras,

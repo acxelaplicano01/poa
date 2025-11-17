@@ -13,7 +13,7 @@ return [
             RkNavigation::makeSimple('dashboard')
                 ->setParentId('dashboard_group')
                 ->setUrl('/dashboard')
-                ->setDescription('Accede al panel principal')
+                ->setDescription('Administra estadisticas y supervisa los movimientos del sistema')
                 ->setLabel('Panel Principal')
                 ->setHeroIcon('home')
                 ->setItems([])
@@ -31,7 +31,13 @@ return [
                 ->setDescription('Visualiza tus planificaciones')
                 ->setLabel('Mis planificaciones')
                 ->setHeroIcon('document-text')
-                ->setItems([])
+                ->setItems([
+                    RkNavigation::make('actividades')
+                        ->setDescription('Ver y gestionar mis actividades planificadas')
+                        ->setLabel('Mis actividades')
+                        ->setHeroIcon('folder-open')
+                        ->setEndBlock('actividades'),
+                ])
                 ->setEndBlock('planificar'),
 
             RkNavigation::make('requerir')
@@ -274,6 +280,11 @@ return [
                         ->setDescription('Gestión de techos presupuestarios por Unidades Ejecutoras')
                         ->setLabel('Techos presupuestarios UE')
                         ->setHeroIcon('arrow-trending-up')
+                        ->setItems([
+                            RkNavigation::make('plazos-poa')
+                            ->setLabel('Plazos del POA')
+                            ->setDescription('Define y gestiona los plazos para la asignación presupuestaria nacional, departamental y planificación de este POA')
+                    ])
                         ->setEndBlock('techonacional'),
                 ])
                 ->setEndBlock('asignacionnacionalpresupuestaria'),

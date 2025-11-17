@@ -64,19 +64,19 @@
                 @if($poas->count() > 0)
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
                         @foreach($poas as $poa)
-                            <div class="bg-gradient-to-br from-indigo-700 to-purple-700 dark:from-indigo-900 dark:to-purple-900 rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200 cursor-pointer relative group p-5">
+                            <div class="bg-gradient-to-br {{ $poa->activo ? 'from-indigo-700 to-purple-700 dark:from-indigo-900 dark:to-purple-900' : 'from-zinc-500 to-zinc-600 dark:from-zinc-700 dark:to-zinc-800' }} rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200 cursor-pointer relative group p-5 {{ !$poa->activo ? 'opacity-75' : '' }}">
                                 <div wire:click="gestionarTechoUeNacional({{ $poa->id }})">
-                                    <div class="absolute top-2 right-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div class="absolute top-2 right-2 {{ $poa->activo ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-zinc-600 hover:bg-zinc-700' }} text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                         Gestionar Presupuesto UEs
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <h3 class="text-6xl font-extrabold">{{ $poa->anio }}</h3>
-                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">
-                                            Activo
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $poa->activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                            {{ $poa->activo ? 'Activo' : 'Inactivo' }}
                                         </span>
                                     </div>
                                     
-                                    <div class="mt-4 flex flex-col space-y-2 text-sm text-indigo-50">
+                                    <div class="mt-4 flex flex-col space-y-2 text-sm {{ $poa->activo ? 'text-indigo-50' : 'text-zinc-200' }}">
                                         <div class="flex items-center justify-between">
                                             <span>Institución:</span>
                                             <span class="font-semibold truncate ml-2" title="{{ $poa->institucion->nombre ?? 'N/A' }}">
@@ -104,33 +104,43 @@
                                     
                                     <!-- Barra de progreso mejorada -->
                                     <div class="mt-3 space-y-2">
-                                        <div class="flex items-center justify-between text-xs text-indigo-50">
+                                        <div class="flex items-center justify-between text-xs {{ $poa->activo ? 'text-indigo-50' : 'text-zinc-200' }}">
                                             <span>Progreso de Asignación</span>
                                             <span class="font-semibold">{{ $poa->progreso_departamentos['porcentaje'] }}%</span>
                                         </div>
-                                        <div class="w-full bg-indigo-200 bg-opacity-30 rounded-full h-2 overflow-hidden">
+                                        <div class="w-full {{ $poa->activo ? 'bg-indigo-200 bg-opacity-30' : 'bg-zinc-300 bg-opacity-30' }} rounded-full h-2 overflow-hidden">
                                             <div class="h-2 rounded-full transition-all duration-300 {{ $poa->progreso_departamentos['color'] }}" 
                                                  style="width: {{ $poa->progreso_departamentos['porcentaje'] }}%"
                                                  title="Departamentos con presupuesto: {{ $poa->progreso_departamentos['departamentos_con_presupuesto'] }}/{{ $poa->progreso_departamentos['total_departamentos'] }}">
                                             </div>
                                         </div>
-                                        <div class="text-xs text-indigo-50 opacity-75">
+                                        <div class="text-xs {{ $poa->activo ? 'text-indigo-50 opacity-75' : 'text-zinc-200 opacity-75' }}">
                                             {{ $poa->progreso_departamentos['departamentos_con_presupuesto'] }} de {{ $poa->progreso_departamentos['total_departamentos'] }} unidades ejecutoras con presupuesto
                                         </div>
                                     </div>
                                     
                                 </div>
+                                    @php
+                                        $anioActual = now()->year;
+                                        $poaVencido = $poa->anio < $anioActual;
+                                    @endphp
                                     <div class="mt-5 flex space-x-2">
-                                        <button wire:click="edit({{ $poa->id }})" 
-                                            class="flex-1 flex items-center justify-center px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-zinc-900 font-medium rounded-md transition-colors text-sm">
+                                        <button 
+                                            wire:click="edit({{ $poa->id }})" 
+                                            @if($poaVencido) disabled @endif
+                                            class="flex-1 flex items-center justify-center px-3 py-2 {{ $poaVencido ? 'bg-zinc-400 cursor-not-allowed opacity-50' : 'bg-yellow-400 hover:bg-yellow-500' }} text-zinc-900 font-medium rounded-md transition-colors text-sm"
+                                            @if($poaVencido) title="No se puede editar un POA de años anteriores" @endif>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                                 <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
                                                 <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
                                             </svg>
                                             <span>Editar</span>
                                         </button>
-                                        <button wire:click="confirmDelete({{ $poa->id }})" 
-                                            class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-md transition-colors">
+                                        <button 
+                                            wire:click="confirmDelete({{ $poa->id }})" 
+                                            @if($poaVencido) disabled @endif
+                                            class="px-3 py-2 {{ $poaVencido ? 'bg-zinc-400 cursor-not-allowed opacity-50' : 'bg-red-500 hover:bg-red-600' }} text-white font-medium rounded-md transition-colors"
+                                            @if($poaVencido) title="No se puede eliminar un POA de años anteriores" @endif>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                                             </svg>

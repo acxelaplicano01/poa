@@ -4,7 +4,6 @@ namespace App\Models\Poa;
 use App\Models\BaseModel;
 use App\Models\Dimension\Dimension;
 use App\Models\Instituciones\Institucion;
-use App\Models\Poa\PeiElemento;
 
 class Pei extends BaseModel
 {
@@ -59,11 +58,5 @@ class Pei extends BaseModel
     public function includesYear($year)
     {
         return $year >= $this->initialYear && $year <= $this->finalYear;
-    }
-
-    // Relación polimórfica con PeiElemento
-    public function elementos()
-    {
-        return $this->hasMany(PeiElemento::class);
     }
 }

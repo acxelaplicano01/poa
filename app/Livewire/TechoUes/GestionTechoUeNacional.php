@@ -34,6 +34,39 @@ class GestionTechoUeNacional extends Component
     // Listados para los selects
     public $unidadesEjecutoras = [];
     
+    // Estado del plazo de asignación nacional
+    public $puedeAsignarPresupuesto = false;
+    public $mensajePlazo = '';
+    public $diasRestantes = null;
+    
+    // Timeline de plazos
+    public function getPlazosTimelineProperty()
+    {
+        if (!$this->poa) {
+            return collect();
+        }
+        
+        return \App\Models\Plazos\PlazoPoa::where('idPoa', $this->idPoa)
+            ->orderBy('fecha_inicio', 'asc')
+            ->get()
+            ->map(function($plazo) {
+                return [
+                    'id' => $plazo->id,
+                    'nombre' => $plazo->tipo_plazo_label,
+                    'tipo' => $plazo->tipo_plazo,
+                    'fecha_inicio' => $plazo->fecha_inicio,
+                    'fecha_fin' => $plazo->fecha_fin,
+                    'activo' => $plazo->activo,
+                    'estado' => $plazo->estado,
+                    'dias_restantes' => $plazo->diasRestantes(),
+                    'es_vigente' => $plazo->estaVigente(),
+                    'ha_vencido' => $plazo->haVencido(),
+                    'es_proximo' => $plazo->esProximo(),
+                    'descripcion' => $plazo->descripcion,
+                ];
+            });
+    }
+    
     public function getFuentesProperty()
     {
         // Obtener techos globales (con idUE null) del POA actual como fuentes disponibles
@@ -72,32 +105,81 @@ class GestionTechoUeNacional extends Component
         }
         
         $this->loadPoa();
+        $this->verificarPlazo();
         $this->loadUnidadesEjecutoras();
+    }
+
+    private function verificarPlazo()
+    {
+        if ($this->poa) {
+            // Desactivar automáticamente plazos vencidos
+            \App\Models\Plazos\PlazoPoa::desactivarPlazosVencidos($this->idPoa);
+            
+            $this->puedeAsignarPresupuesto = $this->poa->puedeAsignarPresupuestoNacional();
+            $this->diasRestantes = $this->poa->getDiasRestantesAsignacionNacional();
+            
+            if (!$this->puedeAsignarPresupuesto) {
+                $this->mensajePlazo = $this->poa->getMensajeErrorPlazo('asignacion_nacional');
+            }
+        }
     }
 
     public function loadPoa()
     {
-        $this->poa = Poa::with(['institucion', 'techoUes.unidadEjecutora', 'techoUes.grupoGasto'])
-            ->findOrFail($this->idPoa);
+        // Obtener institución del usuario autenticado
+        $user = auth()->user();
+        $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+
+        $query = Poa::with(['institucion', 'techoUes.unidadEjecutora', 'techoUes.grupoGasto']);
+        
+        // Filtrar por institución del usuario si aplica
+        if ($userInstitucionId) {
+            $query->where('idInstitucion', $userInstitucionId);
+        }
+        
+        $this->poa = $query->findOrFail($this->idPoa);
     }
 
     public function loadUnidadesEjecutoras()
     {
-        $this->unidadesEjecutoras = UnidadEjecutora::orderBy('name')->get();
+        // Obtener institución del usuario para mostrar todas las UEs de su institución
+        $user = auth()->user();
+        $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+        
+        // Mostrar todas las UEs de la institución del usuario
+        $this->unidadesEjecutoras = $userInstitucionId 
+            ? UnidadEjecutora::where('idInstitucion', $userInstitucionId)->orderBy('name')->get()
+            : UnidadEjecutora::orderBy('name')->get();
     }
 
     public function render()
     {
+        // Recargar POA para tener datos frescos de plazos
+        $this->poa->refresh();
+        
+        // Verificar estado del plazo en cada render
+        $this->verificarPlazo();
+        
+        // Obtener institución del usuario (no filtrar por UE específica aquí)
+        $user = auth()->user();
+        $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+        
         $techoUesConTecho = collect();
         $unidadesSinTecho = collect();
         $resumenPorFuente = [];
         $totalAsignado = 0;
 
         if ($this->poa) {
-            // Obtener todas las UEs con techo asignado (excluyendo techos globales)
+            // Obtener techos asignados de TODAS las UEs de la institución
             $techoUesQuery = $this->poa->techoUes()
                 ->with(['unidadEjecutora', 'grupoGasto'])
-                ->whereNotNull('idUE'); // Excluir techos globales
+                ->whereNotNull('idUE') // Excluir techos globales
+                // Filtrar solo UEs de la institución del usuario
+                ->when($userInstitucionId, function ($query) use ($userInstitucionId) {
+                    $query->whereHas('unidadEjecutora', function ($q) use ($userInstitucionId) {
+                        $q->where('idInstitucion', $userInstitucionId);
+                    });
+                });
             
             if ($this->searchConTecho) {
                 $techoUesQuery->whereHas('unidadEjecutora', function($q) {
@@ -109,9 +191,13 @@ class GestionTechoUeNacional extends Component
             $techoUesConTecho = $techoUesQuery->get();
             $totalAsignado = $techoUesConTecho->sum('monto');
 
-            // Obtener UEs sin techo asignado
+            // Obtener UEs sin techo asignado (todas de la institución)
             $uesConTechoIds = $techoUesConTecho->pluck('idUE')->unique();
-            $unidadesSinTechoQuery = UnidadEjecutora::whereNotIn('id', $uesConTechoIds);
+            $unidadesSinTechoQuery = UnidadEjecutora::whereNotIn('id', $uesConTechoIds)
+                // Filtrar solo UEs de la institución del usuario
+                ->when($userInstitucionId, function ($query) use ($userInstitucionId) {
+                    $query->where('idInstitucion', $userInstitucionId);
+                });
             
             if ($this->searchSinTecho) {
                 $unidadesSinTechoQuery->where(function($q) {
@@ -147,6 +233,12 @@ class GestionTechoUeNacional extends Component
 
     public function create()
     {
+        // Verificar que se pueda asignar presupuesto
+        if (!$this->puedeAsignarPresupuesto) {
+            session()->flash('error', $this->mensajePlazo);
+            return;
+        }
+
         $this->resetForm();
         $this->showModal = true;
     }
@@ -320,6 +412,12 @@ class GestionTechoUeNacional extends Component
 
     public function edit($idUnidadEjecutora)
     {
+        // Verificar que se pueda asignar presupuesto
+        if (!$this->puedeAsignarPresupuesto) {
+            session()->flash('error', $this->mensajePlazo);
+            return;
+        }
+
         $this->isEditing = true;
         $this->idUnidadEjecutora = $idUnidadEjecutora;
         

@@ -122,8 +122,16 @@ class Empleados extends Component
     // Renderizar la vista
     public function render()
     {
+        // Obtener UE del usuario autenticado
+        $user = auth()->user();
+        $userUE = $user->empleado?->idUnidadEjecutora;
+
         $query = Empleado::query()
             ->with('departamentos')
+            // Filtrar por UE del usuario
+            ->when($userUE, function ($query) use ($userUE) {
+                $query->where('idUnidadEjecutora', $userUE);
+            })
             ->when($this->search, function($query) {
                 $query->where(function($q) {
                     $q->where('nombre', 'like', '%' . $this->search . '%')
@@ -145,7 +153,11 @@ class Empleados extends Component
         }
         
         $empleados = $query->paginate($this->perPage);
-        $unidadesEjecutoras = UnidadEjecutora::orderBy('name')->get();
+        
+        // Filtrar UEs disponibles (solo la del usuario)
+        $unidadesEjecutoras = $userUE 
+            ? UnidadEjecutora::where('id', $userUE)->orderBy('name')->get()
+            : UnidadEjecutora::orderBy('name')->get();
         
         return view('livewire.empleado.empleado', [
             'empleados' => $empleados,

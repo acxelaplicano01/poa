@@ -14,6 +14,41 @@
         <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
             {{ $isEditing ? 'Editar POA' : 'Crear Nuevo POA' }}
         </h3>
+
+        {{-- Alerta de plazo (solo en edición) --}}
+        @if($isEditing && !$puedeAsignarPresupuestoNacional && $mensajePlazo)
+            <div class="mb-4 bg-amber-100 dark:bg-amber-900/30 border border-amber-400 dark:border-amber-700 text-amber-800 dark:text-amber-300 px-4 py-3 rounded-lg flex items-start" role="alert">
+                <svg class="w-5 h-5 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                    <p class="font-semibold text-sm">Asignación nacional no disponible</p>
+                    <p class="text-xs mt-1">{{ $mensajePlazo }}</p>
+                </div>
+            </div>
+        @endif
+
+        {{-- Contador de días restantes (solo en edición y si hay plazo activo) --}}
+        @if($isEditing && $puedeAsignarPresupuestoNacional && $diasRestantes !== null)
+            <div class="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 px-4 py-3 rounded-lg flex items-center justify-between" role="alert">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <div>
+                        <p class="font-semibold text-sm">Plazo de asignación nacional activo</p>
+                        <p class="text-xs mt-0.5">Puedes modificar el presupuesto nacional</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="flex items-baseline">
+                        <span class="text-2xl font-bold">{{ $diasRestantes }}</span>
+                        <span class="text-xs ml-1">{{ $diasRestantes == 1 ? 'día' : 'días' }}</span>
+                    </div>
+                    <p class="text-xs mt-0.5">{{ $diasRestantes == 1 ? 'restante' : 'restantes' }}</p>
+                </div>
+            </div>
+        @endif
         
         <form wire:submit.prevent="save">            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -52,6 +87,34 @@
                     />
                     <x-input-error for="idInstitucion" class="mt-2" />
                 </div>
+
+                <!-- Estado Activo (solo en edición) -->
+                @if($isEditing)
+                <div>
+                    <x-label for="activo" value="{{ __('Estado del POA') }}" class="mb-2" />
+                    <div class="flex items-center space-x-4 mt-3">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                wire:model="activo" 
+                                id="activo"
+                                class="sr-only peer"
+                            />
+                            <div class="relative w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-indigo-600"></div>
+                            <span class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300">
+                                {{ $activo ? 'POA Activo' : 'POA Inactivo' }}
+                            </span>
+                        </label>
+                    </div>
+                    <p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                        @if($activo)
+                            El POA está activo y visible para asignaciones presupuestarias.
+                        @else
+                            El POA está inactivo y no aparecerá en la vista de asignación presupuestaria de departamentos.
+                        @endif
+                    </p>
+                </div>
+                @endif
 
                 <!-- Nota informativa sobre UEs -->
                 <div class="md:col-span-2">

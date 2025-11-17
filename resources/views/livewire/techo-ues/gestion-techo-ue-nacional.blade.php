@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="flex justify-end mt-4 sm:mt-0">
-                        <x-button wire:click="create()" class="w-full sm:w-auto justify-center">
+                        <x-button wire:click="create()" class="w-full sm:w-auto justify-center {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                             <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -33,6 +33,52 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Alerta de plazo --}}
+            @if(!$puedeAsignarPresupuesto && $mensajePlazo)
+                <div class="mb-4 bg-amber-100 dark:bg-amber-900/30 border border-amber-400 dark:border-amber-700 text-amber-800 dark:text-amber-300 px-4 py-3 rounded-lg" role="alert">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start flex-1">
+                            <svg class="w-5 h-5 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div>
+                                <p class="font-semibold">Asignación a UEs no disponible</p>
+                                <p class="text-sm mt-1">{{ $mensajePlazo }}</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('plazos-poa', ['idPoa' => $idPoa]) }}" class="ml-4 flex-shrink-0 px-3 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-800 text-white text-sm font-medium rounded-md transition-colors flex items-center">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Configurar Plazos
+                        </a>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Contador de días restantes --}}
+            @if($puedeAsignarPresupuesto && $diasRestantes !== null)
+                <div class="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 px-4 py-3 rounded-lg flex items-center justify-between" role="alert">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <div>
+                            <p class="font-semibold text-sm">Plazo de asignación nacional activo</p>
+                            <p class="text-xs mt-0.5">Puedes asignar presupuesto a las Unidades Ejecutoras</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="flex items-baseline">
+                            <span class="text-3xl font-bold">{{ $diasRestantes }}</span>
+                            <span class="text-sm ml-1">{{ $diasRestantes == 1 ? 'día' : 'días' }}</span>
+                        </div>
+                        <p class="text-xs mt-0.5">{{ $diasRestantes == 1 ? 'restante' : 'restantes' }}</p>
+                    </div>
+                </div>
+            @endif
 
             @if (session()->has('message'))
                 <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md" role="alert">
@@ -81,6 +127,17 @@
                                 </span>
                             </span>
                         </button>
+                        <button 
+                            wire:click="setActiveTab('timeline')"
+                            class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 flex-shrink-0 {{ $activeTab === 'timeline' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300' }}">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="hidden sm:inline">Línea de Tiempo</span>
+                                <span class="sm:hidden">Timeline</span>
+                            </span>
+                        </button>
                     </nav>
                 </div>
 
@@ -88,7 +145,8 @@
                 <div class="mt-6">
                     @if($activeTab === 'resumen')
                         <!-- Resumen Presupuestario -->
-                        <div class="space-y-8">
+                        <div class="grid grid-cols-1 xl:grid-cols-[73.5%_25%] gap-6">
+                            <div class="space-y-8">
                             <!-- Métricas Presupuestarias por Fuente -->
                             @if($fuentes && $fuentes->count() > 0)
                                 <!-- Resumen General del Presupuesto -->
@@ -98,20 +156,20 @@
                                     </h3>
                                     
                                     @php
-        $totalGeneral = 0;
-        $asignadoGeneral = 0;
-        $disponibleGeneral = 0;
+                                        $totalGeneral = 0;
+                                        $asignadoGeneral = 0;
+                                        $disponibleGeneral = 0;
 
-        foreach ($fuentes as $fuente) {
-            $techoGlobal = $poa->techoUes->where('fuente.id', $fuente->id)->whereNull('idUE')->sum('monto');
-            $asignadoUE = $poa->techoUes->where('fuente.id', $fuente->id)->whereNotNull('idUE')->sum('monto');
+                                        foreach ($fuentes as $fuente) {
+                                            $techoGlobal = $poa->techoUes->where('fuente.id', $fuente->id)->whereNull('idUE')->sum('monto');
+                                            $asignadoUE = $poa->techoUes->where('fuente.id', $fuente->id)->whereNotNull('idUE')->sum('monto');
 
-            $totalGeneral += $techoGlobal;
-            $asignadoGeneral += $asignadoUE;
-        }
+                                            $totalGeneral += $techoGlobal;
+                                            $asignadoGeneral += $asignadoUE;
+                                        }
 
-        $disponibleGeneral = $totalGeneral - $asignadoGeneral;
-        $porcentajeGeneral = $totalGeneral > 0 ? ($asignadoGeneral / $totalGeneral) * 100 : 0;
+                                        $disponibleGeneral = $totalGeneral - $asignadoGeneral;
+                                        $porcentajeGeneral = $totalGeneral > 0 ? ($asignadoGeneral / $totalGeneral) * 100 : 0;
                                     @endphp
                                     
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -150,25 +208,25 @@
                                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         @foreach($fuentes as $fuente)
                                             @php
-            $techoGlobal = $poa->techoUes->where('fuente.id', $fuente->id)->whereNull('idUE')->sum('monto');
-            $asignadoUE = $poa->techoUes->where('fuente.id', $fuente->id)->whereNotNull('idUE')->sum('monto');
-            $disponible = $techoGlobal - $asignadoUE;
-            $porcentajeUsado = $techoGlobal > 0 ? ($asignadoUE / $techoGlobal) * 100 : 0;
+                                                $techoGlobal = $poa->techoUes->where('fuente.id', $fuente->id)->whereNull('idUE')->sum('monto');
+                                                $asignadoUE = $poa->techoUes->where('fuente.id', $fuente->id)->whereNotNull('idUE')->sum('monto');
+                                                $disponible = $techoGlobal - $asignadoUE;
+                                                $porcentajeUsado = $techoGlobal > 0 ? ($asignadoUE / $techoGlobal) * 100 : 0;
 
-            // Determinar estado y color
-            if ($porcentajeUsado >= 100) {
-                $estadoClase = 'bg-red-500';
-                $estadoTexto = 'Agotado';
-                $colorTexto = 'text-red-600 dark:text-red-400';
-            } elseif ($porcentajeUsado >= 60) {
-                $estadoClase = 'bg-yellow-500';
-                $estadoTexto = 'Poco recurso';
-                $colorTexto = 'text-yellow-600 dark:text-yellow-400';
-            } else {
-                $estadoClase = 'bg-green-500';
-                $estadoTexto = 'Disponible';
-                $colorTexto = 'text-green-600 dark:text-green-400';
-            }
+                                                // Determinar estado y color
+                                                if ($porcentajeUsado >= 100) {
+                                                    $estadoClase = 'bg-red-500';
+                                                    $estadoTexto = 'Agotado';
+                                                    $colorTexto = 'text-red-600 dark:text-red-400';
+                                                } elseif ($porcentajeUsado >= 60) {
+                                                    $estadoClase = 'bg-yellow-500';
+                                                    $estadoTexto = 'Poco recurso';
+                                                    $colorTexto = 'text-yellow-600 dark:text-yellow-400';
+                                                } else {
+                                                    $estadoClase = 'bg-green-500';
+                                                    $estadoTexto = 'Disponible';
+                                                    $colorTexto = 'text-green-600 dark:text-green-400';
+                                        }
                                             @endphp
                                             
                                             <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-6 hover:shadow-lg transition-shadow duration-200">
@@ -311,7 +369,199 @@
                                 </div>
                             </div>
                         </div>
-
+                         <!-- Línea de Tiempo de Plazos -->
+                            @if($this->plazosTimeline && $this->plazosTimeline->count() > 0)
+                                <div class="space-y-4">
+                                    @php
+                                        $hoy = \Carbon\Carbon::now();
+                                        $plazosVigentes = $this->plazosTimeline->where('es_vigente', true);
+                                        $plazosVencidos = $this->plazosTimeline->where('ha_vencido', true);
+                                        $plazosProximos = $this->plazosTimeline->where('es_proximo', true);
+                                    @endphp
+                                    <!-- Timeline Visual Compacto -->
+                                    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-3 sm:p-4">
+                                        <!-- Encabezado de Timeline -->
+                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 gap-2">
+                                        <div>
+                                            <h3 class="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-200">
+                                                <span class="hidden sm:inline">Línea de Tiempo de Plazos POA {{ $poa->anio }}</span>
+                                                <span class="sm:hidden">Plazos POA {{ $poa->anio }}</span>
+                                            </h3>
+                                            <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                                                <span class="hidden sm:inline">Estado actual de los plazos</span>
+                                                <span class="sm:hidden">{{ $plazosVigentes->count() }} vigente(s)</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                        <div class="relative">
+                                            <!-- Línea de tiempo central -->
+                                            <div class="absolute left-3 sm:left-6 top-0 bottom-0 w-0.5 bg-zinc-300 dark:bg-zinc-600"></div>
+                                            
+                                            <!-- Items del timeline -->
+                                            <div class="space-y-3 sm:space-y-6">
+                                                @foreach($this->plazosTimeline as $plazo)
+                                                    @php
+                                                        $fechaInicio = \Carbon\Carbon::parse($plazo['fecha_inicio']);
+                                                        $fechaFin = \Carbon\Carbon::parse($plazo['fecha_fin']);
+                                                        $duracionDias = $fechaInicio->diffInDays($fechaFin) + 1;
+                                                        
+                                                        // Determinar color según estado
+                                                        if ($plazo['es_vigente']) {
+                                                            $colorClass = 'bg-green-500';
+                                                            $borderClass = 'border-green-500';
+                                                            $bgClass = 'bg-green-50 dark:bg-green-900/20';
+                                                            $textClass = 'text-green-700 dark:text-green-300';
+                                                            $badgeClass = 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100';
+                                                            $estadoTexto = 'EN CURSO';
+                                                        } elseif ($plazo['ha_vencido']) {
+                                                            $colorClass = 'bg-red-500';
+                                                            $borderClass = 'border-red-500';
+                                                            $bgClass = 'bg-red-50 dark:bg-red-900/20';
+                                                            $textClass = 'text-red-700 dark:text-red-300';
+                                                            $badgeClass = 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
+                                                            $estadoTexto = 'VENCIDO';
+                                                        } elseif ($plazo['es_proximo']) {
+                                                            $colorClass = 'bg-purple-500';
+                                                            $borderClass = 'border-purple-500';
+                                                            $bgClass = 'bg-purple-50 dark:bg-purple-900/20';
+                                                            $textClass = 'text-purple-700 dark:text-purple-300';
+                                                            $badgeClass = 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100';
+                                                            $estadoTexto = 'PRÓXIMO';
+                                                        } else {
+                                                            $colorClass = 'bg-zinc-400';
+                                                            $borderClass = 'border-zinc-400';
+                                                            $bgClass = 'bg-zinc-50 dark:bg-zinc-800';
+                                                            $textClass = 'text-zinc-600 dark:text-zinc-400';
+                                                            $badgeClass = 'bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300';
+                                                            $estadoTexto = 'INACTIVO';
+                                                        }
+                                                        
+                                                        // Calcular días hasta el inicio (si es próximo)
+                                                        $diasHastaInicio = $plazo['es_proximo'] ? (int) $hoy->diffInDays($fechaInicio) : null;
+                                                    @endphp
+                                                    
+                                                    <div class="relative flex items-start group">
+                                                        <!-- Punto del timeline -->
+                                                        <div class="absolute left-3 sm:left-6 -translate-x-1/2 flex items-center justify-center">
+                                                            <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full {{ $colorClass }} ring-2 sm:ring-4 ring-white dark:ring-zinc-900 transition-transform group-hover:scale-125"></div>
+                                                        </div>
+                                                        
+                                                        <!-- Contenido -->
+                                                        <div class="ml-7 sm:ml-12 flex-1">
+                                                            <div class="border-l-2 sm:border-l-4 {{ $borderClass }} {{ $bgClass }} rounded-lg p-2 sm:p-3 shadow-sm hover:shadow-md transition-shadow">
+                                                                <div class="flex justify-between items-start mb-1 sm:mb-2">
+                                                                    <div class="flex-1">
+                                                                        <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
+                                                                            <h4 class="text-sm sm:text-base font-semibold {{ $textClass }}">
+                                                                                {{ $plazo['nombre'] }}
+                                                                            </h4>
+                                                                            <span class="px-1.5 sm:px-2 py-0.5 text-xs font-semibold rounded-full {{ $badgeClass }}">
+                                                                                {{ $estadoTexto }}
+                                                                            </span>
+                                                                            @if(!$plazo['activo'])
+                                                                                <span class="px-1.5 sm:px-2 py-0.5 text-xs font-semibold rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400">
+                                                                                    INACTIVO
+                                                                                </span>
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-2 text-xs sm:text-sm">
+                                                                    <div class="flex items-center text-zinc-600 dark:text-zinc-400">
+                                                                        <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                        </svg>
+                                                                        <span class="font-medium">{{ $fechaInicio->format('d/m/Y') }}</span>
+                                                                    </div>
+                                                                    
+                                                                    <div class="flex items-center text-zinc-600 dark:text-zinc-400">
+                                                                        <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                                                        </svg>
+                                                                        <span class="font-medium">{{ $fechaFin->format('d/m/Y') }}</span>
+                                                                    </div>
+                                                                    
+                                                                    <div class="flex items-center text-zinc-600 dark:text-zinc-400">
+                                                                        <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                        </svg>
+                                                                        <span class="font-medium">{{ $duracionDias }} días</span>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <!-- Información adicional según estado -->
+                                                                @if($plazo['es_vigente'] && $plazo['dias_restantes'] !== null)
+                                                                    <div class="mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                                                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+                                                                            <div class="flex items-center {{ $textClass }}">
+                                                                                <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                                                </svg>
+                                                                                <span class="text-xs sm:text-sm font-semibold">
+                                                                                    {{ $plazo['dias_restantes'] }} {{ $plazo['dias_restantes'] == 1 ? 'día restante' : 'días restantes' }}
+                                                                                </span>
+                                                                            </div>
+                                                                            <!-- Barra de progreso -->
+                                                                            @php
+                                                                                $totalDias = $fechaInicio->diffInDays($fechaFin) + 1;
+                                                                                $diasTranscurridos = $fechaInicio->diffInDays($hoy);
+                                                                                $porcentajeProgreso = $totalDias > 0 ? ($diasTranscurridos / $totalDias) * 100 : 0;
+                                                                            @endphp
+                                                                            <div class="flex-1 sm:ml-3">
+                                                                                <div class="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-1.5 sm:h-2">
+                                                                                    <div class="bg-green-500 h-1.5 sm:h-2 rounded-full transition-all" style="width: {{ min($porcentajeProgreso, 100) }}%"></div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <span class="text-xs text-zinc-500 dark:text-zinc-400 sm:ml-2">
+                                                                                {{ number_format($porcentajeProgreso, 0) }}%
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                @elseif($plazo['es_proximo'] && $diasHastaInicio)
+                                                                    <div class="mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                                                                        <div class="flex items-center {{ $textClass }}">
+                                                                            <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                            </svg>
+                                                                            <span class="text-xs sm:text-sm font-semibold">
+                                                                                Comienza en {{ $diasHastaInicio }} {{ $diasHastaInicio == 1 ? 'día' : 'días' }}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                @elseif($plazo['ha_vencido'])
+                                                                    @php
+                                                                        $diasVencido = (int) $fechaFin->diffInDays($hoy);
+                                                                    @endphp
+                                                                    <div class="mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                                                                        <div class="flex items-center {{ $textClass }}">
+                                                                            <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                                            </svg>
+                                                                            <span class="text-xs sm:text-sm font-semibold">
+                                                                                Venció hace {{ $diasVencido }} {{ $diasVencido == 1 ? 'día' : 'días' }}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-center py-12">
+                                    <svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">No hay plazos registrados</h3>
+                                    <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">No se han definido plazos para el POA {{ $poa->anio }}.</p>
+                                </div>
+                            @endif
+                        </div>
                     @elseif($activeTab === 'sin-asignar')
                         <!-- Unidades Ejecutoras sin Techo -->
                         <div class="space-y-4">
@@ -347,13 +597,13 @@
                                                 </div>
                                             </div>
                                             <div class="mt-3 flex justify-end">
-                                                <button wire:click="crearTechoParaUe({{ $ue->id }})"
-                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800 transition-colors">
+                                                <x-button wire:click="crearTechoParaUe({{ $ue->id }})" :disabled="!$puedeAsignarPresupuesto"
+                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-indigo-700 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-300 transition-colors {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-indigo-200 dark:hover:bg-indigo-800' }}">
                                                     <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                                     </svg>
-                                                    Asignar Techo
-                                                </button>
+                                                    Asignar
+                                                </x-button>
                                             </div>
                                         </div>
                                     @endforeach
@@ -473,6 +723,330 @@
                                     </svg>
                                     <h3 class="mt-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">No hay techos asignados</h3>
                                     <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Comienza asignando techos presupuestarios a las unidades ejecutoras.</p>
+                                </div>
+                            @endif
+                        </div>
+                    @elseif($activeTab === 'timeline')
+                        <!-- Línea de Tiempo de Plazos -->
+                        <div class="space-y-4 sm:space-y-6">
+                            <!-- Encabezado -->
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+                                <div>
+                                    <h3 class="text-base sm:text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                                        Línea de Tiempo de Plazos POA {{ $poa->anio }}
+                                    </h3>
+                                    <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                                        Visualización de todos los plazos configurados para este POA
+                                    </p>
+                                </div>
+                                <a href="{{ route('plazos-poa', ['idPoa' => $idPoa]) }}" class="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white text-xs sm:text-sm font-medium rounded-md transition-colors">
+                                    <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Gestionar Plazos
+                                </a>
+                            </div>
+
+                            @if($this->plazosTimeline && $this->plazosTimeline->count() > 0)
+                                @php
+                                    $hoy = \Carbon\Carbon::now();
+                                    $plazosVigentes = $this->plazosTimeline->where('es_vigente', true);
+                                    $plazosVencidos = $this->plazosTimeline->where('ha_vencido', true);
+                                    $plazosProximos = $this->plazosTimeline->where('es_proximo', true);
+                                @endphp
+
+                                <!-- Resumen de Estado -->
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                                    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-3 sm:p-4 border-l-4 border-blue-500">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">Total Plazos</p>
+                                                <p class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100">{{ $this->plazosTimeline->count() }}</p>
+                                            </div>
+                                            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-3 sm:p-4 border-l-4 border-green-500">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">Vigentes</p>
+                                                <p class="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">{{ $plazosVigentes->count() }}</p>
+                                            </div>
+                                            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-3 sm:p-4 border-l-4 border-red-500">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">Vencidos</p>
+                                                <p class="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">{{ $plazosVencidos->count() }}</p>
+                                            </div>
+                                            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-3 sm:p-4 border-l-4 border-purple-500">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">Próximos</p>
+                                                <p class="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">{{ $plazosProximos->count() }}</p>
+                                            </div>
+                                            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Timeline Visual -->
+                                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-3 sm:p-4 md:p-6">
+                                    <div class="relative">
+                                        <!-- Línea de tiempo central -->
+                                        <div class="absolute left-3 sm:left-6 md:left-8 top-0 bottom-0 w-0.5 bg-zinc-300 dark:bg-zinc-600"></div>
+                                        
+                                        <!-- Items del timeline -->
+                                        <div class="space-y-3 sm:space-y-6 md:space-y-8">
+                                            @foreach($this->plazosTimeline as $plazo)
+                                                @php
+                                                    $fechaInicio = \Carbon\Carbon::parse($plazo['fecha_inicio']);
+                                                    $fechaFin = \Carbon\Carbon::parse($plazo['fecha_fin']);
+                                                    $duracionDias = $fechaInicio->diffInDays($fechaFin) + 1;
+                                                    
+                                                    // Determinar color según estado
+                                                    if ($plazo['es_vigente']) {
+                                                        $colorClass = 'bg-green-500';
+                                                        $borderClass = 'border-green-500';
+                                                        $bgClass = 'bg-green-50 dark:bg-green-900/20';
+                                                        $textClass = 'text-green-700 dark:text-green-300';
+                                                        $badgeClass = 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100';
+                                                        $estadoTexto = 'EN CURSO';
+                                                    } elseif ($plazo['ha_vencido']) {
+                                                        $colorClass = 'bg-red-500';
+                                                        $borderClass = 'border-red-500';
+                                                        $bgClass = 'bg-red-50 dark:bg-red-900/20';
+                                                        $textClass = 'text-red-700 dark:text-red-300';
+                                                        $badgeClass = 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
+                                                        $estadoTexto = 'VENCIDO';
+                                                    } elseif ($plazo['es_proximo']) {
+                                                        $colorClass = 'bg-purple-500';
+                                                        $borderClass = 'border-purple-500';
+                                                        $bgClass = 'bg-purple-50 dark:bg-purple-900/20';
+                                                        $textClass = 'text-purple-700 dark:text-purple-300';
+                                                        $badgeClass = 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100';
+                                                        $estadoTexto = 'PRÓXIMO';
+                                                    } else {
+                                                        $colorClass = 'bg-zinc-400';
+                                                        $borderClass = 'border-zinc-400';
+                                                        $bgClass = 'bg-zinc-50 dark:bg-zinc-800';
+                                                        $textClass = 'text-zinc-600 dark:text-zinc-400';
+                                                        $badgeClass = 'bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300';
+                                                        $estadoTexto = 'INACTIVO';
+                                                    }
+                                                    
+                                                    // Calcular días hasta el inicio (si es próximo)
+                                                    $diasHastaInicio = $plazo['es_proximo'] ? (int) $hoy->diffInDays($fechaInicio) : null;
+                                                @endphp
+                                                
+                                                <div class="relative flex items-start group">
+                                                    <!-- Punto del timeline -->
+                                                    <div class="absolute left-3 sm:left-6 md:left-8 -translate-x-1/2 flex items-center justify-center">
+                                                        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 rounded-full {{ $colorClass }} ring-2 sm:ring-3 md:ring-4 ring-white dark:ring-zinc-900 transition-transform group-hover:scale-125"></div>
+                                                    </div>
+                                                    
+                                                    <!-- Contenido -->
+                                                    <div class="ml-7 sm:ml-12 md:ml-16 flex-1">
+                                                        <div class="border-l-2 sm:border-l-3 md:border-l-4 {{ $borderClass }} {{ $bgClass }} rounded-lg p-2 sm:p-3 md:p-4 shadow-sm hover:shadow-md transition-shadow">
+                                                            <div class="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-0 mb-2 sm:mb-3">
+                                                                <div class="flex-1">
+                                                                    <div class="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
+                                                                        <h4 class="text-sm sm:text-base md:text-lg font-semibold {{ $textClass }}">
+                                                                            {{ $plazo['nombre'] }}
+                                                                        </h4>
+                                                                        <span class="px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs font-semibold rounded-full {{ $badgeClass }}">
+                                                                            {{ $estadoTexto }}
+                                                                        </span>
+                                                                        @if(!$plazo['activo'])
+                                                                            <span class="px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs font-semibold rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400">
+                                                                                INACTIVO
+                                                                            </span>
+                                                                        @endif
+                                                                    </div>
+                                                                    @if($plazo['descripcion'])
+                                                                        <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+                                                                            {{ $plazo['descripcion'] }}
+                                                                        </p>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-sm">
+                                                                <div class="flex items-center text-zinc-600 dark:text-zinc-400">
+                                                                    <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                    </svg>
+                                                                    <span class="font-medium">Inicio:</span>
+                                                                    <span class="ml-1">{{ $fechaInicio->format('d/m/Y') }}</span>
+                                                                </div>
+                                                                
+                                                                <div class="flex items-center text-zinc-600 dark:text-zinc-400">
+                                                                    <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                    </svg>
+                                                                    <span class="font-medium">Fin:</span>
+                                                                    <span class="ml-1">{{ $fechaFin->format('d/m/Y') }}</span>
+                                                                </div>
+                                                                
+                                                                <div class="flex items-center text-zinc-600 dark:text-zinc-400">
+                                                                    <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                    </svg>
+                                                                    <span class="font-medium">Duración:</span>
+                                                                    <span class="ml-1">{{ $duracionDias }} {{ $duracionDias == 1 ? 'día' : 'días' }}</span>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Información adicional según estado -->
+                                                            @if($plazo['es_vigente'] && $plazo['dias_restantes'] !== null)
+                                                                <div class="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-zinc-200 dark:border-zinc-700">
+                                                                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 sm:justify-between">
+                                                                        <div class="flex items-center {{ $textClass }}">
+                                                                            <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                                            </svg>
+                                                                            <span class="text-xs sm:text-sm font-semibold">
+                                                                                {{ $plazo['dias_restantes'] }} {{ $plazo['dias_restantes'] == 1 ? 'día restante' : 'días restantes' }}
+                                                                            </span>
+                                                                        </div>
+                                                                        <!-- Barra de progreso -->
+                                                                        @php
+                                                                            $totalDias = $fechaInicio->diffInDays($fechaFin) + 1;
+                                                                            $diasTranscurridos = $fechaInicio->diffInDays($hoy);
+                                                                            $porcentajeProgreso = $totalDias > 0 ? ($diasTranscurridos / $totalDias) * 100 : 0;
+                                                                        @endphp
+                                                                        <div class="flex-1 sm:ml-4">
+                                                                            <div class="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-1.5 sm:h-2">
+                                                                                <div class="bg-green-500 h-1.5 sm:h-2 rounded-full transition-all" style="width: {{ min($porcentajeProgreso, 100) }}%"></div>
+                                                                            </div>
+                                                                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 text-right">
+                                                                                {{ number_format($porcentajeProgreso, 1) }}% transcurrido
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            @elseif($plazo['es_proximo'] && $diasHastaInicio)
+                                                                <div class="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-zinc-200 dark:border-zinc-700">
+                                                                    <div class="flex items-center {{ $textClass }}">
+                                                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                        </svg>
+                                                                        <span class="text-xs sm:text-sm font-semibold">
+                                                                            Comienza en {{ $diasHastaInicio }} {{ $diasHastaInicio == 1 ? 'día' : 'días' }}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            @elseif($plazo['ha_vencido'])
+                                                                @php
+                                                                    $diasVencido = (int) $fechaFin->diffInDays($hoy);
+                                                                @endphp
+                                                                <div class="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-zinc-200 dark:border-zinc-700">
+                                                                    <div class="flex items-center {{ $textClass }}">
+                                                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                                        </svg>
+                                                                        <span class="text-xs sm:text-sm font-semibold">
+                                                                            Venció hace {{ $diasVencido }} {{ $diasVencido == 1 ? 'día' : 'días' }}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Vista compacta en móvil/lista -->
+                                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-4">
+                                    <h4 class="text-md font-semibold text-zinc-800 dark:text-zinc-200 mb-4">Vista Rápida</h4>
+                                    <div class="space-y-2">
+                                        @foreach($this->plazosTimeline as $plazo)
+                                            @php
+                                                $fechaInicio = \Carbon\Carbon::parse($plazo['fecha_inicio']);
+                                                $fechaFin = \Carbon\Carbon::parse($plazo['fecha_fin']);
+                                                
+                                                if ($plazo['es_vigente']) {
+                                                    $iconClass = 'text-green-500';
+                                                    $icon = '●';
+                                                } elseif ($plazo['ha_vencido']) {
+                                                    $iconClass = 'text-red-500';
+                                                    $icon = '✕';
+                                                } elseif ($plazo['es_proximo']) {
+                                                    $iconClass = 'text-purple-500';
+                                                    $icon = '○';
+                                                } else {
+                                                    $iconClass = 'text-zinc-400';
+                                                    $icon = '−';
+                                                }
+                                            @endphp
+                                            <div class="flex items-center justify-between p-2 hover:bg-zinc-50 dark:hover:bg-zinc-700 rounded transition-colors">
+                                                <div class="flex items-center flex-1">
+                                                    <span class="text-2xl {{ $iconClass }} mr-3">{{ $icon }}</span>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                                                            {{ $plazo['nombre'] }}
+                                                        </p>
+                                                        <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                                                            {{ $fechaInicio->format('d/m/Y') }} - {{ $fechaFin->format('d/m/Y') }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="text-right ml-2">
+                                                    @if($plazo['es_vigente'] && $plazo['dias_restantes'] !== null)
+                                                        <span class="text-xs font-semibold text-green-600 dark:text-green-400">
+                                                            {{ $plazo['dias_restantes'] }}d
+                                                        </span>
+                                                    @elseif($plazo['es_proximo'])
+                                                        <span class="text-xs font-semibold text-purple-600 dark:text-purple-400">
+                                                            Próximo
+                                                        </span>
+                                                    @elseif($plazo['ha_vencido'])
+                                                        <span class="text-xs font-semibold text-red-600 dark:text-red-400">
+                                                            Vencido
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-center py-12 bg-white dark:bg-zinc-800 rounded-lg shadow">
+                                    <svg class="mx-auto h-16 w-16 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <h3 class="mt-4 text-lg font-medium text-zinc-900 dark:text-zinc-100">No hay plazos configurados</h3>
+                                    <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                                        Aún no se han configurado plazos para este POA.
+                                    </p>
+                                    <div class="mt-6">
+                                        <a href="{{ route('plazos-poa', ['idPoa' => $idPoa]) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white text-sm font-medium rounded-md transition-colors">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Crear Primer Plazo
+                                        </a>
+                                    </div>
                                 </div>
                             @endif
                         </div>
