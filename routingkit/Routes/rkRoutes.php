@@ -373,6 +373,15 @@ return [
                                     ->setUrlController('App\Livewire\Consola\Pei\Areas\Area')
                                     ->setRoles(['admin_general'])
                                     ->setItems([
+                                        RkRoute::make('resultados')
+                                    ->setParentId('consola')
+                                    ->setAccessPermission('consola.resultados.ver')
+                                    ->setUrlMethod('get')
+                                    ->setUrlController('App\Livewire\Consola\Pei\Resultados\Resultado')
+                                    ->setRoles(['admin_general'])
+                                    ->setItems([
+                                    ])
+                                    ->setEndBlock('resultados'),
                                     ])
                                     ->setEndBlock('areas'),
                                     ])

@@ -1,47 +1,74 @@
 <?php
 
 namespace App\Models\Resultados;
-use App\Models\BaseModel;
-use App\Models\Areas\Area;
-use App\Models\Objetivos\Objetivo;
-use App\Models\Dimension\Dimension;
-use App\Models\Poa\Pei;
 
-class Resultado extends BaseModel
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Resultado extends Model
 {
+    use HasFactory, SoftDeletes;
+
     protected $table = 'resultados';
 
     protected $fillable = [
         'nombre',
         'descripcion',
         'idArea',
-        'idObjetivos',
-        'idDimension',
-        'idPei',
-        // Los campos de auditoría ya están en BaseModel
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
-    // Relación con Area
     public function area()
     {
-        return $this->belongsTo(Area::class, 'idArea');
+        return $this->belongsTo(\App\Models\Areas\Area::class, 'idArea');
     }
 
-    // Relación con Objetivo
-    public function objetivo()
+    public function peiElemento()
     {
-        return $this->belongsTo(Objetivo::class, 'idObjetivos');
+        return $this->hasOne(\App\Models\Poa\PeiElemento::class, 'elemento_id')
+                    ->where('elemento_tipo', 'resultados');
     }
 
-    // Relación con Dimension
-    public function dimension()
+    protected static function booted()
     {
-        return $this->belongsTo(Dimension::class, 'idDimension');
-    }
+        static::created(function ($resultado) {
+            $peiId = $resultado->area?->objetivo?->dimension?->idPei;
+            if ($peiId) {
+                DB::table('pei_elementos')->insert([
+                    'idPei' => $peiId,
+                    'elemento_id' => $resultado->id,
+                    'elemento_tipo' => 'resultados',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        });
 
-    // Relación con Pei
-    public function pei()
-    {
-        return $this->belongsTo(Pei::class, 'idPei');
+        static::updated(function ($resultado) {
+            $peiId = $resultado->area?->objetivo?->dimension?->idPei;
+            if ($peiId) {
+                DB::table('pei_elementos')->updateOrInsert(
+                    [
+                        'elemento_id' => $resultado->id,
+                        'elemento_tipo' => 'resultados',
+                    ],
+                    [
+                        'idPei' => $peiId,
+                        'updated_at' => now(),
+                        'created_at' => now(),
+                    ]
+                );
+            }
+        });
+
+        static::deleted(function ($resultado) {
+            DB::table('pei_elementos')
+                ->where('elemento_id', $resultado->id)
+                ->where('elemento_tipo', 'resultados')
+                ->delete();
+        });
     }
 }

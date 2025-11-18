@@ -272,11 +272,21 @@ return [
                                 ->setDescription('Gestión de Objetivos')
                                 ->setLabel('Areas')
                                 ->setHeroIcon('square-3-stack-3d')
-                                ->setEndBlock('areas'),
+                                ->setEndBlock('areas')
+                                ->setItems([
+                                    RkNavigation::make('resultados')
+                                        ->setParentId('areas')
+                                        ->setDescription('Gestión de Resultados')
+                                        ->setLabel('Resultados')
+                                        ->setHeroIcon('square-3-stack-3d')
+                                        ->setEndBlock('resultados')
+                                        ->setItems([])                      
+                                ->setEndBlock('resultados'),
+                                ]),
                         ])
-                        ->setEndBlock('planestrategicoinstitucional', 'objetivos'),                  
+                        ->setEndBlock('objetivos'),                  
                         ])
-                        ->setEndBlock('planestrategicoinstitucional', 'dimensiones'),
+                        ->setEndBlock( 'dimensiones'),
                 ])
                 ->setEndBlock('planestrategicoinstitucional'),
 
