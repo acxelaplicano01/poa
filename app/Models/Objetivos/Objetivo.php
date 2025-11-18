@@ -11,66 +11,29 @@ use Illuminate\Support\Facades\DB;
 
 class Objetivo extends BaseModel
 {
-    protected $table = 'objetivos';
-
     protected $fillable = [
         'nombre',
         'descripcion',
         'idDimension',
-        'idPei',
-        // Los campos de auditoría ya están en BaseModel
     ];
 
-    // Relación con Dimension
     public function dimension()
     {
-        return $this->belongsTo(Dimension::class, 'idDimension');
+        return $this->belongsTo(\App\Models\Dimension\Dimension::class, 'idDimension');
     }
 
-    // Relación con Pei
-    public function pei()
-    {
-        return $this->belongsTo(Pei::class, 'idPei');
-    }
-
-    // Relación con Areas
     public function areas()
     {
-        return $this->hasMany(Area::class, 'idObjetivos');
-    }
-
-    // Relación con Resultados
-    public function resultados()
-    {
-        return $this->hasMany(Resultado::class, 'idObjetivos');
-    }
-
-    // Relación polimórfica con PeiElemento
-    public function peiElementos()
-    {
-        return $this->morphMany(PeiElemento::class, 'elemento');
+        return $this->hasMany(\App\Models\Areas\Area::class, 'idObjetivo');
     }
 
     protected static function booted()
     {
-        static::creating(function ($objetivo) {
-            if (!$objetivo->idPei && $objetivo->idDimension) {
-                $objetivo->idPei = Dimension::whereKey($objetivo->idDimension)->value('idPei');
-            }
-        });
-
-        static::updating(function ($objetivo) {
-            if (!$objetivo->idPei && $objetivo->idDimension) {
-                $objetivo->idPei = Dimension::whereKey($objetivo->idDimension)->value('idPei');
-            }
-        });
-
         static::created(function ($objetivo) {
-            $peiId = $objetivo->idPei ?? Dimension::whereKey($objetivo->idDimension)->value('idPei');
-
+            $peiId = $objetivo->dimension?->idPei;
             if ($peiId) {
                 DB::table('pei_elementos')->insert([
-                    'idPei' => $peiId,
+                    'idPei' => $peiId,  // Usa idPei como en dimensiones
                     'elemento_id' => $objetivo->id,
                     'elemento_tipo' => 'objetivos',
                     'created_at' => now(),
@@ -80,8 +43,7 @@ class Objetivo extends BaseModel
         });
 
         static::updated(function ($objetivo) {
-            $peiId = $objetivo->idPei ?? Dimension::whereKey($objetivo->idDimension)->value('idPei');
-
+            $peiId = $objetivo->dimension?->idPei;
             if ($peiId) {
                 DB::table('pei_elementos')->updateOrInsert(
                     [
@@ -89,7 +51,7 @@ class Objetivo extends BaseModel
                         'elemento_tipo' => 'objetivos',
                     ],
                     [
-                        'idPei' => $peiId,
+                        'idPei' => $peiId,  // idPei
                         'updated_at' => now(),
                         'created_at' => now(),
                     ]

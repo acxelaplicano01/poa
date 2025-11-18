@@ -359,8 +359,26 @@ return [
                                 ->setUrlController('App\Livewire\Consola\Pei\Dimensiones\Dimension')
                                 ->setRoles(['admin_general'])
                                 ->setItems([
+                                        RkRoute::make('objetivos')
+                                    ->setParentId('consola')
+                                    ->setAccessPermission('consola.objetivos.ver')
+                                    ->setUrlMethod('get')
+                                    ->setUrlController('App\Livewire\Consola\Pei\Objetivos\Objetivo')
+                                    ->setRoles(['admin_general'])
+                                    ->setItems([
+                                         RkRoute::make('areas')
+                                    ->setParentId('consola')
+                                    ->setAccessPermission('consola.areas.ver')
+                                    ->setUrlMethod('get')
+                                    ->setUrlController('App\Livewire\Consola\Pei\Areas\Area')
+                                    ->setRoles(['admin_general'])
+                                    ->setItems([
+                                    ])
+                                    ->setEndBlock('areas'),
+                                    ])
+                                    ->setEndBlock('objetivos'),
                                 ])
-                                ->setEndBlock('dimensiones'),
+                                ->setEndBlock('planestrategicoinstitucional'),
                         ])
                         ->setEndBlock('planestrategicoinstitucional'),
 

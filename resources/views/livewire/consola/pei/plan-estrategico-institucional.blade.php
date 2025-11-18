@@ -83,8 +83,9 @@
                                 {{ $pei->periodo ?? 'N/A' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                                <a href="{{ route('dimensiones', ['pei' => $pei->id]) }}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
-                                    {{ $pei->dimensions->count() }} dimensiones
+                                <a href="{{ route('dimensiones', ['pei' => $pei->id]) }}" 
+                                   class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                    {{ $pei->dimensions->count() }} Dimensiones
                                 </a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">

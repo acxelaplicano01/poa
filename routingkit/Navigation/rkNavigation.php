@@ -13,7 +13,7 @@ return [
             RkNavigation::makeSimple('dashboard')
                 ->setParentId('dashboard_group')
                 ->setUrl('/dashboard')
-                ->setDescription('Administra estadisticas y supervisa los movimientos del sistema')
+                ->setDescription('Accede al panel principal')
                 ->setLabel('Panel Principal')
                 ->setHeroIcon('home')
                 ->setItems([])
@@ -31,13 +31,7 @@ return [
                 ->setDescription('Visualiza tus planificaciones')
                 ->setLabel('Mis planificaciones')
                 ->setHeroIcon('document-text')
-                ->setItems([
-                    RkNavigation::make('actividades')
-                        ->setDescription('Ver y gestionar mis actividades planificadas')
-                        ->setLabel('Mis actividades')
-                        ->setHeroIcon('folder-open')
-                        ->setEndBlock('actividades'),
-                ])
+                ->setItems([])
                 ->setEndBlock('planificar'),
 
             RkNavigation::make('requerir')
@@ -261,12 +255,28 @@ return [
                 ->setHeroIcon('document-text')
                 ->setItems([
                     RkNavigation::make('dimensiones')
-                        ->setParentId('consola')
+                        ->setParentId('planestrategicoinstitucional')
                         ->setDescription('Gestión de Dimensiones')
                         ->setLabel('Dimensiones')
                         ->setHeroIcon('square-3-stack-3d')
-                        ->setEndBlock('dimensiones'),
-
+                        ->setItems([
+                            RkNavigation::make('objetivos')
+                                ->setParentId('dimensiones')
+                                ->setDescription('Gestión de Objetivos')
+                                ->setLabel('Objetivos')
+                                ->setHeroIcon('square-3-stack-3d')
+                                ->setEndBlock('objetivos')
+                                ->setItems([
+                                     RkNavigation::make('areas')
+                                ->setParentId('objetivos')
+                                ->setDescription('Gestión de Objetivos')
+                                ->setLabel('Areas')
+                                ->setHeroIcon('square-3-stack-3d')
+                                ->setEndBlock('areas'),
+                        ])
+                        ->setEndBlock('planestrategicoinstitucional', 'objetivos'),                  
+                        ])
+                        ->setEndBlock('planestrategicoinstitucional', 'dimensiones'),
                 ])
                 ->setEndBlock('planestrategicoinstitucional'),
 
@@ -280,11 +290,6 @@ return [
                         ->setDescription('Gestión de techos presupuestarios por Unidades Ejecutoras')
                         ->setLabel('Techos presupuestarios UE')
                         ->setHeroIcon('arrow-trending-up')
-                        ->setItems([
-                            RkNavigation::make('plazos-poa')
-                            ->setLabel('Plazos del POA')
-                            ->setDescription('Define y gestiona los plazos para la asignación presupuestaria nacional, departamental y planificación de este POA')
-                    ])
                         ->setEndBlock('techonacional'),
                 ])
                 ->setEndBlock('asignacionnacionalpresupuestaria'),
