@@ -146,10 +146,11 @@
                     <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Estado</label>
                     <select wire:model.live="filtroEstado" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         <option value="">Todos los estados</option>
-                        <option value="planificada">Planificada</option>
-                        <option value="en_proceso">En Proceso</option>
-                        <option value="completada">Completada</option>
-                        <option value="cancelada">Cancelada</option>
+                        <option value="FORMULACION">Formulación</option>
+                        <option value="REFORMULACION">Reformulación</option>
+                        <option value="REVISION">Revisión</option>
+                        <option value="APROBADO">Aprobado</option>
+                        <option value="RECHAZADO">Rechazado</option>
                     </select>
                 </div>
             </div>
@@ -183,13 +184,13 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="text-sm text-zinc-900 dark:text-zinc-100">
-                                    {{ $actividad->tipoActividad->tipo ?? 'N/A' }}
+                                    {{ $actividad->tipo->tipo ?? 'N/A' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">
                                 @if($actividad->resultado)
                                     <div class="text-sm text-zinc-900 dark:text-zinc-100">
-                                        <span class="font-medium">Dimensión:</span> {{ $actividad->resultado->dimension->nombre ?? 'N/A' }}
+                                        <span class="font-medium">Dimensión:</span> {{ $actividad->resultado->area->objetivo->dimension->nombre ?? 'N/A' }}
                                     </div>
                                     <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                                         <span class="font-medium">Resultado:</span> {{ Str::limit($actividad->resultado->nombre, 40) }}
@@ -199,21 +200,29 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($actividad->estado === 'planificada')
+                                @if($actividad->estado === 'FORMULACION')
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
-                                        Planificada
+                                        Formulación
                                     </span>
-                                @elseif($actividad->estado === 'en_proceso')
+                                @elseif($actividad->estado === 'REFORMULACION')
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">
-                                        En Proceso
+                                        Reformulación
                                     </span>
-                                @elseif($actividad->estado === 'completada')
+                                @elseif($actividad->estado === 'REVISION')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300">
+                                        Revisión
+                                    </span>
+                                @elseif($actividad->estado === 'APROBADO')
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                                        Completada
+                                        Aprobado
+                                    </span>
+                                @elseif($actividad->estado === 'RECHAZADO')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
+                                        Rechazado
                                     </span>
                                 @else
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
-                                        Cancelada
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300">
+                                        {{ $actividad->estado }}
                                     </span>
                                 @endif
                             </td>
@@ -249,32 +258,40 @@
                                         </p>
                                     @endif
                                 </div>
-                                @if($actividad->estado === 'planificada')
+                                @if($actividad->estado === 'FORMULACION')
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
-                                        Planificada
+                                        Formulación
                                     </span>
-                                @elseif($actividad->estado === 'en_proceso')
+                                @elseif($actividad->estado === 'REFORMULACION')
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">
-                                        En Proceso
+                                        Reformulación
                                     </span>
-                                @elseif($actividad->estado === 'completada')
+                                @elseif($actividad->estado === 'REVISION')
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300">
+                                        Revisión
+                                    </span>
+                                @elseif($actividad->estado === 'APROBADO')
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                                        Completada
+                                        Aprobado
+                                    </span>
+                                @elseif($actividad->estado === 'RECHAZADO')
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
+                                        Rechazado
                                     </span>
                                 @else
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
-                                        Cancelada
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300">
+                                        {{ $actividad->estado }}
                                     </span>
                                 @endif
                             </div>
                             
                             <div class="text-sm text-zinc-600 dark:text-zinc-400 space-y-2 mb-3">
                                 <div>
-                                    <span class="font-medium">Tipo:</span> {{ $actividad->tipoActividad->tipo ?? 'N/A' }}
+                                    <span class="font-medium">Tipo:</span> {{ $actividad->tipo->tipo ?? 'N/A' }}
                                 </div>
                                 @if($actividad->resultado)
                                     <div>
-                                        <span class="font-medium">Dimensión:</span> {{ $actividad->resultado->dimension->nombre ?? 'N/A' }}
+                                        <span class="font-medium">Dimensión:</span> {{ $actividad->resultado->area->objetivo->dimension->nombre ?? 'N/A' }}
                                     </div>
                                     <div>
                                         <span class="font-medium">Resultado:</span> {{ Str::limit($actividad->resultado->nombre, 50) }}

@@ -20,7 +20,7 @@ class Area extends BaseModel
     // Relación con Objetivo
     public function objetivo()
     {
-        return $this->belongsTo(Objetivo::class, 'idObjetivos');
+        return $this->belongsTo(Objetivo::class, 'idObjetivo');
     }
 
     // Relación con Dimension

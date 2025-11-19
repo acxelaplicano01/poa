@@ -28,10 +28,17 @@ return [
 
             RkNavigation::make('planificar')
                 ->setParentId('planificacion')
-                ->setDescription('Visualiza tus planificaciones')
+                ->setDescription('Visualiza los POAs por departamento y planifica actividades')
                 ->setLabel('Mis planificaciones')
                 ->setHeroIcon('document-text')
-                ->setItems([])
+                ->setItems([
+                    RkNavigation::make('actividades')
+                        ->setParentId('planificar')
+                        ->setDescription('Crea y gestiona actividades planificadas')
+                        ->setLabel('Mis actividades')
+                        ->setHeroIcon('folder-open')
+                        ->setEndBlock('actividades'),
+                ])
                 ->setEndBlock('planificar'),
 
             RkNavigation::make('requerir')

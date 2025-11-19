@@ -195,9 +195,13 @@ class Actividades extends Component
     public function updatedIdDimension($value)
     {
         if ($value) {
-            $this->resultadosPorDimension = Resultado::where('idDimension', $value)
-                ->orderBy('nombre')
-                ->get();
+            // Los resultados están relacionados con áreas, y las áreas con objetivos que tienen dimensiones
+            $this->resultadosPorDimension = Resultado::whereHas('area.objetivo', function($query) use ($value) {
+                $query->where('idDimension', $value);
+            })
+            ->with('area.objetivo.dimension')
+            ->orderBy('nombre')
+            ->get();
             $this->idResultado = null;
         } else {
             $this->resultadosPorDimension = [];
@@ -217,7 +221,7 @@ class Actividades extends Component
                       'poblacion_objetivo', 'medio_verificacion', 'idTipo', 'idResultado', 
                       'idCategoria', 'idDimension']);
         
-        $this->estado = 'planificada';
+        $this->estado = 'FORMULACION';
         $this->currentStep = 1;
         $this->resultadosPorDimension = [];
         $this->modalOpen = true;
@@ -254,7 +258,7 @@ class Actividades extends Component
         
         if ($lastRequest && now()->diffInSeconds($lastRequest) < $throttleSeconds) {
             $segundosRestantes = $throttleSeconds - now()->diffInSeconds($lastRequest);
-            session()->flash('error', "⏱️ Por favor espera {$segundosRestantes} segundos antes de generar otra actividad con IA.");
+            session()->flash('error', "Por favor espera {$segundosRestantes} segundos antes de generar otra actividad con IA.");
             return;
         }
 
@@ -353,7 +357,7 @@ class Actividades extends Component
 
     public function editar($id)
     {
-        $actividad = Actividad::findOrFail($id);
+        $actividad = Actividad::with('resultado.area.objetivo')->findOrFail($id);
         
         // Verificar que pertenece al departamento del usuario
         if ($actividad->idDeptartamento != $this->idDeptartamento) {
@@ -372,7 +376,9 @@ class Actividades extends Component
         $this->idTipo = $actividad->idTipo;
         $this->idResultado = $actividad->idResultado;
         $this->idCategoria = $actividad->idCategoria;
-        $this->idDimension = $actividad->resultado ? $actividad->resultado->idDimension : null;
+        $this->idDimension = $actividad->resultado && $actividad->resultado->area && $actividad->resultado->area->objetivo 
+            ? $actividad->resultado->area->objetivo->idDimension 
+            : null;
 
         // Cargar resultados de la dimensión
         if ($this->idDimension) {
@@ -421,6 +427,15 @@ class Actividades extends Component
 
         try {
             DB::beginTransaction();
+
+            // Generar correlativo si es una nueva actividad
+            if (!$this->actividadId && empty($this->correlativo)) {
+                $ultimoCorrelativo = Actividad::where('idPoa', $this->idPoa)
+                    ->where('idDeptartamento', $this->idDeptartamento)
+                    ->max('correlativo');
+                
+                $this->correlativo = $ultimoCorrelativo ? $ultimoCorrelativo + 1 : 1;
+            }
 
             $datos = [
                 'nombre' => $this->nombre,
@@ -590,7 +605,7 @@ class Actividades extends Component
                 $query->where('estado', $this->filtroEstado);
             })
             ->orderBy($this->sortField, $this->sortDirection)
-            ->with(['tipo', 'departamento', 'categoria', 'resultado.dimension'])
+            ->with(['tipo', 'departamento', 'categoria', 'resultado.area.objetivo.dimension'])
             ->paginate(10);
 
         $resumenPresupuesto = $this->getResumenPresupuesto();
