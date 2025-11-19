@@ -56,6 +56,10 @@ Responde ÚNICAMENTE con el JSON válido, sin markdown ni explicaciones adiciona
 
     protected function generarConOpenAI($prompt)
     {
+        if (empty($this->apiKey)) {
+            throw new \Exception('No se ha configurado la API Key de OpenAI. Por favor, agrega OPENAI_API_KEY en tu archivo .env o cambia el proveedor a Gemini con IA_PROVIDER=gemini');
+        }
+
         $client = \OpenAI::client($this->apiKey);
 
         $response = $client->chat()->create([
