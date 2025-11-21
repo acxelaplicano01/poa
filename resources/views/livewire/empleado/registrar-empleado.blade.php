@@ -37,7 +37,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {{-- DNI --}}
                                 <div>
-                                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">DNI *</label>
+                                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">DNI </label>
                                     <x-input wire:model="dni" type="text" class="w-full" placeholder="0000-0000-00000" />
                                     @error('dni') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                                 </div>
@@ -51,21 +51,21 @@
 
                                 {{-- Nombre --}}
                                 <div>
-                                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Nombre *</label>
+                                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Nombre </label>
                                     <x-input wire:model="nombre" type="text" class="w-full" />
                                     @error('nombre') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                                 </div>
 
                                 {{-- Apellido --}}
                                 <div>
-                                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Apellido *</label>
+                                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Apellido </label>
                                     <x-input wire:model="apellido" type="text" class="w-full" />
                                     @error('apellido') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                                 </div>
 
                                 {{-- Sexo --}}
                                 <div>
-                                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Sexo *</label>
+                                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Sexo </label>
                                     <select wire:model="sexo" class="block w-full rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         <option value="M">Masculino</option>
                                         <option value="F">Femenino</option>
@@ -107,7 +107,7 @@
                             
                             {{-- Unidad Ejecutora --}}
                             <div class="mb-4">
-                                <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Unidad Ejecutora *</label>
+                                <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Unidad Ejecutora </label>
                                 <select wire:model.live="idUnidadEjecutora" class="block w-full rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     <option value="">Seleccione una Unidad Ejecutora</option>
                                     @foreach($unidadesEjecutoras as $ue)
@@ -242,27 +242,26 @@
                                 </svg>
                                 <div class="text-sm text-blue-800 dark:text-blue-300">
                                     <p class="font-medium mb-1">Información importante</p>
-                                    <p>Esta información será utilizada para identificarte en el sistema y asignar tus responsabilidades laborales. Los campos marcados con (*) son obligatorios.</p>
+                                    <p>Esta información será utilizada para identificarte en el sistema y asignar tus responsabilidades laborales.</p>
                                 </div>
                             </div>
                         </div>
-
+                        @if (session()->has('error'))
+                            <div class="mb-6 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg flex items-start">
+                                <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm">{{ session('error') }}</span>
+                            </div>
+                       @endif
                         {{-- Botón de envío --}}
                         <div class="flex items-center justify-end pt-4">
-                             @if (session()->has('error'))
-                    <div class="mb-6 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg flex items-start">
-                        <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="text-sm">{{ session('error') }}</span>
-                    </div>
-                @endif
-                            <x-button type="submit" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold">
+                            <x-spinner-button type="submit" loadingTarget="guardar" :loadingText="'Guardando...'" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold cursor-pointer">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
                                 Completar Registro
-                            </x-button>
+                            </x-spinner-button>
                         </div>
                     </div>
                 </form>
