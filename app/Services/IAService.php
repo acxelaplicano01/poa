@@ -23,7 +23,7 @@ class IAService
             : config('openai.api_key');
     }
 
-    public function generarActividad($nombreActividad, $contextoInstitucion = 'institución educativa')
+    public function generarActividad($nombreActividad, $contextoInstitucion = 'Universidad Nacional Autónoma de Honduras')
     {
         $prompt = $this->construirPrompt($nombreActividad, $contextoInstitucion);
 
@@ -43,15 +43,15 @@ class IAService
     {
         return "Eres un experto en planificación estratégica institucional para {$contextoInstitucion}.
 
-Basándote en el siguiente nombre de actividad: '{$nombreActividad}'
+                Basándote en el siguiente nombre de actividad: '{$nombreActividad}'
 
-Genera un JSON con los siguientes campos para una actividad del Plan Operativo Anual (POA):
-- descripcion: Una descripción detallada y profesional de la actividad (2-3 oraciones), explicando qué se hará y cómo contribuye a los objetivos institucionales
-- resultadoActividad: El resultado concreto y medible que se espera obtener de la actividad (1 oración clara)
-- poblacion_objetivo: La población específica que se beneficiará (ej: estudiantes de primaria, docentes, personal administrativo, comunidad educativa, etc.)
-- medio_verificacion: Cómo se verificará el cumplimiento de la actividad (ej: informes técnicos, actas de reunión, registros fotográficos, listas de asistencia, etc.)
+                Genera un JSON con los siguientes campos para una actividad del Plan Operativo Anual (POA):
+                - descripcion: Una descripción detallada y profesional de la actividad (2-3 oraciones), explicando qué se hará y cómo contribuye a los objetivos institucionales
+                - resultadoActividad: El resultado concreto y medible que se espera obtener de la actividad (1 oración clara)
+                - poblacion_objetivo: La población específica que se beneficiará (ej: estudiantes universitarios, docentes, personal administrativo, comunidad educativa, personal de servicio, etc.)
+                - medio_verificacion: Cómo se verificará el cumplimiento de la actividad (ej: informes técnicos, actas de reunión, registros fotográficos, listas de asistencia, etc.)
 
-Responde ÚNICAMENTE con el JSON válido, sin markdown ni explicaciones adicionales.";
+                Responde ÚNICAMENTE con el JSON válido, sin markdown ni explicaciones adicionales.";
     }
 
     protected function generarConOpenAI($prompt)

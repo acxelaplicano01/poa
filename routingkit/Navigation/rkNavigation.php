@@ -307,7 +307,14 @@ return [
                         ->setDescription('Gestión de techos presupuestarios por Unidades Ejecutoras')
                         ->setLabel('Techos presupuestarios UE')
                         ->setHeroIcon('arrow-trending-up')
-                        ->setEndBlock('techonacional'),
+                        ->setItems([
+                            RkNavigation::make('plazos-poa')
+                                ->setDescription('Gestión de techos presupuestarios por departamento')
+                                ->setLabel('Gestión de plazos')
+                                ->setHeroIcon('cog-8-tooth')
+                                ->setEndBlock('plazos-poa'),
+                                ])
+                                ->setEndBlock('techonacional'),
                 ])
                 ->setEndBlock('asignacionnacionalpresupuestaria'),
 

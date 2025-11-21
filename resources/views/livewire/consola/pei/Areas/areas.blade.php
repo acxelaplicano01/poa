@@ -153,6 +153,6 @@
     <x-error-modal 
         :show="$showErrorModal" 
         :message="$errorMessage"
-        wire:click="hideError"
+        wire:click="closeErrorModal"
     />
 </div>

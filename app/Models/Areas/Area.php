@@ -13,7 +13,8 @@ class Area extends BaseModel
 
     protected $fillable = [
         'nombre',
-        'idObjetivo', // Corregido para consistencia
+        'idObjetivo',
+        'idPei', // Necesario si la tabla tiene esta columna
         // Los campos de auditoría ya están en BaseModel
     ];
 
@@ -47,9 +48,9 @@ class Area extends BaseModel
             // Obtener el objetivo relacionado para determinar el PEI
             $objetivo = $area->objetivo;
 
-            if ($objetivo) {
+            if ($objetivo && $objetivo->dimension) {
                 \DB::table('pei_elementos')->insert([
-                    'idPei' => $objetivo->idPei, // Relación con el PEI a través del objetivo
+                    'idPei' => $objetivo->dimension->idPei, // Relación con el PEI a través del objetivo → dimensión
                     'elemento_id' => $area->id,
                     'elemento_tipo' => 'areas', // Tipo de elemento
                     'created_at' => now(),
@@ -62,14 +63,14 @@ class Area extends BaseModel
             // Obtener el objetivo relacionado para determinar el PEI
             $objetivo = $area->objetivo;
 
-            if ($objetivo) {
+            if ($objetivo && $objetivo->dimension) {
                 \DB::table('pei_elementos')->updateOrInsert(
                     [
                         'elemento_id' => $area->id,
                         'elemento_tipo' => 'areas',
                     ],
                     [
-                        'idPei' => $objetivo->idPei, // Relación con el PEI a través del objetivo
+                        'idPei' => $objetivo->dimension->idPei, // Relación con el PEI a través del objetivo → dimensión
                         'updated_at' => now(),
                         'created_at' => now(),
                     ]

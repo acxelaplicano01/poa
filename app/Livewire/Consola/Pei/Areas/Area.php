@@ -127,9 +127,13 @@ class Area extends Component
         $this->validate();
 
         try {
+            // Obtener idPei del objetivo a través de su dimensión
+            $idPei = $objetivo->dimension?->idPei;
+            
             $data = [
                 'nombre' => $this->nombre,
                 'idObjetivo' => $this->idObjetivo,
+                'idPei' => $idPei, // Agregar idPei si la tabla lo requiere
             ];
 
             $area = AreaModel::updateOrCreate(
