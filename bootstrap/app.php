@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'permission' => Spatie\Permission\Middleware\PermissionMiddleware::class, // cloned from Spatie\Permission\Middleware
+            'check.empleado' => \App\Http\Middleware\CheckEmpleado::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

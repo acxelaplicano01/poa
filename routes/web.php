@@ -42,10 +42,16 @@ Route::get('/doc', function () {
     return view('doc');
 });
 
+// Ruta para registrar empleado (sin middleware check.empleado)
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/empleado/registrar', \App\Livewire\Empleado\RegistrarEmpleado::class)
+        ->name('empleado.registrar');
+});
+
 Route::get('/dashboard', function () {
     return view('layouts.app');
 })
-    ->middleware(['auth:sanctum', 'verified'])
+    ->middleware(['auth:sanctum', 'verified', 'check.empleado'])
     ->name('dashboard');
     
 // Route::view('/error/404', 'errors.404')->name('error.404');

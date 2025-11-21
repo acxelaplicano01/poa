@@ -9,6 +9,7 @@ return [
             'auth:sanctum',
             config('jetstream.auth_session'),
             'verified',
+            'check.empleado',
         ])
         ->setItems([
 
