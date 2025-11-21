@@ -1,7 +1,16 @@
 <div>
     <div class="flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-zinc-900 dark:to-zinc-800">
         <div class="w-full bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
-            
+            {{-- Header --}}
+            <div class="bg-gradient-to-r from-zinc-800 to-zinc-800 px-8 py-6">
+                
+                <h2 class="text-3xl font-bold text-center text-white">
+                    Completa tu Perfil
+                </h2>
+                <p class="mt-2 text-center text-indigo-100">
+                    Para continuar, necesitamos algunos datos adicionales sobre ti para una correcta administración y asignación de roles.
+                </p>
+            </div>
 
             {{-- Form --}}
             <div class="px-8 py-8">
@@ -240,6 +249,14 @@
 
                         {{-- Botón de envío --}}
                         <div class="flex items-center justify-end pt-4">
+                             @if (session()->has('error'))
+                    <div class="mb-6 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg flex items-start">
+                        <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-sm">{{ session('error') }}</span>
+                    </div>
+                @endif
                             <x-button type="submit" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />

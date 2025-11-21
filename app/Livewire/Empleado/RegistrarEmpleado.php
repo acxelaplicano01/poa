@@ -20,35 +20,53 @@ class RegistrarEmpleado extends Component
     public $fechaNacimiento;
     public $sexo = 'M';
     public $idUnidadEjecutora;
+    public $empleado_id;
     public $selectedDepartamentos = [];
 
     // Listas para selects
     public $unidadesEjecutoras = [];
     public $departamentos = [];
 
-    protected $rules = [
-        'dni' => 'required|string|max:20|unique:empleados,dni',
-        'num_empleado' => 'nullable|string|max:50',
-        'nombre' => 'required|string|max:100',
-        'apellido' => 'required|string|max:100',
-        'direccion' => 'nullable|string|max:255',
-        'telefono' => 'nullable|string|max:20',
-        'fechaNacimiento' => 'nullable|date',
-        'sexo' => 'required|in:M,F',
-        'idUnidadEjecutora' => 'required|exists:unidad_ejecutora,id',
-        'selectedDepartamentos' => 'nullable|array',
-        'selectedDepartamentos.*' => 'exists:departamentos,id',
-    ];
+   protected function rules()
+    {
+        $idRule = $this->empleado_id ? ','.$this->empleado_id : '';
+        
+        return [
+            'dni' => 'required|string|max:20|unique:empleados,dni'.$idRule,
+            'num_empleado' => 'required|string|max:20|unique:empleados,num_empleado'.$idRule,
+            'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
+            'telefono' => 'required|string|max:20',
+            'fechaNacimiento' => 'required|date',
+            'direccion' => 'required|string|max:255',
+            'sexo' => 'required|string|max:10|in:M,F', // M para Masculino, F para Femenino
+            'selectedDepartamentos' => 'required|array|min:1',
+            'idUnidadEjecutora' => 'required|exists:unidad_ejecutora,id', 
+        ];
+    }
 
-    protected $messages = [
-        'dni.required' => 'El DNI es obligatorio',
-        'dni.unique' => 'Este DNI ya está registrado',
-        'nombre.required' => 'El nombre es obligatorio',
-        'apellido.required' => 'El apellido es obligatorio',
-        'sexo.required' => 'El sexo es obligatorio',
-        'idUnidadEjecutora.required' => 'Debe seleccionar una Unidad Ejecutora',
-        'idUnidadEjecutora.exists' => 'La Unidad Ejecutora seleccionada no es válida',
-    ];
+    // Mensajes personalizados de validación
+    protected function messages()
+    {
+        return [
+            'dni.required' => 'El DNI es obligatorio',
+            'dni.unique' => 'Este DNI ya está registrado',
+            'num_empleado.required' => 'El número de empleado es obligatorio',
+            'num_empleado.unique' => 'Este número de empleado ya está registrado',
+            'nombre.required' => 'El nombre es obligatorio',
+            'apellido.required' => 'El apellido es obligatorio',
+            'telefono.required' => 'El teléfono es obligatorio',
+            'fechaNacimiento.required' => 'La fecha de nacimiento es obligatoria',
+            'fechaNacimiento.date' => 'La fecha de nacimiento debe ser una fecha válida',
+            'direccion.required' => 'La dirección es obligatoria',
+            'selectedDepartamentos.required' => 'Debe seleccionar al menos un departamento',
+            'selectedDepartamentos.min' => 'Debe seleccionar al menos un departamento', 
+            'sexo.required' => 'El campo sexo es obligatorio',
+            'sexo.in' => 'El valor seleccionado para sexo no es válido', 
+            'idUnidadEjecutora.required' => 'Debe seleccionar una unidad ejecutora',
+            'idUnidadEjecutora.exists' => 'La unidad ejecutora seleccionada no es válida',
+        ];
+    }
 
     public function mount()
     {
