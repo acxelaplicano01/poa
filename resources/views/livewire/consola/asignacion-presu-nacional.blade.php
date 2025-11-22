@@ -64,19 +64,37 @@
                 @if($poas->count() > 0)
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
                         @foreach($poas as $poa)
-                            <div class="bg-gradient-to-br {{ $poa->activo ? 'from-indigo-700 to-purple-700 dark:from-indigo-900 dark:to-purple-900' : 'from-zinc-500 to-zinc-600 dark:from-zinc-700 dark:to-zinc-800' }} rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200 cursor-pointer relative group p-5 {{ !$poa->activo ? 'opacity-75' : '' }}">
+                            @php
+                                // Determinar estado del POA
+                                $anioActual = (int) date('Y');
+                                $anioPoa = (int) ($poa->anio ?? 0);
+                                $estadoPoa = 'pasado';
+                                if ($anioPoa == $anioActual) $estadoPoa = 'actual';
+                                elseif ($anioPoa > $anioActual) $estadoPoa = 'proximo';
+                            @endphp
+                            <div class="bg-gradient-to-br {{ $estadoPoa === 'actual' ? 'from-indigo-700 to-purple-700 dark:from-indigo-900 dark:to-purple-900' : ($estadoPoa === 'proximo' ? 'from-emerald-600 to-teal-600 dark:from-emerald-800 dark:to-teal-800' : 'from-zinc-500 to-zinc-600 dark:from-zinc-700 dark:to-zinc-800') }} rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200 cursor-pointer relative group p-5 {{ $estadoPoa === 'pasado' ? 'opacity-75' : '' }}">
                                 <div wire:click="gestionarTechoUeNacional({{ $poa->id }})">
-                                    <div class="absolute top-2 right-2 {{ $poa->activo ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-zinc-600 hover:bg-zinc-700' }} text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div class="absolute top-2 right-2 {{ $estadoPoa === 'pasado' ? 'bg-zinc-600 hover:bg-zinc-700' : ($estadoPoa === 'actual' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-emerald-600 hover:bg-emerald-700') }} text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                         Gestionar Presupuesto UEs
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <h3 class="text-6xl font-extrabold">{{ $poa->anio }}</h3>
-                                        <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $poa->activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                            {{ $poa->activo ? 'Activo' : 'Inactivo' }}
-                                        </span>
+                                        @if($estadoPoa === 'actual')
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-white text-indigo-600">
+                                                Actual
+                                            </span>
+                                        @elseif($estadoPoa === 'proximo')
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-white text-emerald-600">
+                                                Próximo
+                                            </span>
+                                        @else
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-300 text-gray-800">
+                                                Histórico
+                                            </span>
+                                        @endif
                                     </div>
                                     
-                                    <div class="mt-4 flex flex-col space-y-2 text-sm {{ $poa->activo ? 'text-indigo-50' : 'text-zinc-200' }}">
+                                    <div class="mt-4 flex flex-col space-y-2 text-sm {{ $estadoPoa === 'pasado' ? 'text-zinc-200' : ($estadoPoa === 'actual' ? 'text-indigo-50' : 'text-emerald-50') }}">
                                         <div class="flex items-center justify-between">
                                             <span>Institución:</span>
                                             <span class="font-semibold truncate ml-2" title="{{ $poa->institucion->nombre ?? 'N/A' }}">

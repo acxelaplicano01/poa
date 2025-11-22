@@ -127,17 +127,21 @@
                     <!-- Grid de tarjetas de POAs -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($poasHistorial as $poaData)
-                            <div class="bg-white dark:bg-zinc-800 border-2 {{ $poaData['isActual'] ? 'border-indigo-500 dark:border-indigo-400' : 'border-zinc-200 dark:border-zinc-700' }} rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200">
+                            <div class="bg-white dark:bg-zinc-800 border-2 {{ $poaData['estadoPoa'] === 'actual' ? 'border-indigo-500 dark:border-indigo-400' : ($poaData['estadoPoa'] === 'proximo' ? 'border-emerald-500 dark:border-emerald-400' : 'border-zinc-200 dark:border-zinc-700') }} rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200">
                                 <!-- Header de la tarjeta -->
-                                <div class="bg-gradient-to-r {{ $poaData['isActual'] ? 'from-indigo-500 to-indigo-600' : 'from-zinc-500 to-zinc-600' }} p-4">
+                                <div class="bg-gradient-to-r {{ $poaData['estadoPoa'] === 'actual' ? 'from-indigo-500 to-indigo-600' : ($poaData['estadoPoa'] === 'proximo' ? 'from-emerald-500 to-emerald-600' : 'from-zinc-500 to-zinc-600') }} p-4">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <h3 class="text-white font-bold text-lg">
                                                 {{ $poaData['anio'] }}
                                             </h3>
-                                            @if($poaData['isActual'])
+                                            @if($poaData['estadoPoa'] === 'actual')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white text-indigo-600 mt-1">
                                                     Actual
+                                                </span>
+                                            @elseif($poaData['estadoPoa'] === 'proximo')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white text-emerald-600 mt-1">
+                                                    Próximo
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-zinc-700 text-white mt-1">
@@ -199,12 +203,12 @@
                                     <!-- Botón de redirección -->
                                     <div class="pt-2">
                                         <button wire:click="seleccionarPoa({{ $poaData['idPoa'] }})"
-                                                class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white {{ $poaData['isActual'] ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-zinc-600 hover:bg-zinc-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150 cursor-pointer">
+                                                class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white {{ $poaData['estadoPoa'] === 'actual' ? 'bg-indigo-600 hover:bg-indigo-700' : ($poaData['estadoPoa'] === 'proximo' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-zinc-600 hover:bg-zinc-700') }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150 cursor-pointer">
                                             <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                            {{ $poaData['isActual'] ? 'Planificar' : 'Ver Detalle' }}
+                                            {{ $poaData['estadoPoa'] === 'pasado' ? 'Ver Detalle' : 'Planificar' }}
                                         </button>
                                     </div>
                                 </div>

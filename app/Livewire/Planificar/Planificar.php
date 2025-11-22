@@ -80,6 +80,17 @@ class Planificar extends Component
                 $primerTecho = $techos->first();
                 $poa = $primerTecho->poa;
                 
+                // Determinar el estado del POA en relación al año actual
+                $anioActual = (int) date('Y');
+                $anioPoa = (int) ($poa->anio ?? 0);
+                
+                $estadoPoa = 'pasado'; // Por defecto
+                if ($anioPoa == $anioActual) {
+                    $estadoPoa = 'actual';
+                } elseif ($anioPoa > $anioActual) {
+                    $estadoPoa = 'proximo';
+                }
+                
                 return [
                     'idPoa' => $idPoa,
                     'poa' => $poa,
@@ -98,7 +109,8 @@ class Planificar extends Component
                             'monto' => $techo->monto,
                         ];
                     }),
-                    'isActual' => $poa->anio == date('Y'),
+                    'estadoPoa' => $estadoPoa, // 'actual', 'proximo', o 'pasado'
+                    'isActual' => $estadoPoa === 'actual', // Mantener compatibilidad
                 ];
             })
             ->sortByDesc('anio')
@@ -109,8 +121,11 @@ class Planificar extends Component
 
     public function seleccionarPoa($idPoa)
     {
-        // Aquí puedes redirigir a una vista de detalle o abrir un modal
-        return redirect()->route('actividades', ['idPoa' => $idPoa, 'departamento' => $this->departamentoSeleccionado]);
+        // Redirigir a actividades con el POA específico y el departamento
+        return redirect()->route('actividades', [
+            'idPoa' => $idPoa, 
+            'departamento' => $this->departamentoSeleccionado
+        ]);
     }
 
     public function render()

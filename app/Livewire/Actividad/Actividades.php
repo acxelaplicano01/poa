@@ -37,8 +37,14 @@ class Actividades extends Component
     public $medio_verificacion;
     public $estado = 'planificada';
     
+    // Parámetros de URL
+    #[Url]
+    public $departamento = null;
+    
+    #[Url]
+    public $idPoa = null; // POA desde URL, si no viene se usa el activo
+    
     // Campos que se toman por defecto del contexto del usuario
-    public $idPoa;
     public $idPoaDepto;
     public $idInstitucion;
     public $idDeptartamento;
@@ -59,10 +65,6 @@ class Actividades extends Component
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
     public $activeTab = 'actividades'; // Tab activo: 'actividades' o 'resumen'
-    
-    // Parámetro de URL para departamento
-    #[Url]
-    public $departamento = null;
 
     // Control de modales
     public $modalOpen = false;
@@ -113,11 +115,30 @@ class Actividades extends Component
         'idResultado.required' => 'El resultado es obligatorio',
     ];
 
-    public function mount($departamento = null)
+    public function mount($departamento = null, $idPoa = null)
     {
         // El atributo #[Url] ya maneja la sincronización automática
-        // Si no viene en URL, usar el de la propiedad
-        $this->loadUserContext($this->departamento);
+        // Asegurarnos de que idPoa esté sincronizado desde los parámetros
+        if ($idPoa && !$this->idPoa) {
+            $this->idPoa = $idPoa;
+        }
+        
+        $this->loadUserContext($this->departamento, $this->idPoa);
+        $this->loadSelectData();
+        $this->verificarPlazo();
+    }
+    
+    // Watchers para recargar contexto cuando cambian los parámetros URL
+    public function updatedDepartamento($value)
+    {
+        $this->loadUserContext($value, $this->idPoa);
+        $this->loadSelectData();
+        $this->verificarPlazo();
+    }
+    
+    public function updatedIdPoa($value)
+    {
+        $this->loadUserContext($this->departamento, $value);
         $this->loadSelectData();
         $this->verificarPlazo();
     }
@@ -135,7 +156,7 @@ class Actividades extends Component
         }
     }
 
-    public function loadUserContext($departamentoId = null)
+    public function loadUserContext($departamentoId = null, $poaId = null)
     {
         $user = Auth::user();
         
@@ -151,12 +172,22 @@ class Actividades extends Component
             return;
         }
 
-        // Obtener POA activo
-        $poaActivo = Poa::where('activo', true)->first();
-        
-        if (!$poaActivo) {
-            session()->flash('error', 'No hay un POA activo');
-            return;
+        // Si viene idPoa desde URL, usar ese; si no, usar el POA activo
+        if ($poaId) {
+            $poaActivo = Poa::find($poaId);
+            
+            if (!$poaActivo) {
+                session()->flash('error', 'No se encontró el POA especificado');
+                return;
+            }
+        } else {
+            // Obtener POA activo
+            $poaActivo = Poa::where('activo', true)->first();
+            
+            if (!$poaActivo) {
+                session()->flash('error', 'No hay un POA activo');
+                return;
+            }
         }
 
         // Si viene el parámetro departamento desde la URL, usarlo
@@ -181,7 +212,7 @@ class Actividades extends Component
             return;
         }
 
-        // Obtener PoaDepto
+        // Obtener PoaDepto (puede no existir para POAs futuros o históricos sin techos)
         $poaDepto = PoaDepto::where('idPoa', $poaActivo->id)
             ->where('idDepartamento', $departamento->id)
             ->first();
@@ -189,7 +220,10 @@ class Actividades extends Component
         // Establecer valores por defecto
         $this->idDeptartamento = $departamento->id;
         $this->idUE = $empleado->idUnidadEjecutora;
-        $this->idPoa = $poaActivo->id;
+        // Solo actualizar idPoa si no viene desde URL (para mantener sincronización)
+        if (!$poaId) {
+            $this->idPoa = $poaActivo->id;
+        }
         $this->idPoaDepto = $poaDepto ? $poaDepto->id : null;
         $this->idInstitucion = $empleado->unidadEjecutora->idInstitucion ?? null;
 
@@ -619,6 +653,7 @@ class Actividades extends Component
         }
 
         $actividades = Actividad::where('idDeptartamento', $this->idDeptartamento)
+            ->where('idPoa', $this->idPoa) // Filtrar por el POA específico
             ->when($this->search, function($query) {
                 $query->where('nombre', 'like', '%' . $this->search . '%')
                       ->orWhere('descripcion', 'like', '%' . $this->search . '%');

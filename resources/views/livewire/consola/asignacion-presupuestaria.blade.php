@@ -69,24 +69,31 @@
                                     $ueNombre = $poa->unidadEjecutora->name ?? $poa->techoUes->whereNotNull('idUE')->first()?->unidadEjecutora?->name ?? 'N/A';
                                 }
                                 
-                                // Determinar si es histórico (año vencido)
+                                // Determinar estado del POA
                                 $anioActual = (int) date('Y');
-                                $esHistorico = $poa->anio < $anioActual;
+                                $anioPoa = (int) ($poa->anio ?? 0);
+                                $estadoPoa = 'pasado';
+                                if ($anioPoa == $anioActual) $estadoPoa = 'actual';
+                                elseif ($anioPoa > $anioActual) $estadoPoa = 'proximo';
                             @endphp
-                            <div class="bg-gradient-to-br {{ $esHistorico ? 'from-zinc-500 to-zinc-600 dark:from-zinc-700 dark:to-zinc-800' : 'from-indigo-700 to-purple-700 dark:from-indigo-900 dark:to-purple-900' }} rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200 cursor-pointer relative group p-5">
+                            <div class="bg-gradient-to-br {{ $estadoPoa === 'actual' ? 'from-indigo-700 to-purple-700 dark:from-indigo-900 dark:to-purple-900' : ($estadoPoa === 'proximo' ? 'from-emerald-600 to-teal-600 dark:from-emerald-800 dark:to-teal-800' : 'from-zinc-500 to-zinc-600 dark:from-zinc-700 dark:to-zinc-800') }} rounded-lg shadow-lg overflow-hidden text-white hover:shadow-xl transition-all duration-200 cursor-pointer relative group p-5">
                                 <div wire:click="gestionarTechoDepto({{ $poa->id }}, {{ $ueId }})">
-                                    <div class="absolute top-2 right-2 {{ $esHistorico ? 'bg-gray-500' : 'bg-indigo-600 hover:bg-indigo-700' }} text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        {{ $esHistorico ? 'Solo lectura' : 'Gestionar Techos Depto' }}
+                                    <div class="absolute top-2 right-2 {{ $estadoPoa === 'pasado' ? 'bg-gray-500' : ($estadoPoa === 'actual' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-emerald-600 hover:bg-emerald-700') }} text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {{ $estadoPoa === 'pasado' ? 'Solo lectura' : 'Gestionar Techos Depto' }}
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <h3 class="text-6xl font-extrabold">{{ $poa->anio }}</h3>
-                                        @if($esHistorico)
-                                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-300 text-gray-800">
-                                                Histórico
+                                        @if($estadoPoa === 'actual')
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-white text-indigo-600">
+                                                Actual
+                                            </span>
+                                        @elseif($estadoPoa === 'proximo')
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-white text-emerald-600">
+                                                Próximo
                                             </span>
                                         @else
-                                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                                Actual
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-300 text-gray-800">
+                                                Histórico
                                             </span>
                                         @endif
                                     </div>
