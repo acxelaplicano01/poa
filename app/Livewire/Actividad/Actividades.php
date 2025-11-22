@@ -4,6 +4,7 @@ namespace App\Livewire\Actividad;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Url;
 use App\Models\Actividad\Actividad;
 use App\Models\Actividad\TipoActividad;
 use App\Models\Categoria\Categoria;
@@ -58,6 +59,10 @@ class Actividades extends Component
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
     public $activeTab = 'actividades'; // Tab activo: 'actividades' o 'resumen'
+    
+    // Parámetro de URL para departamento
+    #[Url]
+    public $departamento = null;
 
     // Control de modales
     public $modalOpen = false;
@@ -108,9 +113,11 @@ class Actividades extends Component
         'idResultado.required' => 'El resultado es obligatorio',
     ];
 
-    public function mount()
+    public function mount($departamento = null)
     {
-        $this->loadUserContext();
+        // El atributo #[Url] ya maneja la sincronización automática
+        // Si no viene en URL, usar el de la propiedad
+        $this->loadUserContext($this->departamento);
         $this->loadSelectData();
         $this->verificarPlazo();
     }
@@ -128,7 +135,7 @@ class Actividades extends Component
         }
     }
 
-    public function loadUserContext()
+    public function loadUserContext($departamentoId = null)
     {
         $user = Auth::user();
         
@@ -144,18 +151,33 @@ class Actividades extends Component
             return;
         }
 
-        $departamento = $empleado->departamentos()->first();
-        
-        if (!$departamento) {
-            session()->flash('error', 'El empleado no tiene un departamento asignado');
-            return;
-        }
-
         // Obtener POA activo
         $poaActivo = Poa::where('activo', true)->first();
         
         if (!$poaActivo) {
             session()->flash('error', 'No hay un POA activo');
+            return;
+        }
+
+        // Si viene el parámetro departamento desde la URL, usarlo
+        $departamento = null;
+        
+        if ($departamentoId) {
+            // Verificar que el empleado tenga acceso a este departamento
+            $departamento = $empleado->departamentos()->where('departamentos.id', $departamentoId)->first();
+            
+            if (!$departamento) {
+                session()->flash('warning', 'No tiene acceso al departamento solicitado. Mostrando su departamento principal.');
+                // Si no tiene acceso, tomar el primero
+                $departamento = $empleado->departamentos()->first();
+            }
+        } else {
+            // Si no viene parámetro, tomar el primer departamento
+            $departamento = $empleado->departamentos()->first();
+        }
+        
+        if (!$departamento) {
+            session()->flash('error', 'El empleado no tiene un departamento asignado');
             return;
         }
 

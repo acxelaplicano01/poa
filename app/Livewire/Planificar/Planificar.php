@@ -110,7 +110,7 @@ class Planificar extends Component
     public function seleccionarPoa($idPoa)
     {
         // Aquí puedes redirigir a una vista de detalle o abrir un modal
-        return redirect()->route('actividades', ['idPoa' => $idPoa]);
+        return redirect()->route('actividades', ['idPoa' => $idPoa, 'departamento' => $this->departamentoSeleccionado]);
     }
 
     public function render()
