@@ -37,6 +37,14 @@ return [
                         ->setDescription('Crea y gestiona actividades planificadas')
                         ->setLabel('Mis actividades')
                         ->setHeroIcon('folder-open')
+                        ->setItems([
+                            RkNavigation::make('gestionar-actividad')
+                                ->setParentId('planificar')
+                                ->setDescription('Gestión de Objetivos')
+                                ->setLabel('Gestionar Actividad')
+                                ->setHeroIcon('square-3-stack-3d')
+                                ->setEndBlock('gestionar-actividad')
+                        ])
                         ->setEndBlock('actividades'),
                 ])
                 ->setEndBlock('planificar'),

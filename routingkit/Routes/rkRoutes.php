@@ -285,6 +285,19 @@ return [
                         ->setItems([])
                         ->setEndBlock('actividades'),
 
+                    RkRoute::make('gestionar-actividad')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceso-planificacion')
+                        ->setPermissions([
+                            'planificacion.actividades.ver',
+                            'planificacion.actividades.editar',
+                        ])
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\Actividad\GestionarActividad')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('gestionar-actividad'),
+
                     RkRoute::make('requerir')
                         ->setParentId('planificacion')
                         ->setAccessPermission('acceso-planificacion')

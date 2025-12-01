@@ -8,7 +8,7 @@ use App\Models\Requisicion\UnidadMedida;
 use App\Models\Mes\Mes;
 use App\Models\Mes\Trimestre;
 
-class Presupuestos extends BaseModel
+class Presupuesto extends BaseModel
 {
     protected $table = 'presupuestos';
 
