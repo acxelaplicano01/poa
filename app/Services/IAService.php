@@ -50,6 +50,12 @@ class IAService
                 - resultadoActividad: El resultado concreto y medible que se espera obtener de la actividad (1 oración clara)
                 - poblacion_objetivo: La población específica que se beneficiará (ej: estudiantes universitarios, docentes, personal administrativo, comunidad educativa, personal de servicio, etc.)
                 - medio_verificacion: Cómo se verificará el cumplimiento de la actividad (ej: informes técnicos, actas de reunión, registros fotográficos, listas de asistencia, etc.)
+                - indicadores: Un array de **2-3 indicadores altamente específicos (cuantitativos, de gestión o de producto)** que reflejen directamente el cumplimiento de entregables o procesos (similar a 'Porcentaje de personal docente con carga académica verificada'). **Evita indicadores de satisfacción que requieran encuestas**. Cada indicador debe tener:
+                  * nombre: Nombre conciso y muy descriptivo del indicador, siguiendo el formato de oración que detalla el entregable (máximo 100 caracteres).
+                  * descripcion: Descripción clara de **qué mide el indicador y su método de cálculo**. **Incluye la fórmula solo si es un porcentaje o si el cálculo es complejo** (Ej: (Informes entregados / Informes planificados) * 100).
+                  * cantidadPlanificada: **LA META PLANIFICADA. Valor numérico o porcentual exacto que se debe alcanzar para considerar cumplido el indicador** (ej: 100 si la meta es alcanzar el 100%, 5 si la meta es entregar 5 documentos)
+                  * isCantidad: **true** si el indicador mide una **cantidad absoluta** (conteo de unidades), **false** en caso contrario.
+                  * isPorcentaje: **true** si el indicador mide una **tasa o proporción** (porcentaje), **false** en caso contrario.
 
                 Responde ÚNICAMENTE con el JSON válido, sin markdown ni explicaciones adicionales.";
     }
@@ -98,7 +104,7 @@ class IAService
                 ],
                 'generationConfig' => [
                     'temperature' => 0.7,
-                    'maxOutputTokens' => 800,
+                    'maxOutputTokens' => 1800,
                 ],
             ]);
 
@@ -113,10 +119,18 @@ class IAService
             throw new \Exception("Error de Gemini API: {$error}");
         }
 
+        // Log de la respuesta completa para debugging
+        $responseData = $response->json();
+        Log::info('Respuesta completa de Gemini', ['response' => $responseData]);
+
         $content = $response->json('candidates.0.content.parts.0.text');
         
         if (!$content) {
-            throw new \Exception('No se recibió respuesta válida de Gemini');
+            Log::error('No se encontró contenido en la respuesta de Gemini', [
+                'response' => $responseData,
+                'candidates' => $response->json('candidates')
+            ]);
+            throw new \Exception('No se recibió respuesta válida de Gemini. Por favor, revisa los logs para más detalles.');
         }
 
         return $this->procesarRespuesta($content);
