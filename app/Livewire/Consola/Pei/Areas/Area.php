@@ -96,6 +96,12 @@ class Area extends Component
         $this->openModal();
     }
 
+    public function hideError()
+    {
+        $this->showErrorModal = false;
+        $this->errorMessage = '';
+    }
+
     public function openModal()
     {
         $this->showModal = true;
