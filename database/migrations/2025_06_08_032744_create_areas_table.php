@@ -15,9 +15,9 @@ return new class extends Migration
                 $table->id();
                 $table->text('nombre');
 
-                $table->foreignId('idObjetivos')->constrained('objetivos')->onDelete('cascade');
-                $table->foreignId('idDimension')->constrained('dimensions')->onDelete('cascade');
-                $table->foreignId('idPei')->constrained('peis')->onDelete('cascade');
+                $table->foreignId('idObjetivo')->constrained('objetivos')->onDelete('cascade');
+                // $table->foreignId('idDimension')->constrained('dimensions')->onDelete('cascade');
+                // $table->foreignId('idPei')->constrained('peis')->onDelete('cascade');
 
                 $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
                 $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

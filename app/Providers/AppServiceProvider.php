@@ -63,6 +63,9 @@ class AppServiceProvider extends ServiceProvider
             // Verificar el permiso específico
             return $user->can($permission);
         });
+        
+        // Registrar Observers
         \Spatie\Permission\Models\Role::observe(\App\Observers\RolePermissionObserver::class);
+        \App\Models\Poa\Poa::observe(\App\Observers\PoaObserver::class);
     }
 }

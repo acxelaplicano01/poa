@@ -9,6 +9,7 @@ return [
             'auth:sanctum',
             config('jetstream.auth_session'),
             'verified',
+            'check.empleado',
         ])
         ->setItems([
 
@@ -117,7 +118,14 @@ return [
 
                     RkRoute::make('roles')
                         ->setParentId('configuracion')
-                        ->setAccessPermission('configuracion.roles.ver')
+                        ->setAccessPermission('acceso-configuracion')
+                        ->setPermissions([
+                            'configuracion.roles.ver', 
+                            'configuracion.roles.editar', 
+                            'configuracion.roles.crear', 
+                            'configuracion.roles.eliminar', 
+                            'acceso-configuracion'
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Rol\Roles')
                         ->setRoles(['admin_general'])
@@ -133,18 +141,26 @@ return [
                         ->setItems([])
                         ->setEndBlock('roles.create'),
 
-                    RkRoute::make('roles.edit')
+                   /* RkRoute::make('roles.edit')
                         ->setParentId('configuracion')
                         ->setAccessPermission('configuracion.roles.editar')
                         ->setUrlMethod('get')
+                        ->setUrlPattern('roles/{roleId}/editar')
                         ->setUrlController('App\Livewire\Rol\RoleForm')
                         ->setRoles(['admin_general'])
                         ->setItems([])
-                        ->setEndBlock('roles.edit'),
+                        ->setEndBlock('roles.edit'),*/
 
                     RkRoute::make('usuarios')
                         ->setParentId('configuracion')
-                        ->setAccessPermission('configuracion.usuarios.ver')
+                        ->setAccessPermission('acceso-configuracion')
+                        ->setPermissions([
+                            'configuracion.usuarios.ver',
+                            'configuracion.usuarios.crear',
+                            'configuracion.usuarios.editar',
+                            'configuracion.usuarios.eliminar',
+                            'acceso-configuracion',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Usuario\Usuarios')
                         ->setRoles(['admin_general'])
@@ -153,7 +169,14 @@ return [
 
                     RkRoute::make('empleados')
                         ->setParentId('configuracion')
-                        ->setAccessPermission('configuracion.empleados.ver')
+                        ->setAccessPermission('acceso-configuracion')
+                        ->setPermissions([
+                            'configuracion.empleados.ver',
+                            'configuracion.empleados.crear',
+                            'configuracion.empleados.editar',
+                            'configuracion.empleados.eliminar',
+                            'acceso-configuracion',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Empleado\Empleados')
                         ->setRoles(['admin_general'])
@@ -162,7 +185,14 @@ return [
 
                     RkRoute::make('departamentos')
                         ->setParentId('configuracion')
-                        ->setAccessPermission('configuracion.departamentos.ver')
+                        ->setAccessPermission('acceso-configuracion')
+                        ->setPermissions([
+                            'configuracion.departamentos.ver',
+                            'configuracion.departamentos.crear',
+                            'configuracion.departamentos.editar',
+                            'configuracion.departamentos.eliminar',
+                            'acceso-configuracion',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Departamento\Departamentos')
                         ->setRoles(['admin_general'])
@@ -171,7 +201,14 @@ return [
 
                     RkRoute::make('unidades-ejecutoras')
                         ->setParentId('configuracion')
-                        ->setAccessPermission('configuracion.unidades-ejecutoras.ver')
+                        ->setAccessPermission('acceso-configuracion')
+                        ->setPermissions([
+                            'configuracion.unidades-ejecutoras.ver',
+                            'configuracion.unidades-ejecutoras.crear',
+                            'configuracion.unidades-ejecutoras.editar',
+                            'configuracion.unidades-ejecutoras.eliminar',
+                            'acceso-configuracion',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\UnidadEjecutora\UnidadesEjecutoras')
                         ->setRoles(['admin_general'])
@@ -180,7 +217,14 @@ return [
 
                     RkRoute::make('procesoscompras')
                         ->setParentId('configuracion')
-                        ->setAccessPermission('configuracion.procesoscompras.ver')
+                        ->setAccessPermission('acceso-configuracion')
+                        ->setPermissions([
+                            'configuracion.procesoscompras.ver',
+                            'configuracion.procesoscompras.crear',
+                            'configuracion.procesoscompras.editar',
+                            'configuracion.procesoscompras.eliminar',
+                            'acceso-configuracion',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\ProcesCompra\ProcesCompras')
                         ->setRoles(['admin_general'])
@@ -189,7 +233,14 @@ return [
 
                     RkRoute::make('cubs')
                         ->setParentId('configuracion')
-                        ->setAccessPermission('configuracion.cubs.ver')
+                        ->setAccessPermission('acceso-configuracion')
+                        ->setPermissions([
+                            'configuracion.cubs.ver',
+                            'configuracion.cubs.crear',
+                            'configuracion.cubs.editar',
+                            'configuracion.cubs.eliminar',
+                            'acceso-configuracion',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Cub\Cubs')
                         ->setRoles(['admin_general'])
@@ -204,16 +255,59 @@ return [
 
                     RkRoute::make('planificar')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('planificacion.planificar.ver')
+                        ->setAccessPermission('acceso-planificacion')
+                        ->setPermissions([
+                            'planificacion.planificar.ver',
+                            'planificacion.planificar.crear',
+                            'planificacion.planificar.editar',
+                            'planificacion.planificar.eliminar',
+                            'acceso-planificacion',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Planificar\Planificar')
                         ->setRoles(['admin_general'])
                         ->setItems([])
                         ->setEndBlock('planificar'),
 
+                    RkRoute::make('actividades')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceso-planificacion')
+                        ->setPermissions([
+                            'planificacion.actividades.ver',
+                            'planificacion.actividades.crear',
+                            'planificacion.actividades.editar',
+                            'planificacion.actividades.eliminar',
+                            'acceso-planificacion',
+                        ])
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\Actividad\Actividades')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('actividades'),
+
+                    RkRoute::make('gestionar-actividad')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceso-planificacion')
+                        ->setPermissions([
+                            'planificacion.actividades.ver',
+                            'planificacion.actividades.editar',
+                        ])
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\Actividad\GestionarActividad')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('gestionar-actividad'),
+
                     RkRoute::make('requerir')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('planificacion.requerir.ver')
+                        ->setAccessPermission('acceso-planificacion')
+                        ->setPermissions([
+                            'planificacion.requerir.ver',
+                            'planificacion.requerir.crear',
+                            'planificacion.requerir.editar',
+                            'planificacion.requerir.eliminar',
+                            'acceso-planificacion',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Requerir\Requerir')
                         ->setRoles(['admin_general'])
@@ -222,7 +316,14 @@ return [
 
                     RkRoute::make('seguimiento')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('planificacion.seguimiento.ver')
+                        ->setAccessPermission('acceso-planificacion')
+                        ->setPermissions([
+                            'planificacion.seguimiento.ver',
+                            'planificacion.seguimiento.crear',
+                            'planificacion.seguimiento.editar',
+                            'planificacion.seguimiento.eliminar',
+                            'acceso-planificacion',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Seguimiento\Seguimiento')
                         ->setRoles(['admin_general'])
@@ -231,7 +332,14 @@ return [
 
                     RkRoute::make('consolidado')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('planificacion.consolidado.ver')
+                        ->setAccessPermission('acceso-planificacion')
+                        ->setPermissions([
+                            'planificacion.consolidado.ver',
+                            'planificacion.consolidado.crear',
+                            'planificacion.consolidado.editar',
+                            'planificacion.consolidado.eliminar',
+                            'acceso-planificacion',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Consolidado\Consolidado')
                         ->setRoles(['admin_general'])
@@ -246,16 +354,67 @@ return [
 
                     RkRoute::make('planestrategicoinstitucional')
                         ->setParentId('consola')
-                        ->setAccessPermission('consola.planestrategicoinstitucional.ver')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'consola.planestrategicoinstitucional.ver',
+                            'consola.planestrategicoinstitucional.crear',
+                            'consola.planestrategicoinstitucional.editar',
+                            'consola.planestrategicoinstitucional.eliminar',
+                            'acceso-consola',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Consola\PlanEstrategicoInstitucional')
                         ->setRoles(['admin_general'])
-                        ->setItems([])
+                        ->setItems([
+                                    RkRoute::make('dimensiones')
+                                ->setParentId('consola')
+                                ->setAccessPermission('consola.dimensiones.ver')
+                                ->setUrlMethod('get')
+                                ->setUrlController('App\Livewire\Consola\Pei\Dimensiones\Dimension')
+                                ->setRoles(['admin_general'])
+                                ->setItems([
+                                        RkRoute::make('objetivos')
+                                    ->setParentId('consola')
+                                    ->setAccessPermission('consola.objetivos.ver')
+                                    ->setUrlMethod('get')
+                                    ->setUrlController('App\Livewire\Consola\Pei\Objetivos\Objetivo')
+                                    ->setRoles(['admin_general'])
+                                    ->setItems([
+                                         RkRoute::make('areas')
+                                    ->setParentId('consola')
+                                    ->setAccessPermission('consola.areas.ver')
+                                    ->setUrlMethod('get')
+                                    ->setUrlController('App\Livewire\Consola\Pei\Areas\Area')
+                                    ->setRoles(['admin_general'])
+                                    ->setItems([
+                                        RkRoute::make('resultados')
+                                    ->setParentId('consola')
+                                    ->setAccessPermission('consola.resultados.ver')
+                                    ->setUrlMethod('get')
+                                    ->setUrlController('App\Livewire\Consola\Pei\Resultados\Resultado')
+                                    ->setRoles(['admin_general'])
+                                    ->setItems([
+                                    ])
+                                    ->setEndBlock('resultados'),
+                                    ])
+                                    ->setEndBlock('areas'),
+                                    ])
+                                    ->setEndBlock('objetivos'),
+                                ])
+                                ->setEndBlock('planestrategicoinstitucional'),
+                        ])
                         ->setEndBlock('planestrategicoinstitucional'),
 
                     RkRoute::make('asignacionnacionalpresupuestaria')
                         ->setParentId('consola')
-                        ->setAccessPermission('consola.asignacionnacionalpresupuestaria.ver')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'consola.asignacionnacionalpresupuestaria.ver',
+                            'consola.asignacionnacionalpresupuestaria.crear',
+                            'consola.asignacionnacionalpresupuestaria.editar',
+                            'consola.asignacionnacionalpresupuestaria.eliminar',
+                            'acceso-consola',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Consola\AsignacionPresuNacional')
                         ->setRoles(['admin_general'])
@@ -264,7 +423,14 @@ return [
 
                     RkRoute::make('asignacionpresupuestaria')
                         ->setParentId('consola')
-                        ->setAccessPermission('consola.asignacionpresupuestaria.ver')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'consola.asignacionpresupuestaria.ver',
+                            'consola.asignacionpresupuestaria.crear',
+                            'consola.asignacionpresupuestaria.editar',
+                            'consola.asignacionpresupuestaria.eliminar',
+                            'acceso-consola',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Consola\AsignacionPresupuestaria')
                         ->setRoles(['admin_general'])
@@ -273,7 +439,14 @@ return [
 
                     RkRoute::make('techodeptos')
                         ->setParentId('consola')
-                        ->setAccessPermission('consola.techodeptos.ver')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'consola.techodeptos.ver',
+                            'consola.techodeptos.crear',
+                            'consola.techodeptos.editar',
+                            'consola.techodeptos.eliminar',
+                            'acceso-consola',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\TechoDeptos\GestionTechoDeptos')
                         ->setRoles(['admin_general'])
@@ -282,7 +455,11 @@ return [
 
                     RkRoute::make('techodeptos.detalle-estructura')
                         ->setParentId('consola')
-                        ->setAccessPermission('consola.techodeptos.ver')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'consola.techodeptos.ver',
+                            'acceso-consola',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\TechoDeptos\DetalleEstructura')
                         ->setRoles(['admin_general'])
@@ -291,12 +468,43 @@ return [
 
                     RkRoute::make('techonacional')
                         ->setParentId('consola')
-                        ->setAccessPermission('consola.techonacional.ver')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'consola.techonacional.ver',
+                            'acceso-consola',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\TechoUes\GestionTechoUeNacional')
                         ->setRoles(['admin_general'])
                         ->setItems([])
                         ->setEndBlock('techonacional'),
+
+                    RkRoute::make('plazos')
+                        ->setParentId('consola')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'consola.plazos.gestionar',
+                            'acceso-consola',
+                        ])
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\Plazos\GestionPlazos')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('plazos'),
+
+                    RkRoute::make('plazos-poa')
+                        ->setParentId('consola')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'consola.plazos.gestionar',
+                            'acceso-consola',
+                        ])
+                        ->setUrlMethod('get')
+                        ->setUrlPattern('plazos-poa/{idPoa}')
+                        ->setUrlController('App\Livewire\Plazos\GestionPlazosPoa')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('plazos-poa'),
                 ])
                 ->setEndBlock('consola'),
 
@@ -306,7 +514,11 @@ return [
 
                     RkRoute::make('logs')
                         ->setParentId('consola') // Puedes cambiarlo si tienes otro padre
-                        ->setAccessPermission('logs.visor.ver')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'logs.visor.ver',
+                            'acceso-consola',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Http\Controllers\LogViewerController@index')
                         ->setRoles(['admin_general'])
@@ -315,7 +527,11 @@ return [
 
                     RkRoute::make('logsdashboard')
                         ->setParentId('consola')
-                        ->setAccessPermission('logs.dashboard.ver')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'logs.dashboard.ver',
+                            'acceso-consola',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Http\Controllers\LogViewerController@dashboard')
                         ->setRoles(['admin_general'])
@@ -324,7 +540,11 @@ return [
 
                     RkRoute::make('sessions')
                         ->setParentId('consola')
-                        ->setAccessPermission('logs.sessions.ver')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'logs.sessions.ver',
+                            'acceso-consola',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Admin\SessionManager') // Si es Livewire
                         ->setRoles(['admin_general'])
@@ -333,7 +553,11 @@ return [
 
                     RkRoute::make('logs.show')
                         ->setParentId('consola')
-                        ->setAccessPermission('logs.visor.ver')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'logs.visor.ver',
+                            'acceso-consola',
+                        ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Http\Controllers\LogViewerController@show')
                         ->setRoles(['admin_general'])
@@ -342,7 +566,11 @@ return [
 
                     RkRoute::make('cleanup')
                         ->setParentId('consola')
-                        ->setAccessPermission('logs.mantenimiento.limpiar')
+                        ->setAccessPermission('acceso-consola')
+                        ->setPermissions([
+                            'logs.mantenimiento.limpiar',
+                            'acceso-consola',
+                        ])
                         ->setUrlMethod('post')
                         ->setUrlController('App\Http\Controllers\LogViewerController@cleanup')
                         ->setRoles(['admin_general'])

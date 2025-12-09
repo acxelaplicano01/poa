@@ -28,10 +28,25 @@ return [
 
             RkNavigation::make('planificar')
                 ->setParentId('planificacion')
-                ->setDescription('Visualiza tus planificaciones')
+                ->setDescription('Visualiza los POAs por departamento y planifica actividades')
                 ->setLabel('Mis planificaciones')
                 ->setHeroIcon('document-text')
-                ->setItems([])
+                ->setItems([
+                    RkNavigation::make('actividades')
+                        ->setParentId('planificar')
+                        ->setDescription('Crea y gestiona actividades planificadas')
+                        ->setLabel('Mis actividades')
+                        ->setHeroIcon('folder-open')
+                        ->setItems([
+                            RkNavigation::make('gestionar-actividad')
+                                ->setParentId('planificar')
+                                ->setDescription('Gestión de Objetivos')
+                                ->setLabel('Gestionar Actividad')
+                                ->setHeroIcon('square-3-stack-3d')
+                                ->setEndBlock('gestionar-actividad')
+                        ])
+                        ->setEndBlock('actividades'),
+                ])
                 ->setEndBlock('planificar'),
 
             RkNavigation::make('requerir')
@@ -253,7 +268,41 @@ return [
                 ->setDescription('Visualiza y gestiona el plan estratégico')
                 ->setLabel('Plan estratégico')
                 ->setHeroIcon('document-text')
-                ->setItems([])
+                ->setItems([
+                    RkNavigation::make('dimensiones')
+                        ->setParentId('planestrategicoinstitucional')
+                        ->setDescription('Gestión de Dimensiones')
+                        ->setLabel('Dimensiones')
+                        ->setHeroIcon('square-3-stack-3d')
+                        ->setItems([
+                            RkNavigation::make('objetivos')
+                                ->setParentId('dimensiones')
+                                ->setDescription('Gestión de Objetivos')
+                                ->setLabel('Objetivos')
+                                ->setHeroIcon('square-3-stack-3d')
+                                ->setEndBlock('objetivos')
+                                ->setItems([
+                                     RkNavigation::make('areas')
+                                ->setParentId('objetivos')
+                                ->setDescription('Gestión de Objetivos')
+                                ->setLabel('Areas')
+                                ->setHeroIcon('square-3-stack-3d')
+                                ->setEndBlock('areas')
+                                ->setItems([
+                                    RkNavigation::make('resultados')
+                                        ->setParentId('areas')
+                                        ->setDescription('Gestión de Resultados')
+                                        ->setLabel('Resultados')
+                                        ->setHeroIcon('square-3-stack-3d')
+                                        ->setEndBlock('resultados')
+                                        ->setItems([])                      
+                                ->setEndBlock('resultados'),
+                                ]),
+                        ])
+                        ->setEndBlock('objetivos'),                  
+                        ])
+                        ->setEndBlock( 'dimensiones'),
+                ])
                 ->setEndBlock('planestrategicoinstitucional'),
 
             RkNavigation::make('asignacionnacionalpresupuestaria')
@@ -266,7 +315,14 @@ return [
                         ->setDescription('Gestión de techos presupuestarios por Unidades Ejecutoras')
                         ->setLabel('Techos presupuestarios UE')
                         ->setHeroIcon('arrow-trending-up')
-                        ->setEndBlock('techonacional'),
+                        ->setItems([
+                            RkNavigation::make('plazos-poa')
+                                ->setDescription('Gestión de techos presupuestarios por departamento')
+                                ->setLabel('Gestión de plazos')
+                                ->setHeroIcon('cog-8-tooth')
+                                ->setEndBlock('plazos-poa'),
+                                ])
+                                ->setEndBlock('techonacional'),
                 ])
                 ->setEndBlock('asignacionnacionalpresupuestaria'),
 

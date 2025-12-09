@@ -105,8 +105,9 @@
                                     Comenzar ahora
                                 </a>
                             @endauth
-                            
-                            <a href="#features" class="border border-gray-300 dark:border-zinc-600 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 font-semibold py-4 px-8 rounded-lg transition-all duration-300">
+
+                            <a href="{{ route('login') }}"
+                                class="border border-gray-300 dark:border-zinc-600 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 font-semibold py-4 px-8 rounded-lg transition-all duration-300">
                                 Conocer más
                             </a>
                         </div>

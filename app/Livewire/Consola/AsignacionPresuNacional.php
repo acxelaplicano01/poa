@@ -30,9 +30,17 @@ class AsignacionPresuNacional extends Component
     public $name = '';
     public $anio = '';
     public $idInstitucion = '';
+    public $activo = true; // Estado activo del POA
     
     // Propiedades para múltiples Techos UE
     public $techos = [];
+
+    // Nota: El plazo de asignación_nacional solo aplica para asignar presupuesto a las UEs,
+    // no para asignar presupuesto de fuentes al POA. Por lo tanto, estas propiedades
+    // siempre se mantienen en valores que permiten la edición del POA.
+    public $puedeAsignarPresupuestoNacional = true;
+    public $mensajePlazo = '';
+    public $diasRestantes = null;
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -99,7 +107,27 @@ class AsignacionPresuNacional extends Component
 
     public function render()
     {
+        // Obtener institución y UE del usuario autenticado
+        $user = auth()->user();
+        $userInstitucionId = $user->empleado?->unidadEjecutora?->idInstitucion;
+        $userUE = $user->empleado?->idUnidadEjecutora;
+
         $poas = Poa::with(['institucion', 'unidadEjecutora', 'techoUes.grupoGasto', 'techoUes.fuente'])
+            // Filtrar por institución del usuario
+            ->when($userInstitucionId, function ($query) use ($userInstitucionId) {
+                $query->where('idInstitucion', $userInstitucionId);
+            })
+            // Filtrar por UE del usuario si tiene una asignada
+            // Mostrar POAs sin UE (nacionales) O POAs de su UE O POAs con techos asignados a su UE
+            ->when($userUE, function ($query) use ($userUE) {
+                $query->where(function ($q) use ($userUE) {
+                    $q->whereNull('idUE') // POAs nacionales sin UE específica
+                      ->orWhere('idUE', $userUE) // POAs de su UE
+                      ->orWhereHas('techoUes', function ($subQ) use ($userUE) {
+                          $subQ->where('idUE', $userUE); // POAs con techos asignados a su UE
+                      });
+                });
+            })
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('anio', 'like', '%' . $this->search . '%')
@@ -122,12 +150,19 @@ class AsignacionPresuNacional extends Component
             $poa->progreso_departamentos = $this->calcularProgresoDepartamentos($poa);
         }
 
-        $instituciones = Institucion::orderBy('nombre')->get();
+        // Filtrar instituciones, grupos y fuentes por la institución del usuario
+        $instituciones = $userInstitucionId 
+            ? Institucion::where('id', $userInstitucionId)->orderBy('nombre')->get()
+            : Institucion::orderBy('nombre')->get();
+            
         $grupoGastos = GrupoGasto::orderBy('nombre')->get();
         $fuentes = Fuente::orderBy('nombre')->get();
         
-        // Obtener años únicos para el filtro
+        // Obtener años únicos para el filtro (solo de la institución del usuario)
         $anios = Poa::select('anio')
+            ->when($userInstitucionId, function ($query) use ($userInstitucionId) {
+                $query->where('idInstitucion', $userInstitucionId);
+            })
             ->distinct()
             ->whereNotNull('anio')
             ->orderBy('anio', 'desc')
@@ -154,10 +189,22 @@ class AsignacionPresuNacional extends Component
     public function edit($id)
     {
         $poa = Poa::findOrFail($id);
+        
+        // Validar que el POA no sea de un año anterior
+        $anioActual = now()->year;
+        if ($poa->anio < $anioActual) {
+            session()->flash('error', "No se puede editar un POA de años anteriores. El POA {$poa->anio} ya no puede ser modificado.");
+            return;
+        }
+        
+        // Verificar plazo de asignación nacional
+        $this->verificarPlazo($poa);
+        
         $this->poaId = $poa->id;
         $this->name = $poa->name;
         $this->anio = $poa->anio;
         $this->idInstitucion = $poa->idInstitucion;
+        $this->activo = $poa->activo ?? true; // Cargar estado activo
         
         // Cargar techos globales del POA nacional (sin UE específica)
         $techosGlobales = TechoUe::where('idPoa', $poa->id)
@@ -180,8 +227,22 @@ class AsignacionPresuNacional extends Component
         $this->showModal = true;
     }
 
+    private function verificarPlazo($poa)
+    {
+        // El plazo de asignación_nacional solo aplica para asignar a las UEs, 
+        // no para asignar presupuesto de fuentes al POA
+        // Por lo tanto, siempre permitimos la edición del POA
+        $this->puedeAsignarPresupuestoNacional = true;
+        $this->diasRestantes = null;
+        $this->mensajePlazo = '';
+    }
+
     public function save()
     {
+        // El plazo de asignación_nacional solo aplica para asignar a las UEs,
+        // no para asignar presupuesto de fuentes al POA
+        // Por lo tanto, no validamos plazos aquí
+
         try {
             // Log para debugging
             \Log::info('Iniciando save de POA', [
@@ -191,6 +252,22 @@ class AsignacionPresuNacional extends Component
                 'techos' => $this->techos,
                 'isEditing' => $this->isEditing
             ]);
+
+            // Validación específica para creación: año debe ser actual o futuro
+            if (!$this->isEditing) {
+                $anioActual = now()->year;
+                if ($this->anio < $anioActual) {
+                    session()->flash('error', "No se pueden crear POAs con años anteriores. El año debe ser {$anioActual} o posterior.");
+                    return;
+                }
+
+                // Validar que no exista otro POA con el mismo año
+                $poaExistente = Poa::where('anio', $this->anio)->first();
+                if ($poaExistente) {
+                    session()->flash('error', "Ya existe un POA para el año {$this->anio}. No se puede crear un POA duplicado.");
+                    return;
+                }
+            }
 
             // Validar campos básicos
             $this->validate([
@@ -229,6 +306,7 @@ class AsignacionPresuNacional extends Component
                     'name' => $this->name,
                     'anio' => $this->anio,
                     'idInstitucion' => $this->idInstitucion,
+                    'activo' => $this->activo, // Actualizar estado activo
                 ]);
                 
                 // Actualizar techos globales del POA nacional
@@ -244,6 +322,7 @@ class AsignacionPresuNacional extends Component
                     'anio' => $this->anio,
                     'idInstitucion' => $this->idInstitucion,
                     'idUE' => null, // POA nacional no tiene UE específica
+                    'activo' => true, // Por defecto activo al crear
                 ]);
                 
                 \Log::info('POA creado exitosamente', ['id' => $poa->id]);
@@ -264,7 +343,16 @@ class AsignacionPresuNacional extends Component
 
     public function confirmDelete($id)
     {
-        $this->poaToDelete = Poa::findOrFail($id);
+        $poa = Poa::findOrFail($id);
+        
+        // Validar que el POA no sea de un año anterior
+        $anioActual = now()->year;
+        if ($poa->anio < $anioActual) {
+            session()->flash('error', "No se puede eliminar un POA de años anteriores. El POA {$poa->anio} ya no puede ser modificado.");
+            return;
+        }
+        
+        $this->poaToDelete = $poa;
         $this->showDeleteModal = true;
     }
 
@@ -337,6 +425,7 @@ class AsignacionPresuNacional extends Component
         $this->name = '';
         $this->anio = date('Y');
         $this->idInstitucion = '';
+        $this->activo = true; // Por defecto activo
         $this->techos = []; // Limpia completamente el array de techos
         $this->initializeTechos(); // Inicializa con un techo vacío
     }

@@ -27,4 +27,10 @@ class PoaDepto extends BaseModel
     {
         return $this->belongsTo(Departamento::class, 'idDepartamento');
     }
+
+    // Relación con TechoDeptos
+    public function techoDeptos()
+    {
+        return $this->hasMany(\App\Models\TechoUes\TechoDepto::class, 'idPoaDepto');
+    }
 }

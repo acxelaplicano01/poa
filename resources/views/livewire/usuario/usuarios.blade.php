@@ -60,6 +60,7 @@
                     ['key' => 'id', 'label' => 'ID', 'sortable' => true],
                     ['key' => 'name', 'label' => 'Nombre', 'sortable' => true],
                     ['key' => 'email', 'label' => 'Email', 'sortable' => true],
+                    ['key' => 'empleado', 'label' => 'Empleado'],
                     ['key' => 'roles', 'label' => 'Roles'],
                     ['key' => 'actions', 'label' => 'Acciones', 'class' => 'text-right'],
                 ]"
@@ -72,6 +73,18 @@
                             <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">{{ $user->id }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">{{ $user->name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">{{ $user->email }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
+                                @if($user->empleado)
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {{ $user->empleado->nombre }} {{ $user->empleado->apellido }}
+                                    </span>
+                                @else
+                                    <span class="text-zinc-400 dark:text-zinc-500 text-xs italic">Sin asignar</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-zinc-900 dark:text-zinc-300">
                                 <div class="flex flex-wrap gap-2">
                                     @foreach($user->roles as $role)

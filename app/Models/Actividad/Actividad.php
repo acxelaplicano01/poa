@@ -12,6 +12,7 @@ use App\Models\Actividad\Evento;
 use App\Models\Actividad\Revision;
 use App\Models\Actividad\MedioVerificacionActividad;
 use App\Models\Empleados\Empleado;
+use App\Models\Categoria\Categoria;
 
 class Actividad extends BaseModel
 {
@@ -62,6 +63,11 @@ class Actividad extends BaseModel
     public function resultado()
     {
         return $this->belongsTo(Resultado::class, 'idResultado');
+    }
+
+    public function categoria()
+    {
+        return $this->belongsTo(Categoria::class, 'idCategoria');
     }
 
     public function indicadores()

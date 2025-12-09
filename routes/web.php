@@ -24,7 +24,7 @@
 // use App\Livewire\Requisicion\EstadosRequisicion;
 // use App\Livewire\Requisicion\UnidadMedidas;
 // use App\Livewire\Rol\Roles;
-// use App\Livewire\Rol\RoleForm;
+ use App\Livewire\Rol\RoleForm;
 // use App\Livewire\Seguimiento\Seguimiento;
 // use App\Livewire\Actividad\TipoActividades;
 // use App\Livewire\Mes\Trimestres;
@@ -38,10 +38,20 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/doc', function () {
+    return view('doc');
+});
+
+// Ruta para registrar empleado (sin middleware check.empleado)
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/empleado/registrar', \App\Livewire\Empleado\RegistrarEmpleado::class)
+        ->name('empleado.registrar');
+});
+
 Route::get('/dashboard', function () {
     return view('layouts.app');
 })
-    ->middleware(['auth:sanctum', 'verified'])
+    ->middleware(['auth:sanctum', 'verified', 'check.empleado'])
     ->name('dashboard');
     
 // Route::view('/error/404', 'errors.404')->name('error.404');
@@ -108,9 +118,9 @@ Route::get('/dashboard', function () {
 //             ->name('roles.create')
 //             ->middleware('can:configuracion.roles.crear');
 
-//         Route::get('/configuracion/roles/{roleId}/editar', RoleForm::class)
-//             ->name('roles.edit')
-//             ->middleware('can:configuracion.roles.editar');
+         Route::get('/configuracion/roles/{roleId}/editar', RoleForm::class)
+             ->name('roles.edit')
+             ->middleware('can:configuracion.roles.editar');
 
 //         Route::get('/configuracion/usuarios', Usuarios::class)
 //             ->name('usuarios')
@@ -204,3 +214,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('techonacional')
         ->middleware('can:consola.techonacional.ver');
 }); */
+
+Route::get('/consola/pei/areas', \App\Livewire\Consola\Pei\Areas\Area::class)->name('areas');
