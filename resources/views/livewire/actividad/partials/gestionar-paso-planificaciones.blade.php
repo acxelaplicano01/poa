@@ -58,7 +58,7 @@
                 @foreach($planificacionesPorTrimestre as $trimestreNum => $planificaciones)
                     <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4">
                         <h4 class="text-md font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
-                            Trimestre {{ $trimestreNum }}
+                            {{ $trimestreNum }}
                         </h4>
 
                         <div class="overflow-x-auto">
