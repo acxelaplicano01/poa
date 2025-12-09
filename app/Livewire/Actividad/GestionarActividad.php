@@ -72,11 +72,19 @@ class GestionarActividad extends Component
     
     // Control de modales
     public $showIndicadorModal = false;
+    public $showDeleteIndicadorModal = false;
+    public $indicadorToDelete = null;
     public $showPlanificacionModal = false;
     public $showEmpleadoModal = false;
+    public $showDeleteEmpleadoModal = false;
+    public $empleadoToRemove = null;
     public $showTareaModal = false;
+    public $showDeleteTareaModal = false;
+    public $tareaToDelete = null;
     public $showAsignarEmpleadoTareaModal = false;
     public $showPresupuestoModal = false;
+    public $showDeletePlanificacionModal = false;
+    public $planificacionToDelete = null;
     
     // Asignación de empleados a tareas
     public $tareaSeleccionada = null;
@@ -303,17 +311,37 @@ class GestionarActividad extends Component
         $this->showIndicadorModal = true;
     }
 
-    public function deleteIndicador($indicadorId)
+    public function openDeleteIndicadorModal($indicadorId)
+    {
+        $this->indicadorToDelete = Indicador::findOrFail($indicadorId);
+        $this->showDeleteIndicadorModal = true;
+    }
+
+    public function closeDeleteIndicadorModal()
+    {
+        $this->showDeleteIndicadorModal = false;
+        $this->indicadorToDelete = null;
+    }
+
+    public function confirmDeleteIndicador()
     {
         try {
-            $indicador = Indicador::findOrFail($indicadorId);
-            $indicador->delete();
-            
-            $this->loadIndicadores();
-            session()->flash('message', 'Indicador eliminado exitosamente');
+            if ($this->indicadorToDelete) {
+                $this->indicadorToDelete->delete();
+                $this->loadIndicadores();
+                session()->flash('message', 'Indicador eliminado exitosamente');
+            }
+            $this->closeDeleteIndicadorModal();
         } catch (\Exception $e) {
             session()->flash('error', 'Error al eliminar indicador: ' . $e->getMessage());
+            $this->closeDeleteIndicadorModal();
         }
+    }
+
+    public function deleteIndicador($indicadorId)
+    {
+        // Este método se mantiene para compatibilidad
+        $this->openDeleteIndicadorModal($indicadorId);
     }
 
     private function resetNuevoIndicador()
@@ -482,16 +510,30 @@ class GestionarActividad extends Component
         $this->showPlanificacionModal = true;
     }
 
-    public function deletePlanificacion($planificacionId)
+    public function openDeletePlanificacionModal($planificacionId)
+    {
+        $this->planificacionToDelete = Planificacion::with(['indicador', 'mes.trimestre'])->findOrFail($planificacionId);
+        $this->showDeletePlanificacionModal = true;
+    }
+
+    public function closeDeletePlanificacionModal()
+    {
+        $this->showDeletePlanificacionModal = false;
+        $this->planificacionToDelete = null;
+    }
+
+    public function confirmDeletePlanificacion()
     {
         try {
-            $planificacion = Planificacion::findOrFail($planificacionId);
-            $planificacion->delete();
-            
-            $this->loadIndicadores();
-            session()->flash('message', 'Planificación eliminada exitosamente');
+            if ($this->planificacionToDelete) {
+                $this->planificacionToDelete->delete();
+                $this->loadIndicadores();
+                session()->flash('message', 'Planificación eliminada exitosamente');
+            }
+            $this->closeDeletePlanificacionModal();
         } catch (\Exception $e) {
             session()->flash('error', 'Error al eliminar planificación: ' . $e->getMessage());
+            $this->closeDeletePlanificacionModal();
         }
     }
 
@@ -543,6 +585,38 @@ class GestionarActividad extends Component
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Error al asignar empleado: ' . $e->getMessage());
+        }
+    }
+
+    public function openDeleteEmpleadoModal($empleadoId)
+    {
+        $empleado = Empleado::findOrFail($empleadoId);
+        $this->empleadoToRemove = [
+            'id' => $empleado->id,
+            'nombre' => $empleado->user->name ?? $empleado->nombre,
+            'num_empleado' => $empleado->num_empleado
+        ];
+        $this->showDeleteEmpleadoModal = true;
+    }
+
+    public function closeDeleteEmpleadoModal()
+    {
+        $this->showDeleteEmpleadoModal = false;
+        $this->empleadoToRemove = null;
+    }
+
+    public function confirmRemoveEmpleado()
+    {
+        try {
+            if ($this->empleadoToRemove) {
+                $this->actividad->empleados()->detach($this->empleadoToRemove['id']);
+                $this->loadEmpleados();
+                session()->flash('message', 'Empleado removido exitosamente');
+            }
+            $this->closeDeleteEmpleadoModal();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al remover empleado: ' . $e->getMessage());
+            $this->closeDeleteEmpleadoModal();
         }
     }
 
@@ -652,17 +726,37 @@ class GestionarActividad extends Component
         $this->showTareaModal = true;
     }
 
-    public function deleteTarea($tareaId)
+    public function openDeleteTareaModal($tareaId)
+    {
+        $this->tareaToDelete = Tarea::findOrFail($tareaId);
+        $this->showDeleteTareaModal = true;
+    }
+
+    public function closeDeleteTareaModal()
+    {
+        $this->showDeleteTareaModal = false;
+        $this->tareaToDelete = null;
+    }
+
+    public function confirmDeleteTarea()
     {
         try {
-            $tarea = Tarea::findOrFail($tareaId);
-            $tarea->delete();
-            
-            $this->loadTareas();
-            session()->flash('message', 'Tarea eliminada exitosamente');
+            if ($this->tareaToDelete) {
+                $this->tareaToDelete->delete();
+                $this->loadTareas();
+                session()->flash('message', 'Tarea eliminada exitosamente');
+            }
+            $this->closeDeleteTareaModal();
         } catch (\Exception $e) {
             session()->flash('error', 'Error al eliminar tarea: ' . $e->getMessage());
+            $this->closeDeleteTareaModal();
         }
+    }
+
+    public function deleteTarea($tareaId)
+    {
+        // Este método se mantiene para compatibilidad
+        $this->openDeleteTareaModal($tareaId);
     }
 
     private function resetNuevaTarea()
