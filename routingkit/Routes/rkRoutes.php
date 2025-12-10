@@ -298,21 +298,21 @@ return [
                         ->setItems([])
                         ->setEndBlock('gestionar-actividad'),
 
-                    RkRoute::make('requerir')
+                    RkRoute::make('requisicion')
                         ->setParentId('planificacion')
                         ->setAccessPermission('acceso-planificacion')
                         ->setPermissions([
-                            'planificacion.requerir.ver',
-                            'planificacion.requerir.crear',
-                            'planificacion.requerir.editar',
-                            'planificacion.requerir.eliminar',
+                            'planificacion.requisicion.ver',
+                            'planificacion.requisicion.crear',
+                            'planificacion.requisicion.editar',
+                            'planificacion.requisicion.eliminar',
                             'acceso-planificacion',
                         ])
                         ->setUrlMethod('get')
-                        ->setUrlController('App\Livewire\Requerir\Requerir')
+                        ->setUrlController('App\Livewire\Requisicion\Requisicion')
                         ->setRoles(['admin_general'])
                         ->setItems([])
-                        ->setEndBlock('requerir'),
+                        ->setEndBlock('requisicion'),
 
                     RkRoute::make('seguimiento')
                         ->setParentId('planificacion')
@@ -325,7 +325,7 @@ return [
                             'acceso-planificacion',
                         ])
                         ->setUrlMethod('get')
-                        ->setUrlController('App\Livewire\Seguimiento\Seguimiento')
+                        ->setUrlController('App\Livewire\Requisicion\Requisicion')
                         ->setRoles(['admin_general'])
                         ->setItems([])
                         ->setEndBlock('seguimiento'),

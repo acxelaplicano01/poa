@@ -1,7 +1,7 @@
 <x-dialog-modal wire:model="showModal" maxWidth="lg">
         <x-slot name="title">
             <div class="flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">
+                <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                     {{ $isEditing ? __('Editar Resultado') : __('Crear Nuevo Resultado') }}
                 </h3>
                 <button wire:click="closeModal" type="button"
@@ -20,14 +20,14 @@
             <div>
                 <form wire:submit.prevent="store">
                     <div class="mb-4">
-                        <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
-                        <input type="text" id="nombre" wire:model="nombre" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+                        <input type="text" id="nombre" wire:model="nombre" class="mt-1 block w-full border-gray-300 dark:border-zinc-700 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100">
                         @error('nombre') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="mb-4">
-                        <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
-                        <textarea id="descripcion" wire:model="descripcion" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                        <label for="descripcion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+                        <textarea id="descripcion" wire:model="descripcion" class="mt-1 block w-full border-gray-300 dark:border-zinc-700 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"></textarea>
                         @error('descripcion') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                 </form>

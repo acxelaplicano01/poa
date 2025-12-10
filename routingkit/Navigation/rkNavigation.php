@@ -49,13 +49,13 @@ return [
                 ])
                 ->setEndBlock('planificar'),
 
-            RkNavigation::make('requerir')
+            RkNavigation::make('requisicion')
                 ->setParentId('planificacion')
-                ->setDescription('Crear o gestionar requerimientos')
-                ->setLabel('Requerir')
+                ->setDescription('Crear o gestionar requisiciones')
+                ->setLabel('Requisicion')
                 ->setHeroIcon('clipboard-document')
                 ->setItems([])
-                ->setEndBlock('requerir'),
+                ->setEndBlock('requisicion'),
 
             RkNavigation::make('seguimiento')
                 ->setParentId('planificacion')

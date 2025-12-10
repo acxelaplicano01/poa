@@ -14,7 +14,7 @@ class Area extends BaseModel
     protected $fillable = [
         'nombre',
         'idObjetivo',
-        'idPei', // Necesario si la tabla tiene esta columna
+        // 'idPei', // Necesario si la tabla tiene esta columna
         // Los campos de auditoría ya están en BaseModel
     ];
 
