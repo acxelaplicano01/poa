@@ -82,6 +82,8 @@ class GestionarActividad extends Component
     public $showDeleteTareaModal = false;
     public $tareaToDelete = null;
     public $showAsignarEmpleadoTareaModal = false;
+    public $showDeleteEmpleadoTareaModal = false;
+    public $empleadoTareaToRemove = null;
     public $showPresupuestoModal = false;
     public $showDeletePlanificacionModal = false;
     public $planificacionToDelete = null;
@@ -823,6 +825,40 @@ class GestionarActividad extends Component
             
         } catch (\Exception $e) {
             session()->flash('error', 'Error al asignar empleado: ' . $e->getMessage());
+        }
+    }
+
+    public function openDeleteEmpleadoTareaModal($empleadoId)
+    {
+        $empleado = Empleado::findOrFail($empleadoId);
+        $this->empleadoTareaToRemove = [
+            'id' => $empleado->id,
+            'nombre' => $empleado->user->name ?? $empleado->nombre,
+            'num_empleado' => $empleado->num_empleado
+        ];
+        $this->showDeleteEmpleadoTareaModal = true;
+    }
+
+    public function closeDeleteEmpleadoTareaModal()
+    {
+        $this->showDeleteEmpleadoTareaModal = false;
+        $this->empleadoTareaToRemove = null;
+    }
+
+    public function confirmRemoveEmpleadoDeTarea()
+    {
+        try {
+            if ($this->empleadoTareaToRemove && $this->tareaSeleccionada) {
+                $tarea = Tarea::findOrFail($this->tareaSeleccionada);
+                $tarea->empleados()->detach($this->empleadoTareaToRemove['id']);
+                $this->loadEmpleadosTarea($this->tareaSeleccionada);
+                $this->loadTareas();
+                session()->flash('message', 'Empleado removido de la tarea exitosamente');
+            }
+            $this->closeDeleteEmpleadoTareaModal();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al remover empleado: ' . $e->getMessage());
+            $this->closeDeleteEmpleadoTareaModal();
         }
     }
 

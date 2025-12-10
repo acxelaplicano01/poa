@@ -362,8 +362,7 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <button wire:click="removerEmpleadoDeTarea({{ $empleado['id'] }})"
-                                            onclick="return confirm('¿Remover este empleado de la tarea?')"
+                                    <button wire:click="openDeleteEmpleadoTareaModal({{ $empleado['id'] }})"
                                             class="text-red-600 hover:text-red-800 dark:text-red-400 text-sm">
                                         Quitar
                                     </button>
@@ -601,5 +600,7 @@
             </x-secondary-button>
         </x-slot>
     </x-dialog-modal>
+
+    @include('livewire.actividad.delete-empleado-tarea-modal')
 
 </div>
