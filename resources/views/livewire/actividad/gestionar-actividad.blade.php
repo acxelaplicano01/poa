@@ -102,11 +102,11 @@
                             </svg>
                         </x-button>
                     @else
-                        <x-button wire:click="enviarARevision" class="bg-green-600 hover:bg-green-700">
+                        <x-button wire:click="enviarARevision" class="bg-green-600 hover:bg-green-700 {{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Enviar a Revisión
+                            {{ !$actividadEnFormulacion ? 'No Editable' : 'Enviar a Revisión' }}
                         </x-button>
                     @endif
                 </div>
