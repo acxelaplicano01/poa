@@ -362,8 +362,7 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <button wire:click="removerEmpleadoDeTarea({{ $empleado['id'] }})"
-                                            onclick="return confirm('¿Remover este empleado de la tarea?')"
+                                    <button wire:click="openDeleteEmpleadoTareaModal({{ $empleado['id'] }})"
                                             class="text-red-600 hover:text-red-800 dark:text-red-400 text-sm">
                                         Quitar
                                     </button>
@@ -432,13 +431,45 @@
 
         <x-slot name="content">
             <div class="space-y-6">
+                <!-- Información del Techo del Departamento -->
+                @if($presupuestoTechoInfo['techoTotal'] > 0 || $presupuestoTechoInfo['presupuestoDisponible'] >= 0)
+                    <div class="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-200 dark:border-indigo-700 p-4 rounded-lg">
+                        <h4 class="text-sm font-semibold text-indigo-900 dark:text-indigo-100 mb-3">Información de Presupuesto - Departamento: {{ $presupuestoTechoInfo['departamentoNombre'] }} | Fuente: {{ $presupuestoTechoInfo['fuenteNombre'] }}</h4>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <p class="text-xs text-indigo-600 dark:text-indigo-400 font-medium">Techo Total</p>
+                                <p class="text-lg font-bold text-indigo-900 dark:text-indigo-100">L {{ number_format($presupuestoTechoInfo['techoTotal'], 2) }}</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-orange-600 dark:text-orange-400 font-medium">Asignado</p>
+                                <p class="text-lg font-bold text-orange-900 dark:text-orange-100">L {{ number_format($presupuestoTechoInfo['presupuestoAsignado'], 2) }}</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-green-600 dark:text-green-400 font-medium">Disponible</p>
+                                <p class="text-lg font-bold text-green-900 dark:text-green-100">L {{ number_format($presupuestoTechoInfo['presupuestoDisponible'], 2) }}</p>
+                            </div>
+                        </div>
+                        @if($presupuestoTechoInfo['presupuestoDisponible'] <= 0)
+                            <div class="mt-3 p-2 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded text-sm text-red-700 dark:text-red-300">
+                                ⚠️ Presupuesto insuficiente. No hay fondos disponibles en el techo del departamento.
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 p-4 rounded-lg">
+                        <p class="text-sm text-yellow-800 dark:text-yellow-300">
+                            ⚠️ No hay techo presupuestario asignado a este departamento. Solicita al administrador que asigne un presupuesto al departamento antes de crear presupuestos para tareas.
+                        </p>
+                    </div>
+                @endif
+                
                 <!-- Formulario para agregar presupuesto -->
                 <div class="bg-zinc-50 dark:bg-zinc-700 p-4 rounded-lg space-y-4">
                     <h4 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Agregar Recurso</h4>
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <x-label for="recursoPresupuesto" value="Recurso (CUB)" />
+                            <x-label for="recursoPresupuesto" value="Recurso" />
                             <select id="recursoPresupuesto" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 text-sm" wire:model="nuevoPresupuesto.idRecurso">
                                 <option value="">Seleccione un recurso</option>
                                 @foreach($recursosDisponibles as $recurso)
@@ -450,7 +481,7 @@
 
                         <div>
                             <x-label for="fuentePresupuesto" value="Fuente de Financiamiento" />
-                            <select id="fuentePresupuesto" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 text-sm" wire:model="nuevoPresupuesto.idfuente">
+                            <select id="fuentePresupuesto" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 text-sm" wire:model.live="nuevoPresupuesto.idfuente">
                                 <option value="">Seleccione una fuente</option>
                                 @foreach($fuentesFinanciamiento as $fuente)
                                     <option value="{{ $fuente['id'] }}">{{ $fuente['nombre'] }}</option>
@@ -479,7 +510,7 @@
                         </div>
 
                         <div>
-                            <x-label for="costoUnitario" value="Costo Unitario ($)" />
+                            <x-label for="costoUnitario" value="Costo Unitario (L)" />
                             <x-input id="costoUnitario" type="number" step="0.01" min="0" class="mt-1 block w-full text-sm" wire:model.live="nuevoPresupuesto.costounitario" />
                             @error('nuevoPresupuesto.costounitario') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
@@ -495,7 +526,7 @@
                             <select id="mesEjecucion" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 text-sm" wire:model="nuevoPresupuesto.idMes">
                                 <option value="">Seleccione</option>
                                 @foreach($meses as $mes)
-                                    <option value="{{ $mes['id'] }}">Mes {{ $mes['mes'] }}</option>
+                                    <option value="{{ $mes['id'] }}">{{ $mes['mes'] }}</option>
                                 @endforeach
                             </select>
                             @error('nuevoPresupuesto.idMes') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -505,7 +536,7 @@
                     <div class="flex items-center justify-between p-3 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-600">
                         <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Total:</span>
                         <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400">
-                            ${{ number_format($nuevoPresupuesto['total'], 2) }}
+                            L {{ number_format($nuevoPresupuesto['total'], 2) }}
                         </span>
                     </div>
 
@@ -553,13 +584,13 @@
                                                 {{ $presupuesto['cantidad'] }} {{ $presupuesto['unidad_medida']['nombre'] ?? '' }}
                                             </td>
                                             <td class="px-3 py-2 text-xs text-right text-zinc-900 dark:text-zinc-100">
-                                                ${{ number_format($presupuesto['costounitario'], 2) }}
+                                                L {{ number_format($presupuesto['costounitario'], 2) }}
                                             </td>
                                             <td class="px-3 py-2 text-xs text-center text-zinc-900 dark:text-zinc-100">
                                                 {{ $presupuesto['mes']['mes'] ?? 'N/A' }}
                                             </td>
                                             <td class="px-3 py-2 text-xs text-right font-semibold text-indigo-600 dark:text-indigo-400">
-                                                ${{ number_format($presupuesto['total'], 2) }}
+                                                L {{ number_format($presupuesto['total'], 2) }}
                                             </td>
                                             <td class="px-3 py-2 text-center">
                                                 <button wire:click="deletePresupuesto({{ $presupuesto['id'] }})"
@@ -579,7 +610,7 @@
                                             Total Presupuestado:
                                         </td>
                                         <td class="px-3 py-2 text-right text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                                            ${{ number_format(collect($presupuestosTarea)->sum('total'), 2) }}
+                                            L {{ number_format(collect($presupuestosTarea)->sum('total'), 2) }}
                                         </td>
                                         <td></td>
                                     </tr>
@@ -601,5 +632,7 @@
             </x-secondary-button>
         </x-slot>
     </x-dialog-modal>
+
+    @include('livewire.actividad.delete-empleado-tarea-modal')
 
 </div>

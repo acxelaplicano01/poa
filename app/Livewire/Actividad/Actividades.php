@@ -89,6 +89,7 @@ class Actividades extends Component
     public $usarIA = false;
     public $generandoConIA = false;
     public $nombreParaIA = '';
+    public $indicadoresGenerados = [];
 
     protected function rules()
     {
@@ -382,6 +383,7 @@ class Actividades extends Component
             $this->resultadoActividad = $data['resultadoActividad'] ?? '';
             $this->poblacion_objetivo = $data['poblacion_objetivo'] ?? '';
             $this->medio_verificacion = $data['medio_verificacion'] ?? '';
+            $this->indicadoresGenerados = $data['indicadores'] ?? [];
 
             // Cerrar el panel de IA
            // $this->usarIA = false;
@@ -516,7 +518,24 @@ class Actividades extends Component
                 $actividad->update($datos);
                 $mensaje = 'Actividad actualizada correctamente';
             } else {
-                Actividad::create($datos);
+                $actividad = Actividad::create($datos);
+                
+                // Crear indicadores si se generaron con IA
+                if (!empty($this->indicadoresGenerados) && is_array($this->indicadoresGenerados)) {
+                    foreach ($this->indicadoresGenerados as $indicadorData) {
+                        \App\Models\Actividad\Indicador::create([
+                            'nombre' => $indicadorData['nombre'] ?? '',
+                            'descripcion' => $indicadorData['descripcion'] ?? '',
+                            'cantidadPlanificada' => $indicadorData['cantidadPlanificada'] ?? 0,
+                            'cantidadEjecutada' => 0,
+                            'promedioAlcanzado' => 0,
+                            'isCantidad' => $indicadorData['isCantidad'] ?? true,
+                            'isPorcentaje' => $indicadorData['isPorcentaje'] ?? false,
+                            'idActividad' => $actividad->id,
+                        ]);
+                    }
+                }
+                
                 $mensaje = 'Actividad creada correctamente';
             }
 
@@ -604,9 +623,21 @@ class Actividades extends Component
             $fuente = $techos->first()->techoUe->fuente;
             $montoTotal = $techos->sum('monto');
             
-            // Por ahora, el monto asignado a actividades será 0 ya que no hay relación directa
-            // Esto se puede implementar cuando se defina cómo las actividades consumen presupuesto
-            $montoAsignado = 0;
+            // Calcular monto asignado sumando todos los presupuestos de tareas con esta fuente
+            // que pertenecen a actividades del departamento
+            $idDeptartamento = $this->idDeptartamento;
+            $idPoa = $this->idPoa;
+            
+            $montoAsignado = \App\Models\Presupuestos\Presupuesto::whereHas('tarea', function($q) use ($idDeptartamento, $idPoa) {
+                $q->where('idDeptartamento', $idDeptartamento)
+                  ->whereHas('actividad', function($aq) use ($idPoa) {
+                      $aq->where('idPoa', $idPoa);
+                  });
+            })
+            ->where('idfuente', $fuenteId)
+            ->whereNull('deleted_at')
+            ->sum('total');
+            
             $montoDisponible = $montoTotal - $montoAsignado;
             $porcentajeUsado = $montoTotal > 0 ? ($montoAsignado / $montoTotal) * 100 : 0;
 

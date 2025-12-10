@@ -14,7 +14,6 @@ class Area extends BaseModel
     protected $fillable = [
         'nombre',
         'idObjetivo',
-        // 'idPei', // Necesario si la tabla tiene esta columna
         // Los campos de auditoría ya están en BaseModel
     ];
 
@@ -22,18 +21,6 @@ class Area extends BaseModel
     public function objetivo()
     {
         return $this->belongsTo(Objetivo::class, 'idObjetivo');
-    }
-
-    // Relación con Dimension
-    public function dimension()
-    {
-        return $this->belongsTo(Dimension::class, 'idDimension');
-    }
-
-    // Relación con Pei
-    public function pei()
-    {
-        return $this->belongsTo(Pei::class, 'idPei');
     }
 
     // Relación con Resultados
@@ -45,10 +32,13 @@ class Area extends BaseModel
     protected static function booted()
     {
         static::created(function ($area) {
+            // Cargar las relaciones necesarias
+            $area->load('objetivo.dimension');
+            
             // Obtener el objetivo relacionado para determinar el PEI
             $objetivo = $area->objetivo;
 
-            if ($objetivo && $objetivo->dimension) {
+            if ($objetivo && $objetivo->dimension && isset($objetivo->dimension->idPei)) {
                 \DB::table('pei_elementos')->insert([
                     'idPei' => $objetivo->dimension->idPei, // Relación con el PEI a través del objetivo → dimensión
                     'elemento_id' => $area->id,
@@ -60,10 +50,13 @@ class Area extends BaseModel
         });
 
         static::updated(function ($area) {
+            // Cargar las relaciones necesarias
+            $area->load('objetivo.dimension');
+            
             // Obtener el objetivo relacionado para determinar el PEI
             $objetivo = $area->objetivo;
 
-            if ($objetivo && $objetivo->dimension) {
+            if ($objetivo && $objetivo->dimension && isset($objetivo->dimension->idPei)) {
                 \DB::table('pei_elementos')->updateOrInsert(
                     [
                         'elemento_id' => $area->id,

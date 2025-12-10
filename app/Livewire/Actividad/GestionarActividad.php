@@ -16,6 +16,7 @@ use App\Models\Tareas\TareaHistorico;
 use App\Models\GrupoGastos\Fuente;
 use App\Models\GrupoGastos\ObjetoGasto;
 use App\Models\Requisicion\UnidadMedida;
+use App\Models\TechoUes\TechoDepto;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -72,11 +73,21 @@ class GestionarActividad extends Component
     
     // Control de modales
     public $showIndicadorModal = false;
+    public $showDeleteIndicadorModal = false;
+    public $indicadorToDelete = null;
     public $showPlanificacionModal = false;
     public $showEmpleadoModal = false;
+    public $showDeleteEmpleadoModal = false;
+    public $empleadoToRemove = null;
     public $showTareaModal = false;
+    public $showDeleteTareaModal = false;
+    public $tareaToDelete = null;
     public $showAsignarEmpleadoTareaModal = false;
+    public $showDeleteEmpleadoTareaModal = false;
+    public $empleadoTareaToRemove = null;
     public $showPresupuestoModal = false;
+    public $showDeletePlanificacionModal = false;
+    public $planificacionToDelete = null;
     
     // Asignación de empleados a tareas
     public $tareaSeleccionada = null;
@@ -89,6 +100,13 @@ class GestionarActividad extends Component
     public $fuentesFinanciamiento = [];
     public $unidadesMedida = [];
     public $meses = [];
+    public $presupuestoTechoInfo = [
+        'techoTotal' => 0,
+        'presupuestoAsignado' => 0,
+        'presupuestoDisponible' => 0,
+        'departamentoNombre' => '',
+        'fuenteNombre' => ''
+    ];
     public $nuevoPresupuesto = [
         'idRecurso' => '',
         'detalle_tecnico' => '',
@@ -303,17 +321,37 @@ class GestionarActividad extends Component
         $this->showIndicadorModal = true;
     }
 
-    public function deleteIndicador($indicadorId)
+    public function openDeleteIndicadorModal($indicadorId)
+    {
+        $this->indicadorToDelete = Indicador::findOrFail($indicadorId);
+        $this->showDeleteIndicadorModal = true;
+    }
+
+    public function closeDeleteIndicadorModal()
+    {
+        $this->showDeleteIndicadorModal = false;
+        $this->indicadorToDelete = null;
+    }
+
+    public function confirmDeleteIndicador()
     {
         try {
-            $indicador = Indicador::findOrFail($indicadorId);
-            $indicador->delete();
-            
-            $this->loadIndicadores();
-            session()->flash('message', 'Indicador eliminado exitosamente');
+            if ($this->indicadorToDelete) {
+                $this->indicadorToDelete->delete();
+                $this->loadIndicadores();
+                session()->flash('message', 'Indicador eliminado exitosamente');
+            }
+            $this->closeDeleteIndicadorModal();
         } catch (\Exception $e) {
             session()->flash('error', 'Error al eliminar indicador: ' . $e->getMessage());
+            $this->closeDeleteIndicadorModal();
         }
+    }
+
+    public function deleteIndicador($indicadorId)
+    {
+        // Este método se mantiene para compatibilidad
+        $this->openDeleteIndicadorModal($indicadorId);
     }
 
     private function resetNuevoIndicador()
@@ -482,16 +520,30 @@ class GestionarActividad extends Component
         $this->showPlanificacionModal = true;
     }
 
-    public function deletePlanificacion($planificacionId)
+    public function openDeletePlanificacionModal($planificacionId)
+    {
+        $this->planificacionToDelete = Planificacion::with(['indicador', 'mes.trimestre'])->findOrFail($planificacionId);
+        $this->showDeletePlanificacionModal = true;
+    }
+
+    public function closeDeletePlanificacionModal()
+    {
+        $this->showDeletePlanificacionModal = false;
+        $this->planificacionToDelete = null;
+    }
+
+    public function confirmDeletePlanificacion()
     {
         try {
-            $planificacion = Planificacion::findOrFail($planificacionId);
-            $planificacion->delete();
-            
-            $this->loadIndicadores();
-            session()->flash('message', 'Planificación eliminada exitosamente');
+            if ($this->planificacionToDelete) {
+                $this->planificacionToDelete->delete();
+                $this->loadIndicadores();
+                session()->flash('message', 'Planificación eliminada exitosamente');
+            }
+            $this->closeDeletePlanificacionModal();
         } catch (\Exception $e) {
             session()->flash('error', 'Error al eliminar planificación: ' . $e->getMessage());
+            $this->closeDeletePlanificacionModal();
         }
     }
 
@@ -543,6 +595,38 @@ class GestionarActividad extends Component
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Error al asignar empleado: ' . $e->getMessage());
+        }
+    }
+
+    public function openDeleteEmpleadoModal($empleadoId)
+    {
+        $empleado = Empleado::findOrFail($empleadoId);
+        $this->empleadoToRemove = [
+            'id' => $empleado->id,
+            'nombre' => $empleado->user->name ?? $empleado->nombre,
+            'num_empleado' => $empleado->num_empleado
+        ];
+        $this->showDeleteEmpleadoModal = true;
+    }
+
+    public function closeDeleteEmpleadoModal()
+    {
+        $this->showDeleteEmpleadoModal = false;
+        $this->empleadoToRemove = null;
+    }
+
+    public function confirmRemoveEmpleado()
+    {
+        try {
+            if ($this->empleadoToRemove) {
+                $this->actividad->empleados()->detach($this->empleadoToRemove['id']);
+                $this->loadEmpleados();
+                session()->flash('message', 'Empleado removido exitosamente');
+            }
+            $this->closeDeleteEmpleadoModal();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al remover empleado: ' . $e->getMessage());
+            $this->closeDeleteEmpleadoModal();
         }
     }
 
@@ -652,17 +736,37 @@ class GestionarActividad extends Component
         $this->showTareaModal = true;
     }
 
-    public function deleteTarea($tareaId)
+    public function openDeleteTareaModal($tareaId)
+    {
+        $this->tareaToDelete = Tarea::findOrFail($tareaId);
+        $this->showDeleteTareaModal = true;
+    }
+
+    public function closeDeleteTareaModal()
+    {
+        $this->showDeleteTareaModal = false;
+        $this->tareaToDelete = null;
+    }
+
+    public function confirmDeleteTarea()
     {
         try {
-            $tarea = Tarea::findOrFail($tareaId);
-            $tarea->delete();
-            
-            $this->loadTareas();
-            session()->flash('message', 'Tarea eliminada exitosamente');
+            if ($this->tareaToDelete) {
+                $this->tareaToDelete->delete();
+                $this->loadTareas();
+                session()->flash('message', 'Tarea eliminada exitosamente');
+            }
+            $this->closeDeleteTareaModal();
         } catch (\Exception $e) {
             session()->flash('error', 'Error al eliminar tarea: ' . $e->getMessage());
+            $this->closeDeleteTareaModal();
         }
+    }
+
+    public function deleteTarea($tareaId)
+    {
+        // Este método se mantiene para compatibilidad
+        $this->openDeleteTareaModal($tareaId);
     }
 
     private function resetNuevaTarea()
@@ -732,6 +836,40 @@ class GestionarActividad extends Component
         }
     }
 
+    public function openDeleteEmpleadoTareaModal($empleadoId)
+    {
+        $empleado = Empleado::findOrFail($empleadoId);
+        $this->empleadoTareaToRemove = [
+            'id' => $empleado->id,
+            'nombre' => $empleado->user->name ?? $empleado->nombre,
+            'num_empleado' => $empleado->num_empleado
+        ];
+        $this->showDeleteEmpleadoTareaModal = true;
+    }
+
+    public function closeDeleteEmpleadoTareaModal()
+    {
+        $this->showDeleteEmpleadoTareaModal = false;
+        $this->empleadoTareaToRemove = null;
+    }
+
+    public function confirmRemoveEmpleadoDeTarea()
+    {
+        try {
+            if ($this->empleadoTareaToRemove && $this->tareaSeleccionada) {
+                $tarea = Tarea::findOrFail($this->tareaSeleccionada);
+                $tarea->empleados()->detach($this->empleadoTareaToRemove['id']);
+                $this->loadEmpleadosTarea($this->tareaSeleccionada);
+                $this->loadTareas();
+                session()->flash('message', 'Empleado removido de la tarea exitosamente');
+            }
+            $this->closeDeleteEmpleadoTareaModal();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al remover empleado: ' . $e->getMessage());
+            $this->closeDeleteEmpleadoTareaModal();
+        }
+    }
+
     public function removerEmpleadoDeTarea($empleadoId)
     {
         try {
@@ -752,18 +890,137 @@ class GestionarActividad extends Component
     public function openPresupuestoModal($tareaId)
     {
         $this->tareaSeleccionada = $tareaId;
+        \Log::debug("Abriendo modal presupuesto para tarea: {$tareaId}");
+        
+        // Obtener la tarea para debug
+        $tarea = Tarea::find($tareaId);
+        if ($tarea) {
+            \Log::debug("Tarea encontrada: {$tarea->nombre}, Departamento: {$tarea->idDeptartamento}");
+            
+            // Cargar información del techo del departamento (sin fuente específica por ahora)
+            $this->loadTechoDepartamento($tarea);
+        } else {
+            \Log::error("Tarea NO ENCONTRADA con ID: {$tareaId}");
+        }
+        
         $this->loadPresupuestosTarea($tareaId);
         $this->loadRecursosYCatalogos();
         $this->resetNuevoPresupuesto();
         $this->showPresupuestoModal = true;
     }
 
+    private function loadTechoDepartamento($tarea, $idFuente = null)
+    {
+        try {
+            // Cargar la relación departamento si no está cargada
+            if (!$tarea->departamento) {
+                $tarea->load('departamento');
+            }
+            
+            // Construir consulta para obtener techos del departamento
+            $query = TechoDepto::where('idDepartamento', $tarea->idDeptartamento);
+            
+            // Si se proporciona una fuente, filtrar por ella a través de techo_ues
+            if ($idFuente) {
+                // Obtener los techo_ues que corresponden a esta fuente
+                $techoUesIds = \App\Models\TechoUes\TechoUe::where('idFuente', $idFuente)
+                    ->pluck('id')
+                    ->toArray();
+                
+                if (!empty($techoUesIds)) {
+                    $query->whereIn('idTechoUE', $techoUesIds);
+                } else {
+                    // Si no hay techo_ues para esta fuente, devolver vacío
+                    $this->presupuestoTechoInfo = [
+                        'techoTotal' => 0,
+                        'presupuestoAsignado' => 0,
+                        'presupuestoDisponible' => 0,
+                        'departamentoNombre' => $tarea->departamento->name ?? 'N/A',
+                        'fuenteNombre' => Fuente::find($idFuente)->nombre ?? 'Desconocida'
+                    ];
+                    return;
+                }
+            }
+            
+            $techosDepartamento = $query->get();
+            
+            if ($techosDepartamento->isNotEmpty()) {
+                // Sumar todos los techos disponibles para esta fuente (o todas si no hay fuente específica)
+                $techoTotalDisponible = $techosDepartamento->sum('monto');
+                
+                // Calcular presupuesto ya asignado a esta tarea PARA LA FUENTE SELECCIONADA
+                $queryPresupuesto = Presupuesto::where('idtarea', $tarea->id)
+                    ->whereNull('deleted_at');
+                if ($idFuente) {
+                    $queryPresupuesto->where('idfuente', $idFuente);
+                }
+                $presupuestoTareaActual = $queryPresupuesto->sum('total');
+                
+                // Obtener nombre de la fuente si está disponible
+                $fuenteNombre = 'General';
+                if ($idFuente) {
+                    $fuente = Fuente::find($idFuente);
+                    $fuenteNombre = $fuente->nombre ?? 'Fuente ' . $idFuente;
+                }
+                
+                $this->presupuestoTechoInfo = [
+                    'techoTotal' => $techoTotalDisponible,
+                    'presupuestoAsignado' => $presupuestoTareaActual,
+                    'presupuestoDisponible' => $techoTotalDisponible - $presupuestoTareaActual,
+                    'departamentoNombre' => $tarea->departamento->name ?? 'N/A',
+                    'fuenteNombre' => $fuenteNombre
+                ];
+                
+                \Log::debug("Techo cargado - Fuente: {$fuenteNombre}, Total: {$techoTotalDisponible}, Asignado: {$presupuestoTareaActual}, Disponible: " . ($techoTotalDisponible - $presupuestoTareaActual));
+            } else {
+                \Log::warning("No hay techo asignado al departamento: {$tarea->idDeptartamento}");
+                $fuenteNombre = $idFuente ? (Fuente::find($idFuente)->nombre ?? 'Desconocida') : 'General';
+                $this->presupuestoTechoInfo = [
+                    'techoTotal' => 0,
+                    'presupuestoAsignado' => 0,
+                    'presupuestoDisponible' => 0,
+                    'departamentoNombre' => $tarea->departamento->name ?? 'N/A',
+                    'fuenteNombre' => $fuenteNombre
+                ];
+            }
+        } catch (\Exception $e) {
+            \Log::error("Error cargando techo: " . $e->getMessage());
+            $this->presupuestoTechoInfo = [
+                'techoTotal' => 0,
+                'presupuestoAsignado' => 0,
+                'presupuestoDisponible' => 0,
+                'departamentoNombre' => $tarea->departamento->name ?? 'Desconocido',
+                'fuenteNombre' => 'Error: ' . $e->getMessage()
+            ];
+        }
+    }
+
     private function loadPresupuestosTarea($tareaId)
     {
+        // Usar whereNull para excluir soft deletes explícitamente
         $this->presupuestosTarea = Presupuesto::where('idtarea', $tareaId)
+            ->whereNull('deleted_at')
             ->with(['fuente', 'unidadMedida', 'mes'])
+            ->orderBy('id', 'desc')
             ->get()
             ->toArray();
+        
+        // Debug: Log si no encuentra presupuestos
+        if (empty($this->presupuestosTarea)) {
+            \Log::debug("No presupuestos encontrados para tarea ID: {$tareaId}");
+            
+            // Verificar si la tarea existe
+            $tarea = Tarea::find($tareaId);
+            if ($tarea) {
+                \Log::debug("Tarea existe: {$tarea->id}, idActividad: {$tarea->idActividad}");
+            } else {
+                \Log::debug("Tarea NO existe con ID: {$tareaId}");
+            }
+            
+            // Ver todos los presupuestos sin filtrar
+            $todosPresupuestos = Presupuesto::count();
+            \Log::debug("Total presupuestos en base de datos: {$todosPresupuestos}");
+        }
     }
 
     private function loadRecursosYCatalogos()
@@ -794,6 +1051,17 @@ class GestionarActividad extends Component
     public function updatedNuevoPresupuestoCantidad()
     {
         $this->calcularTotal();
+    }
+
+    public function updatedNuevoPresupuestoIdfuente($value)
+    {
+        // Cuando cambia la fuente, recalcular el presupuesto disponible
+        if ($this->tareaSeleccionada) {
+            $tarea = Tarea::find($this->tareaSeleccionada);
+            if ($tarea) {
+                $this->loadTechoDepartamento($tarea, $value);
+            }
+        }
     }
 
     private function calcularTotal()
@@ -836,13 +1104,44 @@ class GestionarActividad extends Component
                 $idgrupo = $objetoGasto?->idgrupo;
             }
             
+            // Obtener la tarea y el departamento
+            $tarea = Tarea::findOrFail($this->tareaSeleccionada);
+            $idDepartamento = $tarea->idDeptartamento;
+            $idFuente = $this->nuevoPresupuesto['idfuente'];
+            
+            // Obtener los techo_ues que corresponden a esta fuente
+            $techoUesIds = \App\Models\TechoUes\TechoUe::where('idFuente', $idFuente)
+                ->pluck('id')
+                ->toArray();
+            
+            if (empty($techoUesIds)) {
+                throw new \Exception('No hay techo presupuestario para la fuente de financiamiento seleccionada');
+            }
+            
+            // Obtener el techo del departamento para esta fuente
+            $techoDepto = TechoDepto::where('idDepartamento', $idDepartamento)
+                ->whereIn('idTechoUE', $techoUesIds)
+                ->first();
+            
+            if (!$techoDepto) {
+                throw new \Exception('No se encontró techo presupuestario para el departamento y fuente de financiamiento seleccionada');
+            }
+            
+            // Verificar que haya suficiente presupuesto disponible
+            $presupuestoTotal = $this->nuevoPresupuesto['total'];
+            if ($techoDepto->monto < $presupuestoTotal) {
+                throw new \Exception('Presupuesto insuficiente. Disponible: L ' . number_format($techoDepto->monto, 2) . ', Requerido: L ' . number_format($presupuestoTotal, 2));
+            }
+            
+            // Crear el presupuesto (registrar la asignación, sin modificar el techo_depto)
+            // Esto es similar a cómo techo_deptos registra asignaciones del techo_ues sin modificarlo
             Presupuesto::create([
                 'cantidad' => $this->nuevoPresupuesto['cantidad'],
                 'costounitario' => $this->nuevoPresupuesto['costounitario'],
                 'total' => $this->nuevoPresupuesto['total'],
                 'detalle_tecnico' => $this->nuevoPresupuesto['detalle_tecnico'],
                 'recurso' => $recurso->nombre,
-                'idgrupo' => $idgrupo ?? 1, // Default a 1 si no hay grupo
+                'idgrupo' => $idgrupo ?? 1,
                 'idobjeto' => $recurso->idobjeto,
                 'idtarea' => $this->tareaSeleccionada,
                 'idfuente' => $this->nuevoPresupuesto['idfuente'],
@@ -856,7 +1155,8 @@ class GestionarActividad extends Component
             $this->loadPresupuestosTarea($this->tareaSeleccionada);
             $this->loadTareas();
             $this->resetNuevoPresupuesto();
-            session()->flash('message', 'Recurso presupuestario agregado exitosamente');
+            $this->loadTechoDepartamento($tarea, $idFuente);
+            session()->flash('message', 'Recurso presupuestario agregado exitosamente.');
             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -867,13 +1167,26 @@ class GestionarActividad extends Component
     public function deletePresupuesto($presupuestoId)
     {
         try {
+            DB::beginTransaction();
+            
             $presupuesto = Presupuesto::findOrFail($presupuestoId);
+            $idFuente = $presupuesto->idfuente;
+            
+            // Obtener la tarea
+            $tarea = Tarea::findOrFail($presupuesto->idtarea);
+            
+            // Eliminar el presupuesto (sin modificar el techo_depto)
             $presupuesto->delete();
+            
+            DB::commit();
             
             $this->loadPresupuestosTarea($this->tareaSeleccionada);
             $this->loadTareas();
-            session()->flash('message', 'Presupuesto eliminado exitosamente');
+            $tarea->load('departamento');
+            $this->loadTechoDepartamento($tarea, $idFuente);
+            session()->flash('message', 'Presupuesto eliminado exitosamente.');
         } catch (\Exception $e) {
+            DB::rollBack();
             session()->flash('error', 'Error al eliminar presupuesto: ' . $e->getMessage());
         }
     }
