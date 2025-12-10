@@ -16,6 +16,7 @@ use App\Models\Tareas\TareaHistorico;
 use App\Models\GrupoGastos\Fuente;
 use App\Models\GrupoGastos\ObjetoGasto;
 use App\Models\Requisicion\UnidadMedida;
+use App\Models\TechoUes\TechoDepto;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -99,6 +100,13 @@ class GestionarActividad extends Component
     public $fuentesFinanciamiento = [];
     public $unidadesMedida = [];
     public $meses = [];
+    public $presupuestoTechoInfo = [
+        'techoTotal' => 0,
+        'presupuestoAsignado' => 0,
+        'presupuestoDisponible' => 0,
+        'departamentoNombre' => '',
+        'fuenteNombre' => ''
+    ];
     public $nuevoPresupuesto = [
         'idRecurso' => '',
         'detalle_tecnico' => '',
@@ -882,18 +890,137 @@ class GestionarActividad extends Component
     public function openPresupuestoModal($tareaId)
     {
         $this->tareaSeleccionada = $tareaId;
+        \Log::debug("Abriendo modal presupuesto para tarea: {$tareaId}");
+        
+        // Obtener la tarea para debug
+        $tarea = Tarea::find($tareaId);
+        if ($tarea) {
+            \Log::debug("Tarea encontrada: {$tarea->nombre}, Departamento: {$tarea->idDeptartamento}");
+            
+            // Cargar información del techo del departamento (sin fuente específica por ahora)
+            $this->loadTechoDepartamento($tarea);
+        } else {
+            \Log::error("Tarea NO ENCONTRADA con ID: {$tareaId}");
+        }
+        
         $this->loadPresupuestosTarea($tareaId);
         $this->loadRecursosYCatalogos();
         $this->resetNuevoPresupuesto();
         $this->showPresupuestoModal = true;
     }
 
+    private function loadTechoDepartamento($tarea, $idFuente = null)
+    {
+        try {
+            // Cargar la relación departamento si no está cargada
+            if (!$tarea->departamento) {
+                $tarea->load('departamento');
+            }
+            
+            // Construir consulta para obtener techos del departamento
+            $query = TechoDepto::where('idDepartamento', $tarea->idDeptartamento);
+            
+            // Si se proporciona una fuente, filtrar por ella a través de techo_ues
+            if ($idFuente) {
+                // Obtener los techo_ues que corresponden a esta fuente
+                $techoUesIds = \App\Models\TechoUes\TechoUe::where('idFuente', $idFuente)
+                    ->pluck('id')
+                    ->toArray();
+                
+                if (!empty($techoUesIds)) {
+                    $query->whereIn('idTechoUE', $techoUesIds);
+                } else {
+                    // Si no hay techo_ues para esta fuente, devolver vacío
+                    $this->presupuestoTechoInfo = [
+                        'techoTotal' => 0,
+                        'presupuestoAsignado' => 0,
+                        'presupuestoDisponible' => 0,
+                        'departamentoNombre' => $tarea->departamento->name ?? 'N/A',
+                        'fuenteNombre' => Fuente::find($idFuente)->nombre ?? 'Desconocida'
+                    ];
+                    return;
+                }
+            }
+            
+            $techosDepartamento = $query->get();
+            
+            if ($techosDepartamento->isNotEmpty()) {
+                // Sumar todos los techos disponibles para esta fuente (o todas si no hay fuente específica)
+                $techoTotalDisponible = $techosDepartamento->sum('monto');
+                
+                // Calcular presupuesto ya asignado a esta tarea PARA LA FUENTE SELECCIONADA
+                $queryPresupuesto = Presupuesto::where('idtarea', $tarea->id)
+                    ->whereNull('deleted_at');
+                if ($idFuente) {
+                    $queryPresupuesto->where('idfuente', $idFuente);
+                }
+                $presupuestoTareaActual = $queryPresupuesto->sum('total');
+                
+                // Obtener nombre de la fuente si está disponible
+                $fuenteNombre = 'General';
+                if ($idFuente) {
+                    $fuente = Fuente::find($idFuente);
+                    $fuenteNombre = $fuente->nombre ?? 'Fuente ' . $idFuente;
+                }
+                
+                $this->presupuestoTechoInfo = [
+                    'techoTotal' => $techoTotalDisponible,
+                    'presupuestoAsignado' => $presupuestoTareaActual,
+                    'presupuestoDisponible' => $techoTotalDisponible - $presupuestoTareaActual,
+                    'departamentoNombre' => $tarea->departamento->name ?? 'N/A',
+                    'fuenteNombre' => $fuenteNombre
+                ];
+                
+                \Log::debug("Techo cargado - Fuente: {$fuenteNombre}, Total: {$techoTotalDisponible}, Asignado: {$presupuestoTareaActual}, Disponible: " . ($techoTotalDisponible - $presupuestoTareaActual));
+            } else {
+                \Log::warning("No hay techo asignado al departamento: {$tarea->idDeptartamento}");
+                $fuenteNombre = $idFuente ? (Fuente::find($idFuente)->nombre ?? 'Desconocida') : 'General';
+                $this->presupuestoTechoInfo = [
+                    'techoTotal' => 0,
+                    'presupuestoAsignado' => 0,
+                    'presupuestoDisponible' => 0,
+                    'departamentoNombre' => $tarea->departamento->name ?? 'N/A',
+                    'fuenteNombre' => $fuenteNombre
+                ];
+            }
+        } catch (\Exception $e) {
+            \Log::error("Error cargando techo: " . $e->getMessage());
+            $this->presupuestoTechoInfo = [
+                'techoTotal' => 0,
+                'presupuestoAsignado' => 0,
+                'presupuestoDisponible' => 0,
+                'departamentoNombre' => $tarea->departamento->name ?? 'Desconocido',
+                'fuenteNombre' => 'Error: ' . $e->getMessage()
+            ];
+        }
+    }
+
     private function loadPresupuestosTarea($tareaId)
     {
+        // Usar whereNull para excluir soft deletes explícitamente
         $this->presupuestosTarea = Presupuesto::where('idtarea', $tareaId)
+            ->whereNull('deleted_at')
             ->with(['fuente', 'unidadMedida', 'mes'])
+            ->orderBy('id', 'desc')
             ->get()
             ->toArray();
+        
+        // Debug: Log si no encuentra presupuestos
+        if (empty($this->presupuestosTarea)) {
+            \Log::debug("No presupuestos encontrados para tarea ID: {$tareaId}");
+            
+            // Verificar si la tarea existe
+            $tarea = Tarea::find($tareaId);
+            if ($tarea) {
+                \Log::debug("Tarea existe: {$tarea->id}, idActividad: {$tarea->idActividad}");
+            } else {
+                \Log::debug("Tarea NO existe con ID: {$tareaId}");
+            }
+            
+            // Ver todos los presupuestos sin filtrar
+            $todosPresupuestos = Presupuesto::count();
+            \Log::debug("Total presupuestos en base de datos: {$todosPresupuestos}");
+        }
     }
 
     private function loadRecursosYCatalogos()
@@ -924,6 +1051,17 @@ class GestionarActividad extends Component
     public function updatedNuevoPresupuestoCantidad()
     {
         $this->calcularTotal();
+    }
+
+    public function updatedNuevoPresupuestoIdfuente($value)
+    {
+        // Cuando cambia la fuente, recalcular el presupuesto disponible
+        if ($this->tareaSeleccionada) {
+            $tarea = Tarea::find($this->tareaSeleccionada);
+            if ($tarea) {
+                $this->loadTechoDepartamento($tarea, $value);
+            }
+        }
     }
 
     private function calcularTotal()
@@ -966,13 +1104,44 @@ class GestionarActividad extends Component
                 $idgrupo = $objetoGasto?->idgrupo;
             }
             
+            // Obtener la tarea y el departamento
+            $tarea = Tarea::findOrFail($this->tareaSeleccionada);
+            $idDepartamento = $tarea->idDeptartamento;
+            $idFuente = $this->nuevoPresupuesto['idfuente'];
+            
+            // Obtener los techo_ues que corresponden a esta fuente
+            $techoUesIds = \App\Models\TechoUes\TechoUe::where('idFuente', $idFuente)
+                ->pluck('id')
+                ->toArray();
+            
+            if (empty($techoUesIds)) {
+                throw new \Exception('No hay techo presupuestario para la fuente de financiamiento seleccionada');
+            }
+            
+            // Obtener el techo del departamento para esta fuente
+            $techoDepto = TechoDepto::where('idDepartamento', $idDepartamento)
+                ->whereIn('idTechoUE', $techoUesIds)
+                ->first();
+            
+            if (!$techoDepto) {
+                throw new \Exception('No se encontró techo presupuestario para el departamento y fuente de financiamiento seleccionada');
+            }
+            
+            // Verificar que haya suficiente presupuesto disponible
+            $presupuestoTotal = $this->nuevoPresupuesto['total'];
+            if ($techoDepto->monto < $presupuestoTotal) {
+                throw new \Exception('Presupuesto insuficiente. Disponible: L ' . number_format($techoDepto->monto, 2) . ', Requerido: L ' . number_format($presupuestoTotal, 2));
+            }
+            
+            // Crear el presupuesto (registrar la asignación, sin modificar el techo_depto)
+            // Esto es similar a cómo techo_deptos registra asignaciones del techo_ues sin modificarlo
             Presupuesto::create([
                 'cantidad' => $this->nuevoPresupuesto['cantidad'],
                 'costounitario' => $this->nuevoPresupuesto['costounitario'],
                 'total' => $this->nuevoPresupuesto['total'],
                 'detalle_tecnico' => $this->nuevoPresupuesto['detalle_tecnico'],
                 'recurso' => $recurso->nombre,
-                'idgrupo' => $idgrupo ?? 1, // Default a 1 si no hay grupo
+                'idgrupo' => $idgrupo ?? 1,
                 'idobjeto' => $recurso->idobjeto,
                 'idtarea' => $this->tareaSeleccionada,
                 'idfuente' => $this->nuevoPresupuesto['idfuente'],
@@ -986,7 +1155,8 @@ class GestionarActividad extends Component
             $this->loadPresupuestosTarea($this->tareaSeleccionada);
             $this->loadTareas();
             $this->resetNuevoPresupuesto();
-            session()->flash('message', 'Recurso presupuestario agregado exitosamente');
+            $this->loadTechoDepartamento($tarea, $idFuente);
+            session()->flash('message', 'Recurso presupuestario agregado exitosamente.');
             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -997,13 +1167,26 @@ class GestionarActividad extends Component
     public function deletePresupuesto($presupuestoId)
     {
         try {
+            DB::beginTransaction();
+            
             $presupuesto = Presupuesto::findOrFail($presupuestoId);
+            $idFuente = $presupuesto->idfuente;
+            
+            // Obtener la tarea
+            $tarea = Tarea::findOrFail($presupuesto->idtarea);
+            
+            // Eliminar el presupuesto (sin modificar el techo_depto)
             $presupuesto->delete();
+            
+            DB::commit();
             
             $this->loadPresupuestosTarea($this->tareaSeleccionada);
             $this->loadTareas();
-            session()->flash('message', 'Presupuesto eliminado exitosamente');
+            $tarea->load('departamento');
+            $this->loadTechoDepartamento($tarea, $idFuente);
+            session()->flash('message', 'Presupuesto eliminado exitosamente.');
         } catch (\Exception $e) {
+            DB::rollBack();
             session()->flash('error', 'Error al eliminar presupuesto: ' . $e->getMessage());
         }
     }

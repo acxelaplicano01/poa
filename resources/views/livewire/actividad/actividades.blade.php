@@ -397,14 +397,13 @@
                                         <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-6 hover:shadow-lg transition-shadow duration-200">
                                             <div class="flex items-center justify-between mb-4">
                                                 <h4 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                                                    {{ $fuente['identificador'] }}
+                                                    {{ $fuente['identificador'] }} - {{ Str::limit($fuente['fuente'], 25) }}
                                                 </h4>
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $fuente['estado']['clase'] }} text-white">
                                                     {{ $fuente['estado']['texto'] }}
                                                 </span>
                                             </div>
                                             
-                                            <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-4">{{ $fuente['fuente'] }}</p>
                                             
                                             <div class="space-y-3">
                                                 <div>
