@@ -321,6 +321,10 @@
                             </div>
 
                             <div class="flex justify-end items-center pt-3 border-t border-zinc-200 dark:border-zinc-700 space-x-2">
+                                <a href="{{ route('gestionar-actividad', ['idActividad' => $actividad->id]) }}"
+                                   class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300 text-sm font-medium">
+                                    Gestionar
+                                </a>
                                 <button wire:click="editar({{ $actividad->id }})" 
                                         class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm font-medium">
                                     Editar
