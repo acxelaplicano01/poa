@@ -86,6 +86,8 @@ class GestionarActividad extends Component
     public $showDeleteEmpleadoTareaModal = false;
     public $empleadoTareaToRemove = null;
     public $showPresupuestoModal = false;
+    public $showDeletePresupuestoModal = false;
+    public $presupuestoToDelete = null;
     public $showDeletePlanificacionModal = false;
     public $planificacionToDelete = null;
     
@@ -1127,10 +1129,19 @@ class GestionarActividad extends Component
                 throw new \Exception('No se encontró techo presupuestario para el departamento y fuente de financiamiento seleccionada');
             }
             
+            // Calcular presupuesto ya asignado a esta tarea para esta fuente
+            $presupuestoYaAsignado = Presupuesto::where('idtarea', $this->tareaSeleccionada)
+                ->where('idfuente', $idFuente)
+                ->whereNull('deleted_at')
+                ->sum('total');
+            
+            // Calcular disponible = techo del departamento - presupuesto ya asignado
+            $presupuestoDisponible = $techoDepto->monto - $presupuestoYaAsignado;
+            
             // Verificar que haya suficiente presupuesto disponible
             $presupuestoTotal = $this->nuevoPresupuesto['total'];
-            if ($techoDepto->monto < $presupuestoTotal) {
-                throw new \Exception('Presupuesto insuficiente. Disponible: L ' . number_format($techoDepto->monto, 2) . ', Requerido: L ' . number_format($presupuestoTotal, 2));
+            if ($presupuestoDisponible < $presupuestoTotal) {
+                throw new \Exception('Presupuesto insuficiente. Disponible: L ' . number_format($presupuestoDisponible, 2) . ', Requerido: L ' . number_format($presupuestoTotal, 2));
             }
             
             // Crear el presupuesto (registrar la asignación, sin modificar el techo_depto)
@@ -1188,6 +1199,24 @@ class GestionarActividad extends Component
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Error al eliminar presupuesto: ' . $e->getMessage());
+        }
+    }
+
+    public function openDeletePresupuestoModal($presupuestoId)
+    {
+        $presupuesto = Presupuesto::find($presupuestoId);
+        if ($presupuesto) {
+            $this->presupuestoToDelete = $presupuesto->toArray();
+            $this->showDeletePresupuestoModal = true;
+        }
+    }
+
+    public function confirmDeletePresupuesto()
+    {
+        if ($this->presupuestoToDelete) {
+            $this->deletePresupuesto($this->presupuestoToDelete['id']);
+            $this->showDeletePresupuestoModal = false;
+            $this->presupuestoToDelete = null;
         }
     }
 
