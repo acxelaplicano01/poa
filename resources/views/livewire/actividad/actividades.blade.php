@@ -236,7 +236,7 @@
                                     </svg>
                                 </a>
                                 <button wire:click="editar({{ $actividad->id }})" 
-                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 cursor-pointer"
+                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 cursor-pointer {{ !$puedeCrearActividades ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeCrearActividades"
                                         title="Editar">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                         fill="currentColor">
@@ -247,7 +247,7 @@
                                     </svg>
                                 </button>
                                 <button wire:click="confirmDelete({{ $actividad->id }})" 
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 cursor-pointer"
+                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 cursor-pointer {{ !$puedeCrearActividades ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeCrearActividades"
                                         title="Eliminar">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                         fill="currentColor">

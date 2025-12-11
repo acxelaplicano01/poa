@@ -29,6 +29,7 @@ class GestionarActividad extends Component
     // Actividad
     public $actividadId;
     public $actividad;
+    public $actividadEnFormulacion = false;
     
     // Paso 1: Indicadores
     public $indicadores = [];
@@ -86,6 +87,8 @@ class GestionarActividad extends Component
     public $showDeleteEmpleadoTareaModal = false;
     public $empleadoTareaToRemove = null;
     public $showPresupuestoModal = false;
+    public $showDeletePresupuestoModal = false;
+    public $presupuestoToDelete = null;
     public $showDeletePlanificacionModal = false;
     public $planificacionToDelete = null;
     
@@ -100,6 +103,7 @@ class GestionarActividad extends Component
     public $fuentesFinanciamiento = [];
     public $unidadesMedida = [];
     public $meses = [];
+    public $actividadEnRevision = false;
     public $presupuestoTechoInfo = [
         'techoTotal' => 0,
         'presupuestoAsignado' => 0,
@@ -133,6 +137,9 @@ class GestionarActividad extends Component
         $this->actividadId = $this->idActividad;
         $this->loadActividad();
         $this->loadTrimestres();
+        
+        // Recuperar el paso del asistente desde la sesión
+        $this->currentStep = session()->get('actividad_wizard_step_' . $this->actividadId, 1);
         
         // Asignar automáticamente al usuario actual si no está asignado
         $this->asignarUsuarioActual();
@@ -172,6 +179,9 @@ class GestionarActividad extends Component
             'departamento',
             'poa'
         ])->findOrFail($this->actividadId);
+        
+        // Actualizar si está en estado FORMULACIÓN
+        $this->actividadEnFormulacion = $this->actividad->estado === 'FORMULACION';
         
         $this->loadIndicadores();
         $this->loadTodasPlanificaciones();
@@ -242,6 +252,17 @@ class GestionarActividad extends Component
         $this->trimestres = Trimestre::with('meses')->orderBy('id')->get()->toArray();
     }
 
+    /**
+     * Verifica si la actividad está en estado FORMULACIÓN, si no lanza excepción
+     * @throws \Exception
+     */
+    private function verificarActividadEnRevision()
+    {
+        if ($this->actividad->estado !== 'FORMULACION') {
+            throw new \Exception('Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN.');
+        }
+    }
+
     // ============= PASO 1: INDICADORES =============
     
     public function openIndicadorModal()
@@ -252,6 +273,8 @@ class GestionarActividad extends Component
 
     public function saveIndicador()
     {
+        $this->verificarActividadEnRevision();
+        
         $this->validate([
             'nuevoIndicador.nombre' => 'required|string|max:255',
             'nuevoIndicador.descripcion' => 'required|string',
@@ -323,6 +346,8 @@ class GestionarActividad extends Component
 
     public function openDeleteIndicadorModal($indicadorId)
     {
+        $this->verificarActividadEnRevision();
+        
         $this->indicadorToDelete = Indicador::findOrFail($indicadorId);
         $this->showDeleteIndicadorModal = true;
     }
@@ -335,6 +360,8 @@ class GestionarActividad extends Component
 
     public function confirmDeleteIndicador()
     {
+        $this->verificarActividadEnRevision();
+        
         try {
             if ($this->indicadorToDelete) {
                 $this->indicadorToDelete->delete();
@@ -422,6 +449,8 @@ class GestionarActividad extends Component
 
     public function savePlanificacion()
     {
+        $this->verificarActividadEnRevision();
+        
         $this->validate([
             'nuevaPlanificacion.idIndicador' => 'required|exists:indicadores,id',
             'nuevaPlanificacion.idTrimestre' => 'required|exists:trimestres,id',
@@ -522,6 +551,8 @@ class GestionarActividad extends Component
 
     public function openDeletePlanificacionModal($planificacionId)
     {
+        $this->verificarActividadEnRevision();
+        
         $this->planificacionToDelete = Planificacion::with(['indicador', 'mes.trimestre'])->findOrFail($planificacionId);
         $this->showDeletePlanificacionModal = true;
     }
@@ -534,6 +565,8 @@ class GestionarActividad extends Component
 
     public function confirmDeletePlanificacion()
     {
+        $this->verificarActividadEnRevision();
+        
         try {
             if ($this->planificacionToDelete) {
                 $this->planificacionToDelete->delete();
@@ -569,6 +602,8 @@ class GestionarActividad extends Component
 
     public function assignEmpleado()
     {
+        $this->verificarActividadEnRevision();
+        
         $this->validate([
             'nuevoEmpleado.idEmpleado' => 'required|exists:empleados,id',
             'nuevoEmpleado.descripcion' => 'nullable|string|max:500'
@@ -600,6 +635,8 @@ class GestionarActividad extends Component
 
     public function openDeleteEmpleadoModal($empleadoId)
     {
+        $this->verificarActividadEnRevision();
+        
         $empleado = Empleado::findOrFail($empleadoId);
         $this->empleadoToRemove = [
             'id' => $empleado->id,
@@ -632,6 +669,8 @@ class GestionarActividad extends Component
 
     public function removeEmpleado($empleadoId)
     {
+        $this->verificarActividadEnRevision();
+        
         try {
             $this->actividad->empleados()->detach($empleadoId);
             
@@ -660,6 +699,8 @@ class GestionarActividad extends Component
 
     public function saveTarea()
     {
+        $this->verificarActividadEnRevision();
+        
         $this->validate([
             'nuevaTarea.nombre' => 'required|string|max:255',
             'nuevaTarea.descripcion' => 'required|string'
@@ -738,6 +779,8 @@ class GestionarActividad extends Component
 
     public function openDeleteTareaModal($tareaId)
     {
+        $this->verificarActividadEnRevision();
+        
         $this->tareaToDelete = Tarea::findOrFail($tareaId);
         $this->showDeleteTareaModal = true;
     }
@@ -750,6 +793,8 @@ class GestionarActividad extends Component
 
     public function confirmDeleteTarea()
     {
+        $this->verificarActividadEnRevision();
+        
         try {
             if ($this->tareaToDelete) {
                 $this->tareaToDelete->delete();
@@ -765,6 +810,8 @@ class GestionarActividad extends Component
 
     public function deleteTarea($tareaId)
     {
+        $this->verificarActividadEnRevision();
+        
         // Este método se mantiene para compatibilidad
         $this->openDeleteTareaModal($tareaId);
     }
@@ -807,6 +854,8 @@ class GestionarActividad extends Component
 
     public function asignarEmpleadoATarea($empleadoId)
     {
+        $this->verificarActividadEnRevision();
+        
         try {
             $tarea = Tarea::findOrFail($this->tareaSeleccionada);
             
@@ -838,6 +887,8 @@ class GestionarActividad extends Component
 
     public function openDeleteEmpleadoTareaModal($empleadoId)
     {
+        $this->verificarActividadEnRevision();
+        
         $empleado = Empleado::findOrFail($empleadoId);
         $this->empleadoTareaToRemove = [
             'id' => $empleado->id,
@@ -855,6 +906,8 @@ class GestionarActividad extends Component
 
     public function confirmRemoveEmpleadoDeTarea()
     {
+        $this->verificarActividadEnRevision();
+        
         try {
             if ($this->empleadoTareaToRemove && $this->tareaSeleccionada) {
                 $tarea = Tarea::findOrFail($this->tareaSeleccionada);
@@ -1073,6 +1126,8 @@ class GestionarActividad extends Component
 
     public function savePresupuesto()
     {
+        $this->verificarActividadEnRevision();
+        
         $this->validate([
             'nuevoPresupuesto.idRecurso' => 'required|exists:tareas_historicos,id',
             'nuevoPresupuesto.detalle_tecnico' => 'required|string',
@@ -1127,10 +1182,19 @@ class GestionarActividad extends Component
                 throw new \Exception('No se encontró techo presupuestario para el departamento y fuente de financiamiento seleccionada');
             }
             
+            // Calcular presupuesto ya asignado a esta tarea para esta fuente
+            $presupuestoYaAsignado = Presupuesto::where('idtarea', $this->tareaSeleccionada)
+                ->where('idfuente', $idFuente)
+                ->whereNull('deleted_at')
+                ->sum('total');
+            
+            // Calcular disponible = techo del departamento - presupuesto ya asignado
+            $presupuestoDisponible = $techoDepto->monto - $presupuestoYaAsignado;
+            
             // Verificar que haya suficiente presupuesto disponible
             $presupuestoTotal = $this->nuevoPresupuesto['total'];
-            if ($techoDepto->monto < $presupuestoTotal) {
-                throw new \Exception('Presupuesto insuficiente. Disponible: L ' . number_format($techoDepto->monto, 2) . ', Requerido: L ' . number_format($presupuestoTotal, 2));
+            if ($presupuestoDisponible < $presupuestoTotal) {
+                throw new \Exception('Presupuesto insuficiente. Disponible: L ' . number_format($presupuestoDisponible, 2) . ', Requerido: L ' . number_format($presupuestoTotal, 2));
             }
             
             // Crear el presupuesto (registrar la asignación, sin modificar el techo_depto)
@@ -1166,6 +1230,8 @@ class GestionarActividad extends Component
 
     public function deletePresupuesto($presupuestoId)
     {
+        $this->verificarActividadEnRevision();
+        
         try {
             DB::beginTransaction();
             
@@ -1191,6 +1257,28 @@ class GestionarActividad extends Component
         }
     }
 
+    public function openDeletePresupuestoModal($presupuestoId)
+    {
+        $this->verificarActividadEnRevision();
+        
+        $presupuesto = Presupuesto::find($presupuestoId);
+        if ($presupuesto) {
+            $this->presupuestoToDelete = $presupuesto->toArray();
+            $this->showDeletePresupuestoModal = true;
+        }
+    }
+
+    public function confirmDeletePresupuesto()
+    {
+        $this->verificarActividadEnRevision();
+        
+        if ($this->presupuestoToDelete) {
+            $this->deletePresupuesto($this->presupuestoToDelete['id']);
+            $this->showDeletePresupuestoModal = false;
+            $this->presupuestoToDelete = null;
+        }
+    }
+
     private function resetNuevoPresupuesto()
     {
         $this->nuevoPresupuesto = [
@@ -1211,6 +1299,8 @@ class GestionarActividad extends Component
     {
         if ($this->currentStep < $this->totalSteps) {
             $this->currentStep++;
+            // Guardar el paso en la sesión
+            session()->put('actividad_wizard_step_' . $this->actividadId, $this->currentStep);
         }
     }
 
@@ -1218,6 +1308,8 @@ class GestionarActividad extends Component
     {
         if ($this->currentStep > 1) {
             $this->currentStep--;
+            // Guardar el paso en la sesión
+            session()->put('actividad_wizard_step_' . $this->actividadId, $this->currentStep);
         }
     }
 
@@ -1225,6 +1317,8 @@ class GestionarActividad extends Component
     {
         if ($step >= 1 && $step <= $this->totalSteps) {
             $this->currentStep = $step;
+            // Guardar el paso en la sesión
+            session()->put('actividad_wizard_step_' . $this->actividadId, $this->currentStep);
         }
     }
 
