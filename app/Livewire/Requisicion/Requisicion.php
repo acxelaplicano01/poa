@@ -22,8 +22,8 @@ class Requisicion extends Component
     public $correlativo;
     public $descripcion;
     public $observacion;
-    public $createdBy;
-    public $approvedBy;
+    public $created_by;
+    public $approved_by;
     public $idPoa;
     public $idDepartamento;
     public $idEstado;
@@ -45,8 +45,7 @@ class Requisicion extends Component
         'correlativo' => 'required|min:3',
         'descripcion' => 'required',
         'observacion' => 'nullable',
-        'createdBy' => 'required|exists:users,id',
-        'approvedBy' => 'nullable|exists:users,id',
+        'approved_by' => 'nullable|exists:users,id',
         'idPoa' => 'required|exists:poas,id',
         'fechaSolicitud' => 'required|date',
         'fechaRequerido' => 'required|date',
@@ -56,7 +55,6 @@ class Requisicion extends Component
         'correlativo.required' => 'El correlativo es obligatorio.',
         'correlativo.min' => 'El correlativo debe tener al menos 3 caracteres.',
         'descripcion.required' => 'La descripción es obligatoria.',
-        'createdBy.required' => 'El usuario creador es obligatorio.',
         'idPoa.required' => 'El POA es obligatorio.',
         'fechaSolicitud.required' => 'La fecha de solicitud es obligatoria.',
         'fechaRequerido.required' => 'La fecha requerida es obligatoria.',
@@ -93,8 +91,8 @@ class Requisicion extends Component
         $this->correlativo = '';
         $this->descripcion = '';
         $this->observacion = '';
-        $this->createdBy = Auth::id();
-        $this->approvedBy = null;
+        $this->created_by = Auth::id();
+        $this->approved_by = null;
         $this->idPoa = null;
         $this->idDepartamento = Auth::user()->idDepartamento ?? null;
         $this->idEstado = $this->getEstadoPresentadoId();
@@ -137,15 +135,15 @@ class Requisicion extends Component
                 'correlativo' => $this->correlativo,
                 'descripcion' => $this->descripcion,
                 'observacion' => $this->observacion,
-                'createdBy' => $this->createdBy,
-                'approvedBy' => $this->approvedBy,
+                'created_by' => $this->created_by,
+                'approved_by' => $this->approved_by,
                 'idPoa' => $this->idPoa,
                 'idDepartamento' => $this->idDepartamento,
                 'idEstado' => $this->idEstado,
                 'fechaSolicitud' => $this->fechaSolicitud,
                 'fechaRequerido' => $this->fechaRequerido,
             ];
-            dd($data);
+           // dd($data);
             $requisicion = RequisicionModel::updateOrCreate(
                 ['id' => $this->requisicionId],
                 $data
@@ -177,8 +175,8 @@ class Requisicion extends Component
         $this->correlativo = $requisicion->correlativo;
         $this->descripcion = $requisicion->descripcion;
         $this->observacion = $requisicion->observacion;
-        $this->createdBy = $requisicion->createdBy;
-        $this->approvedBy = $requisicion->approvedBy;
+        $this->created_by = $requisicion->created_by;
+        $this->approved_by = $requisicion->approved_by;
         $this->idPoa = $requisicion->idPoa;
         $this->idDepartamento = $requisicion->idDepartamento;
         $this->idEstado = $requisicion->idEstado;

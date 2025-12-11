@@ -31,8 +31,11 @@ class DatabaseSeeder extends Seeder
         $this->call(UnidadEjecutoraSeeder::class);
         $this->call(FuenteSeeder::class);
         $this->call(DepartamentoSeeder::class);
-        $this->call(MesesSeeder::class);
         $this->call(TrimestresSeeder::class);
+        $this->call(MesesSeeder::class);
+        $this->call(TipoActividadSeeder::class);
+        $this->call(UnidadMedidaSeeder::class);
+        $this->call(CategoriasSeeder::class);
         //$this->call(GrupoGastoSeeder::class);
         //$this->call(ObjetoGastoSeeder::class);
         //$this->call(CubSeeder::class);
