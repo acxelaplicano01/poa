@@ -36,8 +36,9 @@ class DatabaseSeeder extends Seeder
         $this->call(TipoActividadSeeder::class);
         $this->call(UnidadMedidaSeeder::class);
         $this->call(CategoriasSeeder::class);
+        $this->call(CubSeeder::class);
         //$this->call(GrupoGastoSeeder::class);
         //$this->call(ObjetoGastoSeeder::class);
-        //$this->call(CubSeeder::class);
+        
     }
 }

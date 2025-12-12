@@ -189,7 +189,6 @@ return [
                 ->setLabel('Procesos')
                 ->setHeroIcon('cog-8-tooth')
                 ->setItems([
-
                     RkNavigation::make('procesoscompras')
                         ->setParentId('config-procesos')
                         ->setDescription('Gestiona los procesos de compras')
@@ -197,6 +196,14 @@ return [
                         ->setHeroIcon('shopping-bag')
                         ->setItems([])
                         ->setEndBlock('procesoscompras'),
+
+                   /* RkNavigation::make('recursos')
+                        ->setParentId('crear-recursos')
+                        ->setDescription('Crea recursos de compra')
+                        ->setLabel('Recursos')
+                        ->setHeroIcon('shopping-bag')
+                        ->setItems([])
+                        ->setEndBlock('recursos'),*/
 
                     RkNavigation::make('estados-requisicion')
                         ->setParentId('config-procesos')

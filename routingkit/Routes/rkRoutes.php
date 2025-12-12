@@ -505,6 +505,8 @@ return [
                         ->setRoles(['admin_general'])
                         ->setItems([])
                         ->setEndBlock('plazos-poa'),
+
+
                 ])
                 ->setEndBlock('consola'),
 
