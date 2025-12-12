@@ -313,6 +313,19 @@ return [
                         ->setRoles(['admin_general'])
                         ->setItems([])
                         ->setEndBlock('gestionar-actividad'),
+                    
+                        RkRoute::make('revisiones')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceso-planificacion')
+                        ->setPermissions([
+                            'revision.ver',
+                            'revision.gestionar'
+                        ])
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\Revision\Revisiones')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('revisiones'),
 
                     RkRoute::make('requisicion')
                         ->setParentId('planificacion')

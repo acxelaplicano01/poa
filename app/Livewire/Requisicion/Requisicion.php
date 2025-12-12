@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Requisicion extends Component
 {
+    public $detalleRequisiciones = [];
     use WithPagination;
 
     protected string $layout = 'layouts.app';
@@ -31,6 +32,8 @@ class Requisicion extends Component
     public $fechaRequerido;
     public $requisicionId;
     public $search = '';
+    public $busqueda = '';
+    public $estado = 0;
     public $perPage = 10;
     public $sortField = 'id';
     public $sortDirection = 'desc';
@@ -71,6 +74,8 @@ class Requisicion extends Component
         $this->correlativo = is_array($value) ? '' : $value;
     }
 
+    public function buscar() {}
+
     public function sortBy($field)
     {
         if ($this->sortField === $field) {
@@ -82,6 +87,16 @@ class Requisicion extends Component
     }
 
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingBusqueda()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingEstado()
     {
         $this->resetPage();
     }
@@ -183,6 +198,8 @@ class Requisicion extends Component
         $this->fechaSolicitud = $requisicion->fechaSolicitud;
         $this->fechaRequerido = $requisicion->fechaRequerido;
         $this->isEditing = true;
+        // Cargar detalles de la requisición con relaciones
+        $this->detalleRequisiciones = $requisicion->detalleRequisiciones()->with(['recurso', 'presupuesto'])->get();
         $this->openModal();
     }
 
@@ -221,18 +238,29 @@ class Requisicion extends Component
 
     public function render()
     {
-        $requisiciones = RequisicionModel::when($this->search, function ($query) {
-                $query->where('correlativo', 'like', '%' . $this->search . '%')
-                      ->orWhere('descripcion', 'like', '%' . $this->search . '%');
+        $requisiciones = RequisicionModel::with(['departamento', 'estadoRequisicion'])
+            ->when($this->busqueda, function($q) {
+                $q->where('correlativo', 'like', '%'.$this->busqueda.'%')
+                  ->orWhereHas('departamento', fn($q) => $q->where('name', 'like', '%'.$this->busqueda.'%'));
+            })
+            ->when($this->estado, function($q) {
+                if ($this->estado > 0) $q->where('idEstado', $this->estado);
             })
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
 
         $poas = \App\Models\Poa\Poa::activo()->get();
 
+        // Si hay una requisición seleccionada, cargar detalles
+        if ($this->requisicionId) {
+            $requisicion = RequisicionModel::find($this->requisicionId);
+            $this->detalleRequisiciones = $requisicion ? $requisicion->detalleRequisiciones()->with(['recurso', 'presupuesto'])->get() : collect();
+        }
+
         return view('livewire.seguimiento.Requisicion.requisicion', [
             'requisiciones' => $requisiciones,
             'poas' => $poas,
+            'detalleRequisiciones' => $this->detalleRequisiciones,
         ])->layout($this->layout);
     }
 

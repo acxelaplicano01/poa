@@ -55,4 +55,9 @@ class Requisicion extends BaseModel
     {
         return $this->hasMany(EstadoRequisicionLog::class, 'idRequisicion');
     }
+
+    public function detalleRequisiciones()
+    {
+        return $this->hasMany(DetalleRequisicion::class, 'idRequisicion');
+    }
 }

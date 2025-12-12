@@ -49,6 +49,14 @@ return [
                 ])
                 ->setEndBlock('planificar'),
 
+            RkNavigation::make('revisiones')
+                ->setParentId('planificacion')
+                ->setDescription('Gestionar revisiones de actividades')
+                ->setLabel('Revision')
+                ->setHeroIcon('clipboard-document-check')
+                ->setItems([])
+                ->setEndBlock('revisiones'),
+
             RkNavigation::make('requisicion')
                 ->setParentId('planificacion')
                 ->setDescription('Crear o gestionar requisiciones')
