@@ -242,7 +242,7 @@ return [
                             'acceso-configuracion',
                         ])
                         ->setUrlMethod('get')
-                        ->setUrlController('App\Livewire\ProcesCompra\ProcesCompras')
+                        ->setUrlController('App\Livewire\Tarea\TareasHistorico')
                         ->setRoles(['admin_general'])
                         ->setItems([])
                         ->setEndBlock('recursos'),
