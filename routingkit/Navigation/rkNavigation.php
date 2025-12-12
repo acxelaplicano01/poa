@@ -197,14 +197,6 @@ return [
                         ->setItems([])
                         ->setEndBlock('procesoscompras'),
 
-                   /* RkNavigation::make('recursos')
-                        ->setParentId('crear-recursos')
-                        ->setDescription('Crea recursos de compra')
-                        ->setLabel('Recursos')
-                        ->setHeroIcon('shopping-bag')
-                        ->setItems([])
-                        ->setEndBlock('recursos'),*/
-
                     RkNavigation::make('estados-requisicion')
                         ->setParentId('config-procesos')
                         ->setDescription('Gestión de estados de requisición')
@@ -262,6 +254,14 @@ return [
                         ->setEndBlock('trimestres'),
                 ])
                 ->setEndBlock('catalogos-generales'),
+
+            RkNavigation::make('recursos')
+                ->setParentId('configuracion')
+                ->setDescription('Crear o gestionar recursos')
+                ->setLabel('Recursos')
+                ->setHeroIcon('clipboard-document')
+                ->setItems([])
+                ->setEndBlock('recursos'),
         ])
         ->setEndBlock('configuracion'),
 

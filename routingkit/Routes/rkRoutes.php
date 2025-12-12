@@ -231,6 +231,22 @@ return [
                         ->setItems([])
                         ->setEndBlock('procesoscompras'),
 
+                    RkRoute::make('recursos')
+                        ->setParentId('configuracion')
+                        ->setAccessPermission('acceso-configuracion')
+                        ->setPermissions([
+                            'recursos.ver',
+                            'recursos.crear',
+                            'recursos.editar',
+                            'recursos.eliminar',
+                            'acceso-configuracion',
+                        ])
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\ProcesCompra\ProcesCompras')
+                        ->setRoles(['admin_general'])
+                        ->setItems([])
+                        ->setEndBlock('recursos'),
+
                     RkRoute::make('cubs')
                         ->setParentId('configuracion')
                         ->setAccessPermission('acceso-configuracion')
