@@ -324,7 +324,17 @@ return [
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Revision\Revisiones')
                         ->setRoles(['admin_general'])
+                        ->setItems([
+
+                            RkRoute::make('revision-actividades')
+                        ->setParentId('revisiones')
+                        ->setAccessPermission('revision.gestionar')
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\Revision\ActividadesRevision')
+                        ->setRoles(['admin_general'])
                         ->setItems([])
+                        ->setEndBlock('revision-actividades'),
+                        ])
                         ->setEndBlock('revisiones'),
 
                     RkRoute::make('requisicion')

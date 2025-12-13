@@ -54,7 +54,14 @@ return [
                 ->setDescription('Gestionar revisiones de actividades')
                 ->setLabel('Revision')
                 ->setHeroIcon('clipboard-document-check')
-                ->setItems([])
+                ->setItems([
+                    RkNavigation::make('revision-actividades')
+                                ->setParentId('revisiones')
+                                ->setDescription('Revisión de actividades')
+                                ->setLabel('Gestionar Actividad')
+                                ->setHeroIcon('square-3-stack-3d')
+                                ->setEndBlock('revision-actividades')
+                ])
                 ->setEndBlock('revisiones'),
 
             RkNavigation::make('requisicion')

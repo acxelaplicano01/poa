@@ -21,6 +21,13 @@
 							</svg>
 						</div>
 					</div>
+					<div class="w-full sm:w-auto min-w-[150px] max-w-xs">
+						<select wire:model.live="poaYear" class="block w-full min-w-[180px] max-w-xs rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 text-sm py-2 px-3">
+							@foreach($poaYears as $year)
+								<option value="{{ $year }}">POA {{ $year }}</option>
+							@endforeach
+						</select>
+					</div>
 					<div class="w-full sm:w-auto">
 						<x-select 
 							id="perPage" 
@@ -52,7 +59,23 @@
 					@forelse ($revisiones as $rev)
 						<tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
 							<td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-								{{ $rev->name ?? '-' }}
+								<div class="flex items-center">
+									<div class="flex-shrink-0 h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mr-3">
+										<svg class="h-4 w-4 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h6m-6 4h6m-6 4h6" />
+										</svg>
+									</div>
+									<div>
+										<div class="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+											{{ $rev->name ?? '-' }}
+										</div>
+										@if(!empty($rev->siglas))
+											<div class="text-xs text-zinc-500 dark:text-zinc-400">
+												{{ $rev->siglas }}
+											</div>
+										@endif
+									</div>
+								</div>
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap">
 								<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300">
@@ -60,7 +83,7 @@
 								</span>
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-								<button wire:click="verActividades({{ $rev->departamento->id }})"
+								<button wire:click="verActividades({{ $rev->id }})"
 									class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-700 active:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
 									Ver Actividades
 								</button>
