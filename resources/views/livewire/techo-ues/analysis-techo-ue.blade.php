@@ -113,16 +113,17 @@
                         <thead class="bg-zinc-50 dark:bg-zinc-700">
                             <tr>
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Fuente</th>
-                                <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">General</th>
-                                <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">%</th>
-                                <th class="px-4 sm:px-6 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Barra</th>
+                                <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Presupuesto General</th>
+                                <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Asignado</th>
+                                <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Planificado</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                             @forelse($techos as $techo)
                                 @php
-                                    $percentage = $presupuestoGeneral > 0 ? ($techo['monto'] / $presupuestoGeneral) * 100 : 0;
                                     $fuente = $techo['fuente']['identificador'] . ' - ' . $techo['fuente']['nombre'] ?? 'Sin fuente';
+                                    $asignado = $techo['presupuestoAsignado'] ?? 0;
+                                    $planificado = $techo['presupuestoPlanificado'] ?? 0;
                                 @endphp
                                 <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700/50">
                                     <td class="px-4 sm:px-6 py-3 text-sm font-medium text-zinc-900 dark:text-zinc-100">
@@ -131,15 +132,22 @@
                                     <td class="px-4 sm:px-6 py-3 text-sm text-right font-semibold text-zinc-900 dark:text-zinc-100">
                                         L. {{ number_format($techo['monto'], 2) }}
                                     </td>
-                                    <td class="px-4 sm:px-6 py-3 text-sm text-right text-zinc-600 dark:text-zinc-400">
-                                        {{ number_format($percentage, 1) }}%
+                                    <td class="px-4 sm:px-6 py-3 text-sm text-right">
+                                        <span class="text-green-600 dark:text-green-400 font-semibold">L. {{ number_format($asignado, 2) }}</span>
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                                            @php
+                                                $porcentajeAsignado = $techo['monto'] > 0 ? ($asignado / $techo['monto']) * 100 : 0;
+                                            @endphp
+                                            {{ number_format($porcentajeAsignado, 1) }}%
+                                        </div>
                                     </td>
-                                    <td class="px-4 sm:px-6 py-3 text-center">
-                                        <div class="flex items-center justify-center gap-2">
-                                            <div class="w-16 sm:w-24 bg-zinc-200 dark:bg-zinc-600 rounded-full h-2">
-                                                <div class="bg-indigo-600 dark:bg-indigo-500 h-2 rounded-full transition-all duration-300" 
-                                                     style="width: {{ $percentage }}%"></div>
-                                            </div>
+                                    <td class="px-4 sm:px-6 py-3 text-sm text-right">
+                                        <span class="text-amber-600 dark:text-amber-400 font-semibold">L. {{ number_format($planificado, 2) }}</span>
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                                            @php
+                                                $porcentajePlanificado = $techo['monto'] > 0 ? ($planificado / $techo['monto']) * 100 : 0;
+                                            @endphp
+                                            {{ number_format($porcentajePlanificado, 1) }}%
                                         </div>
                                     </td>
                                 </tr>
@@ -156,13 +164,13 @@
             </div>
         </div>
 
-        <!-- Indicadores de Ejecución -->
+        <!-- Indicadores de Ejecución 
         <div>
             <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">Indicadores de Ejecución</h3>
             
             <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 sm:p-6">
                 <div class="space-y-5">
-                    <!-- Indicador 1: General vs Ejecutado -->
+                    <!-- Indicador 1: General vs Ejecutado 
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
@@ -180,7 +188,7 @@
                         </div>
                     </div>
 
-                    <!-- Indicador 2: Planificado vs Ejecutado -->
+                    <!-- Indicador 2: Planificado vs Ejecutado 
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
@@ -198,7 +206,7 @@
                         </div>
                     </div>
 
-                    <!-- Indicador 3: Requerido vs Ejecutado -->
+                    <!-- Indicador 3: Requerido vs Ejecutado 
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
@@ -217,7 +225,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>-->
     </div>
 
     <!-- Nota informativa -->

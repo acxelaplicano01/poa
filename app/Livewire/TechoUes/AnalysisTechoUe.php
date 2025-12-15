@@ -23,6 +23,7 @@ class AnalysisTechoUe extends Component
     public $presupuestoPlanificado = 0;
     public $presupuestoRequerido = 0;
     public $presupuestoEjecutado = 0;
+    public $presupuestosPorFuente = [];
 
     public function mount($idPoa = null, $idUE = null)
     {
@@ -74,6 +75,37 @@ class AnalysisTechoUe extends Component
                   ->where('idPoa', $this->idPoa);
         })->sum('total');
 
+        // Calcular presupuestos por fuente
+        foreach ($this->techos as &$techo) {
+            $techoId = $techo['id'] ?? null;
+            
+            if ($techoId) {
+                // Presupuesto Asignado por Fuente
+                // Se calcula sumando todos los techos_deptos que pertenecen a este techoUE
+                $asignado = TechoDepto::where('idUE', $this->idUE)
+                    ->where('idPoa', $this->idPoa)
+                    ->where('idTechoUE', $techoId)
+                    ->sum('monto');
+                
+                // Presupuesto Planificado por Fuente
+                // Se calcula sumando presupuestos donde la tarea está asociada a esta fuente
+                $fuenteId = $techo['idFuente'] ?? null;
+                $planificado = 0;
+                if ($fuenteId) {
+                    $planificado = Presupuesto::whereHas('tarea', function ($query) {
+                        $query->where('idUE', $this->idUE)
+                              ->where('idPoa', $this->idPoa);
+                    })->where('idFuente', $fuenteId)
+                      ->sum('total');
+                }
+                
+                $techo['presupuestoAsignado'] = $asignado;
+                $techo['presupuestoPlanificado'] = $planificado;
+                $techo['presupuestoRequerido'] = 0;
+                $techo['presupuestoEjecutado'] = 0;
+            }
+        }
+        
         // Los otros dos valores (requerido y ejecutado) se pueden agregar cuando haya 
         // datos reales en las tablas de requisiciones y ejecuciones presupuestarias
     }
@@ -89,6 +121,7 @@ class AnalysisTechoUe extends Component
             'presupuestoPlanificado' => $this->presupuestoPlanificado,
             'presupuestoRequerido' => $this->presupuestoRequerido,
             'presupuestoEjecutado' => $this->presupuestoEjecutado,
+            'presupuestosPorFuente' => $this->presupuestosPorFuente,
         ]);
     }
 }
