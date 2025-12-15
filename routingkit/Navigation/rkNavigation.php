@@ -323,6 +323,13 @@ return [
                                 ->setEndBlock('plazos-poa'),
                                 ])
                                 ->setEndBlock('techonacional'),
+
+                            RkNavigation::make('analysis-techo-ue')
+                                ->setDescription('Análisis detallado de techo UE')
+                                ->setLabel('Análisis techo UE')
+                                ->setHeroIcon('chart-bar')
+                                ->setItems([])
+                                ->setEndBlock('analysis-techo-ue'),
                 ])
                 ->setEndBlock('asignacionnacionalpresupuestaria'),
 

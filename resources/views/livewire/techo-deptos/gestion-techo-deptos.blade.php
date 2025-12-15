@@ -443,7 +443,7 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                                 <div class="flex justify-center space-x-2">
                                                     <button wire:click="editDepartment({{ $departamentoId }})"
-                                                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer">
+                                                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                             fill="currentColor">
                                                             <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
@@ -453,7 +453,7 @@
                                                         </svg>
                                                     </button>
                                                     <button wire:click="confirmDeleteDepartment({{ $departamentoId }})"
-                                                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 cursor-pointer">
+                                                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 cursor-pointer {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                             fill="currentColor">
                                                             <path fill-rule="evenodd"
@@ -519,7 +519,7 @@
                                             
                                             <div class="flex space-x-2">
                                                 <button wire:click="editDepartment({{ $departamentoId }})"
-                                                    class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded  bg-yellow-400 hover:bg-yellow-500  transition-colors duration-150">
+                                                    class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded  bg-yellow-400 hover:bg-yellow-500  transition-colors duration-150 {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                                                     <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                     </svg>
@@ -528,7 +528,7 @@
                                                  
 
                                                 <button wire:click="confirmDeleteDepartment({{ $departamentoId }})"
-                                                    class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-md transition-colors"
+                                                    class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-md transition-colors {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto"
                                                     title="Eliminar">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                         fill="currentColor">

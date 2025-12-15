@@ -692,8 +692,15 @@
                                                             </div>
                                                         </td>
                                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                                            <button wire:click="viewAnalysis({{ $idUe }})"
+                                                                class="text-emerald-600 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300 cursor-pointer" title="Ver análisis presupuestario">
+                                                                <svg class="w-5 h-5 text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6.025A7.5 7.5 0 1 0 17.975 14H10V6.025Z"/>
+                                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 3c-.169 0-.334.014-.5.025V11h7.975c.011-.166.025-.331.025-.5A7.5 7.5 0 0 0 13.5 3Z"/>
+                                                                </svg>
+                                                            </button>
                                                             <button wire:click="edit({{ $idUe }})"
-                                                                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer">
+                                                                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                                     <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
                                                                     <path fill-rule="evenodd"
@@ -702,7 +709,7 @@
                                                                 </svg>
                                                             </button>
                                                             <button wire:click="eliminarTodosLosTechos({{ $idUe }})"
-                                                                class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 cursor-pointer">
+                                                                class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 cursor-pointer {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                                     <path fill-rule="evenodd"
                                                                         d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"

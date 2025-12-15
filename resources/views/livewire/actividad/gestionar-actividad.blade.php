@@ -23,30 +23,41 @@
                 </div>
             </div>
 
-            <!-- Stepper -->
+            <!-- Stepper Horizontal -->
             <div class="mb-8">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
                     @for ($i = 1; $i <= $totalSteps; $i++)
-                        <div class="flex-1 {{ $i < $totalSteps ? 'mr-2' : '' }}">
-                            <div class="flex items-center">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-full {{ $currentStep >= $i ? 'bg-indigo-600 text-white' : 'bg-zinc-300 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400' }} font-semibold cursor-pointer"
-                                     wire:click="goToStep({{ $i }})">
+                        @php
+                            $isCompleted = $currentStep > $i;
+                            $isActive = $currentStep == $i;
+                            $stepLabel = $i == 1 ? 'Indicadores' : ($i == 2 ? 'Planificaciones' : ($i == 3 ? 'Empleados' : ($i == 4 ? 'Tareas' : 'Confirmación')));
+                        @endphp
+                        
+                        <!-- Paso -->
+                        <button type="button"
+                                wire:click="goToStep({{ $i }})"
+                                class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap
+                                        {{ $isActive 
+                                            ? 'bg-indigo-600 text-white shadow-md' 
+                                            : ($isCompleted
+                                                ? 'bg-indigo-600 text-white'
+                                                : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-300 dark:hover:bg-zinc-600') }}">
+                            <div class="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold
+                                        {{ $isActive || $isCompleted ? 'bg-white/20' : 'bg-white/30' }}">
+                                @if ($isCompleted)
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd" />
+                                    </svg>
+                                @else
                                     {{ $i }}
-                                </div>
-                                <div class="flex-1 ml-2">
-                                    <p class="text-sm font-medium {{ $currentStep >= $i ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-500 dark:text-zinc-400' }}">
-                                        @if ($i == 1) Indicadores
-                                        @elseif ($i == 2) Planificaciones
-                                        @elseif ($i == 3) Empleados
-                                        @elseif ($i == 4) Tareas
-                                        @else Confirmación
-                                        @endif
-                                    </p>
-                                </div>
+                                @endif
                             </div>
-                        </div>
+                            <span class="hidden sm:inline">{{ $stepLabel }}</span>
+                        </button>
+
+                        <!-- Conectador -->
                         @if ($i < $totalSteps)
-                            <div class="w-8 h-1 {{ $currentStep > $i ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700' }}"></div>
+                            <div class="flex-1 h-1 {{ $currentStep > $i ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700' }} transition-colors duration-200"></div>
                         @endif
                     @endfor
                 </div>
@@ -102,11 +113,11 @@
                             </svg>
                         </x-button>
                     @else
-                        <x-button wire:click="enviarARevision" class="bg-green-600 hover:bg-green-700">
+                        <x-button wire:click="enviarARevision" class="bg-green-600 hover:bg-green-700 {{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Enviar a Revisión
+                            {{ !$actividadEnFormulacion ? 'No Editable' : 'Enviar a Revisión' }}
                         </x-button>
                     @endif
                 </div>
@@ -362,9 +373,8 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <button wire:click="removerEmpleadoDeTarea({{ $empleado['id'] }})"
-                                            onclick="return confirm('¿Remover este empleado de la tarea?')"
-                                            class="text-red-600 hover:text-red-800 dark:text-red-400 text-sm">
+                                    <button wire:click="openDeleteEmpleadoTareaModal({{ $empleado['id'] }})"
+                                            class="text-red-600 hover:text-red-800 dark:text-red-400 text-sm {{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion">
                                         Quitar
                                     </button>
                                 </div>
@@ -396,7 +406,7 @@
                                         </div>
                                     </div>
                                     <button wire:click="asignarEmpleadoATarea({{ $empleado['id'] }})"
-                                            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 text-sm font-medium">
+                                            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 text-sm font-medium {{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion">
                                         Asignar
                                     </button>
                                 </div>
@@ -432,13 +442,59 @@
 
         <x-slot name="content">
             <div class="space-y-6">
+                <!-- Información del Techo del Departamento -->
+                @if($presupuestoTechoInfo['techoTotal'] > 0 || $presupuestoTechoInfo['presupuestoDisponible'] >= 0)
+                    <div class="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-200 dark:border-indigo-700 p-4 rounded-lg">
+                        <h4 class="text-sm font-semibold text-indigo-900 dark:text-indigo-100 mb-3">Información de Presupuesto - Departamento: {{ $presupuestoTechoInfo['departamentoNombre'] }} | Fuente: {{ $presupuestoTechoInfo['fuenteNombre'] }}</h4>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <p class="text-xs text-indigo-600 dark:text-indigo-400 font-medium">Techo Total</p>
+                                <p class="text-lg font-bold text-indigo-900 dark:text-indigo-100">L {{ number_format($presupuestoTechoInfo['techoTotal'], 2) }}</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-orange-600 dark:text-orange-400 font-medium">Asignado</p>
+                                <p class="text-lg font-bold text-orange-900 dark:text-orange-100">L {{ number_format($presupuestoTechoInfo['presupuestoAsignado'], 2) }}</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-green-600 dark:text-green-400 font-medium">Disponible</p>
+                                <p class="text-lg font-bold text-green-900 dark:text-green-100">L {{ number_format($presupuestoTechoInfo['presupuestoDisponible'], 2) }}</p>
+                            </div>
+                        </div>
+                        @if($presupuestoTechoInfo['presupuestoDisponible'] <= 0)
+                            <div class="mt-3 p-2 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded text-sm text-red-700 dark:text-red-300">
+                                ⚠️ Presupuesto insuficiente. No hay fondos disponibles en el techo del departamento.
+                            </div>
+                        @endif
+                        <!-- Mensajes de éxito/error -->
+                    </div>
+                @else
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 p-4 rounded-lg">
+                        <p class="text-sm text-yellow-800 dark:text-yellow-300">
+                            ⚠️ No hay techo presupuestario asignado a este departamento. Solicita al administrador que asigne un presupuesto al departamento antes de crear presupuestos para tareas.
+                        </p>
+                    </div>
+                @endif
+                @if (session()->has('message'))
+                    <div
+                        class="mb-4 bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-700 text-green-800 dark:text-green-300 px-4 py-3 rounded">
+                        {{ session('message') }}
+                    </div>
+                @endif
+                
+                @if (session()->has('error'))
+                    <div
+                        class="mb-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-800 dark:text-red-300 px-4 py-3 rounded">
+                        {{ session('error') }}
+                    </div>
+                @endif
+                
                 <!-- Formulario para agregar presupuesto -->
                 <div class="bg-zinc-50 dark:bg-zinc-700 p-4 rounded-lg space-y-4">
                     <h4 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Agregar Recurso</h4>
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <x-label for="recursoPresupuesto" value="Recurso (CUB)" />
+                            <x-label for="recursoPresupuesto" value="Recurso" />
                             <select id="recursoPresupuesto" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 text-sm" wire:model="nuevoPresupuesto.idRecurso">
                                 <option value="">Seleccione un recurso</option>
                                 @foreach($recursosDisponibles as $recurso)
@@ -450,7 +506,7 @@
 
                         <div>
                             <x-label for="fuentePresupuesto" value="Fuente de Financiamiento" />
-                            <select id="fuentePresupuesto" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 text-sm" wire:model="nuevoPresupuesto.idfuente">
+                            <select id="fuentePresupuesto" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 text-sm" wire:model.live="nuevoPresupuesto.idfuente">
                                 <option value="">Seleccione una fuente</option>
                                 @foreach($fuentesFinanciamiento as $fuente)
                                     <option value="{{ $fuente['id'] }}">{{ $fuente['nombre'] }}</option>
@@ -479,7 +535,7 @@
                         </div>
 
                         <div>
-                            <x-label for="costoUnitario" value="Costo Unitario ($)" />
+                            <x-label for="costoUnitario" value="Costo Unitario (L)" />
                             <x-input id="costoUnitario" type="number" step="0.01" min="0" class="mt-1 block w-full text-sm" wire:model.live="nuevoPresupuesto.costounitario" />
                             @error('nuevoPresupuesto.costounitario') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
@@ -495,7 +551,7 @@
                             <select id="mesEjecucion" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 text-sm" wire:model="nuevoPresupuesto.idMes">
                                 <option value="">Seleccione</option>
                                 @foreach($meses as $mes)
-                                    <option value="{{ $mes['id'] }}">Mes {{ $mes['mes'] }}</option>
+                                    <option value="{{ $mes['id'] }}">{{ $mes['mes'] }}</option>
                                 @endforeach
                             </select>
                             @error('nuevoPresupuesto.idMes') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -505,13 +561,13 @@
                     <div class="flex items-center justify-between p-3 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-600">
                         <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Total:</span>
                         <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400">
-                            ${{ number_format($nuevoPresupuesto['total'], 2) }}
+                            L {{ number_format($nuevoPresupuesto['total'], 2) }}
                         </span>
                     </div>
 
                     <div class="flex justify-end">
-                        <x-button wire:click="savePresupuesto">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <x-button wire:click="savePresupuesto" class="{{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion">
+                            <svg class="w-4 h-4 mr-2"  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             Agregar Recurso
@@ -553,18 +609,17 @@
                                                 {{ $presupuesto['cantidad'] }} {{ $presupuesto['unidad_medida']['nombre'] ?? '' }}
                                             </td>
                                             <td class="px-3 py-2 text-xs text-right text-zinc-900 dark:text-zinc-100">
-                                                ${{ number_format($presupuesto['costounitario'], 2) }}
+                                                L {{ number_format($presupuesto['costounitario'], 2) }}
                                             </td>
                                             <td class="px-3 py-2 text-xs text-center text-zinc-900 dark:text-zinc-100">
                                                 {{ $presupuesto['mes']['mes'] ?? 'N/A' }}
                                             </td>
                                             <td class="px-3 py-2 text-xs text-right font-semibold text-indigo-600 dark:text-indigo-400">
-                                                ${{ number_format($presupuesto['total'], 2) }}
+                                                L {{ number_format($presupuesto['total'], 2) }}
                                             </td>
                                             <td class="px-3 py-2 text-center">
-                                                <button wire:click="deletePresupuesto({{ $presupuesto['id'] }})"
-                                                        onclick="return confirm('¿Eliminar este recurso?')"
-                                                        class="text-red-600 hover:text-red-800 dark:text-red-400">
+                                                <button wire:click="openDeletePresupuestoModal({{ $presupuesto['id'] }})"
+                                                        class="text-red-600 hover:text-red-800 dark:text-red-400 {{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
@@ -579,7 +634,7 @@
                                             Total Presupuestado:
                                         </td>
                                         <td class="px-3 py-2 text-right text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                                            ${{ number_format(collect($presupuestosTarea)->sum('total'), 2) }}
+                                            L {{ number_format(collect($presupuestosTarea)->sum('total'), 2) }}
                                         </td>
                                         <td></td>
                                     </tr>
@@ -601,5 +656,9 @@
             </x-secondary-button>
         </x-slot>
     </x-dialog-modal>
+
+    <!-- Modal Eliminar Presupuesto -->
+    @include('livewire.actividad.delete-presupuesto-modal')
+    @include('livewire.actividad.delete-empleado-tarea-modal')
 
 </div>

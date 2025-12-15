@@ -228,15 +228,16 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                 <a href="{{ route('gestionar-actividad', ['idActividad' => $actividad->id]) }}"
-                                   class="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300 cursor-pointer"
+                                   class="inline-flex items-center text-white dark:hover:bg-green-500 hover:bg-green-700 rounded cursor-pointer p-1.5 bg-green-600"
                                    title="Gestionar">
+                                   Gestionar
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
                                     </svg>
                                 </a>
                                 <button wire:click="editar({{ $actividad->id }})" 
-                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 cursor-pointer"
+                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 cursor-pointer {{ !$puedeCrearActividades ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeCrearActividades"
                                         title="Editar">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                         fill="currentColor">
@@ -247,7 +248,7 @@
                                     </svg>
                                 </button>
                                 <button wire:click="confirmDelete({{ $actividad->id }})" 
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 cursor-pointer"
+                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 cursor-pointer {{ !$puedeCrearActividades ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeCrearActividades"
                                         title="Eliminar">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                         fill="currentColor">
@@ -321,6 +322,10 @@
                             </div>
 
                             <div class="flex justify-end items-center pt-3 border-t border-zinc-200 dark:border-zinc-700 space-x-2">
+                                <a href="{{ route('gestionar-actividad', ['idActividad' => $actividad->id]) }}"
+                                   class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300 text-sm font-medium">
+                                    Gestionar
+                                </a>
                                 <button wire:click="editar({{ $actividad->id }})" 
                                         class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm font-medium">
                                     Editar
@@ -397,14 +402,13 @@
                                         <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-6 hover:shadow-lg transition-shadow duration-200">
                                             <div class="flex items-center justify-between mb-4">
                                                 <h4 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                                                    {{ $fuente['identificador'] }}
+                                                    {{ $fuente['identificador'] }} - {{ Str::limit($fuente['fuente'], 25) }}
                                                 </h4>
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $fuente['estado']['clase'] }} text-white">
                                                     {{ $fuente['estado']['texto'] }}
                                                 </span>
                                             </div>
                                             
-                                            <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-4">{{ $fuente['fuente'] }}</p>
                                             
                                             <div class="space-y-3">
                                                 <div>

@@ -95,7 +95,7 @@
                                     {{ $plan['indicador']['nombre'] ?? 'N/A' }}
                                 </td>
                                 <td class="px-4 py-2 text-sm text-center text-zinc-900 dark:text-zinc-100">
-                                    Trimestre {{ $plan['mes']['trimestre']['trimestre'] ?? ($plan['trimestre']['trimestre'] ?? 'N/A') }}
+                                    {{ $plan['mes']['trimestre']['trimestre'] ?? ($plan['trimestre']['trimestre'] ?? 'N/A') }}
                                 </td>
                                 <td class="px-4 py-2 text-sm text-center font-semibold text-green-600 dark:text-green-400">
                                     {{ $plan['cantidad'] }}
@@ -130,10 +130,10 @@
                 @foreach($empleadosAsignados as $empleado)
                     <div class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
                         <p class="font-medium text-sm text-zinc-900 dark:text-zinc-100">
-                            {{ $empleado['user']['name'] ?? $empleado['nombre'] ?? 'Sin nombre' }}
+                            {{ $empleado['nombre'] . ' ' . $empleado['apellido'] ?? $empleado['user']['name'] ?? 'Sin nombre' }}
                         </p>
                         <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                            {{ $empleado['cargo'] ?? 'Sin cargo' }}
+                            {{ $empleado['num_empleado'] ?? 'Empleado' }}
                         </p>
                     </div>
                 @endforeach
