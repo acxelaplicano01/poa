@@ -23,30 +23,41 @@
                 </div>
             </div>
 
-            <!-- Stepper -->
+            <!-- Stepper Horizontal -->
             <div class="mb-8">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
                     @for ($i = 1; $i <= $totalSteps; $i++)
-                        <div class="flex-1 {{ $i < $totalSteps ? 'mr-2' : '' }}">
-                            <div class="flex items-center">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-full {{ $currentStep >= $i ? 'bg-indigo-600 text-white' : 'bg-zinc-300 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400' }} font-semibold cursor-pointer"
-                                     wire:click="goToStep({{ $i }})">
+                        @php
+                            $isCompleted = $currentStep > $i;
+                            $isActive = $currentStep == $i;
+                            $stepLabel = $i == 1 ? 'Indicadores' : ($i == 2 ? 'Planificaciones' : ($i == 3 ? 'Empleados' : ($i == 4 ? 'Tareas' : 'Confirmación')));
+                        @endphp
+                        
+                        <!-- Paso -->
+                        <button type="button"
+                                wire:click="goToStep({{ $i }})"
+                                class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap
+                                        {{ $isActive 
+                                            ? 'bg-indigo-600 text-white shadow-md' 
+                                            : ($isCompleted
+                                                ? 'bg-indigo-600 text-white'
+                                                : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-300 dark:hover:bg-zinc-600') }}">
+                            <div class="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold
+                                        {{ $isActive || $isCompleted ? 'bg-white/20' : 'bg-white/30' }}">
+                                @if ($isCompleted)
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd" />
+                                    </svg>
+                                @else
                                     {{ $i }}
-                                </div>
-                                <div class="flex-1 ml-2">
-                                    <p class="text-sm font-medium {{ $currentStep >= $i ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-500 dark:text-zinc-400' }}">
-                                        @if ($i == 1) Indicadores
-                                        @elseif ($i == 2) Planificaciones
-                                        @elseif ($i == 3) Empleados
-                                        @elseif ($i == 4) Tareas
-                                        @else Confirmación
-                                        @endif
-                                    </p>
-                                </div>
+                                @endif
                             </div>
-                        </div>
+                            <span class="hidden sm:inline">{{ $stepLabel }}</span>
+                        </button>
+
+                        <!-- Conectador -->
                         @if ($i < $totalSteps)
-                            <div class="w-8 h-1 {{ $currentStep > $i ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700' }}"></div>
+                            <div class="flex-1 h-1 {{ $currentStep > $i ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700' }} transition-colors duration-200"></div>
                         @endif
                     @endfor
                 </div>
@@ -179,8 +190,8 @@
                         <option value="">Seleccione un indicador</option>
                         @foreach($indicadores as $indicador)
                             @php
-    $totalPlanificado = collect($indicador['planificacions'] ?? [])->sum('cantidad');
-    $disponible = $indicador['cantidadPlanificada'] - $totalPlanificado;
+                                $totalPlanificado = collect($indicador['planificacions'] ?? [])->sum('cantidad');
+                                $disponible = $indicador['cantidadPlanificada'] - $totalPlanificado;
                             @endphp
                             <option value="{{ $indicador['id'] }}">
                                 {{ $indicador['nombre'] }} (Disponible: {{ $disponible }} de {{ $indicador['cantidadPlanificada'] }})
@@ -191,11 +202,11 @@
                     
                     @if($nuevaPlanificacion['idIndicador'])
                         @php
-    $indicadorSeleccionado = collect($indicadores)->firstWhere('id', $nuevaPlanificacion['idIndicador']);
-    if ($indicadorSeleccionado) {
-        $totalPlanificado = collect($indicadorSeleccionado['planificacions'] ?? [])->sum('cantidad');
-        $disponible = $indicadorSeleccionado['cantidadPlanificada'] - $totalPlanificado;
-    }
+                            $indicadorSeleccionado = collect($indicadores)->firstWhere('id', $nuevaPlanificacion['idIndicador']);
+                            if ($indicadorSeleccionado) {
+                                $totalPlanificado = collect($indicadorSeleccionado['planificacions'] ?? [])->sum('cantidad');
+                                $disponible = $indicadorSeleccionado['cantidadPlanificada'] - $totalPlanificado;
+                            }
                         @endphp
                         @if(isset($disponible))
                             <p class="mt-1 text-sm {{ $disponible > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400' }}">
