@@ -2,7 +2,7 @@
     'wire:model' => 'showErrorModal',
     'title' => 'Error',
     'message' => '',
-    'closeMethod' => 'hideError'
+    'closeMethod' => 'closeErrorModal'
 ])
 
 <!-- Modal de Error -->

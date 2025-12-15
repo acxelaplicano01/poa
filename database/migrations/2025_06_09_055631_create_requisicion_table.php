@@ -14,7 +14,6 @@ return new class extends Migration {
                 $table->text('descripcion');
                 $table->text('observacion');
 
-                $table->foreignId('createdBy')->constrained('users');
                 $table->foreignId('approvedBy')->nullable()->constrained('users');
 
                 $table->foreignId('idPoa')->constrained('poas');
@@ -24,7 +23,11 @@ return new class extends Migration {
                 $table->dateTime('fechaSolicitud')->default(DB::raw('CURRENT_TIMESTAMP'));
                 $table->date('fechaRequerido');
 
-                
+                // Auditoría
+                $table->foreignId('created_by')->nullable()->constrained('users');
+                $table->foreignId('updated_by')->nullable()->constrained('users');
+                $table->foreignId('deleted_by')->nullable()->constrained('users');
+
                 $table->softDeletes(); 
                 $table->timestamps();
             });

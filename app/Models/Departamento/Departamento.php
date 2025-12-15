@@ -4,6 +4,7 @@ namespace App\Models\Departamento;
 use App\Models\BaseModel;
 use App\Models\Empleados\Empleado;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
+use App\Models\Actividad\Actividad;
 
 class Departamento extends BaseModel
 {
@@ -29,5 +30,11 @@ class Departamento extends BaseModel
         return $this->belongsToMany(Empleado::class, 'empleado_deptos', 'idDepto', 'idEmpleado')
                     ->withTimestamps()
                     ->withPivot(['created_by', 'updated_by', 'deleted_by']);
+    }
+
+    // Relación con actividades (para revisiones)
+    public function actividades()
+    {
+        return $this->hasMany(\App\Models\Actividad\Actividad::class, 'idDeptartamento');
     }
 }

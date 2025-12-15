@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models\ProcesoCompras;
+use App\Models\Empleado\Empleado;
 use App\Models\BaseModel;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 
@@ -11,7 +12,9 @@ class ProcesoCompra extends BaseModel
     protected $fillable = [
         'nombre_proceso',
         'idUE',
-        // Los campos de auditoría ya están en BaseModel
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
     // Relación con Unidad Ejecutora
@@ -19,4 +22,5 @@ class ProcesoCompra extends BaseModel
     {
         return $this->belongsTo(UnidadEjecutora::class, 'idUE');
     }
+
 }

@@ -16,6 +16,7 @@ class ObjetoGastoSeeder extends Seeder
                 'nombre' => "Sueldos Básicos",
                 'identificador' => 11100,
                 'idgrupo' => 1,
+                'descripcion' => 'Sueldos básicos para personal',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -23,6 +24,7 @@ class ObjetoGastoSeeder extends Seeder
                 'nombre' => "Sueldos Básicos Educación",
                 'identificador' => 11200,
                 'idgrupo' => 1,
+                'descripcion' => 'Sueldos básicos para personal de educación',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -30,6 +32,7 @@ class ObjetoGastoSeeder extends Seeder
                 'nombre' => "Sueldos Básicos Docentes",
                 'identificador' => 11210,
                 'idgrupo' => 1,
+                'descripcion' => 'Sueldos básicos para docentes',
                 'created_at' => now(),
                 'updated_at' => now()
             ],

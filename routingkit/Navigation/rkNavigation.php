@@ -49,13 +49,28 @@ return [
                 ])
                 ->setEndBlock('planificar'),
 
-            RkNavigation::make('requerir')
+            RkNavigation::make('revisiones')
                 ->setParentId('planificacion')
-                ->setDescription('Crear o gestionar requerimientos')
-                ->setLabel('Requerir')
+                ->setDescription('Gestionar revisiones de actividades')
+                ->setLabel('Revision')
+                ->setHeroIcon('clipboard-document-check')
+                ->setItems([
+                    RkNavigation::make('revision-actividades')
+                                ->setParentId('revisiones')
+                                ->setDescription('Revisión de actividades')
+                                ->setLabel('Gestionar Actividad')
+                                ->setHeroIcon('square-3-stack-3d')
+                                ->setEndBlock('revision-actividades')
+                ])
+                ->setEndBlock('revisiones'),
+
+            RkNavigation::make('requisicion')
+                ->setParentId('planificacion')
+                ->setDescription('Crear o gestionar requisiciones')
+                ->setLabel('Requisicion')
                 ->setHeroIcon('clipboard-document')
                 ->setItems([])
-                ->setEndBlock('requerir'),
+                ->setEndBlock('requisicion'),
 
             RkNavigation::make('seguimiento')
                 ->setParentId('planificacion')
@@ -189,7 +204,6 @@ return [
                 ->setLabel('Procesos')
                 ->setHeroIcon('cog-8-tooth')
                 ->setItems([
-
                     RkNavigation::make('procesoscompras')
                         ->setParentId('config-procesos')
                         ->setDescription('Gestiona los procesos de compras')
@@ -255,6 +269,14 @@ return [
                         ->setEndBlock('trimestres'),
                 ])
                 ->setEndBlock('catalogos-generales'),
+
+            RkNavigation::make('recursos')
+                ->setParentId('configuracion')
+                ->setDescription('Crear o gestionar recursos')
+                ->setLabel('Recursos')
+                ->setHeroIcon('clipboard-document')
+                ->setItems([])
+                ->setEndBlock('recursos'),
         ])
         ->setEndBlock('configuracion'),
 
