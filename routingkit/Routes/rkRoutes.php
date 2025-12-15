@@ -418,7 +418,21 @@ return [
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Consola\AsignacionPresuNacional')
                         ->setRoles(['admin_general'])
-                        ->setItems([])
+                        ->setItems([
+                             RkRoute::make('analysis-techo-ue')
+                                ->setParentId('consola')
+                                ->setAccessPermission('acceso-consola')
+                                ->setPermissions([
+                                    'consola.techonacional.ver',
+                                    'acceso-consola',
+                                ])
+                                ->setUrlMethod('get')
+                                ->setUrlPattern('techonacional/{idPoa}/analysis/{idUE}')
+                                ->setUrlController('App\Livewire\TechoUes\AnalysisTechoUe')
+                                ->setRoles(['admin_general'])
+                                ->setItems([])
+                                ->setEndBlock('analysis-techo-ue'),
+                        ])
                         ->setEndBlock('asignacionnacionalpresupuestaria'),
 
                     RkRoute::make('asignacionpresupuestaria')

@@ -4,12 +4,14 @@ namespace App\Livewire\TechoUes;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 use App\Models\Poa\Poa;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\TechoUes\TechoUe;
 use App\Models\GrupoGastos\GrupoGasto;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+#[Layout('layouts.app')]
 class GestionTechoUeNacional extends Component
 {
     use WithPagination;
@@ -226,7 +228,7 @@ class GestionTechoUeNacional extends Component
             'resumenPorFuente' => $resumenPorFuente,
             'totalAsignado' => $totalAsignado,
             'fuentes' => \App\Models\GrupoGastos\Fuente::orderBy('nombre')->get()
-                ])->layout('layouts.app');
+                ]);
 
 
     }
@@ -591,5 +593,25 @@ class GestionTechoUeNacional extends Component
         }
 
         return true;
+    }
+
+    public function viewAnalysis($idUE)
+    {
+        // Obtener la unidad ejecutora
+        $unidadEjecutora = UnidadEjecutora::findOrFail($idUE);
+        
+        // Obtener los techos de esta UE en el POA actual
+        $techos = TechoUe::where('idPoa', $this->idPoa)
+            ->where('idUE', $idUE)
+            ->with('fuente')
+            ->get();
+        
+        if ($techos->isEmpty()) {
+            session()->flash('error', 'No se encontraron techos para esta unidad ejecutora.');
+            return;
+        }
+        
+        // Redirigir a la vista de análisis detallado
+        return redirect()->to(route('analysis-techo-ue', ['idPoa' => $this->idPoa, 'idUE' => $idUE]));
     }
 }
