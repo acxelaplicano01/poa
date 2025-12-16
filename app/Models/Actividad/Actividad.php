@@ -82,7 +82,7 @@ class Actividad extends BaseModel
 
     public function revisiones()
     {
-        return $this->hasMany(Revision::class, 'idActividad');
+        return $this->hasMany(Revision::class, 'idActividad')->withTrashed();
     }
 
     public function mediosVerificacion()
@@ -95,5 +95,10 @@ class Actividad extends BaseModel
         return $this->belongsToMany(Empleado::class, 'empleado_actividads', 'idActividad', 'idEmpleado')
             ->withTimestamps()
             ->withPivot(['descripcion', 'created_by', 'updated_by', 'deleted_by']);
+    }
+
+    public function tareas()
+    {
+        return $this->hasMany(\App\Models\Tareas\Tarea::class, 'idActividad');
     }
 }

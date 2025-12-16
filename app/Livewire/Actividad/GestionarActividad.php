@@ -180,8 +180,8 @@ class GestionarActividad extends Component
             'poa'
         ])->findOrFail($this->actividadId);
         
-        // Actualizar si está en estado FORMULACIÓN
-        $this->actividadEnFormulacion = $this->actividad->estado === 'FORMULACION';
+        // Actualizar si está en estado FORMULACIÓN o REFORMULACIÓN
+        $this->actividadEnFormulacion = in_array($this->actividad->estado, ['FORMULACION', 'REFORMULACION']);
         
         $this->loadIndicadores();
         $this->loadTodasPlanificaciones();

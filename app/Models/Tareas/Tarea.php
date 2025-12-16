@@ -53,4 +53,9 @@ class Tarea extends BaseModel
             ->withTimestamps()
             ->withPivot(['idActividad', 'created_by', 'updated_by', 'deleted_by']);
     }
+
+    public function presupuestos()
+    {
+        return $this->hasMany(\App\Models\Presupuestos\Presupuesto::class, 'idtarea');
+    }
 }

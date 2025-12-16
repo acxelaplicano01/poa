@@ -47,4 +47,14 @@ class Presupuesto extends BaseModel
     {
         return $this->belongsTo(Mes::class, 'idMes');
     }
+
+    public function objetoGasto()
+    {
+        return $this->belongsTo(\App\Models\GrupoGastos\ObjetoGasto::class, 'idobjeto');
+    }
+
+    public function grupoGasto()
+    {
+        return $this->belongsTo(\App\Models\GrupoGastos\GrupoGasto::class, 'idgrupo');
+    }
 }

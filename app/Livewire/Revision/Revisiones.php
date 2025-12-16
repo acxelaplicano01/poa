@@ -67,7 +67,7 @@ class Revisiones extends Component
 
 		$revisiones = Departamento::query()
 			->withCount(['actividades as actividades_count' => function($q) {
-				$q->where('estado', 'REVISION');
+				$q->whereIn('estado', ['REVISION', 'APROBADO', 'RECHAZADO']);
 				if ($this->poaYear) {
 					$q->whereHas('poa', function($q2) {
 						$q2->where('anio', $this->poaYear);
@@ -75,7 +75,7 @@ class Revisiones extends Component
 				}
 			}])
 			->whereHas('actividades', function($q) {
-				$q->where('estado', 'REVISION');
+				$q->whereIn('estado', ['REVISION', 'APROBADO', 'RECHAZADO']);
 				if ($this->poaYear) {
 					$q->whereHas('poa', function($q2) {
 						$q2->where('anio', $this->poaYear);

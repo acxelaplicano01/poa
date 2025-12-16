@@ -27,7 +27,7 @@ class ActividadesRevision extends Component
     {
         $this->actividades = Actividad::with(['tipo', 'categoria'])
             ->where('idDeptartamento', $this->departamentoId)
-            ->where('estado', 'REVISION')
+            ->whereIn('estado', ['REVISION', 'APROBADO', 'RECHAZADO'])
             ->get();
     }
 

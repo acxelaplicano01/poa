@@ -46,7 +46,12 @@ Route::get('/doc', function () {
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/empleado/registrar', \App\Livewire\Empleado\RegistrarEmpleado::class)
         ->name('empleado.registrar');
+    
+    // Ruta para revisar detalles de actividad
+    Route::get('/review-actividad-detalle/{id}', \App\Livewire\Revision\ReviewActividadDetalle::class)
+        ->name('review-actividad-detalle');
 });
+
 
 Route::get('/dashboard', function () {
     return view('layouts.app');

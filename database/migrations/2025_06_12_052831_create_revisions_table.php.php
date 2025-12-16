@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-       // Tabla revisiones
+        // Tabla revisiones
         if (!Schema::hasTable('revisions')) {
             Schema::create('revisions', function (Blueprint $table) {
                 $table->id();
                 $table->text('revision');
-                $table->enum('tipo', ['TAREA', 'INDICADOR', 'PLANIFICACION']);
+                $table->enum('tipo', ['TAREA', 'INDICADOR', 'PLANIFICACION', 'REVISION', 'DICTAMEN']);
                 $table->boolean('corregido')->default(false);
 
                 $table->foreignId('idActividad')->constrained('actividads');
