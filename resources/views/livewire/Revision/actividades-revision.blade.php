@@ -56,9 +56,32 @@
                         <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-100">{{ $actividad->tipo->tipo ?? '-' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-100">{{ $actividad->categoria->categoria ?? '-' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300">
-                                {{ $actividad->estado }}
-                            </span>
+                            @switch($actividad->estado)
+                                @case('APROBADO')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                                        {{ $actividad->estado }}
+                                    </span>
+                                    @break
+                                @case('RECHAZADO')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
+                                        {{ $actividad->estado }}
+                                    </span>
+                                    @break
+                                @case('REVISION')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
+                                        {{ $actividad->estado }}
+                                    </span>
+                                    @break
+                                @case('REFORMULACION')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">
+                                        {{ $actividad->estado }}
+                                    </span>
+                                    @break
+                                @default
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-zinc-100 dark:bg-zinc-900/30 text-zinc-800 dark:text-zinc-300">
+                                        {{ $actividad->estado }}
+                                    </span>
+                            @endswitch
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <a href="{{ route('review-actividad-detalle', $actividad->id) }}" class="inline-flex items-center px-3 py-1 bg-indigo-600 dark:bg-indigo-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-700 active:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
@@ -91,7 +114,33 @@
                         <div class="text-zinc-600 dark:text-zinc-400 text-sm mb-1">
                             <span class="font-semibold">Tipo:</span> {{ $actividad->tipo->tipo ?? '-' }}<br>
                             <span class="font-semibold">Categoría:</span> {{ $actividad->categoria->categoria ?? '-' }}<br>
-                            <span class="font-semibold">Estado:</span> {{ $actividad->estado }}
+                            <span class="font-semibold">Estado:</span> 
+                            @switch($actividad->estado)
+                                @case('APROBADO')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                                        {{ $actividad->estado }}
+                                    </span>
+                                    @break
+                                @case('RECHAZADO')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
+                                        {{ $actividad->estado }}
+                                    </span>
+                                    @break
+                                @case('REVISION')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
+                                        {{ $actividad->estado }}
+                                    </span>
+                                    @break
+                                @case('REFORMULACION')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">
+                                        {{ $actividad->estado }}
+                                    </span>
+                                    @break
+                                @default
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-zinc-100 dark:bg-zinc-900/30 text-zinc-800 dark:text-zinc-300">
+                                        {{ $actividad->estado }}
+                                    </span>
+                            @endswitch
                         </div>
                     </div>
                 @empty

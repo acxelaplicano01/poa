@@ -220,7 +220,7 @@
                     <x-label for="trimestrePlanificacion" value="Trimestre" />
                     <select id="trimestrePlanificacion" 
                             class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200" 
-                            wire:model="nuevaPlanificacion.idTrimestre">
+                            wire:model.live="nuevaPlanificacion.idTrimestre">
                         <option value="">Seleccione un trimestre</option>
                         @foreach($trimestres as $trimestre)
                             <option value="{{ $trimestre['id'] }}">Trimestre {{ $trimestre['trimestre'] }}</option>
@@ -238,13 +238,13 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <x-label for="fechaInicio" value="Fecha Inicio" />
-                        <x-input id="fechaInicio" type="date" class="mt-1 block w-full" wire:model="nuevaPlanificacion.fechaInicio" />
+                        <x-input id="fechaInicio" type="date" class="mt-1 block w-full" wire:model.live="nuevaPlanificacion.fechaInicio" />
                         @error('nuevaPlanificacion.fechaInicio') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
                         <x-label for="fechaFin" value="Fecha Fin" />
-                        <x-input id="fechaFin" type="date" class="mt-1 block w-full" wire:model="nuevaPlanificacion.fechaFin" />
+                        <x-input id="fechaFin" type="date" class="mt-1 block w-full" wire:model.live="nuevaPlanificacion.fechaFin" />
                         @error('nuevaPlanificacion.fechaFin') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
                 </div>

@@ -237,7 +237,9 @@
                                                 <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Total</th>
                                                 <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Acciones</th>
                                                 <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Veredicto</th>
-                                                <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Comentarios</th>
+                                                @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
+                                                    <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Comentarios</th>
+                                                @endif
                                             </tr>
                                         </thead>
                                         <tbody class="bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700">
@@ -329,8 +331,8 @@
                                                             </div>
                                                         @endif
                                                     </td>
-                                                    <td class="px-4 py-3 text-center">
-                                                        @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
+                                                    @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
+                                                        <td class="px-4 py-3 text-center">
                                                             <button wire:click="abrirComentarioModal('TAREA', {{ $tarea->id }})" 
                                                                     class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md transition">
                                                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -338,20 +340,20 @@
                                                                 </svg>
                                                                 Comentar
                                                             </button>
-                                                        @else
-                                                            <span class="text-xs text-zinc-400">-</span>
-                                                        @endif
-                                                    </td>
+                                                        </td>
+                                                    @endif
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                         <tfoot class="bg-zinc-50 dark:bg-zinc-700">
                                             <tr>
-                                                <td colspan="8" class="px-4 py-3 text-right text-sm font-bold text-zinc-900 dark:text-zinc-100">Total Presupuesto:</td>
+                                                <td colspan="{{ $actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO' ? '8' : '7' }}" class="px-4 py-3 text-right text-sm font-bold text-zinc-900 dark:text-zinc-100">Total Presupuesto:</td>
                                                 <td class="px-4 py-3 text-right text-sm font-bold text-green-700 dark:text-green-400">
                                                     L. {{ number_format($tareasConPresupuesto->sum(function($t) { return $t->presupuestos->sum('total'); }) ?? 0, 2) }}
                                                 </td>
-                                                <td></td>
+                                                @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
+                                                    <td></td>
+                                                @endif
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -378,7 +380,9 @@
                                                 <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Asignados</th>
                                                 <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Estado</th>
                                                 <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Veredicto</th>
-                                                <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Comentarios</th>
+                                                @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
+                                                    <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Comentarios</th>
+                                                @endif
                                             </tr>
                                         </thead>
                                         <tbody class="bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700">
@@ -459,8 +463,8 @@
                                                             </div>
                                                         @endif
                                                     </td>
-                                                    <td class="px-4 py-3 text-center">
-                                                        @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
+                                                    @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
+                                                        <td class="px-4 py-3 text-center">
                                                             <button wire:click="abrirComentarioModal('TAREA', {{ $tarea->id }})" 
                                                                     class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md transition">
                                                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -468,10 +472,8 @@
                                                                 </svg>
                                                                 Comentar
                                                             </button>
-                                                        @else
-                                                            <span class="text-xs text-zinc-400">-</span>
-                                                        @endif
-                                                    </td>
+                                                        </td>
+                                                    @endif
                                                 </tr>
                                             @endforeach
                                         </tbody>

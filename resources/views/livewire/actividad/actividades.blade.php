@@ -237,8 +237,8 @@
                                     </svg>
                                 </a>
                                 <button wire:click="editar({{ $actividad->id }})" 
-                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 cursor-pointer {{ !$puedeCrearActividades ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeCrearActividades"
-                                        title="Editar">
+                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 cursor-pointer {{ !$puedeCrearActividades || in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" {{ !$puedeCrearActividades || in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'disabled' : '' }}
+                                        title="{{ in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'No se puede editar en estado ' . $actividad->estado : 'Editar' }}">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                         fill="currentColor">
                                         <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
@@ -248,8 +248,8 @@
                                     </svg>
                                 </button>
                                 <button wire:click="confirmDelete({{ $actividad->id }})" 
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 cursor-pointer {{ !$puedeCrearActividades ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeCrearActividades"
-                                        title="Eliminar">
+                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 cursor-pointer {{ !$puedeCrearActividades || in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" {{ !$puedeCrearActividades || in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'disabled' : '' }}
+                                        title="{{ in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'No se puede eliminar en estado ' . $actividad->estado : 'Eliminar' }}">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                         fill="currentColor">
                                         <path fill-rule="evenodd"
@@ -327,11 +327,11 @@
                                     Gestionar
                                 </a>
                                 <button wire:click="editar({{ $actividad->id }})" 
-                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm font-medium">
+                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm font-medium {{ in_array($actividad->estado, ['REVISION', 'RECHAZADO']) ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" {{ in_array($actividad->estado, ['REVISION', 'RECHAZADO']) ? 'disabled' : '' }}>
                                     Editar
                                 </button>
                                 <button wire:click="confirmDelete({{ $actividad->id }})" 
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm font-medium">
+                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm font-medium {{ in_array($actividad->estado, ['REVISION', 'RECHAZADO']) ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" {{ in_array($actividad->estado, ['REVISION', 'RECHAZADO']) ? 'disabled' : '' }}>
                                     Eliminar
                                 </button>
                             </div>

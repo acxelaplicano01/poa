@@ -424,10 +424,10 @@ class GestionarActividad extends Component
         }
         
         // Obtener el año del POA de la actividad
-        $year = $this->actividad->poa->year;
+        $year = $this->actividad->poa->anio;
         
-        // Calcular fechas según el número de trimestre
-        switch ($trimestre->trimestre) {
+        // Calcular fechas según el número de trimestre (formato YYYY-MM-DD para inputs type="date")
+        switch ($trimestre->id) {
             case 1: // Primer trimestre: Enero-Marzo
                 $this->nuevaPlanificacion['fechaInicio'] = "{$year}-01-01";
                 $this->nuevaPlanificacion['fechaFin'] = "{$year}-03-31";
@@ -499,6 +499,8 @@ class GestionarActividad extends Component
                 DB::rollBack();
                 return;
             }
+
+            $this->calcularFechasPorTrimestre($this->nuevaPlanificacion['idTrimestre']);
             
             $planificacionData = [
                 'cantidad' => $this->nuevaPlanificacion['cantidad'],
@@ -1114,6 +1116,14 @@ class GestionarActividad extends Component
             if ($tarea) {
                 $this->loadTechoDepartamento($tarea, $value);
             }
+        }
+    }
+
+    public function updatedNuevaPlanificacion($value, $key)
+    {
+        // Cuando cambia el trimestre, calcular automáticamente las fechas
+        if ($key === 'idTrimestre' && !empty($value)) {
+            $this->calcularFechasPorTrimestre($value);
         }
     }
 
