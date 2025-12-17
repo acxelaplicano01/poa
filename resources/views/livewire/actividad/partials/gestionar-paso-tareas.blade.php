@@ -150,6 +150,43 @@
                                 </div>
                             </td>
                         </tr>
+                        
+                        {{-- Fila de comentarios del supervisor --}}
+                        @php
+                            $comentariosTarea = $actividad->revisiones()
+                                ->where('tipo', 'TAREA')
+                                ->where('idElemento', $tarea['id'])
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+                        @endphp
+                        
+                        @if($comentariosTarea->isNotEmpty())
+                            @php
+                                $ultimoComentario = $comentariosTarea->first();
+                            @endphp
+                            <tr>
+                                <td colspan="6" class="px-4 py-2 bg-blue-50 dark:bg-blue-900/10">
+                                    <div x-data="{ open: false }">
+                                        <button @click="open = !open" type="button" class="flex items-center gap-2 text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100 transition-colors w-full">
+                                            <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-90' : ''" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sm font-semibold">Comentarios de revisión</span>
+                                            <span class="text-xs text-blue-600 dark:text-blue-400 ml-auto">{{ $ultimoComentario->created_at->format('d/m/Y H:i') }}</span>
+                                        </button>
+                                        
+                                        <div x-show="open" x-collapse class="mt-2">
+                                            <div class="bg-white dark:bg-zinc-800 rounded-lg p-3 shadow-sm">
+                                                <p class="text-sm text-zinc-700 dark:text-zinc-300">{{ $ultimoComentario->revision }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endif
                     @endforeach
                 </tbody>
             </table>

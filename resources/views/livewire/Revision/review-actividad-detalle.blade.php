@@ -235,7 +235,7 @@
                                                 <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Asignados</th>
                                                 <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Estado</th>
                                                 <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Total</th>
-                                                <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Acciones</th>
+                                                <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Recursos</th>
                                                 <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Veredicto</th>
                                                 @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
                                                     <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Comentarios</th>
@@ -304,32 +304,22 @@
                                                         </button>
                                                     </td>
                                                     <td class="px-4 py-3">
-                                                        @if($tarea->estado === 'REVISION' || is_null($tarea->estado))
-                                                            <div class="flex gap-2 justify-center">
-                                                                <button wire:click="aprobarTarea({{ $tarea->id }})" 
-                                                                    class="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md transition">
-                                                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                                                    </svg>
-                                                                    Aceptar
-                                                                </button>
-                                                                <button wire:click="rechazarTarea({{ $tarea->id }})" 
-                                                                    class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition">
-                                                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                                                                    </svg>
-                                                                    Rechazar
-                                                                </button>
-                                                            </div>
-                                                        @else
-                                                            @php
-                                                                $revisionTarea = collect($actividad->revisiones)->where('tipo', 'TAREA')->sortByDesc('created_at')->first();
-                                                                $veredictoTarea = $revisionTarea ? $revisionTarea['revision'] : '-';
-                                                            @endphp
-                                                            <div class="text-sm text-zinc-600 dark:text-zinc-400 text-center">
-                                                                {{ $veredictoTarea }}
-                                                            </div>
-                                                        @endif
+                                                        <div class="flex gap-2 justify-center">
+                                                            <button wire:click="aprobarTarea({{ $tarea->id }})" 
+                                                                class="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md transition">
+                                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                                Aceptar
+                                                            </button>
+                                                            <button wire:click="rechazarTarea({{ $tarea->id }})" 
+                                                                class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition">
+                                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                                Rechazar
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                     @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
                                                         <td class="px-4 py-3 text-center">
@@ -436,32 +426,22 @@
                                                         @endif
                                                     </td>
                                                     <td class="px-4 py-3">
-                                                        @if($tarea->estado === 'REVISION' || is_null($tarea->estado))
-                                                            <div class="flex gap-2 justify-center">
-                                                                <button wire:click="aprobarTarea({{ $tarea->id }})" 
-                                                                    class="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md transition">
-                                                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                                                    </svg>
-                                                                    Aceptar
-                                                                </button>
-                                                                <button wire:click="rechazarTarea({{ $tarea->id }})" 
-                                                                    class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition">
-                                                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                                                                    </svg>
-                                                                    Rechazar
-                                                                </button>
-                                                            </div>
-                                                        @else
-                                                            @php
-                                                                $revisionTarea = collect($actividad->revisiones)->where('tipo', 'TAREA')->sortByDesc('created_at')->first();
-                                                                $veredictoTarea = $revisionTarea ? $revisionTarea['revision'] : '-';
-                                                            @endphp
-                                                            <div class="text-sm text-zinc-600 dark:text-zinc-400 text-center">
-                                                                {{ $veredictoTarea }}
-                                                            </div>
-                                                        @endif
+                                                        <div class="flex gap-2 justify-center">
+                                                            <button wire:click="aprobarTarea({{ $tarea->id }})" 
+                                                                class="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md transition">
+                                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                                Aceptar
+                                                            </button>
+                                                            <button wire:click="rechazarTarea({{ $tarea->id }})" 
+                                                                class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition">
+                                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                                Rechazar
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                     @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
                                                         <td class="px-4 py-3 text-center">

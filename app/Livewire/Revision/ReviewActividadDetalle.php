@@ -74,9 +74,9 @@ class ReviewActividadDetalle extends Component
             // Crear revisión de tipo TAREA
             Revision::create([
                 'idActividad' => $this->idActividad,
-                'revision' => 'Tarea aprobada',
+                'revision' => 'Tarea aprobada - ' . $tarea->nombre,
                 'tipo' => 'TAREA',
-                'corregido' => true,
+                'corregido' => false,
             ]);
 
             // Cambiar estado de tarea a APROBADO
@@ -102,9 +102,9 @@ class ReviewActividadDetalle extends Component
             // Crear revisión de tipo TAREA
             Revision::create([
                 'idActividad' => $this->idActividad,
-                'revision' => 'Tarea rechazada',
+                'revision' => 'Tarea rechazada - ' . $tarea->nombre,
                 'tipo' => 'TAREA',
-                'corregido' => false,
+                'corregido' => true,
             ]);
 
             // Cambiar estado de tarea a RECHAZADO
@@ -152,6 +152,7 @@ class ReviewActividadDetalle extends Component
             // Crear revisión del tipo correspondiente
             Revision::create([
                 'idActividad' => $this->idActividad,
+                'idElemento' => $this->idElementoComentario,
                 'revision' => $this->textoComentario,
                 'tipo' => $this->tipoComentario,
                 'corregido' => false,

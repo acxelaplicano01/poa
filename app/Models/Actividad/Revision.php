@@ -15,6 +15,7 @@ class Revision extends BaseModel
         'tipo',
         'corregido',
         'idActividad',
+        'idElemento',
     ];
 
     public function actividad()

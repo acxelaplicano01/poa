@@ -109,7 +109,8 @@ class GestionarActividad extends Component
         'presupuestoAsignado' => 0,
         'presupuestoDisponible' => 0,
         'departamentoNombre' => '',
-        'fuenteNombre' => ''
+        'fuenteNombre' => '',
+        'fuenteIdentificador' => ''
     ];
     public $nuevoPresupuesto = [
         'idRecurso' => '',
@@ -253,13 +254,13 @@ class GestionarActividad extends Component
     }
 
     /**
-     * Verifica si la actividad está en estado FORMULACIÓN, si no lanza excepción
+     * Verifica si la actividad está en estado FORMULACIÓN o REFORMULACIÓN, si no lanza excepción
      * @throws \Exception
      */
     private function verificarActividadEnRevision()
     {
-        if ($this->actividad->estado !== 'FORMULACION') {
-            throw new \Exception('Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN.');
+        if (!in_array($this->actividad->estado, ['FORMULACION', 'REFORMULACION'])) {
+            throw new \Exception('Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN.');
         }
     }
 
@@ -991,7 +992,8 @@ class GestionarActividad extends Component
                         'presupuestoAsignado' => 0,
                         'presupuestoDisponible' => 0,
                         'departamentoNombre' => $tarea->departamento->name ?? 'N/A',
-                        'fuenteNombre' => Fuente::find($idFuente)->nombre ?? 'Desconocida'
+                        'fuenteNombre' => Fuente::find($idFuente)->nombre ?? 'Desconocida',
+                        'fuenteIdentificador' => Fuente::find($idFuente)->identificador ?? 'Desconocida'
                     ];
                     return;
                 }
@@ -1016,6 +1018,7 @@ class GestionarActividad extends Component
                 if ($idFuente) {
                     $fuente = Fuente::find($idFuente);
                     $fuenteNombre = $fuente->nombre ?? 'Fuente ' . $idFuente;
+                    $fuenteIdentificador = $fuente->identificador ?? 'Desconocida';
                 }
                 
                 $this->presupuestoTechoInfo = [
@@ -1023,19 +1026,20 @@ class GestionarActividad extends Component
                     'presupuestoAsignado' => $presupuestoTareaActual,
                     'presupuestoDisponible' => $techoTotalDisponible - $presupuestoTareaActual,
                     'departamentoNombre' => $tarea->departamento->name ?? 'N/A',
-                    'fuenteNombre' => $fuenteNombre
+                    'fuenteNombre' => $fuenteNombre,
+                    'fuenteIdentificador' => $fuenteIdentificador ?? 'Todas'
                 ];
                 
-                \Log::debug("Techo cargado - Fuente: {$fuenteNombre}, Total: {$techoTotalDisponible}, Asignado: {$presupuestoTareaActual}, Disponible: " . ($techoTotalDisponible - $presupuestoTareaActual));
             } else {
-                \Log::warning("No hay techo asignado al departamento: {$tarea->idDeptartamento}");
                 $fuenteNombre = $idFuente ? (Fuente::find($idFuente)->nombre ?? 'Desconocida') : 'General';
+                $fuenteIdentificador = $idFuente ? (Fuente::find($idFuente)->identificador ?? 'Desconocida') : 'Todas';
                 $this->presupuestoTechoInfo = [
                     'techoTotal' => 0,
                     'presupuestoAsignado' => 0,
                     'presupuestoDisponible' => 0,
                     'departamentoNombre' => $tarea->departamento->name ?? 'N/A',
-                    'fuenteNombre' => $fuenteNombre
+                    'fuenteNombre' => $fuenteNombre,
+                    'fuenteIdentificador' => $idFuente ? (Fuente::find($idFuente)->identificador ?? 'Desconocida') : 'General'
                 ];
             }
         } catch (\Exception $e) {
@@ -1045,7 +1049,8 @@ class GestionarActividad extends Component
                 'presupuestoAsignado' => 0,
                 'presupuestoDisponible' => 0,
                 'departamentoNombre' => $tarea->departamento->name ?? 'Desconocido',
-                'fuenteNombre' => 'Error: ' . $e->getMessage()
+                'fuenteNombre' => 'Error: ' . $e->getMessage(),
+                'fuenteIdentificador' => 'Error'
             ];
         }
     }

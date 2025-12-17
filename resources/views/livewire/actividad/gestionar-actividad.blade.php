@@ -23,6 +23,63 @@
                 </div>
             </div>
 
+            <!-- Comentarios del Supervisor -->
+            @if(in_array($actividad->estado, ['REFORMULACION', 'RECHAZADO', 'REVISION']))
+                @php
+                    $revisionesActividad = $actividad->revisiones()
+                        ->whereIn('tipo', ['REVISION', 'DICTAMEN', 'REVISION'])
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+                @endphp
+                
+                @if($revisionesActividad->isNotEmpty())
+                    <div class="mb-6 p-5 rounded-lg {{ $actividad->estado === 'RECHAZADO' ? 'bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-700' : 'bg-orange-50 dark:bg-orange-900/20 border-2 border-orange-300 dark:border-orange-700' }}">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-shrink-0">
+                                <svg class="w-6 h-6 {{ $actividad->estado === 'RECHAZADO' ? 'text-red-600 dark:text-red-400' : 'text-orange-600 dark:text-orange-400' }}" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold {{ $actividad->estado === 'RECHAZADO' ? 'text-red-800 dark:text-red-300' : 'text-orange-800 dark:text-orange-300' }} mb-3">
+                                    @if($actividad->estado === 'RECHAZADO')
+                                        Actividad Rechazada
+                                    @else
+                                        Se requiere reformulación
+                                    @endif
+                                </h3>
+                                
+                                <div class="space-y-3">
+                                    @foreach($revisionesActividad as $revision)
+                                        <div class="bg-white dark:bg-zinc-800 rounded-lg p-4 shadow-sm">
+                                            <div class="flex items-start justify-between mb-2">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $revision->tipo === 'DICTAMEN' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' }}">
+                                                    @if($revision->tipo === 'DICTAMEN')
+                                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                        Dictamen Final
+                                                    @else
+                                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                        Mensaje de revisión
+                                                    @endif
+                                                </span>
+                                                <span class="text-xs text-zinc-500 dark:text-zinc-400">
+                                                    {{ $revision->created_at->format('d/m/Y H:i') }}
+                                                </span>
+                                            </div>
+                                            <p class="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-line">{{ $revision->revision }}</p>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @endif
+
             <!-- Stepper Horizontal -->
             <div class="mb-8">
                 <div class="flex items-center gap-2">
@@ -445,7 +502,7 @@
                 <!-- Información del Techo del Departamento -->
                 @if($presupuestoTechoInfo['techoTotal'] > 0 || $presupuestoTechoInfo['presupuestoDisponible'] >= 0)
                     <div class="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-200 dark:border-indigo-700 p-4 rounded-lg">
-                        <h4 class="text-sm font-semibold text-indigo-900 dark:text-indigo-100 mb-3">Información de Presupuesto - Departamento: {{ $presupuestoTechoInfo['departamentoNombre'] }} | Fuente: {{ $presupuestoTechoInfo['fuenteNombre'] }}</h4>
+                        <h4 class="text-sm font-semibold text-indigo-900 dark:text-indigo-100 mb-3">Información de Presupuesto - Departamento: {{ $presupuestoTechoInfo['departamentoNombre'] }} | Fuente: {{ $presupuestoTechoInfo['fuenteIdentificador'] }} - {{ $presupuestoTechoInfo['fuenteNombre'] }}</h4>
                         <div class="grid grid-cols-3 gap-4">
                             <div class="text-center">
                                 <p class="text-xs text-indigo-600 dark:text-indigo-400 font-medium">Techo Total</p>
@@ -462,7 +519,7 @@
                         </div>
                         @if($presupuestoTechoInfo['presupuestoDisponible'] <= 0)
                             <div class="mt-3 p-2 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded text-sm text-red-700 dark:text-red-300">
-                                ⚠️ Presupuesto insuficiente. No hay fondos disponibles en el techo del departamento.
+                                Presupuesto insuficiente. No hay fondos disponibles en el techo del departamento.
                             </div>
                         @endif
                         <!-- Mensajes de éxito/error -->
@@ -470,7 +527,7 @@
                 @else
                     <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 p-4 rounded-lg">
                         <p class="text-sm text-yellow-800 dark:text-yellow-300">
-                            ⚠️ No hay techo presupuestario asignado a este departamento. Solicita al administrador que asigne un presupuesto al departamento antes de crear presupuestos para tareas.
+                            No hay techo presupuestario asignado a este departamento. Solicita al administrador que asigne un presupuesto al departamento antes de crear presupuestos para tareas.
                         </p>
                     </div>
                 @endif
@@ -509,7 +566,7 @@
                             <select id="fuentePresupuesto" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 text-sm" wire:model.live="nuevoPresupuesto.idfuente">
                                 <option value="">Seleccione una fuente</option>
                                 @foreach($fuentesFinanciamiento as $fuente)
-                                    <option value="{{ $fuente['id'] }}">{{ $fuente['nombre'] }}</option>
+                                    <option value="{{ $fuente['id'] }}">{{ $fuente['identificador'] }} - {{ $fuente['nombre'] }}</option>
                                 @endforeach
                             </select>
                             @error('nuevoPresupuesto.idfuente') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
