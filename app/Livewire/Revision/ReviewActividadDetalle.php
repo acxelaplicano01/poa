@@ -34,6 +34,8 @@ class ReviewActividadDetalle extends Component
     public $comentarioRechazo = '';
     public $requiereCorreccion = true;
     
+    protected $queryString = ['activeTab'];
+    
     public function mount($id)
     {
         $this->idActividad = $id;
@@ -171,6 +173,7 @@ class ReviewActividadDetalle extends Component
         $this->tipoComentario = $tipo;
         $this->idElementoComentario = $id;
         $this->textoComentario = '';
+        $this->requiereCorreccion = true;
         $this->showComentarioModal = true;
     }
 
@@ -180,29 +183,44 @@ class ReviewActividadDetalle extends Component
         $this->tipoComentario = '';
         $this->idElementoComentario = null;
         $this->textoComentario = '';
+        $this->requiereCorreccion = true;
     }
 
     public function enviarComentario()
     {
         $this->validate([
-            'textoComentario' => 'required|min:5|max:500',
+            'textoComentario' => 'required|min:10|max:1000',
         ], [
             'textoComentario.required' => 'El comentario es requerido',
-            'textoComentario.min' => 'El comentario debe tener al menos 5 caracteres',
-            'textoComentario.max' => 'El comentario no puede exceder 500 caracteres',
+            'textoComentario.min' => 'El comentario debe tener al menos 10 caracteres',
+            'textoComentario.max' => 'El comentario no puede exceder 1000 caracteres',
         ]);
 
         try {
             DB::beginTransaction();
 
-            // Crear revisión del tipo correspondiente
-            Revision::create([
-                'idActividad' => $this->idActividad,
-                'idElemento' => $this->idElementoComentario,
-                'revision' => $this->textoComentario,
-                'tipo' => $this->tipoComentario,
-                'corregido' => false,
-            ]);
+            // Buscar si ya existe una revisión para este indicador
+            $revision = Revision::where('idActividad', $this->idActividad)
+                ->where('idElemento', $this->idElementoComentario)
+                ->where('tipo', $this->tipoComentario)
+                ->first();
+            
+            if ($revision) {
+                // Actualizar la revisión existente
+                $revision->update([
+                    'revision' => $this->textoComentario,
+                    'corregido' => !$this->requiereCorreccion,
+                ]);
+            } else {
+                // Crear nueva revisión si no existe
+                Revision::create([
+                    'idActividad' => $this->idActividad,
+                    'idElemento' => $this->idElementoComentario,
+                    'revision' => $this->textoComentario,
+                    'tipo' => $this->tipoComentario,
+                    'corregido' => !$this->requiereCorreccion,
+                ]);
+            }
 
             DB::commit();
 

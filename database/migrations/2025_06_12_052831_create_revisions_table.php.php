@@ -18,6 +18,8 @@ return new class extends Migration
                 $table->text('revision');
                 $table->enum('tipo', ['TAREA', 'INDICADOR', 'PLANIFICACION', 'REVISION', 'DICTAMEN']);
                 $table->boolean('corregido')->default(false);
+                
+                $table->unsignedBigInteger('idElemento')->nullable();
 
                 $table->foreignId('idActividad')->constrained('actividads');
 

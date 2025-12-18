@@ -145,14 +145,14 @@
                                                 </div>
                                             </div>
                                             
-                                            <!-- Boton de comentarios -->
+                                            <!-- Boton de rechazar -->
                                             @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
                                                 <button wire:click="abrirComentarioModal('INDICADOR', {{ $indicador->id }})" 
-                                                        class="ml-4 inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md transition">
+                                                        class="ml-4 inline-flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition">
                                                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                                     </svg>
-                                                    Comentar
+                                                    Rechazar
                                                 </button>
                                             @endif
                                         </div>
@@ -613,19 +613,34 @@
     <!-- Modal de Comentarios -->
     <x-dialog-modal wire:model="showComentarioModal" maxWidth="lg">
         <x-slot name="title">
-            Enviar Comentario sobre {{ $tipoComentario === 'TAREA' ? 'Tarea' : 'Indicador' }}
+            Rechazar {{ $tipoComentario === 'TAREA' ? 'Tarea' : 'Indicador' }}
         </x-slot>
 
         <x-slot name="content">
             <div class="mb-4">
+                <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+                    Por favor, explique al usuario por qué este {{ $tipoComentario === 'TAREA' ? 'tarea' : 'indicador' }} debe ser corregido.
+                </p>
                 <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                    Comentario
+                    Motivo del rechazo <span class="text-red-500">*</span>
                 </label>
                 <textarea wire:model="textoComentario" 
                           class="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-200" 
-                          rows="4" 
-                          placeholder="Escriba su comentario..."></textarea>
+                          rows="5" 
+                          placeholder="Describa qué debe corregir el usuario..."></textarea>
                 @error('textoComentario') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
+
+            <div class="mb-4">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" wire:model="requiereCorreccion" class="rounded border-zinc-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
+                    <span class="ml-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        Requiere corrección del usuario
+                    </span>
+                </label>
+                <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    Si está marcado, el usuario deberá marcar como corregido. Si no, el rechazo es solo informativo.
+                </p>
             </div>
         </x-slot>
 
@@ -634,8 +649,8 @@
                 Cancelar
             </x-secondary-button>
 
-            <x-button class="ml-3" wire:click="enviarComentario">
-                Enviar Comentario
+            <x-button class="ml-3 bg-red-600 hover:bg-red-700" wire:click="enviarComentario">
+                Rechazar {{ $tipoComentario === 'TAREA' ? 'Tarea' : 'Indicador' }}
             </x-button>
         </x-slot>
     </x-dialog-modal>
@@ -669,7 +684,7 @@
                     </span>
                 </label>
                 <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                    Si está marcado, el usuario deberá marcar la tarea como corregida. Si no, el rechazo es solo informativo y no aparecerá la etiqueta "Corregido".
+                    Si está marcado, el usuario deberá marcar la tarea como corregida. Si no, el rechazo es solo informativo.
                 </p>
             </div>
         </x-slot>

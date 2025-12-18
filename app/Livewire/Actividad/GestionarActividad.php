@@ -264,6 +264,54 @@ class GestionarActividad extends Component
         }
     }
 
+    /**
+     * Verifica si se puede editar una tarea (en formulación o con revisión pendiente)
+     * @throws \Exception
+     */
+    private function verificarPuedeEditarTarea($tareaId)
+    {
+        if (in_array($this->actividad->estado, ['FORMULACION', 'REFORMULACION'])) {
+            return true;
+        }
+
+        // Verificar si hay una revisión pendiente para esta tarea
+        $tieneRevisionPendiente = \App\Models\Actividad\Revision::where('idActividad', $this->actividad->id)
+            ->where('idElemento', $tareaId)
+            ->where('tipo', 'TAREA')
+            ->where('corregido', false)
+            ->exists();
+
+        if (!$tieneRevisionPendiente) {
+            throw new \Exception('Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN, o cuando hay una corrección pendiente.');
+        }
+
+        return true;
+    }
+
+    /**
+     * Verifica si se puede editar un indicador (en formulación o con revisión pendiente)
+     * @throws \Exception
+     */
+    private function verificarPuedeEditarIndicador($indicadorId)
+    {
+        if (in_array($this->actividad->estado, ['FORMULACION', 'REFORMULACION'])) {
+            return true;
+        }
+
+        // Verificar si hay una revisión pendiente para este indicador
+        $tieneRevisionPendiente = \App\Models\Actividad\Revision::where('idActividad', $this->actividad->id)
+            ->where('idElemento', $indicadorId)
+            ->where('tipo', 'INDICADOR')
+            ->where('corregido', false)
+            ->exists();
+
+        if (!$tieneRevisionPendiente) {
+            throw new \Exception('Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN, o cuando hay una corrección pendiente.');
+        }
+
+        return true;
+    }
+
     public function marcarTareaCorregida($tareaId)
     {
         try {
@@ -298,6 +346,35 @@ class GestionarActividad extends Component
         }
     }
 
+    public function marcarIndicadorCorregido($indicadorId)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Buscar la última revisión de rechazo para este indicador
+            $revision = \App\Models\Actividad\Revision::where('idActividad', $this->actividad->id)
+                ->where('idElemento', $indicadorId)
+                ->where('tipo', 'INDICADOR')
+                ->where('corregido', false)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($revision) {
+                $revision->update(['corregido' => true]);
+                session()->flash('message', 'Indicador marcado como corregido exitosamente');
+            } else {
+                session()->flash('error', 'No se encontró una revisión pendiente para este indicador');
+            }
+
+            DB::commit();
+            $this->loadActividad();
+            $this->loadIndicadores();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
     // ============= PASO 1: INDICADORES =============
     
     public function openIndicadorModal()
@@ -308,8 +385,6 @@ class GestionarActividad extends Component
 
     public function saveIndicador()
     {
-        $this->verificarActividadEnRevision();
-        
         $this->validate([
             'nuevoIndicador.nombre' => 'required|string|max:255',
             'nuevoIndicador.descripcion' => 'required|string',
@@ -325,6 +400,9 @@ class GestionarActividad extends Component
             DB::beginTransaction();
             
             if (!empty($this->nuevoIndicador['id'])) {
+                // Verificar permisos para editar
+                $this->verificarPuedeEditarIndicador($this->nuevoIndicador['id']);
+                
                 // Editar indicador existente
                 $indicador = Indicador::findOrFail($this->nuevoIndicador['id']);
                 $indicador->update([
@@ -736,8 +814,6 @@ class GestionarActividad extends Component
 
     public function saveTarea()
     {
-        $this->verificarActividadEnRevision();
-        
         $this->validate([
             'nuevaTarea.nombre' => 'required|string|max:255',
             'nuevaTarea.descripcion' => 'required|string'
@@ -750,6 +826,9 @@ class GestionarActividad extends Component
             DB::beginTransaction();
             
             if (!empty($this->nuevaTarea['id'])) {
+                // Verificar permisos para editar
+                $this->verificarPuedeEditarTarea($this->nuevaTarea['id']);
+                
                 // Actualizar tarea existente
                 $tarea = Tarea::findOrFail($this->nuevaTarea['id']);
                 $tarea->update([

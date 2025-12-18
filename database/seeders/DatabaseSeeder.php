@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CubSeeder::class);
         $this->call(GrupoGastoSeeder::class);
         $this->call(ObjetoGastoSeeder::class);
+        $this->call(PeiDataSeeder::class);
         
     }
 }
