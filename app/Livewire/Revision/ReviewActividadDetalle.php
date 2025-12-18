@@ -28,6 +28,12 @@ class ReviewActividadDetalle extends Component
     public $idElementoComentario = null;
     public $textoComentario = '';
     
+    // Modal de rechazo de tarea
+    public $showRechazarTareaModal = false;
+    public $tareaIdRechazo = null;
+    public $comentarioRechazo = '';
+    public $requiereCorreccion = true;
+    
     public function mount($id)
     {
         $this->idActividad = $id;
@@ -92,27 +98,55 @@ class ReviewActividadDetalle extends Component
         }
     }
 
-    public function rechazarTarea($tareaId)
+    public function abrirModalRechazo($tareaId)
     {
+        $this->tareaIdRechazo = $tareaId;
+        $this->comentarioRechazo = '';
+        $this->requiereCorreccion = true;
+        $this->showRechazarTareaModal = true;
+    }
+
+    public function cerrarModalRechazo()
+    {
+        $this->showRechazarTareaModal = false;
+        $this->tareaIdRechazo = null;
+        $this->comentarioRechazo = '';
+        $this->requiereCorreccion = true;
+    }
+
+    public function rechazarTarea()
+    {
+        $this->validate([
+            'comentarioRechazo' => 'required|min:10|max:1000',
+        ], [
+            'comentarioRechazo.required' => 'El comentario es requerido',
+            'comentarioRechazo.min' => 'El comentario debe tener al menos 10 caracteres',
+            'comentarioRechazo.max' => 'El comentario no puede exceder 1000 caracteres',
+        ]);
+
         try {
             DB::beginTransaction();
 
-            $tarea = \App\Models\Tareas\Tarea::findOrFail($tareaId);
+            $tarea = \App\Models\Tareas\Tarea::findOrFail($this->tareaIdRechazo);
             
-            // Crear revisión de tipo TAREA
+            // Crear revisión de tipo TAREA con comentario
+            // Si requiere corrección: corregido = false (usuario debe marcar)
+            // Si NO requiere corrección: corregido = true (solo informativo)
             Revision::create([
                 'idActividad' => $this->idActividad,
-                'revision' => 'Tarea rechazada - ' . $tarea->nombre,
+                'idElemento' => $this->tareaIdRechazo,
+                'revision' => $this->comentarioRechazo,
                 'tipo' => 'TAREA',
-                'corregido' => true,
+                'corregido' => !$this->requiereCorreccion,
             ]);
-
+            
             // Cambiar estado de tarea a RECHAZADO
             $tarea->update(['estado' => 'RECHAZADO']);
-
+            
             DB::commit();
 
             session()->flash('message', 'Tarea rechazada exitosamente');
+            $this->cerrarModalRechazo();
             $this->cargarActividad();
         } catch (\Exception $e) {
             DB::rollBack();

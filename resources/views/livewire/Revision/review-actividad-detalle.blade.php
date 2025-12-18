@@ -237,9 +237,6 @@
                                                 <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Total</th>
                                                 <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Recursos</th>
                                                 <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Veredicto</th>
-                                                @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
-                                                    <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Comentarios</th>
-                                                @endif
                                             </tr>
                                         </thead>
                                         <tbody class="bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700">
@@ -278,14 +275,25 @@
                                                         @endif
                                                     </td>
                                                     <td class="px-4 py-3 text-center">
+                                                        @php
+                                                            $ultimaRevision = $actividad->revisiones()
+                                                                ->where('tipo', 'TAREA')
+                                                                ->where('idElemento', $tarea->id)
+                                                                ->orderBy('created_at', 'desc')
+                                                                ->first();
+                                                            $tareaCorregida = $ultimaRevision && $ultimaRevision->corregido;
+                                                        @endphp
+                                                        
                                                         @if($tarea->estado === 'APROBADO')
                                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
                                                                 APROBADO
                                                             </span>
                                                         @elseif($tarea->estado === 'RECHAZADO')
-                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
-                                                                RECHAZADO
-                                                            </span>
+                                                            <div class="flex flex-col items-center gap-1">
+                                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
+                                                                    RECHAZADO
+                                                                </span>
+                                                            </div>
                                                         @else
                                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">
                                                                 EN REVISIÓN
@@ -312,7 +320,7 @@
                                                                 </svg>
                                                                 Aceptar
                                                             </button>
-                                                            <button wire:click="rechazarTarea({{ $tarea->id }})" 
+                                                            <button wire:click="abrirModalRechazo({{ $tarea->id }})" 
                                                                 class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition">
                                                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
@@ -321,29 +329,15 @@
                                                             </button>
                                                         </div>
                                                     </td>
-                                                    @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
-                                                        <td class="px-4 py-3 text-center">
-                                                            <button wire:click="abrirComentarioModal('TAREA', {{ $tarea->id }})" 
-                                                                    class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md transition">
-                                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
-                                                                </svg>
-                                                                Comentar
-                                                            </button>
-                                                        </td>
-                                                    @endif
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                         <tfoot class="bg-zinc-50 dark:bg-zinc-700">
                                             <tr>
-                                                <td colspan="{{ $actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO' ? '8' : '7' }}" class="px-4 py-3 text-right text-sm font-bold text-zinc-900 dark:text-zinc-100">Total Presupuesto:</td>
+                                                <td colspan="7" class="px-4 py-3 text-right text-sm font-bold text-zinc-900 dark:text-zinc-100">Total Presupuesto:</td>
                                                 <td class="px-4 py-3 text-right text-sm font-bold text-green-700 dark:text-green-400">
                                                     L. {{ number_format($tareasConPresupuesto->sum(function($t) { return $t->presupuestos->sum('total'); }) ?? 0, 2) }}
                                                 </td>
-                                                @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
-                                                    <td></td>
-                                                @endif
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -370,9 +364,6 @@
                                                 <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Asignados</th>
                                                 <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Estado</th>
                                                 <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Veredicto</th>
-                                                @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
-                                                    <th class="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">Comentarios</th>
-                                                @endif
                                             </tr>
                                         </thead>
                                         <tbody class="bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700">
@@ -411,14 +402,25 @@
                                                         @endif
                                                     </td>
                                                     <td class="px-4 py-3 text-center">
+                                                        @php
+                                                            $ultimaRevision = $actividad->revisiones()
+                                                                ->where('tipo', 'TAREA')
+                                                                ->where('idElemento', $tarea->id)
+                                                                ->orderBy('created_at', 'desc')
+                                                                ->first();
+                                                            $tareaCorregida = $ultimaRevision && $ultimaRevision->corregido;
+                                                        @endphp
+                                                        
                                                         @if($tarea->estado === 'APROBADO')
                                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
                                                                 APROBADO
                                                             </span>
                                                         @elseif($tarea->estado === 'RECHAZADO')
-                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
-                                                                RECHAZADO
-                                                            </span>
+                                                            <div class="flex flex-col items-center gap-1">
+                                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
+                                                                    RECHAZADO
+                                                                </span>
+                                                            </div>
                                                         @else
                                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">
                                                                 EN REVISIÓN
@@ -434,7 +436,7 @@
                                                                 </svg>
                                                                 Aceptar
                                                             </button>
-                                                            <button wire:click="rechazarTarea({{ $tarea->id }})" 
+                                                            <button wire:click="abrirModalRechazo({{ $tarea->id }})" 
                                                                 class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition">
                                                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
@@ -443,17 +445,6 @@
                                                             </button>
                                                         </div>
                                                     </td>
-                                                    @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
-                                                        <td class="px-4 py-3 text-center">
-                                                            <button wire:click="abrirComentarioModal('TAREA', {{ $tarea->id }})" 
-                                                                    class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md transition">
-                                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
-                                                                </svg>
-                                                                Comentar
-                                                            </button>
-                                                        </td>
-                                                    @endif
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -478,7 +469,20 @@
                                     <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded">
                                         <div class="flex items-start justify-between">
                                             <div class="flex-1">
-                                                <p class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $revision['tipo'] }}</p>
+                                                <div class="flex items-center gap-2 mb-2">
+                                                    <p class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $revision['tipo'] }}</p>
+                                                    @if($revision['tipo'] === 'TAREA' || $revision['tipo'] === 'INDICADOR')
+                                                        @if($revision['corregido'])
+                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                                                                ✓ Corregida
+                                                            </span>
+                                                        @else
+                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">
+                                                                Sin Corregir
+                                                            </span>
+                                                        @endif
+                                                    @endif
+                                                </div>
                                                 <p class="text-sm text-zinc-600 dark:text-zinc-400 mt-2">{{ $revision['revision'] }}</p>
                                             </div>
                                             <span class="text-xs text-zinc-500 dark:text-zinc-400 whitespace-nowrap ml-2">
@@ -632,6 +636,51 @@
 
             <x-button class="ml-3" wire:click="enviarComentario">
                 Enviar Comentario
+            </x-button>
+        </x-slot>
+    </x-dialog-modal>
+
+    <!-- Modal de Rechazo de Tarea -->
+    <x-dialog-modal wire:model="showRechazarTareaModal" maxWidth="lg">
+        <x-slot name="title">
+            Rechazar Tarea
+        </x-slot>
+
+        <x-slot name="content">
+            <div class="mb-4">
+                <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+                    Por favor, explique al usuario por qué esta tarea debe ser corregida.
+                </p>
+                <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                    Motivo del rechazo <span class="text-red-500">*</span>
+                </label>
+                <textarea wire:model="comentarioRechazo" 
+                          class="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-200" 
+                          rows="5" 
+                          placeholder="Describa qué debe corregir el usuario..."></textarea>
+                @error('comentarioRechazo') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
+
+            <div class="mb-4">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" wire:model="requiereCorreccion" class="rounded border-zinc-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
+                    <span class="ml-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        Requiere corrección del usuario
+                    </span>
+                </label>
+                <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    Si está marcado, el usuario deberá marcar la tarea como corregida. Si no, el rechazo es solo informativo y no aparecerá la etiqueta "Corregido".
+                </p>
+            </div>
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-secondary-button wire:click="cerrarModalRechazo">
+                Cancelar
+            </x-secondary-button>
+
+            <x-button class="ml-3 bg-red-600 hover:bg-red-700" wire:click="rechazarTarea">
+                Rechazar Tarea
             </x-button>
         </x-slot>
     </x-dialog-modal>

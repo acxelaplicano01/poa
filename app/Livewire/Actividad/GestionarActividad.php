@@ -264,6 +264,40 @@ class GestionarActividad extends Component
         }
     }
 
+    public function marcarTareaCorregida($tareaId)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Buscar la última revisión de rechazo para esta tarea
+            $revision = \App\Models\Actividad\Revision::where('idActividad', $this->actividad->id)
+                ->where('idElemento', $tareaId)
+                ->where('tipo', 'TAREA')
+                ->where('corregido', false)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($revision) {
+                $revision->update(['corregido' => true]);
+
+                // Actualizar estado de la tarea a REVISION
+                $tarea = \App\Models\Tareas\Tarea::findOrFail($tareaId);
+                $tarea->update(['estado' => 'REVISION']);
+
+                session()->flash('message', 'Tarea marcada como corregida exitosamente');
+            } else {
+                session()->flash('error', 'No se encontró una revisión pendiente para esta tarea');
+            }
+
+            DB::commit();
+            $this->loadActividad();
+            $this->loadTareas();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
     // ============= PASO 1: INDICADORES =============
     
     public function openIndicadorModal()
