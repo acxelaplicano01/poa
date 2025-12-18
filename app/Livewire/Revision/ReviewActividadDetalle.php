@@ -129,16 +129,28 @@ class ReviewActividadDetalle extends Component
 
             $tarea = \App\Models\Tareas\Tarea::findOrFail($this->tareaIdRechazo);
             
-            // Crear revisión de tipo TAREA con comentario
-            // Si requiere corrección: corregido = false (usuario debe marcar)
-            // Si NO requiere corrección: corregido = true (solo informativo)
-            Revision::create([
-                'idActividad' => $this->idActividad,
-                'idElemento' => $this->tareaIdRechazo,
-                'revision' => $this->comentarioRechazo,
-                'tipo' => 'TAREA',
-                'corregido' => !$this->requiereCorreccion,
-            ]);
+            // Buscar si ya existe una revisión para esta tarea
+            $revision = Revision::where('idActividad', $this->idActividad)
+                ->where('idElemento', $this->tareaIdRechazo)
+                ->where('tipo', 'TAREA')
+                ->first();
+            
+            if ($revision) {
+                // Actualizar la revisión existente
+                $revision->update([
+                    'revision' => $this->comentarioRechazo,
+                    'corregido' => !$this->requiereCorreccion,
+                ]);
+            } else {
+                // Crear nueva revisión si no existe
+                Revision::create([
+                    'idActividad' => $this->idActividad,
+                    'idElemento' => $this->tareaIdRechazo,
+                    'revision' => $this->comentarioRechazo,
+                    'tipo' => 'TAREA',
+                    'corregido' => !$this->requiereCorreccion,
+                ]);
+            }
             
             // Cambiar estado de tarea a RECHAZADO
             $tarea->update(['estado' => 'RECHAZADO']);
