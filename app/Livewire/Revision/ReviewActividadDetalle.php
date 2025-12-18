@@ -56,8 +56,25 @@ class ReviewActividadDetalle extends Component
             'revisiones'
         ])->findOrFail($this->idActividad);
 
-        // Cargar todas las revisiones incluyendo las eliminadas (soft deleted)
-        $this->revisiones = $this->actividad->revisiones()->withTrashed()->orderBy('created_at', 'desc')->get()->toArray();
+        // Cargar todas las revisiones con los nombres de tareas e indicadores
+        $revisiones = $this->actividad->revisiones()->withTrashed()->orderBy('created_at', 'desc')->get();
+        
+        $this->revisiones = $revisiones->map(function($revision) {
+            $revisionArray = $revision->toArray();
+            
+            // Agregar el nombre del elemento según el tipo
+            if ($revision->tipo === 'TAREA' && $revision->idElemento) {
+                $tarea = \App\Models\Tareas\Tarea::find($revision->idElemento);
+                $revisionArray['elemento_nombre'] = $tarea ? $tarea->nombre : 'Tarea no encontrada';
+            } elseif ($revision->tipo === 'INDICADOR' && $revision->idElemento) {
+                $indicador = \App\Models\Actividad\Indicador::find($revision->idElemento);
+                $revisionArray['elemento_nombre'] = $indicador ? $indicador->nombre : 'Indicador no encontrado';
+            } else {
+                $revisionArray['elemento_nombre'] = null;
+            }
+            
+            return $revisionArray;
+        })->toArray();
     }
 
     public function openTareaModal($tareaId)
@@ -79,14 +96,6 @@ class ReviewActividadDetalle extends Component
 
             $tarea = \App\Models\Tareas\Tarea::findOrFail($tareaId);
             
-            // Crear revisión de tipo TAREA
-            Revision::create([
-                'idActividad' => $this->idActividad,
-                'revision' => 'Tarea aprobada - ' . $tarea->nombre,
-                'tipo' => 'TAREA',
-                'corregido' => false,
-            ]);
-
             // Cambiar estado de tarea a APROBADO
             $tarea->update(['estado' => 'APROBADO']);
 
@@ -131,20 +140,21 @@ class ReviewActividadDetalle extends Component
 
             $tarea = \App\Models\Tareas\Tarea::findOrFail($this->tareaIdRechazo);
             
-            // Buscar si ya existe una revisión para esta tarea
+            // Buscar si ya existe una revisión PENDIENTE (no corregida) para esta tarea
             $revision = Revision::where('idActividad', $this->idActividad)
                 ->where('idElemento', $this->tareaIdRechazo)
                 ->where('tipo', 'TAREA')
+                ->where('corregido', false)
                 ->first();
             
             if ($revision) {
-                // Actualizar la revisión existente
+                // Actualizar la revisión pendiente existente (mismo ciclo de corrección)
                 $revision->update([
                     'revision' => $this->comentarioRechazo,
                     'corregido' => !$this->requiereCorreccion,
                 ]);
             } else {
-                // Crear nueva revisión si no existe
+                // Crear nueva revisión (primer rechazo o nuevo ciclo después de corrección)
                 Revision::create([
                     'idActividad' => $this->idActividad,
                     'idElemento' => $this->tareaIdRechazo,
@@ -199,20 +209,21 @@ class ReviewActividadDetalle extends Component
         try {
             DB::beginTransaction();
 
-            // Buscar si ya existe una revisión para este indicador
+            // Buscar si ya existe una revisión PENDIENTE (no corregida) para este elemento
             $revision = Revision::where('idActividad', $this->idActividad)
                 ->where('idElemento', $this->idElementoComentario)
                 ->where('tipo', $this->tipoComentario)
+                ->where('corregido', false)
                 ->first();
             
             if ($revision) {
-                // Actualizar la revisión existente
+                // Actualizar la revisión pendiente existente (mismo ciclo de corrección)
                 $revision->update([
                     'revision' => $this->textoComentario,
                     'corregido' => !$this->requiereCorreccion,
                 ]);
             } else {
-                // Crear nueva revisión si no existe
+                // Crear nueva revisión (primer rechazo o nuevo ciclo después de corrección)
                 Revision::create([
                     'idActividad' => $this->idActividad,
                     'idElemento' => $this->idElementoComentario,

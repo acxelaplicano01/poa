@@ -471,6 +471,10 @@
                                             <div class="flex-1">
                                                 <div class="flex items-center gap-2 mb-2">
                                                     <p class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $revision['tipo'] }}</p>
+                                                    @if(isset($revision['elemento_nombre']) && $revision['elemento_nombre'])
+                                                        <span class="text-sm text-zinc-600 dark:text-zinc-400">-</span>
+                                                        <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ $revision['elemento_nombre'] }}</p>
+                                                    @endif
                                                     @if($revision['tipo'] === 'TAREA' || $revision['tipo'] === 'INDICADOR')
                                                         @if($revision['corregido'])
                                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
