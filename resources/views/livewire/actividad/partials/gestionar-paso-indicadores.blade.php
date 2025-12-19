@@ -115,6 +115,7 @@
                             @php
                                 $ultimoComentario = $comentariosIndicador->first();
                             @endphp
+                            @if(!$ultimoComentario->corregido)
                             <tr>
                                 <td colspan="5" class="px-4 py-2 bg-purple-50 dark:bg-purple-900/10">
                                     <div x-data="{ open: false }">
@@ -126,11 +127,16 @@
                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
                                                 </svg>
-                                                <span class="text-sm font-semibold">Comentarios de revisión (marque como corregido si ya realizó los cambios indicados)</span>
+                                                <span class="text-sm font-semibold">Comentarios de revisión</span>
                                                 <span class="text-xs text-purple-600 dark:text-purple-400 ml-auto">{{ $ultimoComentario->created_at->format('d/m/Y H:i') }}</span>
                                             </button>
                                             
                                             @if(!$ultimoComentario->corregido)
+                                            @php
+                                                // Verificar si el indicador se actualizó después del comentario
+                                                $indicadorActualizado = \Carbon\Carbon::parse($indicador['updated_at'])->isAfter($ultimoComentario->created_at);
+                                            @endphp
+                                            @if($indicadorActualizado)
                                                 <button wire:click="marcarIndicadorCorregido({{ $indicador['id'] }})" 
                                                         class="ml-3 inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md transition">
                                                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -138,6 +144,7 @@
                                                     </svg>
                                                     Marcar como Corregido
                                                 </button>
+                                            @endif
                                             @elseif($ultimoComentario->corregido)
                                                 <span class="ml-3 inline-flex items-center px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs font-semibold rounded-md">
                                                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -156,6 +163,7 @@
                                     </div>
                                 </td>
                             </tr>
+                            @endif
                         @endif
                     @endforeach
                 </tbody>

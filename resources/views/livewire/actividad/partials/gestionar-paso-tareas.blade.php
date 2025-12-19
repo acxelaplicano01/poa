@@ -139,9 +139,10 @@
                                             ->first();
                                         
                                         $tieneRevisionPendiente = $ultimaRevisionTarea && !$ultimaRevisionTarea->corregido;
-                                        // No permitir editar si la tarea está aprobada, incluso si hay revisión pendiente
                                         $tareaAprobada = isset($tarea['estado']) && $tarea['estado'] === 'APROBADO';
-                                        $puedeEditarTarea = ($actividadEnFormulacion || $tieneRevisionPendiente) && !$tareaAprobada;
+                                        // Si está en FORMULACION/REFORMULACION, siempre puede editar
+                                        // Si NO está en formulación, solo puede editar si tiene revisión pendiente y NO está aprobada
+                                        $puedeEditarTarea = $actividadEnFormulacion || ($tieneRevisionPendiente && !$tareaAprobada);
                                     @endphp
                                     <button wire:click="editTarea({{ $tarea['id'] }})"
                                             class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 cursor-pointer {{ !$puedeEditarTarea ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}"
@@ -176,6 +177,7 @@
                             @php
                                 $ultimoComentario = $comentariosTarea->first();
                             @endphp
+                            @if(!$ultimoComentario->corregido)
                             <tr>
                                 <td colspan="6" class="px-4 py-2 bg-blue-50 dark:bg-blue-900/10">
                                     <div x-data="{ open: false }">
@@ -187,18 +189,24 @@
                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
                                                 </svg>
-                                                <span class="text-sm font-semibold">Comentarios de revisión (marque como corregido si ya realizó los cambios indicados)</span>
+                                                <span class="text-sm font-semibold">Comentarios de revisión</span>
                                                 <span class="text-xs text-blue-600 dark:text-blue-400 ml-auto">{{ $ultimoComentario->created_at->format('d/m/Y H:i') }}</span>
                                             </button>
                                             
                                             @if(!$ultimoComentario->corregido && $tarea['estado'] == 'RECHAZADO')
-                                                <button wire:click="marcarTareaCorregida({{ $tarea['id'] }})" 
-                                                        class="ml-3 inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md transition">
-                                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                                    </svg>
-                                                    Marcar como Corregido
-                                                </button>
+                                                @php
+                                                    // Verificar si la tarea se actualizó después del comentario
+                                                    $tareaActualizada = \Carbon\Carbon::parse($tarea['updated_at'])->isAfter($ultimoComentario->created_at);
+                                                @endphp
+                                                @if($tareaActualizada)
+                                                    <button wire:click="marcarTareaCorregida({{ $tarea['id'] }})" 
+                                                            class="ml-3 inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md transition">
+                                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                        Marcar como Corregido
+                                                    </button>
+                                                @endif
                                             @elseif($ultimoComentario->corregido)
                                                 <span class="ml-3 inline-flex items-center px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs font-semibold rounded-md">
                                                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -217,6 +225,7 @@
                                     </div>
                                 </td>
                             </tr>
+                            @endif
                         @endif
                     @endforeach
                 </tbody>
