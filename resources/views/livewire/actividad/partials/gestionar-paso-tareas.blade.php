@@ -139,7 +139,9 @@
                                             ->first();
                                         
                                         $tieneRevisionPendiente = $ultimaRevisionTarea && !$ultimaRevisionTarea->corregido;
-                                        $puedeEditarTarea = $actividadEnFormulacion || $tieneRevisionPendiente;
+                                        // No permitir editar si la tarea está aprobada, incluso si hay revisión pendiente
+                                        $tareaAprobada = isset($tarea['estado']) && $tarea['estado'] === 'APROBADO';
+                                        $puedeEditarTarea = ($actividadEnFormulacion || $tieneRevisionPendiente) && !$tareaAprobada;
                                     @endphp
                                     <button wire:click="editTarea({{ $tarea['id'] }})"
                                             class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 cursor-pointer {{ !$puedeEditarTarea ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}"
