@@ -312,6 +312,30 @@ class GestionarActividad extends Component
         return true;
     }
 
+    /**
+     * Verifica si se puede editar una planificación (en formulación o con revisión pendiente)
+     * @throws \Exception
+     */
+    private function verificarPuedeEditarPlanificacion($planificacionId)
+    {
+        if (in_array($this->actividad->estado, ['FORMULACION', 'REFORMULACION'])) {
+            return true;
+        }
+
+        // Verificar si hay una revisión pendiente para esta planificación
+        $tieneRevisionPendiente = \App\Models\Actividad\Revision::where('idActividad', $this->actividad->id)
+            ->where('idElemento', $planificacionId)
+            ->where('tipo', 'PLANIFICACION')
+            ->where('corregido', false)
+            ->exists();
+
+        if (!$tieneRevisionPendiente) {
+            throw new \Exception('Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN, o cuando hay una corrección pendiente.');
+        }
+
+        return true;
+    }
+
     public function marcarTareaCorregida($tareaId)
     {
         try {
@@ -369,6 +393,35 @@ class GestionarActividad extends Component
             DB::commit();
             $this->loadActividad();
             $this->loadIndicadores();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+    public function marcarPlanificacionCorregida($planificacionId)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Buscar la última revisión de rechazo para esta planificación
+            $revision = \App\Models\Actividad\Revision::where('idActividad', $this->actividad->id)
+                ->where('idElemento', $planificacionId)
+                ->where('tipo', 'PLANIFICACION')
+                ->where('corregido', false)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($revision) {
+                $revision->update(['corregido' => true]);
+                session()->flash('message', 'Planificación marcada como corregida exitosamente');
+            } else {
+                session()->flash('error', 'No se encontró una revisión pendiente para esta planificación');
+            }
+
+            DB::commit();
+            $this->loadActividad();
+            $this->loadTodasPlanificaciones();
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Error: ' . $e->getMessage());
@@ -562,8 +615,6 @@ class GestionarActividad extends Component
 
     public function savePlanificacion()
     {
-        $this->verificarActividadEnRevision();
-        
         $this->validate([
             'nuevaPlanificacion.idIndicador' => 'required|exists:indicadores,id',
             'nuevaPlanificacion.idTrimestre' => 'required|exists:trimestres,id',
@@ -626,11 +677,13 @@ class GestionarActividad extends Component
             
             if (!empty($this->nuevaPlanificacion['id'])) {
                 // Actualizar planificación existente
+                $this->verificarPuedeEditarPlanificacion($this->nuevaPlanificacion['id']);
                 $planificacion = Planificacion::findOrFail($this->nuevaPlanificacion['id']);
                 $planificacion->update($planificacionData + ['updated_by' => Auth::id()]);
                 $mensaje = 'Planificación actualizada exitosamente';
             } else {
                 // Crear nueva planificación
+                $this->verificarActividadEnRevision();
                 Planificacion::create($planificacionData + ['created_by' => Auth::id()]);
                 $mensaje = 'Planificación creada exitosamente';
             }
@@ -650,6 +703,8 @@ class GestionarActividad extends Component
 
     public function editPlanificacion($planificacionId)
     {
+        $this->verificarPuedeEditarPlanificacion($planificacionId);
+        
         $planificacion = Planificacion::with(['indicador', 'mes.trimestre'])->findOrFail($planificacionId);
         
         $this->nuevaPlanificacion = [

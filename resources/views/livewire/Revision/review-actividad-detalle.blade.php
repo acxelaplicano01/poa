@@ -148,11 +148,11 @@
                                             <!-- Boton de rechazar -->
                                             @if($actividad->estado !== 'APROBADO' && $actividad->estado !== 'RECHAZADO')
                                                 <button wire:click="abrirComentarioModal('INDICADOR', {{ $indicador->id }})" 
-                                                        class="ml-4 inline-flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition">
+                                                        class="ml-4 inline-flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition cursor-pointer">
                                                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                                     </svg>
-                                                    Rechazar
+                                                    Rechazar indicador
                                                 </button>
                                             @endif
                                         </div>
@@ -178,15 +178,35 @@
                                                                             <th class="px-2 py-1 text-center text-xs font-medium text-zinc-600 dark:text-zinc-300">Cantidad</th>
                                                                             <th class="px-2 py-1 text-left text-xs font-medium text-zinc-600 dark:text-zinc-300">Fecha Inicio</th>
                                                                             <th class="px-2 py-1 text-left text-xs font-medium text-zinc-600 dark:text-zinc-300">Fecha Fin</th>
+                                                                            <th class="px-2 py-1 text-center text-xs font-medium text-zinc-600 dark:text-zinc-300">Acción</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody class="divide-y divide-zinc-200 dark:divide-zinc-600">
                                                                         @foreach($planificaciones as $plan)
+                                                                            @php
+                                                                                // Verificar si hay comentarios para esta planificación específica
+                                                                                $comentariosPlan = $actividad->revisiones()
+                                                                                    ->where('tipo', 'PLANIFICACION')
+                                                                                    ->where('idElemento', $plan->id)
+                                                                                    ->orderBy('created_at', 'desc')
+                                                                                    ->get();
+                                                                                $ultimoComentario = $comentariosPlan->first();
+                                                                            @endphp
                                                                             <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-600/50">
                                                                                 <td class="px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200">{{ $plan->mes->mes ?? 'N/A' }}</td>
                                                                                 <td class="px-2 py-1 text-sm text-center text-zinc-800 dark:text-zinc-200 font-semibold">{{ $plan->cantidad }}</td>
                                                                                 <td class="px-2 py-1 text-sm text-zinc-600 dark:text-zinc-400">{{ \Carbon\Carbon::parse($plan->fechaInicio)->format('d/m/Y') }}</td>
                                                                                 <td class="px-2 py-1 text-sm text-zinc-600 dark:text-zinc-400">{{ \Carbon\Carbon::parse($plan->fechaFin)->format('d/m/Y') }}</td>
+                                                                                <td class="px-2 py-1 text-center">
+                                                                                    <button wire:click="abrirComentarioModal('PLANIFICACION', {{ $plan->id }})" 
+                                                                                            class="inline-flex items-center px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition cursor-pointer"
+                                                                                            title="Rechazar planificación">
+                                                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                                        </svg>
+                                                                                        Rechazar planificación
+                                                                                    </button>
+                                                                                </td>
                                                                             </tr>
                                                                         @endforeach
                                                                     </tbody>
@@ -314,14 +334,14 @@
                                                     <td class="px-4 py-3">
                                                         <div class="flex gap-2 justify-center">
                                                             <button wire:click="aprobarTarea({{ $tarea->id }})" 
-                                                                class="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md transition">
+                                                                class="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md transition cursor-pointer">
                                                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                                                 </svg>
                                                                 Aceptar
                                                             </button>
                                                             <button wire:click="abrirModalRechazo({{ $tarea->id }})" 
-                                                                class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition">
+                                                                class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition cursor-pointer">
                                                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                                                 </svg>
@@ -430,14 +450,14 @@
                                                     <td class="px-4 py-3">
                                                         <div class="flex gap-2 justify-center">
                                                             <button wire:click="aprobarTarea({{ $tarea->id }})" 
-                                                                class="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md transition">
+                                                                class="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md transition cursor-pointer">
                                                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                                                 </svg>
                                                                 Aceptar
                                                             </button>
                                                             <button wire:click="abrirModalRechazo({{ $tarea->id }})" 
-                                                                class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition">
+                                                                class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition cursor-pointer">
                                                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                                                 </svg>
@@ -475,7 +495,7 @@
                                                         <span class="text-sm text-zinc-600 dark:text-zinc-400">-</span>
                                                         <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ $revision['elemento_nombre'] }}</p>
                                                     @endif
-                                                    @if($revision['tipo'] === 'TAREA' || $revision['tipo'] === 'INDICADOR')
+                                                    @if($revision['tipo'] === 'TAREA' || $revision['tipo'] === 'INDICADOR' || $revision['tipo'] === 'PLANIFICACION')
                                                         @if($revision['corregido'])
                                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
                                                                 ✓ Corregida
@@ -513,7 +533,7 @@
                                 @if(!$showFormDictamen)
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                         <button wire:click="$set('showFormRevision', true)" 
-                                                class="p-4 border-2 border-yellow-300 dark:border-yellow-700 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors">
+                                                class="p-4 border-2 border-yellow-300 dark:border-yellow-700 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors cursor-pointer">
                                             <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 6v2M7.08 6.47A9.96 9.96 0 0112 1a9.96 9.96 0 014.92 5.47" />
                                             </svg>
@@ -522,7 +542,7 @@
                                         </button>
 
                                         <button wire:click="$set('showFormDictamen', true)" 
-                                                class="p-4 border-2 border-indigo-300 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors">
+                                                class="p-4 border-2 border-indigo-300 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors cursor-pointer">
                                             <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 12a5 5 0 1110 0 5 5 0 01-10 0z" />
                                             </svg>
@@ -542,10 +562,10 @@
                                             @error('comentarioRevision') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                             
                                             <div class="mt-4 flex gap-2">
-                                                <button wire:click="enviarParaReformulacion" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium">
+                                                <button wire:click="enviarParaReformulacion" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium cursor-pointer">
                                                     Enviar a Reformular
                                                 </button>
-                                                <button wire:click="$set('showFormRevision', false)" class="px-4 py-2 bg-zinc-400 hover:bg-zinc-500 text-white rounded-lg font-medium">
+                                                <button wire:click="$set('showFormRevision', false)" class="px-4 py-2 bg-zinc-400 hover:bg-zinc-500 text-white rounded-lg font-medium cursor-pointer">
                                                     Cancelar
                                                 </button>
                                             </div>
@@ -583,10 +603,10 @@
                                         </div>
 
                                         <div class="flex gap-2">
-                                            <button wire:click="emitirDictamen" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
+                                            <button wire:click="emitirDictamen" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium cursor-pointer">
                                                 Emitir Dictamen
                                             </button>
-                                            <button wire:click="$set('showFormDictamen', false)" class="px-4 py-2 bg-zinc-400 hover:bg-zinc-500 text-white rounded-lg font-medium">
+                                            <button wire:click="$set('showFormDictamen', false)" class="px-4 py-2 bg-zinc-400 hover:bg-zinc-500 text-white rounded-lg font-medium cursor-pointer">
                                                 Cancelar
                                             </button>
                                         </div>
