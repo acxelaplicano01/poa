@@ -211,7 +211,10 @@
                                                             @else
                                                                 <span
                                                                     class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                                                                    ✓ Corregido
+                                                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                                    </svg>
+                                                                    Corregido
                                                                 </span>
                                                             @endif
                                                         @endif
@@ -366,7 +369,10 @@
                                                                                         @else
                                                                                             <span
                                                                                                 class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                                                                                                ✓ Corregido
+                                                                                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                                                                </svg>
+                                                                                                Corregido
                                                                                             </span>
                                                                                         @endif
                                                                                     @endif
@@ -583,7 +589,10 @@
                                                                         <span class="text-purple-600 dark:text-purple-400 ml-2">{{ $ultimoComentarioTarea->created_at->format('d/m/Y H:i') }}</span>
                                                                         @if($ultimoComentarioTarea->corregido)
                                                                             <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                                                                                ✓ Corregido
+                                                                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                                                </svg>
+                                                                                Corregido
                                                                             </span>
                                                                         @else
                                                                             <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">
@@ -758,7 +767,10 @@
                                                                 <span class="text-purple-600 dark:text-purple-400 ml-2">{{ $ultimoComentarioTarea->created_at->format('d/m/Y H:i') }}</span>
                                                                 @if($ultimoComentarioTarea->corregido)
                                                                     <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                                                                        ✓ Corregido
+                                                                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                                    </svg> 
+                                                                    Corregido
                                                                     </span>
                                                                 @else
                                                                     <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">
@@ -789,7 +801,7 @@
                         @if(count($revisiones) > 0)
                             <div class="space-y-4">
                                 @foreach($revisiones as $revision)
-                                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded">
+                                    <div class="{{ $revision['corregido'] ? 'bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500' : 'bg-gray-200 dark:bg-gray-900/20 border-l-4 border-gray-500' }} p-4 rounded">
                                         <div class="flex items-start justify-between">
                                             <div class="flex-1">
                                                 <div class="flex items-center gap-2 mb-2">
@@ -804,7 +816,10 @@
                                                         @if($revision['corregido'])
                                                             <span
                                                                 class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                                                                ✓ Corregida
+                                                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                                </svg> 
+                                                                Corregida
                                                             </span>
                                                         @else
                                                             <span
