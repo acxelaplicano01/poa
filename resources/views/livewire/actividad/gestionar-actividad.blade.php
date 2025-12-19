@@ -3,7 +3,7 @@
         <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow sm:rounded-lg p-4 sm:p-6">
             
             <!-- Encabezado -->
-            <div class="mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-700">
+            <div class="mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-700" x-data="{ drawerOpen: false }">
                 <div class="flex items-center justify-between">
                     <div>
                         <a href="{{ route('actividades', ['idPoa' => $actividad->idPoa, 'departamento' => $actividad->idDeptartamento]) }}" 
@@ -19,6 +19,163 @@
                         <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-2">
                             {{ $actividad->nombre }}
                         </p>
+                    </div>
+                    
+                    <!-- Botón Historial de Comentarios -->
+                    <div>
+                        <button @click="drawerOpen = true" 
+                                class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-md transition duration-200 cursor-pointer">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Drawer Lateral -->
+                <div x-show="drawerOpen" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     @click="drawerOpen = false"
+                     class="fixed inset-0 z-40"
+                     style="display: none;">
+                    <div class="absolute inset-0 bg-gray-500 dark:bg-stone-900 opacity-75"></div>
+                </div>
+                
+                <div x-show="drawerOpen"
+                     x-transition:enter="transition ease-out duration-300 transform"
+                     x-transition:enter-start="translate-x-full"
+                     x-transition:enter-end="translate-x-0"
+                     x-transition:leave="transition ease-in duration-200 transform"
+                     x-transition:leave-start="translate-x-0"
+                     x-transition:leave-end="translate-x-full"
+                     class="fixed right-0 top-0 h-full w-full sm:w-2/3 lg:w-1/2 xl:w-1/3 bg-white dark:bg-zinc-900 shadow-2xl z-50 overflow-y-auto"
+                     style="display: none;">
+                    
+                    <!-- Header del Drawer -->
+                    <div class="sticky top-0 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700 px-6 py-4 z-10">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-zinc-800 dark:text-zinc-200">
+                                Historial de Comentarios
+                            </h3>
+                            <button @click="drawerOpen = false" 
+                                    class="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                            Todos los comentarios de revisión de esta actividad
+                        </p>
+                    </div>
+                    
+                    <!-- Contenido del Drawer -->
+                    <div class="px-6 py-4 space-y-4">
+                        @php
+                            $todosComentarios = $actividad->revisiones()
+                                ->with('user')
+                                ->whereIn('tipo', ['TAREA', 'INDICADOR', 'PLANIFICACION'])
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+                        @endphp
+                        
+                        @if($todosComentarios->isEmpty())
+                            <div class="text-center py-12">
+                                <svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                </svg>
+                                <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                                    No hay comentarios registrados
+                                </p>
+                            </div>
+                        @else
+                            @foreach($todosComentarios as $comentario)
+                                @php
+                                    // Obtener el nombre del elemento según el tipo
+                                    $nombreElemento = '';
+                                    $tipoElemento = '';
+                                    $colorFondo = '';
+                                    $colorTexto = '';
+                                    
+                                    switch($comentario->tipo) {
+                                        case 'TAREA':
+                                            $tarea = \App\Models\Tareas\Tarea::find($comentario->idElemento);
+                                            $nombreElemento = $tarea ? $tarea->nombre : 'Tarea eliminada';
+                                            $tipoElemento = 'Tarea';
+                                            $colorFondo = 'bg-blue-100 dark:bg-blue-900/30';
+                                            $colorTexto = 'text-blue-800 dark:text-blue-300';
+                                            break;
+                                        case 'INDICADOR':
+                                            $indicador = \App\Models\Actividad\Indicador::find($comentario->idElemento);
+                                            $nombreElemento = $indicador ? $indicador->nombre : 'Indicador eliminado';
+                                            $tipoElemento = 'Indicador';
+                                            $colorFondo = 'bg-purple-100 dark:bg-purple-900/30';
+                                            $colorTexto = 'text-purple-800 dark:text-purple-300';
+                                            break;
+                                        case 'PLANIFICACION':
+                                            $planificacion = \App\Models\Planificacion\Planificacion::with('indicador')->find($comentario->idElemento);
+                                            if($planificacion && $planificacion->indicador) {
+                                                $nombreElemento = $planificacion->indicador->nombre . ' (Planificación)';
+                                            } else {
+                                                $nombreElemento = 'Planificación eliminada';
+                                            }
+                                            $tipoElemento = 'Planificación';
+                                            $colorFondo = 'bg-indigo-100 dark:bg-indigo-900/30';
+                                            $colorTexto = 'text-indigo-800 dark:text-indigo-300';
+                                            break;
+                                    }
+                                @endphp
+                                
+                                <div class="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <div class="flex items-start justify-between mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorFondo }} {{ $colorTexto }}">
+                                                {{ $tipoElemento }}
+                                            </span>
+                                            @if($comentario->user)
+                                                <span class="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
+                                                    • {{ $comentario->user->name }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <span class="text-xs text-zinc-500 dark:text-zinc-400">
+                                            {{ $comentario->created_at->format('d/m/Y H:i') }}
+                                        </span>
+                                    </div>
+                                    
+                                    <h4 class="font-semibold text-sm text-zinc-800 dark:text-zinc-200 mb-2">
+                                        {{ $nombreElemento }}
+                                    </h4>
+                                    
+                                    <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
+                                        {{ $comentario->revision }}
+                                    </p>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        @if($comentario->corregido)
+                                            <span class="inline-flex items-center px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs font-semibold rounded-md">
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                </svg>
+                                                Corregido
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 text-xs font-semibold rounded-md">
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                </svg>
+                                                Pendiente
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
             </div>
