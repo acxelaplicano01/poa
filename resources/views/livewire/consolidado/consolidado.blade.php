@@ -1,7 +1,7 @@
-<div class="py-6">
+<div>
         <div class=" mx-auto px-4 bg-white dark:bg-zinc-900 overflow-hidden shadow sm:rounded-lg p-4 sm:p-6">
         <!-- Header -->
-        <div class="mb-6">
+        <div class="mb-3">
             <h2 class="text-2xl font-bold text-zinc-800 dark:text-zinc-200">
                 Consolidado de Actividades
             </h2>

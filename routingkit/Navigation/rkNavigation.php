@@ -60,7 +60,13 @@ return [
                                 ->setDescription('Revisión de actividades')
                                 ->setLabel('Gestionar Actividad')
                                 ->setHeroIcon('square-3-stack-3d')
-                                ->setEndBlock('revision-actividades')
+                                ->setEndBlock('revision-actividades'),
+                    RkNavigation::make('review-actividad-detalle')
+                                ->setParentId('revisiones')
+                                ->setDescription('Revisión de actividades de los diferentes Unidades Ejecutoras')
+                                ->setLabel('Revisión de actividades')
+                                ->setHeroIcon('document-check')
+                                ->setEndBlock('review-actividad-detalle')
                 ])
                 ->setEndBlock('revisiones'),
 
