@@ -479,6 +479,65 @@ class Actividades extends Component
         }
     }
 
+    /**
+     * Genera el correlativo con el formato:
+     * ANIO-CATEGORIA-SIGLAS_DEPTO-R-ID_DIMENSION-ID_RESULTADO-NUM_ACTIVIDAD
+     * Ejemplo: 2024-CA-INTER-R-15-112-2
+     */
+    private function generarCorrelativo()
+    {
+        // Obtener el contador de actividades para este POA y departamento
+        $cantidadActividades = Actividad::where('idPoa', $this->idPoa)
+            ->where('idDeptartamento', $this->idDeptartamento)
+            ->count();
+        
+        $numeroActividad = $cantidadActividades + 1;
+        
+        // Obtener datos necesarios
+        $poa = Poa::find($this->idPoa);
+        $departamento = Departamento::find($this->idDeptartamento);
+        $resultado = Resultado::with('area.objetivo.dimension')->find($this->idResultado);
+        
+        if (!$poa || !$departamento || !$resultado) {
+            return $numeroActividad; // Fallback al número simple
+        }
+        
+        $correlativo = '';
+        
+        // 1. Año del POA
+        $correlativo .= $poa->anio . '-';
+        
+        // 2. Categoría (1=CA, 2=JF, 3=AD, otro=CR)
+        $categoriaId = $this->idCategoria;
+        if ($categoriaId == 1) {
+            $correlativo .= 'CA-';
+        } elseif ($categoriaId == 2) {
+            $correlativo .= 'JF-';
+        } elseif ($categoriaId == 3) {
+            $correlativo .= 'AD-';
+        } else {
+            $correlativo .= 'CR-'; // default
+        }
+        
+        // 3. Siglas del departamento
+        $correlativo .= ($departamento->siglas ?? 'DEPTO') . '-';
+        
+        // 4. Literal "R" (Resultado)
+        $correlativo .= 'R-';
+        
+        // 5. ID de la dimensión del resultado
+        $dimensionId = $resultado->area?->objetivo?->dimension?->id ?? '0';
+        $correlativo .= $dimensionId . '-';
+        
+        // 6. ID del resultado
+        $correlativo .= $resultado->id . '-';
+        
+        // 7. Número correlativo de la actividad
+        $correlativo .= $numeroActividad;
+        
+        return $correlativo;
+    }
+
     public function guardar()
     {
         $this->validate();
@@ -488,11 +547,7 @@ class Actividades extends Component
 
             // Generar correlativo si es una nueva actividad
             if (!$this->actividadId && empty($this->correlativo)) {
-                $ultimoCorrelativo = Actividad::where('idPoa', $this->idPoa)
-                    ->where('idDeptartamento', $this->idDeptartamento)
-                    ->max('correlativo');
-                
-                $this->correlativo = $ultimoCorrelativo ? $ultimoCorrelativo + 1 : 1;
+                $this->correlativo = $this->generarCorrelativo();
             }
 
             $datos = [

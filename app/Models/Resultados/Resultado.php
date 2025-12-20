@@ -33,6 +33,18 @@ class Resultado extends Model
                     ->where('elemento_tipo', 'resultados');
     }
 
+    // Relación con Dimension a través de Area -> Objetivo
+    public function dimension()
+    {
+        return $this->area()->with('objetivo.dimension')->get()->first()?->objetivo?->dimension;
+    }
+
+    // Método para usar en queries con eager loading
+    public function getDimensionAttribute()
+    {
+        return $this->area?->objetivo?->dimension;
+    }
+
     protected static function booted()
     {
         static::created(function ($resultado) {
