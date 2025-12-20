@@ -69,6 +69,14 @@ class ReviewActividadDetalle extends Component
             } elseif ($revision->tipo === 'INDICADOR' && $revision->idElemento) {
                 $indicador = \App\Models\Actividad\Indicador::find($revision->idElemento);
                 $revisionArray['elemento_nombre'] = $indicador ? $indicador->nombre : 'Indicador no encontrado';
+            } elseif ($revision->tipo === 'PLANIFICACION' && $revision->idElemento) {
+                $planificacion = \App\Models\Planificacion\Planificacion::with('mes.trimestre')->find($revision->idElemento);
+                if ($planificacion) {
+                    $trimestre = $planificacion->mes->trimestre->trimestre ?? 'N/A';
+                    $revisionArray['elemento_nombre'] = "Planificación {$trimestre}";
+                } else {
+                    $revisionArray['elemento_nombre'] = 'Planificación no encontrada';
+                }
             } else {
                 $revisionArray['elemento_nombre'] = null;
             }
