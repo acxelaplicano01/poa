@@ -310,6 +310,7 @@
                                                 </p>
                                             </div>
                                             <div class="flex items-center space-x-2">
+                                                @can('consola.asignacionpresupuestaria.asignar')
                                                 <x-button 
                                                     wire:click="createForDepartment({{ $departamento->id }})" class="{{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto"
                                                     >
@@ -318,6 +319,7 @@
                                                     </svg>
                                                     Asignar
                                                 </x-button>
+                                                @endcan
                                             </div>
                                         </div>
                                     </div>

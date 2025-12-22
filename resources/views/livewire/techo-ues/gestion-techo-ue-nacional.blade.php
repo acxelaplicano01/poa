@@ -599,6 +599,7 @@
                                                 </div>
                                             </div>
                                             <div class="mt-3 flex justify-end">
+                                                @can('consola.asignacionnacionalpresupuestaria.asignar')
                                                 <x-button wire:click="crearTechoParaUe({{ $ue->id }})" :disabled="!$puedeAsignarPresupuesto"
                                                     class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-indigo-700 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-300 transition-colors {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-indigo-200 dark:hover:bg-indigo-800' }}">
                                                     <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -606,6 +607,7 @@
                                                     </svg>
                                                     Asignar
                                                 </x-button>
+                                                @endcan
                                             </div>
                                         </div>
                                     @endforeach
