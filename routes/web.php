@@ -53,9 +53,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 });
 
 
-Route::get('/dashboard', function () {
-    return view('layouts.app');
-})
+Route::get('/dashboard', \App\Livewire\Dashboard\DashboardEmpleado::class)
     ->middleware(['auth:sanctum', 'verified', 'check.empleado'])
     ->name('dashboard');
     
