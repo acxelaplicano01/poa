@@ -34,11 +34,11 @@
                             id="perPage" 
                             wire:model.live="perPage"
                             :options="[
-        ['value' => '10', 'text' => '10 por página'],
-        ['value' => '25', 'text' => '25 por página'],
-        ['value' => '50', 'text' => '50 por página'],
-        ['value' => '100', 'text' => '100 por página'],
-    ]"
+                                ['value' => '10', 'text' => '10 por página'],
+                                ['value' => '25', 'text' => '25 por página'],
+                                ['value' => '50', 'text' => '50 por página'],
+                                ['value' => '100', 'text' => '100 por página'],
+                            ]"
                             class="w-full"
                         />
                     </div>

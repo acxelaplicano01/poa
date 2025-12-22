@@ -22,6 +22,7 @@
                     </div>
 
                     <div class="flex justify-end mt-4 sm:mt-0">
+                        @can('consola.asignacionpresupuestaria.crear')
                         <x-button wire:click="create()" class="w-full sm:w-auto justify-center {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                             <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -30,6 +31,7 @@
                             </svg>
                             {{ __('Nuevo Techo Departamental') }}
                         </x-button>
+                        @endcan
                     </div>
                 </div>
             </div>
@@ -442,6 +444,7 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                                 <div class="flex justify-center space-x-2">
+                                                     @can('consola.asignacionpresupuestaria.editar')
                                                     <button wire:click="editDepartment({{ $departamentoId }})"
                                                         class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
@@ -452,6 +455,8 @@
                                                                 clip-rule="evenodd" />
                                                         </svg>
                                                     </button>
+                                                    @endcan
+                                                     @can('consola.asignacionpresupuestaria.eliminar')
                                                     <button wire:click="confirmDeleteDepartment({{ $departamentoId }})"
                                                         class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 cursor-pointer {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
@@ -461,6 +466,7 @@
                                                                 clip-rule="evenodd" />
                                                         </svg>
                                                     </button>
+                                                    @endcan
                                                 </div>
                                             </td>
                                         </tr>
@@ -518,6 +524,7 @@
                                             </div>
                                             
                                             <div class="flex space-x-2">
+                                                 @can('consola.asignacionpresupuestaria.editar')
                                                 <button wire:click="editDepartment({{ $departamentoId }})"
                                                     class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded  bg-yellow-400 hover:bg-yellow-500  transition-colors duration-150 {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                                                     <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -525,8 +532,8 @@
                                                     </svg>
                                                     Editar
                                                 </button>
-                                                 
-
+                                                 @endcan
+                                                 @can('consola.asignacionpresupuestaria.eliminar')
                                                 <button wire:click="confirmDeleteDepartment({{ $departamentoId }})"
                                                     class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-md transition-colors {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto"
                                                     title="Eliminar">
@@ -537,6 +544,7 @@
                                                             clip-rule="evenodd" />
                                                     </svg>
                                                 </button>
+                                                @endcan
                                             </div>
                                         </div>
                                     @endforeach

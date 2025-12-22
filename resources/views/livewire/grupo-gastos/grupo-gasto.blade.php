@@ -29,20 +29,22 @@
                                 id="perPage" 
                                 wire:model.live="perPage"
                                 :options="[
-        ['value' => '10', 'text' => '10 por página'],
-        ['value' => '25', 'text' => '25 por página'],
-        ['value' => '50', 'text' => '50 por página'],
-        ['value' => '100', 'text' => '100 por página'],
-    ]"
+                                    ['value' => '10', 'text' => '10 por página'],
+                                    ['value' => '25', 'text' => '25 por página'],
+                                    ['value' => '50', 'text' => '50 por página'],
+                                    ['value' => '100', 'text' => '100 por página'],
+                                ]"
                                 class="w-full"
                             />
                     </div>
+                     @can('configuracion.grupogastos.crear')
                     <x-spinner-button wire:click="create()" loadingTarget="create()" :loadingText="__('Abriendo...')">
                         <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         {{ __('Nuevo Grupo') }}
                     </x-spinner-button>
+                    @endcan
                 </div>
             </div>
 
@@ -50,11 +52,11 @@
                 sort-field="{{ $sortField }}"
                 sort-direction="{{ $sortDirection }}"
                 :columns="[
-        ['key' => 'id', 'label' => 'ID', 'sortable' => true],
-        ['key' => 'nombre', 'label' => 'Nombre', 'sortable' => true],
-        ['key' => 'identificador', 'label' => 'Identificador', 'sortable' => true],
-        ['key' => 'actions', 'label' => 'Acciones'],
-    ]"
+                    ['key' => 'id', 'label' => 'ID', 'sortable' => true],
+                    ['key' => 'nombre', 'label' => 'Nombre', 'sortable' => true],
+                    ['key' => 'identificador', 'label' => 'Identificador', 'sortable' => true],
+                    ['key' => 'actions', 'label' => 'Acciones'],
+                ]"
                 empty-message="{{ __('No se encontraron grupos de gastos')}}"
                 class="mt-6"
             >
@@ -74,6 +76,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
+                                    @can('configuracion.grupogastos.editar')
                                     <button wire:click="edit({{ $grupo->id }})"
                                         class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
@@ -84,6 +87,8 @@
                                                 clip-rule="evenodd" />
                                         </svg>
                                     </button>
+                                    @endcan
+                                    @can('configuracion.grupogastos.eliminar')
                                     <button wire:click="confirmDelete({{ $grupo->id }})"
                                         class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
@@ -93,6 +98,7 @@
                                                 clip-rule="evenodd" />
                                         </svg>
                                     </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>
@@ -115,6 +121,7 @@
                                     </span>
                                 </div>
                                 <div class="flex space-x-2">
+                                    @can('configuracion.grupogastos.editar')
                                     <button wire:click="edit({{ $grupo->id }})"
                                         class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
@@ -125,6 +132,8 @@
                                                 clip-rule="evenodd" />
                                         </svg>
                                     </button>
+                                    @endcan
+                                    @can('configuracion.grupogastos.eliminar')
                                     <button wire:click="confirmDelete({{ $grupo->id }})"
                                         class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
@@ -134,6 +143,7 @@
                                                 clip-rule="evenodd" />
                                         </svg>
                                     </button>
+                                    @endcan
                                 </div>
                             </div>
                             <h3 class="font-semibold text-zinc-900 dark:text-zinc-200 text-lg mb-1">{{ $grupo->nombre }}</h3>

@@ -12,12 +12,14 @@
                         Administre las actividades del departamento vinculadas al PEI
                     </p>
                 </div>
+                @can('planificacion.actividades.crear')
                 <x-spinner-button wire:click="crear" loadingTarget="crear" :loadingText="__('Abriendo...')" class="{{ !$puedeCrearActividades ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeCrearActividades">
                     <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Nueva Actividad
                 </x-spinner-button>
+                @endcan
             </div>
 
             {{-- Alerta de plazo --}}
@@ -227,6 +229,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                @can('planificacion.actividades.gestionar')
                                 <a href="{{ route('gestionar-actividad', ['idActividad' => $actividad->id]) }}"
                                    class="inline-flex items-center text-white dark:hover:bg-green-500 hover:bg-green-700 rounded cursor-pointer p-1.5 bg-green-600"
                                    title="Gestionar">
@@ -236,6 +239,8 @@
                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
                                     </svg>
                                 </a>
+                                @endcan
+                                @can('planificacion.actividades.editar')
                                 <button wire:click="editar({{ $actividad->id }})" 
                                         class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 cursor-pointer {{ !$puedeCrearActividades || in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" {{ !$puedeCrearActividades || in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'disabled' : '' }}
                                         title="{{ in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'No se puede editar en estado ' . $actividad->estado : 'Editar' }}">
@@ -247,6 +252,8 @@
                                             clip-rule="evenodd" />
                                     </svg>
                                 </button>
+                                @endcan
+                                @can('planificacion.actividades.eliminar')
                                 <button wire:click="confirmDelete({{ $actividad->id }})" 
                                         class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 cursor-pointer {{ !$puedeCrearActividades || in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" {{ !$puedeCrearActividades || in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'disabled' : '' }}
                                         title="{{ in_array($actividad->estado, ['REVISION', 'RECHAZADO', 'APROBADO']) ? 'No se puede eliminar en estado ' . $actividad->estado : 'Eliminar' }}">
@@ -257,6 +264,7 @@
                                             clip-rule="evenodd" />
                                     </svg>
                                 </button>
+                                @endcan
                             </td>
                         </tr>
                     @empty

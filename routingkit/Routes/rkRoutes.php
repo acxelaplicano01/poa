@@ -24,91 +24,161 @@ return [
 
             RkRoute::make('trimestres')
                 ->setParentId('auth_group')
-                ->setAccessPermission('acceder-trimestres')
+                ->setAccessPermission('acceso-configuracion')
+                ->setPermissions([
+                    'configuracion.trimestres.ver', 
+                    'configuracion.trimestres.editar', 
+                    'configuracion.trimestres.crear', 
+                    'configuracion.trimestres.eliminar', 
+                    'acceso-configuracion'
+                ])
                 ->setUrlMethod('get')
                 ->setUrlController('App\Livewire\Mes\Trimestres')
-                ->setRoles(['admin_general'])
+                ->setRoles(['super_admin', 'admin'])
                 ->setItems([])
                 ->setEndBlock('trimestres'),
 
             RkRoute::make('tipoactividades')
                 ->setParentId('auth_group')
-                ->setAccessPermission('acceder-tipoactividades')
+                ->setAccessPermission('acceso-configuracion')
+                ->setPermissions([
+                    'configuracion.tipoactividades.ver', 
+                    'configuracion.tipoactividades.editar', 
+                    'configuracion.tipoactividades.crear', 
+                    'configuracion.tipoactividades.eliminar', 
+                    'acceso-configuracion'
+                ])
                 ->setUrlMethod('get')
                 ->setUrlController('App\Livewire\Actividad\TipoActividades')
-                ->setRoles(['admin_general'])
+                ->setRoles(['super_admin', 'admin'])
                 ->setItems([])
                 ->setEndBlock('tipoactividades'),
 
             RkRoute::make('tipo-acta-entregas')
                 ->setParentId('auth_group')
-                ->setAccessPermission('acceder-tipo-acta-entregas')
+                ->setAccessPermission('acceso-configuracion')
+                ->setPermissions([
+                    'configuracion.tipoactaentregas.ver', 
+                    'configuracion.tipoactaentregas.editar', 
+                    'configuracion.tipoactaentregas.crear', 
+                    'configuracion.tipoactaentregas.eliminar', 
+                    'acceso-configuracion'
+                ])
                 ->setUrlMethod('get')
                 ->setUrlController('App\Livewire\Actas\TipoActaEntregas')
-                ->setRoles(['admin_general'])
+                ->setRoles(['super_admin', 'admin'])
                 ->setItems([])
                 ->setEndBlock('tipo-acta-entregas'),
 
             RkRoute::make('unidad-medidas')
                 ->setParentId('auth_group')
-                ->setAccessPermission('acceder-unidad-medidas')
+                ->setAccessPermission('acceso-configuracion')
+                ->setPermissions([
+                    'configuracion.unidadmedidas.ver', 
+                    'configuracion.unidadmedidas.editar', 
+                    'configuracion.unidadmedidas.crear', 
+                    'configuracion.unidadmedidas.eliminar', 
+                    'acceso-configuracion'
+                ])
                 ->setUrlMethod('get')
                 ->setUrlController('App\Livewire\Requisicion\UnidadMedidas')
-                ->setRoles(['admin_general'])
+                ->setRoles(['super_admin', 'admin'])
                 ->setItems([])
                 ->setEndBlock('unidad-medidas'),
 
             RkRoute::make('categorias')
                 ->setParentId('auth_group')
-                ->setAccessPermission('acceder-categorias')
+                ->setAccessPermission('acceso-configuracion')
+                ->setPermissions([
+                    'configuracion.categorias.ver', 
+                    'configuracion.categorias.editar', 
+                    'configuracion.categorias.crear', 
+                    'configuracion.categorias.eliminar', 
+                    'acceso-configuracion'
+                ])
                 ->setUrlMethod('get')
                 ->setUrlController('App\Livewire\Categoria\Categorias')
-                ->setRoles(['admin_general'])
+                ->setRoles(['super_admin', 'admin'])
                 ->setItems([])
                 ->setEndBlock('categorias'),
 
             RkRoute::make('estados-ejecucion')
                 ->setParentId('auth_group')
-                ->setAccessPermission('acceder-estados-ejecucion')
+                ->setAccessPermission('acceso-configuracion')
+                ->setPermissions([
+                    'configuracion.estadosejecucion.ver', 
+                    'configuracion.estadosejecucion.editar', 
+                    'configuracion.estadosejecucion.crear', 
+                    'configuracion.estadosejecucion.eliminar', 
+                    'acceso-configuracion'
+                ])
                 ->setUrlMethod('get')
                 ->setUrlController('App\Livewire\EjecucionPresupuestaria\EstadosEjecucionPresupuestaria')
-                ->setRoles(['admin_general'])
+                ->setRoles(['super_admin', 'admin'])
                 ->setItems([])
                 ->setEndBlock('estados-ejecucion'),
 
             RkRoute::make('estados-requisicion')
                 ->setParentId('auth_group')
-                ->setAccessPermission('acceder-estados-requisicion')
+                ->setAccessPermission('acceso-configuracion')
+                ->setPermissions([
+                    'configuracion.estadosrequisicion.ver', 
+                    'configuracion.estadosrequisicion.editar', 
+                    'configuracion.estadosrequisicion.crear', 
+                    'configuracion.estadosrequisicion.eliminar', 
+                    'acceso-configuracion'
+                ])
                 ->setUrlMethod('get')
                 ->setUrlController('App\Livewire\Requisicion\EstadosRequisicion')
-                ->setRoles(['admin_general'])
+                ->setRoles(['super_admin', 'admin'])
                 ->setItems([])
                 ->setEndBlock('estados-requisicion'),
 
             RkRoute::make('fuentes')
                 ->setParentId('auth_group')
-                ->setAccessPermission('acceder-fuentes')
+                ->setAccessPermission('acceso-configuracion')
+                ->setPermissions([
+                    'configuracion.fuentes.ver', 
+                    'configuracion.fuentes.editar', 
+                    'configuracion.fuentes.crear', 
+                    'configuracion.fuentes.eliminar', 
+                    'acceso-configuracion'
+                ])
                 ->setUrlMethod('get')
                 ->setUrlController('App\Livewire\GrupoGastos\Fuentes')
-                ->setRoles(['admin_general'])
+                ->setRoles(['super_admin', 'admin'])
                 ->setItems([])
                 ->setEndBlock('fuentes'),
 
             RkRoute::make('grupo-gastos')
                 ->setParentId('auth_group')
-                ->setAccessPermission('acceder-grupo-gastos')
+                ->setAccessPermission('acceso-configuracion')
+                ->setPermissions([
+                    'configuracion.grupogastos.ver', 
+                    'configuracion.grupogastos.editar', 
+                    'configuracion.grupogastos.crear', 
+                    'configuracion.grupogastos.eliminar', 
+                    'acceso-configuracion'
+                ])
                 ->setUrlMethod('get')
                 ->setUrlController('App\Livewire\GrupoGastos\GrupoGastos')
-                ->setRoles(['admin_general'])
+                ->setRoles(['super_admin', 'admin'])
                 ->setItems([])
                 ->setEndBlock('grupo-gastos'),
 
             RkRoute::make('instituciones')
                 ->setParentId('auth_group')
-                ->setAccessPermission('acceder-instituciones')
+                ->setAccessPermission('acceso-configuracion')
+                ->setPermissions([
+                    'configuracion.instituciones.ver', 
+                    'configuracion.instituciones.editar', 
+                    'configuracion.instituciones.crear', 
+                    'configuracion.instituciones.eliminar', 
+                    'acceso-configuracion'
+                ])
                 ->setUrlMethod('get')
                 ->setUrlController('App\Livewire\Institucion\Instituciones')
-                ->setRoles(['admin_general'])
+                ->setRoles(['super_admin', 'admin'])
                 ->setItems([])
                 ->setEndBlock('instituciones'),
 
@@ -128,7 +198,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Rol\Roles')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('roles'),
 
@@ -137,7 +207,7 @@ return [
                         ->setAccessPermission('configuracion.roles.crear')
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Rol\RoleForm')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('roles.create'),
 
@@ -163,7 +233,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Usuario\Usuarios')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('usuarios'),
 
@@ -179,7 +249,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Empleado\Empleados')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('empleados'),
 
@@ -195,7 +265,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Departamento\Departamentos')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('departamentos'),
 
@@ -211,7 +281,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\UnidadEjecutora\UnidadesEjecutoras')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('unidades-ejecutoras'),
 
@@ -227,7 +297,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\ProcesCompra\ProcesCompras')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
                         ->setEndBlock('procesoscompras'),
 
@@ -235,15 +305,15 @@ return [
                         ->setParentId('configuracion')
                         ->setAccessPermission('acceso-configuracion')
                         ->setPermissions([
-                            'recursos.ver',
-                            'recursos.crear',
-                            'recursos.editar',
-                            'recursos.eliminar',
+                            'configuracion.recursos.ver',
+                            'configuracion.recursos.crear',
+                            'configuracion.recursos.editar',
+                            'configuracion.recursos.eliminar',
                             'acceso-configuracion',
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Tarea\TareasHistorico')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
                         ->setEndBlock('recursos'),
 
@@ -259,7 +329,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Cub\Cubs')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
                         ->setEndBlock('cubs'),
                 ])
@@ -281,7 +351,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Planificar\Planificar')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
                         ->setEndBlock('planificar'),
 
@@ -297,7 +367,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Actividad\Actividades')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
                         ->setEndBlock('actividades'),
 
@@ -306,31 +376,33 @@ return [
                         ->setAccessPermission('acceso-planificacion')
                         ->setPermissions([
                             'planificacion.actividades.ver',
+                            'planificacion.actividades.crear',
                             'planificacion.actividades.editar',
+                            'planificacion.actividades.eliminar',
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Actividad\GestionarActividad')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
                         ->setEndBlock('gestionar-actividad'),
                     
                         RkRoute::make('revisiones')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('acceso-planificacion')
+                        ->setAccessPermission('revision.gestionar')
                         ->setPermissions([
                             'revision.ver',
                             'revision.gestionar'
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Revision\Revisiones')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion'])
                         ->setItems([
                             RkRoute::make('revision-actividades')
                                 ->setParentId('revisiones')
                                 ->setAccessPermission('revision.gestionar')
                                 ->setUrlMethod('get')
                                 ->setUrlController('App\Livewire\Revision\ActividadesRevision')
-                                ->setRoles(['admin_general'])
+                                ->setRoles(['super_admin', 'admin', 'direccion'])
                                 ->setItems([])
                                 ->setEndBlock('revision-actividades'),
                             RkRoute::make('review-actividad-detalle')
@@ -338,7 +410,7 @@ return [
                                         ->setAccessPermission('revision.gestionar')
                                         ->setUrlMethod('get')
                                         ->setUrlController('App\Livewire\Revision\ReviewActividadDetalle')
-                                        ->setRoles(['admin_general'])
+                                        ->setRoles(['super_admin', 'admin', 'direccion'])
                                         ->setItems([])
                                         ->setEndBlock('review-actividad-detalle'),
                         ])
@@ -356,7 +428,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Requisicion\Requisicion')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
                         ->setEndBlock('requisicion'),
 
@@ -372,7 +444,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Requisicion\Requisicion')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
                         ->setEndBlock('seguimiento'),
 
@@ -388,7 +460,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Consolidado\Consolidado')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
                         ->setEndBlock('consolidado'),
                 ])
@@ -410,42 +482,70 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Consola\PlanEstrategicoInstitucional')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'direccion'])
                         ->setItems([
                                     RkRoute::make('dimensiones')
                                 ->setParentId('consola')
-                                ->setAccessPermission('consola.dimensiones.ver')
+                                ->setAccessPermission('acceso-consola')
+                                ->setPermissions([
+                                    'consola.dimensiones.ver', 
+                                    'consola.dimensiones.editar', 
+                                    'consola.dimensiones.crear', 
+                                    'consola.dimensiones.eliminar', 
+                                    'acceso-consola'
+                                ])
                                 ->setUrlMethod('get')
                                 ->setUrlController('App\Livewire\Consola\Pei\Dimensiones\Dimension')
-                                ->setRoles(['admin_general'])
+                                ->setRoles(['super_admin', 'direccion'])
                                 ->setItems([
                                         RkRoute::make('objetivos')
-                                    ->setParentId('consola')
-                                    ->setAccessPermission('consola.objetivos.ver')
-                                    ->setUrlMethod('get')
-                                    ->setUrlController('App\Livewire\Consola\Pei\Objetivos\Objetivo')
-                                    ->setRoles(['admin_general'])
-                                    ->setItems([
-                                         RkRoute::make('areas')
-                                    ->setParentId('consola')
-                                    ->setAccessPermission('consola.areas.ver')
-                                    ->setUrlMethod('get')
-                                    ->setUrlController('App\Livewire\Consola\Pei\Areas\Area')
-                                    ->setRoles(['admin_general'])
-                                    ->setItems([
-                                        RkRoute::make('resultados')
-                                    ->setParentId('consola')
-                                    ->setAccessPermission('consola.resultados.ver')
-                                    ->setUrlMethod('get')
-                                    ->setUrlController('App\Livewire\Consola\Pei\Resultados\Resultado')
-                                    ->setRoles(['admin_general'])
-                                    ->setItems([
-                                    ])
-                                    ->setEndBlock('resultados'),
-                                    ])
-                                    ->setEndBlock('areas'),
-                                    ])
-                                    ->setEndBlock('objetivos'),
+                                            ->setParentId('consola')
+                                            ->setAccessPermission('acceso-consola')
+                                            ->setPermissions([
+                                                'consola.objetivos.ver', 
+                                                'consola.objetivos.editar', 
+                                                'consola.objetivos.crear', 
+                                                'consola.objetivos.eliminar', 
+                                                'acceso-consola'
+                                            ])
+                                            ->setUrlMethod('get')
+                                            ->setUrlController('App\Livewire\Consola\Pei\Objetivos\Objetivo')
+                                            ->setRoles(['super_admin', 'direccion'])
+                                            ->setItems([
+                                                RkRoute::make('areas')
+                                                    ->setParentId('consola')
+                                                    ->setAccessPermission('acceso-consola')
+                                                    ->setPermissions([
+                                                        'consola.areas.ver', 
+                                                        'consola.areas.editar', 
+                                                        'consola.areas.crear', 
+                                                        'consola.areas.eliminar', 
+                                                        'acceso-consola'
+                                                    ])
+                                                    ->setUrlMethod('get')
+                                                    ->setUrlController('App\Livewire\Consola\Pei\Areas\Area')
+                                                    ->setRoles(['super_admin', 'direccion'])
+                                                    ->setItems([
+                                                RkRoute::make('resultados')
+                                                    ->setParentId('consola')
+                                                    ->setAccessPermission('acceso-consola')
+                                                    ->setPermissions([
+                                                        'consola.tipoactividades.ver', 
+                                                        'consola.tipoactividades.editar', 
+                                                        'consola.tipoactividades.crear', 
+                                                        'consola.tipoactividades.eliminar', 
+                                                        'acceso-consola'
+                                                    ])
+                                                    ->setUrlMethod('get')
+                                                    ->setUrlController('App\Livewire\Consola\Pei\Resultados\Resultado')
+                                                    ->setRoles(['super_admin', 'direccion'])
+                                                    ->setItems([
+                                                    ])
+                                                    ->setEndBlock('resultados'),
+                                            ])
+                                            ->setEndBlock('areas'),
+                                            ])
+                                            ->setEndBlock('objetivos'),
                                 ])
                                 ->setEndBlock('planestrategicoinstitucional'),
                         ])
@@ -463,7 +563,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Consola\AsignacionPresuNacional')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'direccion'])
                         ->setItems([
                              RkRoute::make('analysis-techo-ue')
                                 ->setParentId('consola')
@@ -475,7 +575,7 @@ return [
                                 ->setUrlMethod('get')
                                 ->setUrlPattern('techonacional/{idPoa}/analysis/{idUE}')
                                 ->setUrlController('App\Livewire\TechoUes\AnalysisTechoUe')
-                                ->setRoles(['admin_general'])
+                                ->setRoles(['super_admin', 'direccion'])
                                 ->setItems([])
                                 ->setEndBlock('analysis-techo-ue'),
                         ])
@@ -493,7 +593,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Consola\AsignacionPresupuestaria')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('asignacionpresupuestaria'),
 
@@ -509,7 +609,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\TechoDeptos\GestionTechoDeptos')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('techodeptos'),
 
@@ -522,7 +622,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\TechoDeptos\DetalleEstructura')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('techodeptos.detalle-estructura'),
 
@@ -535,7 +635,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\TechoUes\GestionTechoUeNacional')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('techonacional'),
 
@@ -544,11 +644,14 @@ return [
                         ->setAccessPermission('acceso-consola')
                         ->setPermissions([
                             'consola.plazos.gestionar',
+                            'consola.plazos.crear',
+                            'consola.plazos.editar',
+                            'consola.plazos.eliminar',
                             'acceso-consola',
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Plazos\GestionPlazos')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('plazos'),
 
@@ -562,7 +665,7 @@ return [
                         ->setUrlMethod('get')
                         ->setUrlPattern('plazos-poa/{idPoa}')
                         ->setUrlController('App\Livewire\Plazos\GestionPlazosPoa')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'direccion'])
                         ->setItems([])
                         ->setEndBlock('plazos-poa'),
 
@@ -583,7 +686,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Http\Controllers\LogViewerController@index')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
                         ->setEndBlock('logs'),
 
@@ -596,7 +699,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Http\Controllers\LogViewerController@dashboard')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
                         ->setEndBlock('logsdashboard'),
 
@@ -609,7 +712,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Admin\SessionManager') // Si es Livewire
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
                         ->setEndBlock('sessions'),
 
@@ -622,7 +725,7 @@ return [
                         ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Http\Controllers\LogViewerController@show')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
                         ->setEndBlock('logs.show'),
 
@@ -635,7 +738,7 @@ return [
                         ])
                         ->setUrlMethod('post')
                         ->setUrlController('App\Http\Controllers\LogViewerController@cleanup')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin'])
                         ->setItems([])
                         ->setEndBlock('cleanup'),
 

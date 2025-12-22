@@ -46,12 +46,14 @@
                                 class="w-full"
                             />
                         </div>
+                        @can('configuracion.tipoactaentregas.crear')
                         <x-spinner-button wire:click="create()" loadingTarget="create()" :loadingText="__('Abriendo...')">
                             <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             {{ __('Nuevo Tipo') }}
                         </x-spinner-button>
+                        @endcan
                     </div>
                 </div>
 
@@ -59,11 +61,11 @@
                     sort-field="{{ $sortField }}"
                     sort-direction="{{ $sortDirection }}"
                     :columns="[
-        ['key' => 'id', 'label' => 'ID', 'sortable' => true],
-        ['key' => 'tipo', 'label' => 'Tipo de Acta', 'sortable' => true],
-        ['key' => 'created_at', 'label' => 'Creado', 'sortable' => true],
-        ['key' => 'actions', 'label' => 'Acciones', 'class' => 'text-right'],
-    ]"
+                        ['key' => 'id', 'label' => 'ID', 'sortable' => true],
+                        ['key' => 'tipo', 'label' => 'Tipo de Acta', 'sortable' => true],
+                        ['key' => 'created_at', 'label' => 'Creado', 'sortable' => true],
+                        ['key' => 'actions', 'label' => 'Acciones', 'class' => 'text-right'],
+                    ]"
                     empty-message="No hay tipos de actas de entrega disponibles"
                     class="mt-6"
                 >
@@ -81,6 +83,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end space-x-2">
+                                        @can('configuracion.tipoactaentregas.editar')
                                         <button wire:click="edit({{ $tipoActa->id }})"
                                             class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer"
                                             title="Editar">
@@ -92,6 +95,8 @@
                                                     clip-rule="evenodd" />
                                             </svg>
                                         </button>
+                                        @endcan
+                                        @can('configuracion.tipoactaentregas.eliminar')
                                         <button wire:click="confirmDelete({{ $tipoActa->id }})"
                                             class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 cursor-pointer"
                                             title="Eliminar">
@@ -102,6 +107,7 @@
                                                     clip-rule="evenodd" />
                                             </svg>
                                         </button>
+                                       @endcan
                                     </div>
                                 </td>
                             </tr>
@@ -124,6 +130,7 @@
                                         </span>
                                     </div>
                                     <div class="flex space-x-2">
+                                        @can('configuracion.tipoentregas.editar')
                                         <button wire:click="edit({{ $tipoActa->id }})"
                                             class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
@@ -134,6 +141,8 @@
                                                     clip-rule="evenodd" />
                                             </svg>
                                         </button>
+                                        @endcan
+                                        @can('configuracion.tipoentregas.eliminar')
                                         <button wire:click="confirmDelete({{ $tipoActa->id }})"
                                             class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
@@ -143,6 +152,7 @@
                                                     clip-rule="evenodd" />
                                             </svg>
                                         </button>
+                                        @endcan
                                     </div>
                                 </div>
                                 <h3 class="font-semibold text-zinc-900 dark:text-zinc-200 text-lg mb-1">

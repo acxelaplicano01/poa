@@ -12,6 +12,15 @@
                         Configura los períodos de tiempo para cada fase del POA
                     </p>
                 </div>
+                <div class="space-x-2">
+                    <button wire:click="volver" 
+                            class="inline-flex items-center px-4 py-2 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-800 dark:text-zinc-200 font-medium rounded-lg transition-colors duration-150">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Volver
+                    </button>
+                    @can('consola.plazos.crear')
                 <button wire:click="crear" 
                         class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-150">
                     <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -19,6 +28,7 @@
                     </svg>
                     Nuevo Plazo
                 </button>
+                @endcan
             </div>
 
             <!-- Mensajes -->
@@ -147,14 +157,18 @@
                                     </button>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                    @can('consola.plazos.editar')
                                     <button wire:click="editar({{ $plazo->id }})" 
                                             class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
                                         Editar
                                     </button>
+                                    @endcan
+                                    @can('consola.plazos.eliminar')
                                     <button wire:click="confirmDelete({{ $plazo->id }})" 
                                             class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
                                         Eliminar
                                     </button>
+                                    @endcan
                                 </td>
                             </tr>
                         @empty
@@ -213,14 +227,18 @@
                             </button>
                             
                             <div class="space-x-2">
+                                @can('consola.plazos.editar')
                                 <button wire:click="editar({{ $plazo->id }})" 
                                         class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm font-medium">
                                     Editar
                                 </button>
+                                @endcan
+                                @can('consola.plazos.eliminar')
                                 <button wire:click="confirmDelete({{ $plazo->id }})" 
                                         class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm font-medium">
                                     Eliminar
                                 </button>
+                                @endcan
                             </div>
                         </div>
                     </div>

@@ -22,6 +22,7 @@
                     </div>
 
                     <div class="flex justify-end mt-4 sm:mt-0">
+                        @can('consola.asignacionnacionalpresupuestaria.crear')
                         <x-button wire:click="create()" class="w-full sm:w-auto justify-center {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                             <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -30,6 +31,7 @@
                             </svg>
                             {{ __('Nuevo Techo UE') }}
                         </x-button>
+                        @endcan
                     </div>
                 </div>
             </div>
@@ -699,6 +701,7 @@
                                                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 3c-.169 0-.334.014-.5.025V11h7.975c.011-.166.025-.331.025-.5A7.5 7.5 0 0 0 13.5 3Z"/>
                                                                 </svg>
                                                             </button>
+                                                            @can('consola.asignacionnacionalpresupuestaria.editar')
                                                             <button wire:click="edit({{ $idUe }})"
                                                                 class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -708,6 +711,8 @@
                                                                         clip-rule="evenodd" />
                                                                 </svg>
                                                             </button>
+                                                            @endcan
+                                                            @can('consola.asignacionnacionalpresupuestaria.eliminar')
                                                             <button wire:click="eliminarTodosLosTechos({{ $idUe }})"
                                                                 class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 cursor-pointer {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -716,6 +721,7 @@
                                                                         clip-rule="evenodd" />
                                                                 </svg>
                                                             </button>
+                                                            @endcan
                                                         </td>
                                                     </tr>
                                                 @endforeach

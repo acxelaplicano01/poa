@@ -20,6 +20,7 @@
                         </svg>
                         Volver
                     </button>
+                    @can('consola.plazos.crear')
                     <button wire:click="crear" 
                             class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-150">
                         <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -27,6 +28,7 @@
                         </svg>
                         Plazo Personalizado
                     </button>
+                    @endcan
                 </div>
             </div>
 
@@ -364,14 +366,18 @@
                                                     Desactivado por vencimiento
                                                 </span>
                                             @else
+                                            @can('consola.plazos.editar')
                                                 <button wire:click="editar({{ $plazo->id }})" 
                                                         class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-3">
                                                     Editar
                                                 </button>
+                                            @endcan
+                                            @can('consola.plazos.eliminar')
                                                 <button wire:click="confirmDelete({{ $plazo->id }})" 
                                                         class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
                                                     Eliminar
                                                 </button>
+                                            @endcan
                                             @endif
                                         </td>
                                     </tr>

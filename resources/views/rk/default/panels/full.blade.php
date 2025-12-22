@@ -87,14 +87,17 @@
             <x-slot name="rightMenu">
                 <x-rk.default::navigation.search />
                 <x-rk.default::ui.theme-toggle />
-                <x-rk.default::dropdowns.profile-dropdown :userName="auth()->user()->name ?? 'Fran'" :userEmail="auth()->user()->email ?? 'fran@example.com'"
+                <x-rk.default::dropdowns.profile-dropdown :userName="auth()->user()->name ?? 'Acxel'" :userEmail="auth()->user()->email ?? 'acxel@example.com'"
                     class="bg-zinc-100 dark:bg-zinc-800">
+
+                    <x-rk.default::navigation.item href="{{ route('profile.show') }}"
+                        icon="heroicon-o-user-circle" class="w-full" title="{{ __('Profile') }}" />
 
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <x-rk.default::navigation.item as="button" type="submit"
-                            icon="heroicon-o-arrow-right-start-on-rectangle" class="w-full"
-                            title="{{ __('Log Out') }}" />
+                            icon="heroicon-o-arrow-right-start-on-rectangle" class="w-full cursor-pointer"
+                            title="{{ __('Cerrar Sesión') }}" />
                     </form>
                 </x-rk.default::dropdowns.profile-dropdown>
             </x-slot>

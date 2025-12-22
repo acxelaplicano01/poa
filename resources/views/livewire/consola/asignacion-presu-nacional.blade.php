@@ -44,6 +44,7 @@
                                 class="w-full"
                             />
                         </div>
+                        @can('consola.asignacionnacionalpresupuestaria.crear')
                         <x-spinner-button wire:click="create()"
                             loadingTarget="create" 
                             :loadingText="__('Abriendo...')"
@@ -55,6 +56,7 @@
                             </svg>
                             {{ __('Nuevo POA') }}
                         </x-spinner-button>
+                        @endcan
                     </div>
                 </div>
             </div>
@@ -143,6 +145,7 @@
                                         $poaVencido = $poa->anio < $anioActual;
                                     @endphp
                                     <div class="mt-5 flex space-x-2">
+                                         @can('consola.asignacionnacionalpresupuestaria.editar')
                                         <button 
                                             wire:click="edit({{ $poa->id }})" 
                                             @if($poaVencido) disabled @endif
@@ -154,6 +157,8 @@
                                             </svg>
                                             <span>Editar</span>
                                         </button>
+                                        @endcan
+                                         @can('consola.asignacionnacionalpresupuestaria.eliminar')
                                         <button 
                                             wire:click="confirmDelete({{ $poa->id }})" 
                                             @if($poaVencido) disabled @endif
@@ -163,6 +168,7 @@
                                                 <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                                             </svg>
                                         </button>
+                                        @endcan
                                     </div>
                             </div>
                         @endforeach
@@ -187,6 +193,7 @@
                                     <x-button wire:click="clearFilters" variant="secondary">
                                         Limpiar filtros
                                     </x-button>
+                                     @can('consola.asignacionnacionalpresupuestaria.crear')
                                     <x-button wire:click="create()" class="inline-flex bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700">
                                         <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor">
@@ -195,6 +202,7 @@
                                         </svg>
                                         Crear POA
                                     </x-button>
+                                    @endcan
                                 </div>
                             @else
                                 <h3 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
@@ -203,6 +211,7 @@
                                 <p class="text-zinc-500 dark:text-zinc-400 mb-8">
                                     Comienza creando tu primer Plan Operativo Anual para gestionar tus proyectos y presupuestos.
                                 </p>
+                                 @can('consola.asignacionnacionalpresupuestaria.crear')
                                 <x-button wire:click="create()" class="inline-flex bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700">
                                     <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor">
@@ -211,6 +220,7 @@
                                     </svg>
                                     Crear POA
                                 </x-button>
+                                @endcan
                             @endif
                         </div>
                     </div>
