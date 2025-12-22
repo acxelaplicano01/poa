@@ -1375,28 +1375,40 @@ class GestionarActividad extends Component
                 throw new \Exception('No hay techo presupuestario para la fuente de financiamiento seleccionada');
             }
             
-            // Obtener el techo del departamento para esta fuente
-            $techoDepto = TechoDepto::where('idDepartamento', $idDepartamento)
+            // Obtener el techo del departamento para esta fuente (suma de todos los techos deptos para esta fuente)
+            $techosTotalDisponible = TechoDepto::where('idDepartamento', $idDepartamento)
                 ->whereIn('idTechoUE', $techoUesIds)
-                ->first();
+                ->sum('monto');
             
-            if (!$techoDepto) {
-                throw new \Exception('No se encontró techo presupuestario para el departamento y fuente de financiamiento seleccionada');
+            if ($techosTotalDisponible <= 0) {
+                throw new \Exception('No hay techo presupuestario disponible para el departamento y fuente de financiamiento seleccionada');
             }
             
-            // Calcular presupuesto ya asignado a esta tarea para esta fuente
-            $presupuestoYaAsignado = Presupuesto::where('idtarea', $this->tareaSeleccionada)
+            // Obtener todas las tareas del departamento en este POA
+            $idPoa = $tarea->idPoa;
+            $todasLasTareas = Tarea::where('idDeptartamento', $idDepartamento)
+                ->where('idPoa', $idPoa)
+                ->pluck('id')
+                ->toArray();
+            
+            // Calcular presupuesto ya asignado a TODAS las tareas del departamento para esta fuente
+            $presupuestoYaAsignado = Presupuesto::whereIn('idtarea', $todasLasTareas)
                 ->where('idfuente', $idFuente)
                 ->whereNull('deleted_at')
                 ->sum('total');
             
-            // Calcular disponible = techo del departamento - presupuesto ya asignado
-            $presupuestoDisponible = $techoDepto->monto - $presupuestoYaAsignado;
+            // Calcular disponible = techo del departamento - presupuesto ya asignado a todas las tareas
+            $presupuestoDisponible = $techosTotalDisponible - $presupuestoYaAsignado;
             
-            // Verificar que haya suficiente presupuesto disponible
+            // Verificar que el presupuesto disponible sea mayor a 0
+            if ($presupuestoDisponible <= 0) {
+                throw new \Exception('No hay presupuesto disponible para esta fuente. Todo el techo ha sido asignado.');
+            }
+            
+            // Verificar que haya suficiente presupuesto disponible para el monto solicitado
             $presupuestoTotal = $this->nuevoPresupuesto['total'];
-            if ($presupuestoDisponible < $presupuestoTotal) {
-                throw new \Exception('Presupuesto insuficiente. Disponible: L ' . number_format($presupuestoDisponible, 2) . ', Requerido: L ' . number_format($presupuestoTotal, 2));
+            if ($presupuestoTotal > $presupuestoDisponible) {
+                throw new \Exception('Presupuesto insuficiente. Disponible: L ' . number_format($presupuestoDisponible, 2) . ', Solicitado: L ' . number_format($presupuestoTotal, 2));
             }
             
             // Crear el presupuesto (registrar la asignación, sin modificar el techo_depto)
