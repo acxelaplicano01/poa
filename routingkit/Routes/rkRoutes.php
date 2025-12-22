@@ -363,6 +363,7 @@ return [
                             'planificacion.actividades.crear',
                             'planificacion.actividades.editar',
                             'planificacion.actividades.eliminar',
+                            'planificacion.actividades.gestionar',
                             'acceso-planificacion',
                         ])
                         ->setUrlMethod('get')
@@ -559,6 +560,7 @@ return [
                             'consola.asignacionnacionalpresupuestaria.crear',
                             'consola.asignacionnacionalpresupuestaria.editar',
                             'consola.asignacionnacionalpresupuestaria.eliminar',
+                            'consola.asignacionnacionalpresupuestaria.asignar',
                             'acceso-consola',
                         ])
                         ->setUrlMethod('get')
@@ -589,6 +591,7 @@ return [
                             'consola.asignacionpresupuestaria.crear',
                             'consola.asignacionpresupuestaria.editar',
                             'consola.asignacionpresupuestaria.eliminar',
+                            'consola.asignacionpresupuestaria.asignar',
                             'acceso-consola',
                         ])
                         ->setUrlMethod('get')
@@ -605,6 +608,7 @@ return [
                             'consola.techodeptos.crear',
                             'consola.techodeptos.editar',
                             'consola.techodeptos.eliminar',
+                            'consola.techodeptos.asignar',
                             'acceso-consola',
                         ])
                         ->setUrlMethod('get')
