@@ -1173,13 +1173,32 @@ class GestionarActividad extends Component
                 // Sumar todos los techos disponibles para esta fuente (o todas si no hay fuente específica)
                 $techoTotalDisponible = $techosDepartamento->sum('monto');
                 
-                // Calcular presupuesto ya asignado a esta tarea PARA LA FUENTE SELECCIONADA
-                $queryPresupuesto = Presupuesto::where('idtarea', $tarea->id)
+                // Calcular presupuesto ya asignado a TODAS las tareas del departamento en el POA actual
+                // No solo la tarea actual, sino todas las tareas del departamento
+                $idDepartamento = $tarea->idDeptartamento;
+                $idPoa = $tarea->idPoa;
+                
+                // Obtener todas las tareas del departamento en este POA
+                $tareasDepartamento = Tarea::where('idDeptartamento', $idDepartamento)
+                    ->where('idPoa', $idPoa)
+                    ->pluck('id')
+                    ->toArray();
+                
+                // Calcular presupuesto total asignado a todas estas tareas para la fuente seleccionada
+                $queryPresupuesto = Presupuesto::whereIn('idtarea', $tareasDepartamento)
                     ->whereNull('deleted_at');
                 if ($idFuente) {
                     $queryPresupuesto->where('idfuente', $idFuente);
                 }
-                $presupuestoTareaActual = $queryPresupuesto->sum('total');
+                $presupuestoAsignadoTotal = $queryPresupuesto->sum('total');
+                
+                // Calcular presupuesto de la tarea actual para mostrar información adicional
+                $queryPresupuestoTareaActual = Presupuesto::where('idtarea', $tarea->id)
+                    ->whereNull('deleted_at');
+                if ($idFuente) {
+                    $queryPresupuestoTareaActual->where('idfuente', $idFuente);
+                }
+                $presupuestoTareaActual = $queryPresupuestoTareaActual->sum('total');
                 
                 // Obtener nombre de la fuente si está disponible
                 $fuenteNombre = 'General';
@@ -1191,8 +1210,8 @@ class GestionarActividad extends Component
                 
                 $this->presupuestoTechoInfo = [
                     'techoTotal' => $techoTotalDisponible,
-                    'presupuestoAsignado' => $presupuestoTareaActual,
-                    'presupuestoDisponible' => $techoTotalDisponible - $presupuestoTareaActual,
+                    'presupuestoAsignado' => $presupuestoAsignadoTotal,
+                    'presupuestoDisponible' => $techoTotalDisponible - $presupuestoAsignadoTotal,
                     'departamentoNombre' => $tarea->departamento->name ?? 'N/A',
                     'fuenteNombre' => $fuenteNombre,
                     'fuenteIdentificador' => $fuenteIdentificador ?? 'Todas'

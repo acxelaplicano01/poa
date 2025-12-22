@@ -366,16 +366,29 @@
                     @error('nuevoIndicador.cantidadPlanificada') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="flex items-center space-x-4">
-                    <label class="flex items-center">
-                        <input type="checkbox" wire:model="nuevoIndicador.isCantidad" class="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm text-zinc-700 dark:text-zinc-300">Es Cantidad</span>
-                    </label>
+                <div>
+                    <x-label value="Tipo de Indicador" />
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-2">Selecciona solo uno</p>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                wire:model.live="nuevoIndicador.isCantidad" 
+                                wire:click="$set('nuevoIndicador.isPorcentaje', false)"
+                                class="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                            <span class="ml-2 text-sm text-zinc-700 dark:text-zinc-300">Es Cantidad</span>
+                        </label>
 
-                    <label class="flex items-center">
-                        <input type="checkbox" wire:model="nuevoIndicador.isPorcentaje" class="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm text-zinc-700 dark:text-zinc-300">Es Porcentaje</span>
-                    </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                wire:model.live="nuevoIndicador.isPorcentaje" 
+                                wire:click="$set('nuevoIndicador.isCantidad', false)"
+                                class="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                            <span class="ml-2 text-sm text-zinc-700 dark:text-zinc-300">Es Porcentaje</span>
+                        </label>
+                    </div>
+                    @error('nuevoIndicador.tipo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
             </div>
         </x-slot>
