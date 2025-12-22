@@ -779,6 +779,8 @@
         // Gráfico de Presupuesto por Grupo de Gasto (Horizontal Bar)
         const ctxPorGrupoGasto = document.getElementById('chartPresupuestoPorGrupoGasto');
         if (ctxPorGrupoGasto && estadisticasPorGrupoGasto.length > 0) {
+            console.log('Datos de grupos de gasto:', estadisticasPorGrupoGasto);
+            
             charts.porGrupoGasto = new Chart(ctxPorGrupoGasto, {
                 type: 'bar',
                 data: {
@@ -799,6 +801,28 @@
                 options: {
                     ...defaultOptions,
                     indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: textColor,
+                                callback: function(value) {
+                                    return 'L ' + value.toLocaleString('es-HN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                }
+                            },
+                            grid: {
+                                color: gridColor
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: textColor
+                            },
+                            grid: {
+                                color: gridColor
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -814,22 +838,64 @@
                         {
                             label: 'Planificado',
                             data: estadisticasMensuales.map(m => parseFloat(m.planificado)),
-                            borderColor: chartColors.info,
-                            backgroundColor: chartColors.info + '33',
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                            borderWidth: 3,
                             tension: 0.4,
-                            fill: true
+                            fill: true,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: 'rgb(59, 130, 246)',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointHoverBackgroundColor: 'rgb(59, 130, 246)',
+                            pointHoverBorderColor: '#fff',
+                            pointHoverBorderWidth: 3
                         },
                         {
                             label: 'Ejecutado',
                             data: estadisticasMensuales.map(m => parseFloat(m.ejecutado)),
-                            borderColor: chartColors.success,
-                            backgroundColor: chartColors.success + '33',
+                            borderColor: 'rgb(34, 197, 94)',
+                            backgroundColor: 'rgba(34, 197, 94, 0.08)',
+                            borderWidth: 3,
                             tension: 0.4,
-                            fill: true
+                            fill: true,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: 'rgb(34, 197, 94)',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointHoverBackgroundColor: 'rgb(34, 197, 94)',
+                            pointHoverBorderColor: '#fff',
+                            pointHoverBorderWidth: 3
                         }
                     ]
                 },
-                options: defaultOptions
+                options: {
+                    ...defaultOptions,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        ...defaultOptions.plugins,
+                        tooltip: {
+                            backgroundColor: isDarkMode ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                            titleColor: textColor,
+                            bodyColor: textColor,
+                            borderColor: isDarkMode ? 'rgba(82, 82, 91, 0.5)' : 'rgba(228, 228, 231, 0.5)',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': L ' + 
+                                           context.parsed.y.toLocaleString('es-HN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                }
+                            }
+                        }
+                    }
+                }
             });
         }
     }
@@ -844,6 +910,13 @@
 
     @script
     <script>
+        // Inicializar charts cuando el componente Livewire se monta
+        setTimeout(() => {
+            if (typeof updateChartsWithLivewireData === 'function') {
+                updateChartsWithLivewireData();
+            }
+        }, 100);
+        
         // Escuchar cambios en los filtros y reinicializar charts con datos actualizados
         $wire.on('charts-update', () => {
             setTimeout(() => {
