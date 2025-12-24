@@ -15,7 +15,11 @@ use Illuminate\Support\Facades\Auth;
 
 class Requisicion extends Component
 {
+    public $mostrarSelector = false;
+    public $departamentosUsuario = [];
+    public $departamentoSeleccionado;
     public $detalleRequisiciones = [];
+    public $presupuestosSeleccionados = [];
     use WithPagination;
 
     protected string $layout = 'layouts.app';
@@ -39,10 +43,22 @@ class Requisicion extends Component
     public $sortDirection = 'desc';
     public $showModal = false;
     public $showDeleteModal = false;
+    public $showSumarioModal = false;
     public $requisicionToDelete;
     public $errorMessage = '';
     public $showErrorModal = false;
     public $isEditing = false;
+    // Abrir el modal de sumario
+    public function abrirSumario()
+    {
+        $this->showSumarioModal = true;
+    }
+
+    // Cerrar el modal de sumario
+    public function cerrarSumario()
+    {
+        $this->showSumarioModal = false;
+    }
 
     protected $rules = [
         'correlativo' => 'required|min:3',
@@ -238,6 +254,13 @@ class Requisicion extends Component
 
     public function render()
     {
+        // Obtener departamentos del usuario (ejemplo: por relación EmpleadoDepto)
+        $userId = Auth::id();
+        $departamentosUsuario = \App\Models\Departamento\Departamento::whereHas('empleados', function($q) use ($userId) {
+            $q->where('empleados.id', $userId);
+        })->with('unidadEjecutora')->get();
+        $mostrarSelector = $departamentosUsuario->count() > 1;
+    {
         $requisiciones = RequisicionModel::with(['departamento', 'estadoRequisicion'])
             ->when($this->busqueda, function($q) {
                 $q->where('correlativo', 'like', '%'.$this->busqueda.'%')
@@ -250,6 +273,10 @@ class Requisicion extends Component
             ->paginate($this->perPage);
 
         $poas = \App\Models\Poa\Poa::activo()->get();
+        // Obtener años únicos de los POA activos
+        $poaYears = $poas->pluck('anio')->unique()->sort()->values();
+        // Obtener departamentos
+        $departamentos = \App\Models\Departamento\Departamento::all();
 
         // Si hay una requisición seleccionada, cargar detalles
         if ($this->requisicionId) {
@@ -257,11 +284,35 @@ class Requisicion extends Component
             $this->detalleRequisiciones = $requisicion ? $requisicion->detalleRequisiciones()->with(['recurso', 'presupuesto'])->get() : collect();
         }
 
+        // Consulta de actividades/tareas aprobadas con presupuestos disponibles
+        $actividades_aprobadas = \App\Models\Tareas\Tarea::whereHas('presupuestos', function($q) {
+                $q->where('cantidad', '>', 0); // Puedes ajustar el filtro según tu lógica de disponibilidad
+            })
+            ->where('estado', 'APROBADO')
+            ->with(['presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente'])
+            ->get();
+
+        // Reunir todos los presupuestos en una sola colección plana
+        $allPresupuestos = collect();
+        foreach ($actividades_aprobadas as $actividad) {
+            foreach ($actividad->presupuestos as $presupuesto) {
+                $allPresupuestos->push($presupuesto);
+            }
+        }
+
         return view('livewire.seguimiento.Requisicion.requisicion', [
+            'mostrarSelector' => $mostrarSelector,
+            'departamentosUsuario' => $departamentosUsuario,
+            'departamentoSeleccionado' => $this->departamentoSeleccionado,
             'requisiciones' => $requisiciones,
             'poas' => $poas,
             'detalleRequisiciones' => $this->detalleRequisiciones,
+            'actividades_aprobadas' => $actividades_aprobadas,
+            'poaYears' => $poaYears,
+            'departamentos' => $departamentos,
+            'allPresupuestos' => $allPresupuestos,
         ])->layout($this->layout);
     }
 
+}
 }

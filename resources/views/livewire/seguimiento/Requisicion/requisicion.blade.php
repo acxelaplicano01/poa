@@ -1,171 +1,86 @@
 <div>
+
     <div class="bg-white dark:bg-zinc-900 rounded-lg shadow p-4 mb-6">
         <form wire:submit.prevent="buscar" class="flex flex-col md:flex-row md:items-center gap-4">
-            <div class="flex-1">
-                <x-input
-                    wire:model.defer="busqueda"
-                    type="text"
-                    placeholder="Buscar por correlativo o departamento"
-                    class="w-full"
-                />
-            </div>
-            <div>
-                <x-select
-                    wire:model.defer="estado"
-                    :options="[
-                        ['value' => 0, 'text' => 'Todos'],
-                        ['value' => 1, 'text' => 'Presentado'],
-                        ['value' => 2, 'text' => 'Recibido'],
-                        ['value' => 3, 'text' => 'En Proceso'],
-                        ['value' => 4, 'text' => 'Aprobado'],
-                        ['value' => 5, 'text' => 'Rechazado'],
-                        ['value' => 6, 'text' => 'Finalizado'],
-                    ]"
-                    class="w-full"
-                />
-            </div>
-            <div>
-                <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-800 dark:border-indigo-700 dark:text-white dark:hover:bg-indigo-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-700 dark:focus:bg-indigo-900 active:bg-zinc-900 dark:active:bg-indigo-800 focus:outline-none focus:ring-2 dark:focus:ring-indigo-500 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-indigo-800 transition ease-in-out duration-150 disabled:opacity-50 disabled:cursor-not-allowed w-full md:w-auto">
+            <div class="flex flex-row items-center w-full gap-2">
+                <x-input wire:model.defer="busqueda" type="text" placeholder="Nombre de Actividad o Tarea" class="w-55 text-sm" />
+                <button type="submit" class="inline-flex items-center px-3 py-2 bg-indigo-600 dark:bg-indigo-800 dark:border-indigo-700 dark:text-white dark:hover:bg-indigo-700 border border-transparent rounded font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-700 dark:focus:bg-indigo-900 active:bg-zinc-900 dark:active:bg-indigo-800 focus:outline-none focus:ring-2 dark:focus:ring-indigo-500 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-indigo-800 transition ease-in-out duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
                     Buscar
                 </button>
+                <div class="flex items-center justify-end flex-shrink-0 w-fit ml-auto">
+                    <x-spinner-button wire:click="abrirSumario" loadingTarget="abrirSumario" :loadingText="__('Abriendo...')"
+                        class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        {{ __('Revisar sumario') }}
+                    </x-spinner-button>
+                </div>
             </div>
         </form>
     </div>
 
-    <div class="mx-auto rounded-lg mt-8 sm:mt-6 lg:mt-4 mb-6">
-        <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow sm:rounded-lg p-4 sm:p-6">
-            @if (session()->has('message'))
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md" role="alert">
-                    <p class="font-medium">{{ session('message') }}</p>
-                </div>
-            @endif
-
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                <h2 class="text-xl font-semibold text-zinc-800 dark:text-zinc-200">{{ __('Detalle de Requisición') }}</h2>
-                <div class="flex flex-col sm:flex-row w-full sm:w-auto space-y-3 sm:space-y-0 sm:space-x-2">
-                    <x-spinner-button wire:click="addDetalle()" loadingTarget="addDetalle()" :loadingText="__('Abriendo...')">
-                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        {{ __('Nuevo Detalle') }}
-                    </x-spinner-button>
-                </div>
-            </div>
-
-            <x-table
-                :columns="[
-                    ['key' => 'recurso', 'label' => 'Recurso'],
-                    ['key' => 'detalle_tecnico', 'label' => 'Detalle Técnico'],
-                    ['key' => 'act_tarea', 'label' => 'Act./Tarea'],
-                    ['key' => 'cantidad', 'label' => 'Cantidad'],
-                    ['key' => 'precio_unitario', 'label' => 'Precio unitario'],
-                    ['key' => 'total', 'label' => 'Total'],
-                    ['key' => 'actions', 'label' => 'Acciones'],
-                    ['key' => 'total', 'label' => 'Total'],
-                    ['key' => 'actions', 'label' => 'Acciones'],
-                ]"
-                empty-message="{{ __('No hay detalles de requisición.') }}"
-                class="mt-6"
-            >
-                <x-slot name="desktop">
-                    @forelse ($detalleRequisiciones as $detalle)
-                        <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                                {{ $detalle->recurso->nombre ?? '' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                                {{ $detalle->presupuesto->detalle_tecnico ?? '' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                                {{ $detalle->cantidad }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                                L {{ number_format($detalle->presupuesto->costounitario ?? 0, 2) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                                L {{ number_format(($detalle->cantidad ?? 0) * ($detalle->presupuesto->costounitario ?? 0), 2) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-2">
-                                    <button wire:click="editDetalle({{ $detalle->id }})"
-                                        class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer"
-                                        title="Editar">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                                            <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                    <button wire:click="confirmDeleteDetalle({{ $detalle->id }})"
-                                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 cursor-pointer"
-                                        title="Eliminar">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-zinc-500 dark:text-zinc-400">
-                                {{ __('No hay detalles de requisición.') }}
-                            </td>
-                        </tr>
-                    @endforelse
-                </x-slot>
-
-                <x-slot name="mobile">
-                    @forelse ($detalleRequisiciones as $detalle)
-                        <div class="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 mb-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <span class="bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-300 px-2 py-1 rounded-full text-xs">
-                                        ID: {{ $detalle->id }}
-                                    </span>
-                                </div>
-                                <div class="flex space-x-2">
-                                    <button wire:click="editDetalle({{ $detalle->id }})"
-                                        class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                                            <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                    <button wire:click="confirmDeleteDetalle({{ $detalle->id }})"
-                                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <h3 class="font-semibold text-zinc-900 dark:text-zinc-200 text-lg mb-2">{{ $detalle->recurso->nombre ?? '' }}</h3>
-                            <div class="text-zinc-600 dark:text-zinc-400 text-sm mb-1">
-                                <span class="font-semibold">Detalle Técnico:</span> {{ $detalle->presupuesto->detalle_tecnico ?? '' }}
-                            </div>
-                            <div class="text-zinc-600 dark:text-zinc-400 text-sm mb-1">
-                                <span class="font-semibold">Cantidad:</span> {{ $detalle->cantidad }}
-                            </div>
-                            <div class="text-zinc-600 dark:text-zinc-400 text-sm mb-1">
-                                <span class="font-semibold">Precio unitario:</span> L {{ number_format($detalle->presupuesto->costounitario ?? 0, 2) }}
-                            </div>
-                            <div class="text-zinc-600 dark:text-zinc-400 text-sm">
-                                <span class="font-semibold">Total:</span> L {{ number_format(($detalle->cantidad ?? 0) * ($detalle->presupuesto->costounitario ?? 0), 2) }}
-                            </div>
-                        </div>
-                    @empty
-                        <div class="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow text-center text-zinc-500 dark:text-zinc-400">
-                            {{__('No hay detalles de requisición.') }}
-                        </div>
-                    @endforelse
-                </x-slot>
-
-                <x-slot name="footer">
-                    <!-- Si necesitas paginación para detalles, agrégala aquí -->
-                </x-slot>
-            </x-table>
+    <!-- Actividades aprobadas con presupuesto disponible -->
+    @if(isset($actividades_aprobadas) && count($actividades_aprobadas) > 0)
+        <div class="bg-white dark:bg-zinc-900 rounded-lg shadow p-4 mb-6">
+            <h2 class="text-lg font-semibold mb-4 text-zinc-800 dark:text-zinc-200">Recursos disponibles de actividades aprobadas</h2>
+            <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+                <thead class="bg-zinc-50 dark:bg-zinc-700">
+                    <tr>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Recurso</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Detalle Técnico</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Act./Tarea</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Mes</th>
+                        <th class="px-3 py-2 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Cant. Disp.</th>
+                        <th class="px-3 py-2 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Cant. Planif.</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Monetario</th>
+                   <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Acción</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700">
+                    @foreach($actividades_aprobadas as $actividad)
+                        @foreach($actividad->presupuestos as $presupuesto)
+                            <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700/50">
+                                <td class="px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100">{{ $presupuesto->recurso ?? 'N/A' }}</td>
+                                <td class="px-3 py-2 text-sm text-zinc-600 dark:text-zinc-400 max-w-xs truncate">{{ $presupuesto->detalle_tecnico ?? '-' }}</td>
+                                <td class="px-3 py-2 text-sm text-zinc-600 dark:text-zinc-400">
+                                    <div><span class="font-semibold">{{ $actividad->actividad->nombre ?? '-' }}</span></div>
+                                    <div>{{ $actividad->nombre ?? '-' }}</div>
+                                </td>
+                                <td class="px-3 py-2 text-sm text-zinc-600 dark:text-zinc-400">{{ $presupuesto->mes->mes ?? 'N/A' }}</td>
+                                <td class="px-3 py-2 text-sm text-center text-zinc-600 dark:text-zinc-400">{{ $presupuesto->cantidad ?? 0 }}</td>
+                                <td class="px-3 py-2 text-sm text-center text-zinc-600 dark:text-zinc-400">{{ $presupuesto->cantidad_planificada ?? 0 }}</td>
+                                <td class="px-3 py-2 text-sm text-zinc-600 dark:text-zinc-400">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-semibold px-3 py-1 rounded-full">Costo unitario</span>
+                                            <span class="font-bold text-sm text-zinc-600 dark:text-zinc-400">L {{ number_format($presupuesto->costounitario ?? 0, 2) }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-semibold px-3 py-1 rounded-full">Disponible</span>
+                                                <span class="font-bold text-sm text-zinc-600 dark:text-zinc-400">L {{ number_format($presupuesto->total ?? 0, 2) }}</span>
+                                            </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-semibold px-3 py-1 rounded-full">Costo planificado</span>
+                                            <span class="font-bold text-sm text-zinc-600 dark:text-zinc-400">L {{ number_format($presupuesto->disponible ?? 0, 2) }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-3 py-2 text-sm text-zinc-600 dark:text-zinc-400">
+                                    <div>
+                                        <label for="cantidad-{{ $presupuesto->id }}" class="block text-xs font-medium text-zinc-700 dark:text-zinc-300">Cantidad a solicitar</label>
+                                        <input id="cantidad-{{ $presupuesto->id }}" type="number" step="1" min="0" max="{{ $presupuesto->cantidad ?? 0 }}" class="mt-1 w-20 text-sm border-zinc-300 dark:border-zinc-700 rounded focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-800 dark:text-zinc-100" wire:model.lazy="presupuestosSeleccionados.{{ $presupuesto->id }}" />
+                                        @error('presupuestosSeleccionados.' . $presupuesto->id) <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-    </div>
+    @endif
+
 
     <!-- Modal para crear/editar requisición -->
     @include('livewire.seguimiento.Requisicion.create')
