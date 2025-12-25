@@ -7,7 +7,8 @@ use App\Models\Departamento\Departamento;
 use App\Models\TechoUes\TechoDepto;
 use App\Models\Poa\Poa;
 use Illuminate\Support\Facades\Auth;
-
+use Livewire\Attributes\Lazy;
+//#[Lazy]
 class Planificar extends Component
 {
     public $departamentoSeleccionado = null;
@@ -15,6 +16,12 @@ class Planificar extends Component
     public $poasHistorial = [];
     public $mostrarSelector = false;
 
+    //crear funcion para placeholder
+    /*public function placeholder()
+    {
+        return view('livewire.placeholder.loaders')->layout('layouts.app');
+    }*/
+        
     public function mount()
     {
         $this->cargarDepartamentosUsuario();

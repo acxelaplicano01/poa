@@ -66,8 +66,10 @@
                     </div>
                 @endif
 
+                @include('livewire.Planificar.partials.skeleton-tarjetas', ['target' => 'departamentoSeleccionado'])
                 <!-- Historial de POAs -->
-                @if($poasHistorial->isEmpty())
+                <div wire:loading.remove wire:target="departamentoSeleccionado">
+                    @if($poasHistorial->isEmpty())
                     <div class="text-center py-12 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
                         <div class="max-w-md mx-auto">
                             <div class="mx-auto h-20 w-20 text-zinc-400 mb-6">
@@ -216,6 +218,7 @@
                         @endforeach
                     </div>
                 @endif
+                </div>
             @endif
 
         </div>
