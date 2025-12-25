@@ -2,15 +2,23 @@
     <div class=" mx-auto rounded-lg mt-8 sm:mt-6 lg:mt-4 mb-6">
         <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow sm:rounded-lg p-4 sm:p-6">
             @if (session()->has('message'))
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md" role="alert">
-                    <p class="font-medium">{{ session('message') }}</p>
-                </div>
+                @include('rk.default.notifications.notification-alert', [
+                    'type' => 'success',
+                    'dismissible' => true,
+                    'icon' => true,
+                    'duration' => 5,
+                    'slot' => session('message')
+                ])
             @endif
 
             @if (session()->has('error'))
-                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md" role="alert">
-                    <p class="font-medium">{{ session('error') }}</p>
-                </div>
+                @include('rk.default.notifications.notification-alert', [
+                    'type' => 'error',
+                    'dismissible' => true,
+                    'icon' => true,
+                    'duration' => 8,
+                    'slot' => session('error')
+                ])
             @endif
 
             <div class="mb-6">

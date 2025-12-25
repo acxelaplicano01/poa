@@ -70,15 +70,23 @@
 
             {{-- Mensajes --}}
             @if (session()->has('message'))
-                <div class="mb-4 bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 px-4 py-3 rounded relative" role="alert">
-                    <span class="block sm:inline">{{ session('message') }}</span>
-                </div>
+                @include('rk.default.notifications.notification-alert', [
+                    'type' => 'success',
+                    'dismissible' => true,
+                    'icon' => true,
+                    'duration' => 5,
+                    'slot' => session('message')
+                ])
             @endif
 
             @if (session()->has('error'))
-                <div class="mb-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded relative" role="alert">
-                    <span class="block sm:inline">{{ session('error') }}</span>
-                </div>
+                @include('rk.default.notifications.notification-alert', [
+                    'type' => 'error',
+                    'dismissible' => true,
+                    'icon' => true,
+                    'duration' => 8,
+                    'slot' => session('error')
+                ])
             @endif
 
             {{-- Contexto del Usuario --}}

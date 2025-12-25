@@ -1,15 +1,23 @@
 <div class="mx-auto rounded-lg mt-8 sm:mt-6 lg:mt-4 mb-6">
     <!-- Mensajes de sesión -->
     @if (session()->has('message'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('message') }}</span>
-        </div>
+        @include('rk.default.notifications.notification-alert', [
+            'type' => 'success',
+            'dismissible' => true,
+            'icon' => true,
+            'duration' => 5,
+            'slot' => session('message')
+        ])
     @endif
 
     @if (session()->has('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('error') }}</span>
-        </div>
+        @include('rk.default.notifications.notification-alert', [
+            'type' => 'error',
+            'dismissible' => true,
+            'icon' => true,
+            'duration' => 8,
+            'slot' => session('error')
+        ])
     @endif
 
     <div class="bg-white dark:bg-zinc-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -100,93 +108,93 @@
 
                     <div class="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 bg-zinc-50 dark:bg-zinc-900">
                         @php
-                            // Organizar permisos por jerarquía de 3 niveles
-                            $permissionTree = [];
-                            $standalonePermissions = [];
+// Organizar permisos por jerarquía de 3 niveles
+$permissionTree = [];
+$standalonePermissions = [];
 
-                            foreach ($permissions ?? [] as $permission) {
-                                $name = $permission->name;
-                                $parts = explode('.', $name);
+foreach ($permissions ?? [] as $permission) {
+    $name = $permission->name;
+    $parts = explode('.', $name);
 
-                                if (count($parts) >= 2) {
-                                    // Tiene al menos 2 partes: módulo.funcionalidad o módulo.funcionalidad.accion
-                                    $module = $parts[0];
-                                    $functionality = $parts[1];
-                                    $action = isset($parts[2]) ? $parts[2] : null;
-                                    
-                                    $parentKey = 'acceso-' . $module;
+    if (count($parts) >= 2) {
+        // Tiene al menos 2 partes: módulo.funcionalidad o módulo.funcionalidad.accion
+        $module = $parts[0];
+        $functionality = $parts[1];
+        $action = isset($parts[2]) ? $parts[2] : null;
 
-                                    // Inicializar el módulo padre si no existe
-                                    if (!isset($permissionTree[$parentKey])) {
-                                        $permissionTree[$parentKey] = [
-                                            'id' => null,
-                                            'name' => ucfirst($module),
-                                            'children' => []
-                                        ];
-                                    }
+        $parentKey = 'acceso-' . $module;
 
-                                    // Si tiene 3 partes (módulo.funcionalidad.accion)
-                                    if ($action) {
-                                        // Buscar o crear la funcionalidad
-                                        $functionalityKey = $module . '.' . $functionality;
-                                        $functionalityIndex = null;
-                                        
-                                        foreach ($permissionTree[$parentKey]['children'] as $index => $child) {
-                                            if ($child['key'] === $functionalityKey) {
-                                                $functionalityIndex = $index;
-                                                break;
-                                            }
-                                        }
-                                        
-                                        // Si no existe la funcionalidad, crearla
-                                        if ($functionalityIndex === null) {
-                                            $permissionTree[$parentKey]['children'][] = [
-                                                'id' => null,
-                                                'key' => $functionalityKey,
-                                                'name' => $functionality,
-                                                'display' => ucfirst($functionality),
-                                                'children' => []
-                                            ];
-                                            $functionalityIndex = count($permissionTree[$parentKey]['children']) - 1;
-                                        }
-                                        
-                                        // Agregar la acción
-                                        $permissionTree[$parentKey]['children'][$functionalityIndex]['children'][] = [
-                                            'id' => $permission->id,
-                                            'name' => $name,
-                                            'display' => ucfirst($action)
-                                        ];
-                                    } else {
-                                        // Solo tiene 2 partes (módulo.funcionalidad)
-                                        $permissionTree[$parentKey]['children'][] = [
-                                            'id' => $permission->id,
-                                            'key' => $name,
-                                            'name' => $functionality,
-                                            'display' => ucfirst($functionality),
-                                            'children' => []
-                                        ];
-                                    }
-                                } else if (strpos($name, 'acceso-') === 0) {
-                                    // Es un permiso padre de módulo
-                                    $module = str_replace('acceso-', '', $name);
+        // Inicializar el módulo padre si no existe
+        if (!isset($permissionTree[$parentKey])) {
+            $permissionTree[$parentKey] = [
+                'id' => null,
+                'name' => ucfirst($module),
+                'children' => []
+            ];
+        }
 
-                                    if (!isset($permissionTree[$name])) {
-                                        $permissionTree[$name] = [
-                                            'id' => $permission->id,
-                                            'name' => ucfirst($module),
-                                            'children' => []
-                                        ];
-                                    } else {
-                                        $permissionTree[$name]['id'] = $permission->id;
-                                    }
-                                } else {
-                                    // Es un permiso independiente
-                                    $standalonePermissions[] = $permission;
-                                }
-                            }
+        // Si tiene 3 partes (módulo.funcionalidad.accion)
+        if ($action) {
+            // Buscar o crear la funcionalidad
+            $functionalityKey = $module . '.' . $functionality;
+            $functionalityIndex = null;
 
-                            // Ordenar los permisos por nombre
-                            ksort($permissionTree);
+            foreach ($permissionTree[$parentKey]['children'] as $index => $child) {
+                if ($child['key'] === $functionalityKey) {
+                    $functionalityIndex = $index;
+                    break;
+                }
+            }
+
+            // Si no existe la funcionalidad, crearla
+            if ($functionalityIndex === null) {
+                $permissionTree[$parentKey]['children'][] = [
+                    'id' => null,
+                    'key' => $functionalityKey,
+                    'name' => $functionality,
+                    'display' => ucfirst($functionality),
+                    'children' => []
+                ];
+                $functionalityIndex = count($permissionTree[$parentKey]['children']) - 1;
+            }
+
+            // Agregar la acción
+            $permissionTree[$parentKey]['children'][$functionalityIndex]['children'][] = [
+                'id' => $permission->id,
+                'name' => $name,
+                'display' => ucfirst($action)
+            ];
+        } else {
+            // Solo tiene 2 partes (módulo.funcionalidad)
+            $permissionTree[$parentKey]['children'][] = [
+                'id' => $permission->id,
+                'key' => $name,
+                'name' => $functionality,
+                'display' => ucfirst($functionality),
+                'children' => []
+            ];
+        }
+    } else if (strpos($name, 'acceso-') === 0) {
+        // Es un permiso padre de módulo
+        $module = str_replace('acceso-', '', $name);
+
+        if (!isset($permissionTree[$name])) {
+            $permissionTree[$name] = [
+                'id' => $permission->id,
+                'name' => ucfirst($module),
+                'children' => []
+            ];
+        } else {
+            $permissionTree[$name]['id'] = $permission->id;
+        }
+    } else {
+        // Es un permiso independiente
+        $standalonePermissions[] = $permission;
+    }
+}
+
+// Ordenar los permisos por nombre
+ksort($permissionTree);
                         @endphp
 
                         <!-- Sección de permisos jerárquicos -->

@@ -14,6 +14,7 @@ $typeClasses = [
 ];
 @endphp
 
+<div style="position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 1rem;">
 <div x-data="{ show: true }"
      x-init="@if($duration) setTimeout(() => show = false, {{ $duration * 1000 }}) @endif"
      x-show="show"
@@ -52,4 +53,5 @@ $typeClasses = [
             </svg>
         </button>
     @endif
+</div>
 </div>
