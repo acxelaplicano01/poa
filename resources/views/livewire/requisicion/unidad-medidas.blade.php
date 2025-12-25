@@ -1,5 +1,5 @@
 <div>
-    <div class=" mx-auto px-2 sm:px-4 lg:px-6 rounded-lg mt-8 sm:mt-10 lg:mt-12 mb-6">
+    <div class="mx-auto rounded-lg mt-8 sm:mt-6 lg:mt-4 mb-6">
         <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow sm:rounded-lg p-4 sm:p-6">
             @if (session()->has('message'))
                 @include('rk.default.notifications.notification-alert', [
