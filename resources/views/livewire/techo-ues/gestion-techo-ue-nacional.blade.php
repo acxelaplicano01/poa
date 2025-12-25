@@ -23,14 +23,14 @@
 
                     <div class="flex justify-end mt-4 sm:mt-0">
                         @can('consola.asignacionnacionalpresupuestaria.crear')
-                        <x-button wire:click="create()" class="w-full sm:w-auto justify-center {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
+                        <x-spinner-button wire:click="create()" loadingTarget="create()" :loadingText="__('Abriendo...')" class="w-full sm:w-auto justify-center {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeAsignarPresupuesto">
                             <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 4v16m8-8H4" />
                             </svg>
                             {{ __('Nuevo Techo UE') }}
-                        </x-button>
+                        </x-spinner-button>
                         @endcan
                     </div>
                 </div>
@@ -600,13 +600,13 @@
                                             </div>
                                             <div class="mt-3 flex justify-end">
                                                 @can('consola.asignacionnacionalpresupuestaria.asignar')
-                                                <x-button wire:click="crearTechoParaUe({{ $ue->id }})" :disabled="!$puedeAsignarPresupuesto"
+                                                <x-spinner-button loadingTarget="crearTechoParaUe({{ $ue->id }})" :loadingText="__('Abriendo...')" wire:click="crearTechoParaUe({{ $ue->id }})" :disabled="!$puedeAsignarPresupuesto"
                                                     class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-indigo-700 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-300 transition-colors {{ !$puedeAsignarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-indigo-200 dark:hover:bg-indigo-800' }}">
                                                     <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                                     </svg>
                                                     Asignar
-                                                </x-button>
+                                                </x-spinner-button>
                                                 @endcan
                                             </div>
                                         </div>

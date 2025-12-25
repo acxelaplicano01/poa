@@ -83,10 +83,10 @@
 								</span>
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-								<button wire:click="verActividades({{ $rev->id }})"
+								<x-spinner-button x-spinner-button wire:click="verActividades({{ $rev->id }})" loadingTarget="verActividades({{ $rev->id }})" :loadingText="__('cargando...')" wire:click="verActividades({{ $rev->id }})"
 									class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-700 active:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
 									Ver Actividades
-								</button>
+								</x-spinner-button>
 							</td>
 						</tr>
 					@empty
@@ -104,13 +104,13 @@
 							<div class="flex justify-between items-start mb-2">
 								<div>
 									<span class="bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-300 px-2 py-1 rounded-full text-xs">
-										{{ $rev->departamento->nombre ?? '-' }}
+										{{ $rev->departamento->name ?? '-' }}
 									</span>
 								</div>
-								<button wire:click="verActividades({{ $rev->departamento->id }})"
+								<x-spinner-button x-spinner-button wire:click="verActividades({{ $rev->departamento->id }})" loadingTarget="verActividades({{ $rev->departamento->id }})" :loadingText="__('cargando...')" wire:click="verActividades({{ $rev->departamento->id }})"
 									class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-700 active:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
 									Ver Actividades
-								</button>
+								</x-spinner-button>
 							</div>
 							<div class="text-zinc-600 dark:text-zinc-400 text-sm mb-1">
 								<span class="font-semibold">Cantidad de Actividades:</span> {{ $rev->actividades_count ?? 0 }}

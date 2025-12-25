@@ -857,11 +857,6 @@
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                         <button wire:click="$set('showFormRevision', true)"
                                             class="p-4 border-2 border-yellow-300 dark:border-yellow-700 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors cursor-pointer">
-                                            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400 mx-auto mb-2" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 9v2m0 4v2m0 6v2M7.08 6.47A9.96 9.96 0 0112 1a9.96 9.96 0 014.92 5.47" />
-                                            </svg>
                                             <h4 class="font-semibold text-yellow-900 dark:text-yellow-100">Enviar a Reformular</h4>
                                             <p class="text-sm text-yellow-700 dark:text-yellow-400 mt-1">Solicitar cambios al
                                                 usuario</p>
@@ -869,11 +864,6 @@
 
                                         <button wire:click="$set('showFormDictamen', true)"
                                             class="p-4 border-2 border-indigo-300 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors cursor-pointer">
-                                            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400 mx-auto mb-2" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 12l2 2 4-4M7 12a5 5 0 1110 0 5 5 0 01-10 0z" />
-                                            </svg>
                                             <h4 class="font-semibold text-indigo-900 dark:text-indigo-100">Emitir Dictamen Final
                                             </h4>
                                             <p class="text-sm text-indigo-700 dark:text-indigo-400 mt-1">Aceptar o rechazar

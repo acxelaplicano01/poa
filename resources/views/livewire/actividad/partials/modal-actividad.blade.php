@@ -237,19 +237,19 @@
                 </x-secondary-button>
 
                 @if($currentStep < $totalSteps)
-                    <x-button wire:click="nextStep">
+                    <x-spinner-button wire:click="nextStep" loadingTarget="nextStep" :loadingText="__('Cargando...')">
                         Siguiente
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>
-                    </x-button>
+                    </x-spinner-button>
                 @else
-                    <x-button type="submit" form="form-actividad" class="bg-green-600 hover:bg-green-700 focus:ring-green-500">
+                    <x-spinner-button type="submit" form="form-actividad" class="bg-green-600 hover:bg-green-700 focus:ring-green-500" loadingTarget="submit" :loadingText="__('Guardando...')">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
                         {{ $actividadId ? 'Actualizar' : 'Crear' }} Actividad
-                    </x-button>
+                    </x-spinner-button>
                 @endif
             </div>
         </div>

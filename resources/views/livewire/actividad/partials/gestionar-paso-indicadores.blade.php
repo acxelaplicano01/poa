@@ -4,12 +4,12 @@
         <h3 class="text-lg font-semibold text-zinc-800 dark:text-zinc-200">
             Indicadores de la Actividad
         </h3>
-        <x-button wire:click="openIndicadorModal" class="{{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion">
+        <x-spinner-button wire:click="openIndicadorModal" loadingTarget="openIndicadorModal" :loadingText="__('Abriendo...')" class="{{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             Agregar Indicador
-        </x-button>
+        </x-spinner-button>
     </div>
 
     @if (empty($indicadores))

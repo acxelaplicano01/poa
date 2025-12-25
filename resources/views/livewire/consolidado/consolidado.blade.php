@@ -570,7 +570,7 @@
                             <div class="flex items-center text-xs">
                                 <span class="text-zinc-500 dark:text-zinc-400 w-24">Departamento:</span>
                                 <span class="text-zinc-900 dark:text-zinc-100 font-medium">
-                                    {{ $actividad->departamento->nombre ?? 'N/A' }}
+                                    {{ $actividad->departamento->name ?? 'N/A' }}
                                 </span>
                             </div>
                             <div class="flex items-center justify-between text-xs">
@@ -665,7 +665,7 @@
                                                 @foreach($actividadDetalle->empleados as $empleado)
                                                 <div class="bg-white dark:bg-zinc-800 rounded p-2">
                                                     <p class="text-zinc-900 dark:text-zinc-200 font-medium">{{ $empleado->nombre }}</p>
-                                                    <p class="text-zinc-500 dark:text-zinc-400">#{{ $empleado->numeroEmpleado ?? 'N/A' }}</p>
+                                                    <p class="text-zinc-500 dark:text-zinc-400">#{{ $empleado->num_empleado ?? 'N/A' }}</p>
                                                 </div>
                                                 @endforeach
                                             </div>

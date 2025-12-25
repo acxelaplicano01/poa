@@ -341,30 +341,30 @@
             <div class="mt-8 flex justify-between border-t border-zinc-200 dark:border-zinc-700 pt-6">
                 <div>
                     @if ($currentStep > 1)
-                        <x-button wire:click="previousStep" variant="secondary">
+                        <x-spinner-button wire:click="previousStep" variant="secondary" loadingTarget="previousStep" :loadingText="__('Cargando...')">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
                             Anterior
-                        </x-button>
+                        </x-spinner-button>
                     @endif
                 </div>
 
                 <div class="flex gap-2">
                     @if ($currentStep < $totalSteps)
-                        <x-button wire:click="nextStep">
+                        <x-spinner-button wire:click="nextStep" loadingTarget="nextStep" :loadingText="__('Cargando...')">
                             Siguiente
                             <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                        </x-button>
+                        </x-spinner-button>
                     @else
-                        <x-button wire:click="enviarARevision" class="bg-green-600 hover:bg-green-700 {{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion">
+                        <x-spinner-button wire:click="enviarARevision" class="bg-green-600 hover:bg-green-700 {{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion" loadingTarget="enviarARevision" :loadingText="__('Enviando...')">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             {{ !$actividadEnFormulacion ? 'No Editable' : 'Enviar a Revisión' }}
-                        </x-button>
+                        </x-spinner-button>
                     @endif
                 </div>
             </div>
@@ -429,9 +429,9 @@
             <x-secondary-button wire:click="$set('showIndicadorModal', false)">
                 Cancelar
             </x-secondary-button>
-            <x-button wire:click="saveIndicador" class="ml-2">
+            <x-spinner-button wire:click="saveIndicador" class="ml-2" loadingTarget="saveIndicador" :loadingText="__('Guardando...')">
                 Guardar Indicador
-            </x-button>
+            </x-spinner-button>
         </x-slot>
     </x-dialog-modal>
 
@@ -514,9 +514,9 @@
             <x-secondary-button wire:click="$set('showPlanificacionModal', false)">
                 Cancelar
             </x-secondary-button>
-            <x-button wire:click="savePlanificacion" class="ml-2">
+            <x-spinner-button wire:click="savePlanificacion" class="ml-2" loadingTarget="savePlanificacion" :loadingText="__('Guardando...')">
                 Guardar Planificación
-            </x-button>
+            </x-spinner-button>
         </x-slot>
     </x-dialog-modal>
 
@@ -551,9 +551,9 @@
             <x-secondary-button wire:click="$set('showEmpleadoModal', false)">
                 Cancelar
             </x-secondary-button>
-            <x-button wire:click="assignEmpleado" class="ml-2">
+            <x-spinner-button wire:click="assignEmpleado" class="ml-2" loadingTarget="assignEmpleado" :loadingText="__('Asignando...')">
                 Asignar Empleado
-            </x-button>
+            </x-spinner-button>
         </x-slot>
     </x-dialog-modal>
 
@@ -596,9 +596,9 @@
             <x-secondary-button wire:click="$set('showTareaModal', false)">
                 Cancelar
             </x-secondary-button>
-            <x-button wire:click="saveTarea" class="ml-2">
+            <x-spinner-button wire:click="saveTarea" class="ml-2" loadingTarget="saveTarea" :loadingText="__('Guardando...')">
                 Guardar Tarea
-            </x-button>
+            </x-spinner-button>
         </x-slot>
     </x-dialog-modal>
 
@@ -825,12 +825,12 @@
                     </div>
 
                     <div class="flex justify-end">
-                        <x-button wire:click="savePresupuesto" class="{{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion">
+                        <x-spinner-button wire:click="savePresupuesto" class="{{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion" loadingTarget="savePresupuesto" :loadingText="__('Guardando...')">
                             <svg class="w-4 h-4 mr-2"  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             Agregar Recurso
-                        </x-button>
+                        </x-spinner-button>
                     </div>
                 </div>
 
