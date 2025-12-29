@@ -450,6 +450,26 @@ class Requisicion extends Component
             }
         }
 
+        $valoresPlanificados = [];
+        foreach ($allPresupuestos as $presupuesto) {
+            $cantidadPlanificada = DetalleRequisicion::where('idPresupuesto', $presupuesto->id)
+                ->whereHas('requisicion', function($q) {
+                    $q->whereHas('estado', function($q2) {
+                        $q2->whereIn('estado', ['Presentado', 'Recibido', 'En Proceso de Compra']);
+                    });
+                })
+                ->sum('cantidad');
+            $cantidadDisponible = ($presupuesto->cantidad ?? 0) - $cantidadPlanificada;
+            $costoUnitario = $presupuesto->costounitario ?? 0;
+            $costoDisponible = $cantidadDisponible * $costoUnitario;
+            $costoPlanificado = $cantidadPlanificada * $costoUnitario;
+            $valoresPlanificados[$presupuesto->id] = [
+                'cantidad_disponible' => $cantidadDisponible,
+                'cantidad_planificada' => $cantidadPlanificada,
+                'costo_disponible' => $costoDisponible,
+                'costo_planificado' => $costoPlanificado,
+            ];
+        }
         return view('livewire.seguimiento.Requisicion.requisicion', [
             'mostrarSelector' => $mostrarSelector,
             'departamentosUsuario' => $departamentosUsuario,
@@ -462,6 +482,7 @@ class Requisicion extends Component
             'departamentos' => $departamentos,
             'allPresupuestos' => $allPresupuestos,
             'recursosSeleccionados' => $this->recursosSeleccionados,
+            'valoresPlanificados' => $valoresPlanificados,
         ])->layout($this->layout);
     }
 

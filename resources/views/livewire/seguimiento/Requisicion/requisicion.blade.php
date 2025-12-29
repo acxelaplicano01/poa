@@ -40,6 +40,14 @@
                 <tbody class="bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700">
                     @foreach($actividades_aprobadas as $actividad)
                         @foreach($actividad->presupuestos as $presupuesto)
+                            @php
+                                $valores = $valoresPlanificados[$presupuesto->id] ?? [
+                                    'cantidad_disponible' => 0,
+                                    'cantidad_planificada' => 0,
+                                    'costo_disponible' => 0,
+                                    'costo_planificado' => 0
+                                ];
+                            @endphp
                             <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700/50">
                                 <td class="px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100">{{ $presupuesto->recurso ?? 'N/A' }}</td>
                                 <td class="px-3 py-2 text-sm text-zinc-600 dark:text-zinc-400 max-w-xs truncate">{{ $presupuesto->detalle_tecnico ?? '-' }}</td>
@@ -48,8 +56,8 @@
                                     <div>{{ $actividad->nombre ?? '-' }}</div>
                                 </td>
                                 <td class="px-3 py-2 text-sm text-zinc-600 dark:text-zinc-400">{{ $presupuesto->mes->mes ?? 'N/A' }}</td>
-                                <td class="px-3 py-2 text-sm text-center text-zinc-600 dark:text-zinc-400">{{ $presupuesto->cantidad ?? 0 }}</td>
-                                <td class="px-3 py-2 text-sm text-center text-zinc-600 dark:text-zinc-400">{{ $presupuesto->cantidad_planificada ?? 0 }}</td>
+                                <td class="px-3 py-2 text-sm text-center text-zinc-600 dark:text-zinc-400">{{ $valores['cantidad_disponible'] }}</td>
+                                <td class="px-3 py-2 text-sm text-center text-zinc-600 dark:text-zinc-400">{{ $valores['cantidad_planificada'] }}</td>
                                 <td class="px-3 py-2 text-sm text-zinc-600 dark:text-zinc-400">
                                     <div class="space-y-1">
                                         <div class="flex items-center gap-2">
@@ -58,18 +66,18 @@
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <span class="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-semibold px-3 py-1 rounded-full">Disponible</span>
-                                                <span class="font-bold text-sm text-zinc-600 dark:text-zinc-400">L {{ number_format($presupuesto->total ?? 0, 2) }}</span>
-                                            </div>
+                                            <span class="font-bold text-sm text-zinc-600 dark:text-zinc-400">L {{ number_format($valores['costo_disponible'], 2) }}</span>
+                                        </div>
                                         <div class="flex items-center gap-2">
                                             <span class="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-semibold px-3 py-1 rounded-full">Costo planificado</span>
-                                            <span class="font-bold text-sm text-zinc-600 dark:text-zinc-400">L {{ number_format($presupuesto->disponible ?? 0, 2) }}</span>
+                                            <span class="font-bold text-sm text-zinc-600 dark:text-zinc-400">L {{ number_format($valores['costo_planificado'], 2) }}</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-3 py-2 text-sm text-zinc-600 dark:text-zinc-400">
                                     <div>
                                         <label for="cantidad-{{ $presupuesto->id }}" class="block text-xs font-medium text-zinc-700 dark:text-zinc-300">Cantidad a solicitar</label>
-                                        <input id="cantidad-{{ $presupuesto->id }}" type="number" step="1" min="0" max="{{ $presupuesto->cantidad ?? 0 }}" class="mt-1 w-20 text-sm border-zinc-300 dark:border-zinc-700 rounded focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-800 dark:text-zinc-100" wire:model.lazy="presupuestosSeleccionados.{{ $presupuesto->id }}" />
+                                        <input id="cantidad-{{ $presupuesto->id }}" type="number" step="1" min="0" max="{{ $valores['cantidad_disponible'] }}" class="mt-1 w-20 text-sm border-zinc-300 dark:border-zinc-700 rounded focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-800 dark:text-zinc-100" wire:model.lazy="presupuestosSeleccionados.{{ $presupuesto->id }}" />
                                         @error('presupuestosSeleccionados.' . $presupuesto->id) <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                     </div>
                                 </td>
