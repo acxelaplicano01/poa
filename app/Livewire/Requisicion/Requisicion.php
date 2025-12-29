@@ -7,6 +7,12 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Requisicion\EstadoRequisicion;
 use App\Models\Empleado\Empleado;
 use App\Models\Empleado\EmpleadoDepto;
+use App\Models\Tareas\TareaHistorico;
+use App\Models\Presupuestos\Presupuesto;
+use App\Models\Departamento\Departamento;
+use App\Models\Requisicion\DetalleRequisicion;
+use App\Models\Tareas\Tarea;
+use App\Models\ProcesoCompras\ProcesoCompra;
 use App\Models\Poa\Poa;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -14,12 +20,132 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class Requisicion extends Component
+
 {
+    
+    public function crearRequisicionDesdeSumario()
+    {
+        
+        $this->validate([
+            'descripcion' => 'required',
+            'fechaRequerido' => 'required|date',
+        ]);
+
+        $user = Auth::user();
+        if (!$this->idPoa && !empty($this->recursosSeleccionados)) {
+            
+            $primerRecurso = $this->recursosSeleccionados[0];
+            $presupuesto = Presupuesto::find($primerRecurso['id']);
+            if ($presupuesto && $presupuesto->idtarea) {
+                $tarea = Tarea::find($presupuesto->idtarea);
+                if ($tarea && $tarea->idPoa) {
+                    $this->idPoa = $tarea->idPoa;
+                }
+            }
+        }
+        
+        $poa = $this->idPoa ? Poa::find($this->idPoa) : null;
+        $poa = $this->idPoa ? Poa::find($this->idPoa) : null;
+        $departamento = $user && $user->idDepartamento ? Departamento::find($user->idDepartamento) : null;
+        $categoria = null;
+        $resultado = null;
+        $correlativo = '';
+        if ($poa) {
+            $correlativo .= $poa->anio . '-';
+        }
+        // Ejemplo: categoría 
+        if ($categoria && isset($categoria->id)) {
+            if ($categoria->id == 1) {
+                $correlativo .= 'CA-';
+            } elseif ($categoria->id == 2) {
+                $correlativo .= 'JF-';
+            } elseif ($categoria->id == 3) {
+                $correlativo .= 'AD-';
+            } else {
+                $correlativo .= 'CR-';
+            }
+        } else {
+            $correlativo .= 'CR-';
+        }
+        $correlativo .= ($departamento->siglas ?? 'DEPTO') . '-';
+        if ($resultado && isset($resultado->id)) {
+            $correlativo .= $resultado->id . '-';
+        } else {
+            $correlativo .= '0-';
+        }
+       
+        $ultimo = \App\Models\Requisicion\Requisicion::orderByDesc('id')->first();
+        $correlativo .= ($ultimo ? $ultimo->id + 1 : 1);
+
+        // Asignar departamento y estado
+        $empleadoDepto = \DB::table('empleado_deptos')
+            ->where('idEmpleado', $user->id)
+            ->whereNull('deleted_at')
+            ->first();
+        $this->idDepartamento = $empleadoDepto ? $empleadoDepto->idDepto : ($user->idDepartamento ?? null);
+        $this->idEstado = $this->getEstadoPresentadoId();
+
+        try {
+            $data = [
+                'correlativo' => $correlativo,
+                'descripcion' => $this->descripcion,
+                'observacion' => $this->observacion,
+                'created_by' => $user->id,
+                'approved_by' => null,
+                'idPoa' => $this->idPoa,
+                'idDepartamento' => $this->idDepartamento,
+                'idEstado' => $this->idEstado,
+                'fechaSolicitud' => now(),
+                'fechaRequerido' => $this->fechaRequerido,
+            ];
+            //dd($data);
+            $requisicion = \App\Models\Requisicion\Requisicion::create($data);
+            
+            foreach ($this->recursosSeleccionados as $recurso) {
+                $presupuesto = Presupuesto::find($recurso['id']);
+                if ($presupuesto) {
+                    DetalleRequisicion::create([
+                        'idRequisicion' => $requisicion->id,
+                        'idPoa' => $this->idPoa,
+                        'idPresupuesto' => $presupuesto->id,
+                        'idRecurso' => $presupuesto->idHistorico,
+                        'cantidad' => $recurso['cantidad_seleccionada'],
+                        'idUnidadMedida' => $presupuesto->idunidad,
+                        'entregado' => false,
+                        'created_by' => $user->id,
+                    ]);
+                }
+            }
+            $this->showSumarioModal = false;
+            $this->resetInputFields();
+            session()->flash('message', 'Requisición creada correctamente.');
+        } catch (\Exception $e) {
+            $this->errorMessage = 'Error al guardar: ' . $e->getMessage();
+            $this->showErrorModal = true;
+        }
+    }
     public $mostrarSelector = false;
     public $departamentosUsuario = [];
     public $departamentoSeleccionado;
     public $detalleRequisiciones = [];
     public $presupuestosSeleccionados = [];
+    public $recursosSeleccionados = [];
+
+    public function agregarRecursoAlSumario($recurso)
+    {
+        if (!collect($this->recursosSeleccionados)->contains('id', $recurso['id'])) {
+            $this->recursosSeleccionados[] = $recurso;
+        }
+    }
+
+    // Quitar recurso del sumario
+    public function quitarRecursoDelSumario($recursoId)
+    {
+        $this->recursosSeleccionados = collect($this->recursosSeleccionados)
+            ->reject(fn($item) => $item['id'] == $recursoId)
+            ->values()
+            ->toArray();
+    }
     use WithPagination;
 
     protected string $layout = 'layouts.app';
@@ -51,6 +177,35 @@ class Requisicion extends Component
     // Abrir el modal de sumario
     public function abrirSumario()
     {
+        $this->recursosSeleccionados = [];
+        // Obtener actividades y presupuestos aprobados (igual que en render)
+        $actividades_aprobadas = Tarea::whereHas('presupuestos', function($q) {
+            $q->where('cantidad', '>', 0);
+        })
+        ->where('estado', 'APROBADO')
+        ->with(['presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente', 'actividad'])
+        ->get();
+
+        foreach ($this->presupuestosSeleccionados as $presupuestoId => $cantidad) {
+            if ($cantidad > 0) {
+                foreach ($actividades_aprobadas as $actividad) {
+                    $presupuesto = $actividad->presupuestos->where('id', $presupuestoId)->first();
+                    if ($presupuesto) {
+                        $this->recursosSeleccionados[] = [
+                            'id' => $presupuesto->id,
+                            'nombre' => $presupuesto->recurso,
+                            'actividad' => ($actividad->actividad->nombre ?? '-') . ' / ' . ($actividad->nombre ?? '-'),
+                            'proceso_compra' => $presupuesto->tareaHistorico && $presupuesto->tareaHistorico->procesoCompra ? $presupuesto->tareaHistorico->procesoCompra->nombre_proceso : '-',
+                            'cantidad_seleccionada' => $cantidad,
+                            'unidad_medida' => $presupuesto->unidadMedida->nombre ?? '-',
+                            'precio_unitario' => $presupuesto->costounitario ?? 0,
+                            'total' => $cantidad * ($presupuesto->costounitario ?? 0),
+                        ];
+                        break;
+                    }
+                }
+            }
+        }
         $this->showSumarioModal = true;
     }
 
@@ -254,14 +409,13 @@ class Requisicion extends Component
 
     public function render()
     {
-        // Obtener departamentos del usuario (ejemplo: por relación EmpleadoDepto)
         $userId = Auth::id();
-        $departamentosUsuario = \App\Models\Departamento\Departamento::whereHas('empleados', function($q) use ($userId) {
+        $departamentosUsuario = Departamento::whereHas('empleados', function($q) use ($userId) {
             $q->where('empleados.id', $userId);
         })->with('unidadEjecutora')->get();
         $mostrarSelector = $departamentosUsuario->count() > 1;
-    {
-        $requisiciones = RequisicionModel::with(['departamento', 'estadoRequisicion'])
+
+        $requisiciones = RequisicionModel::with(['departamento', 'estado'])
             ->when($this->busqueda, function($q) {
                 $q->where('correlativo', 'like', '%'.$this->busqueda.'%')
                   ->orWhereHas('departamento', fn($q) => $q->where('name', 'like', '%'.$this->busqueda.'%'));
@@ -272,27 +426,23 @@ class Requisicion extends Component
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
 
-        $poas = \App\Models\Poa\Poa::activo()->get();
+        $poas = Poa::activo()->get();
         // Obtener años únicos de los POA activos
         $poaYears = $poas->pluck('anio')->unique()->sort()->values();
         // Obtener departamentos
-        $departamentos = \App\Models\Departamento\Departamento::all();
+        $departamentos = Departamento::all();
 
-        // Si hay una requisición seleccionada, cargar detalles
         if ($this->requisicionId) {
             $requisicion = RequisicionModel::find($this->requisicionId);
             $this->detalleRequisiciones = $requisicion ? $requisicion->detalleRequisiciones()->with(['recurso', 'presupuesto'])->get() : collect();
         }
-
-        // Consulta de actividades/tareas aprobadas con presupuestos disponibles
-        $actividades_aprobadas = \App\Models\Tareas\Tarea::whereHas('presupuestos', function($q) {
-                $q->where('cantidad', '>', 0); // Puedes ajustar el filtro según tu lógica de disponibilidad
-            })
+        $actividades_aprobadas = Tarea::whereHas('presupuestos', function($q) {
+            $q->where('cantidad', '>', 0); 
+        })
             ->where('estado', 'APROBADO')
             ->with(['presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente'])
             ->get();
 
-        // Reunir todos los presupuestos en una sola colección plana
         $allPresupuestos = collect();
         foreach ($actividades_aprobadas as $actividad) {
             foreach ($actividad->presupuestos as $presupuesto) {
@@ -311,8 +461,8 @@ class Requisicion extends Component
             'poaYears' => $poaYears,
             'departamentos' => $departamentos,
             'allPresupuestos' => $allPresupuestos,
+            'recursosSeleccionados' => $this->recursosSeleccionados,
         ])->layout($this->layout);
     }
 
-}
 }

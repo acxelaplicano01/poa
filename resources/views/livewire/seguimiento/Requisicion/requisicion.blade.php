@@ -82,8 +82,6 @@
     @endif
 
 
-    <!-- Modal para crear/editar requisición -->
-    @include('livewire.seguimiento.Requisicion.create')
 
     <!-- Modal de confirmación para eliminar -->
     @include('livewire.seguimiento.Requisicion.delete-confirmation')
@@ -94,4 +92,82 @@
         :message="$errorMessage"
         wire:click="closeErrorModal"
     />
+
+    <!-- Modal de sumario de recursos seleccionados usando wire:model -->
+    <x-dialog-modal wire:model="showSumarioModal" maxWidth="4xl">
+        <x-slot name="title">
+            {{ __('Sumario de Recursos Seleccionados') }}
+        </x-slot>
+        <x-slot name="content">
+            <div class="space-y-6">
+                <!-- Tabla de recursos seleccionados -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700 mb-4">
+                        <thead class="bg-zinc-50 dark:bg-zinc-700">
+                            <tr>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Recurso</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Actividad</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Proceso Compra</th>
+                                <th class="px-3 py-2 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Cantidad Seleccionada</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Unidad de Medida</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Precio Unitario</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Total</th>
+                                <!--<th class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Acción</th>-->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recursosSeleccionados as $recurso)
+                                <tr>
+                                    <td class="px-3 py-2 text-zinc-900 dark:text-zinc-100">{{ $recurso['nombre'] ?? '-' }}</td>
+                                    <td class="px-3 py-2 text-zinc-600 dark:text-zinc-400">{{ $recurso['actividad'] ?? '-' }}</td>
+                                    <td class="px-3 py-2 text-zinc-600 dark:text-zinc-400">{{ $recurso['proceso_compra'] ?? '-' }}</td>
+                                    <td class="px-3 py-2 text-center text-zinc-600 dark:text-zinc-400">{{ $recurso['cantidad_seleccionada'] ?? '-' }}</td>
+                                    <td class="px-3 py-2 text-zinc-600 dark:text-zinc-400">{{ $recurso['unidad_medida'] ?? '-' }}</td>
+                                    <td class="px-3 py-2 text-zinc-600 dark:text-zinc-400">L {{ number_format($recurso['precio_unitario'] ?? 0, 2) }}</td>
+                                    <td class="px-3 py-2 text-zinc-600 dark:text-zinc-400 font-bold">L {{ number_format($recurso['total'] ?? 0, 2) }}</td>
+                                   <!--<td class="px-3 py-2">
+                                        <button wire: click="quitarRecursoDelSumario ({ $recurso['id'] }})" class="text-red-600 hover:underline">Quitar</button>
+                                    </td> -->
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="px-3 py-2 text-center text-zinc-500 dark:text-zinc-400">
+                                        {{ __('No hay recursos seleccionados.') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Formulario para crear requisición -->
+                <div class="bg-zinc-50 dark:bg-zinc-700 p-4 rounded-lg space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <x-label for="descripcionRequisicion" value="Descripción" />
+                            <x-input id="descripcionRequisicion" type="text" wire:model.defer="descripcion" placeholder="Descripción" />
+                        </div>
+                        <div>
+                            <x-label for="observacionRequisicion" value="Observación" />
+                            <x-input id="observacionRequisicion" type="text" wire:model.defer="observacion" placeholder="Observación" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 items-end">
+                        <div>
+                            <x-label for="fechaRequerido" value="Fecha a requerir" />
+                            <x-input id="fechaRequerido" type="date" wire:model.defer="fechaRequerido" placeholder="dd/mm/aaaa" />
+                        </div>
+                        <div class="flex justify-end">
+                            <span class="font-semibold text-zinc-900 dark:text-zinc-100">Monto total a requerir: L {{ number_format(collect($recursosSeleccionados)->sum('total'), 2) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </x-slot>
+        <x-slot name="footer">
+            <div class="flex justify-end gap-2">
+                <button wire:click="cerrarSumario" class="px-4 py-2 bg-zinc-400 text-white rounded hover:bg-zinc-500">Cerrar</button>
+                <button wire:click="crearRequisicionDesdeSumario" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 font-semibold">Crear Requisición</button>
+            </div>
+        </x-slot>
+    </x-dialog-modal>
 </div>
