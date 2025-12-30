@@ -455,7 +455,7 @@ class Requisicion extends Component
                 'costo_planificado' => $costoPlanificado,
             ];
         }
-        return view('livewire.seguimiento.Requisicion.requisicion', [
+        return view('livewire.seguimiento.Requisicion.create-requisiciones', [
             'mostrarSelector' => $mostrarSelector,
             'departamentosUsuario' => $departamentosUsuario,
             'departamentoSeleccionado' => $this->departamentoSeleccionado,

@@ -9,8 +9,6 @@
                 </div>
             @endif
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                                
-                <h2 class="text-xl font-semibold text-zinc-800 dark:text-zinc-200">{{ __('Administración de Requisiciones') }}</h2>
                                     <div class="flex flex-row items-end gap-4 w-full sm:w-auto">
                                         <div class="relative w-56">
                                             <x-input wire:model.live="search" type="text" placeholder="Buscar requisiciones..." class="w-full pl-10 pr-4 py-2"/>
@@ -156,7 +154,6 @@
             </x-table>
         </div>
     </div>
-    @include('livewire.seguimiento.Requisicion.create')
     @include('livewire.seguimiento.Requisicion.delete-confirmation')
     <x-error-modal 
         :show="$showErrorModal" 
