@@ -45,37 +45,22 @@ class Requisicion extends Component
         }
         
         $poa = $this->idPoa ? Poa::find($this->idPoa) : null;
-        $poa = $this->idPoa ? Poa::find($this->idPoa) : null;
-        $departamento = $user && $user->idDepartamento ? Departamento::find($user->idDepartamento) : null;
-        $categoria = null;
-        $resultado = null;
-        $correlativo = '';
-        if ($poa) {
-            $correlativo .= $poa->anio . '-';
-        }
-        // Ejemplo: categoría 
-        if ($categoria && isset($categoria->id)) {
-            if ($categoria->id == 1) {
-                $correlativo .= 'CA-';
-            } elseif ($categoria->id == 2) {
-                $correlativo .= 'JF-';
-            } elseif ($categoria->id == 3) {
-                $correlativo .= 'AD-';
-            } else {
-                $correlativo .= 'CR-';
-            }
-        } else {
-            $correlativo .= 'CR-';
-        }
-        $correlativo .= ($departamento->siglas ?? 'DEPTO') . '-';
-        if ($resultado && isset($resultado->id)) {
-            $correlativo .= $resultado->id . '-';
-        } else {
-            $correlativo .= '0-';
-        }
-       
+        // Asignar departamento y estado primero
+        $empleadoDepto = \DB::table('empleado_deptos')
+            ->where('idEmpleado', $user->id)
+            ->whereNull('deleted_at')
+            ->first();
+        $this->idDepartamento = $empleadoDepto ? $empleadoDepto->idDepto : ($user->idDepartamento ?? null);
+        $this->idEstado = $this->getEstadoPresentadoId();
+
+        // Ahora sí, obtener el departamento real de la requisición
+        $departamento = $this->idDepartamento ? Departamento::find($this->idDepartamento) : null;
         $ultimo = \App\Models\Requisicion\Requisicion::orderByDesc('id')->first();
-        $correlativo .= ($ultimo ? $ultimo->id + 1 : 1);
+        $numero = $ultimo ? $ultimo->id + 1 : 1;
+        $tipoDepto = $departamento->tipo ?? '';
+        $nombreDepto = $departamento->name ?? '';
+        $anio = $poa ? $poa->anio : date('Y');
+        $correlativo = \App\Helpers\CorrelativoHelper::generarCorrelativo($tipoDepto, $nombreDepto, $anio, $numero);
 
         // Asignar departamento y estado
         $empleadoDepto = \DB::table('empleado_deptos')
