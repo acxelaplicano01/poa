@@ -365,14 +365,14 @@ return [
                         ->setParentId('planificacion')
                         ->setAccessPermission('acceso-planificacion')
                         ->setPermissions([
-                            'planificacion.seguimiento.ver',
-                            'planificacion.seguimiento.crear',
-                            'planificacion.seguimiento.editar',
-                            'planificacion.seguimiento.eliminar',
+                            'seguimiento.requisicion.ver',
+                            'seguimiento.requisicion.crear',
+                            'seguimiento.requisicion.editar',
+                            'seguimiento.requisicion.eliminar',
                             'acceso-planificacion',
                         ])
                         ->setUrlMethod('get')
-                        ->setUrlController('App\Livewire\Requisicion\Requisicion')
+                        ->setUrlController('App\Livewire\Requisicion\SeguimientoRequisicion')
                         ->setRoles(['admin_general'])
                         ->setItems([])
                         ->setEndBlock('seguimiento'),

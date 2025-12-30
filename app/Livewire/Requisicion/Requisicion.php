@@ -347,7 +347,7 @@ class Requisicion extends Component
         }
         }
     
-        // ...existing code...
+       
         protected function getEstadoPresentadoId()
         {
             $estado = \DB::table('estado_requisicion')->where('estado', 'Presentado')->first();
