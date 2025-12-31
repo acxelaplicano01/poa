@@ -1,23 +1,31 @@
 <div>
 
     <div class="bg-white dark:bg-zinc-900 rounded-lg shadow p-4 mb-6">
-        <form wire:submit.prevent="buscar" class="flex flex-col md:flex-row md:items-center gap-4">
-            <div class="flex flex-row items-center w-full gap-2">
-                <x-input wire:model.defer="busqueda" type="text" placeholder="Nombre de Actividad o Tarea" class="w-55 text-sm" />
-                <button type="submit" class="inline-flex items-center px-3 py-2 bg-indigo-600 dark:bg-indigo-800 dark:border-indigo-700 dark:text-white dark:hover:bg-indigo-700 border border-transparent rounded font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-700 dark:focus:bg-indigo-900 active:bg-zinc-900 dark:active:bg-indigo-800 focus:outline-none focus:ring-2 dark:focus:ring-indigo-500 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-indigo-800 transition ease-in-out duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
-                    Buscar
-                </button>
-                <div class="flex items-center justify-end flex-shrink-0 w-fit ml-auto">
-                    <x-spinner-button wire:click="abrirSumario" loadingTarget="abrirSumario" :loadingText="__('Abriendo...')"
-                        class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        {{ __('Revisar sumario') }}
-                    </x-spinner-button>
-                </div>
+        <div class="flex flex-row items-center w-full gap-2">
+            <x-input wire:model.live="buscarActividad" type="text" placeholder="Buscar por nombre de actividad o tarea" class="w-55 text-sm" />
+            <div class="w-full sm:w-auto">
+                <x-select 
+                    id="perPage" 
+                    wire:model.live="perPage"
+                    :options="[
+                        ['value' => '10', 'text' => '10 por página'],
+                        ['value' => '25', 'text' => '25 por página'],
+                        ['value' => '50', 'text' => '50 por página'],
+                        ['value' => '100', 'text' => '100 por página'],
+                    ]"
+                    class="w-full"
+                />
             </div>
-        </form>
+            <div class="flex items-center justify-end flex-shrink-0 w-fit ml-auto">
+                <x-spinner-button wire:click="abrirSumario" loadingTarget="abrirSumario" :loadingText="__('Abriendo...')"
+                    class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    {{ __('Revisar sumario') }}
+                </x-spinner-button>
+            </div>
+        </div>
     </div>
 
     <!-- Actividades aprobadas con presupuesto disponible -->

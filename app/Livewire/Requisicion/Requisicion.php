@@ -20,9 +20,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class Requisicion extends Component
-
 {
-    
+  
+    // Búsqueda por nombre de actividad o tarea
+    public $buscarActividad = '';
+
     public function crearRequisicionDesdeSumario()
     {
         
@@ -422,10 +424,19 @@ class Requisicion extends Component
             $this->detalleRequisiciones = $requisicion ? $requisicion->detalleRequisiciones()->with(['recurso', 'presupuesto'])->get() : collect();
         }
         $actividades_aprobadas = Tarea::whereHas('presupuestos', function($q) {
-            $q->where('cantidad', '>', 0); 
-        })
+                $q->where('cantidad', '>', 0); 
+            })
             ->where('estado', 'APROBADO')
-            ->with(['presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente'])
+            ->when($this->buscarActividad, function($q) {
+                $q->where(function($subq) {
+                    $subq->where('nombre', 'like', '%'.$this->buscarActividad.'%');
+                    // Si hay relación actividad, buscar también por ese nombre
+                    $subq->orWhereHas('actividad', function($q2) {
+                        $q2->where('nombre', 'like', '%'.$this->buscarActividad.'%');
+                    });
+                });
+            })
+            ->with(['presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente', 'actividad'])
             ->get();
 
         $allPresupuestos = collect();

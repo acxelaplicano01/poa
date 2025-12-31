@@ -10,7 +10,7 @@ use App\Models\Departamento\Departamento;
 use Illuminate\Support\Facades\DB;
 use App\Models\Poa\Poa;
 
-class SeguimientoRequisicion extends Component      
+class SeguimientoRequisicion extends Component   
 {
     public $showRecursosModal = false;
     public $recursosRequisicion = [];
@@ -32,7 +32,21 @@ class SeguimientoRequisicion extends Component
     public $recursosSeleccionados = [];
     public $isViewing = true;
     public $showDetalleRecursosModal = false;
-    public $detalleRecursos = [];
+    public $detalleRecursos = [];   
+    public $departamentoSeleccionado = null;
+    public $search = '';
+    public $sortField = 'id';
+    public $sortDirection = 'desc';
+    
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
 
 
     protected string $layout = 'layouts.app';
@@ -175,13 +189,44 @@ class SeguimientoRequisicion extends Component
 
     public function render()
     {
-        $query = Requisicion::with(['departamento', 'estado']);
-        if ($this->estadoFiltro && $this->estadoFiltro !== 'Todos') {
-            $query->whereHas('estado', function($q) {
-                $q->where('estado', $this->estadoFiltro);
-            });
+        // Lógica para selector de departamento
+        $departamentosUsuario = [];
+        if (auth()->user() && auth()->user()->empleado) {
+            $departamentosUsuario = auth()->user()->empleado->departamentos ?? [];
         }
-        $requisiciones = $query->orderByDesc('id')->paginate(10);
+        $mostrarSelector = count($departamentosUsuario) > 1;
+
+        // Inicializar el departamento seleccionado si no está definido
+        if ($this->departamentoSeleccionado === null && count($departamentosUsuario) > 0) {
+            $this->departamentoSeleccionado = $departamentosUsuario[0]->id;
+        }
+
+
+        $query = Requisicion::with(['departamento', 'estado'])
+            ->when($this->estadoFiltro && $this->estadoFiltro !== 'Todos', function ($query) {
+                $query->whereHas('estado', function($q) {
+                    $q->where('estado', $this->estadoFiltro);
+                });
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function($q) {
+                    $q->where('correlativo', 'like', "%{$this->search}%")
+                      ->orWhereHas('departamento', function($q2) {
+                          $q2->where('name', 'like', "%{$this->search}%");
+                      });
+                });
+            })
+            ->when($this->departamentoSeleccionado, function ($query) {
+                $query->whereHas('departamento', function($q) {
+                    $q->where('id', $this->departamentoSeleccionado);
+                });
+            });
+
+        // Paginación dinámica y ordenamiento
+        $perPage = $this->perPage ?? 10;
+        $sortField = $this->sortField ?? 'id';
+        $sortDirection = $this->sortDirection ?? 'desc';
+        $requisiciones = $query->orderBy($sortField, $sortDirection)->paginate($perPage);
 
         // Agregar manualmente el departamento del creador a cada requisición
         foreach ($requisiciones as $requisicion) {
@@ -197,9 +242,12 @@ class SeguimientoRequisicion extends Component
         }
 
         $poas = Poa::activo()->orderByDesc('anio')->get();
+
         return view('livewire.seguimiento.Requisicion.requisiciones-lista', [
             'requisiciones' => $requisiciones,
             'poas' => $poas,
+            'mostrarSelector' => $mostrarSelector,
+            'departamentosUsuario' => $departamentosUsuario,
         ])->layout($this->layout);
     }
 }
