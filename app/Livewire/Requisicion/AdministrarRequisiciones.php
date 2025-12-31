@@ -5,6 +5,7 @@ namespace App\Livewire\Requisicion;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Requisicion\Requisicion;
+use App\Models\Requisicion\EstadoRequisicionLog;
 use App\Models\Departamento\Departamento;
 use App\Models\Poa\Poa;
 
@@ -22,6 +23,7 @@ class AdministrarRequisiciones extends Component
     public $showDetalleModal = false;
     public $detalleRecursos = [];
     public $detalleRequisicion = [];
+    public $observacionModal = '';
 
     public function sortBy($field)
     {
@@ -107,6 +109,13 @@ class AdministrarRequisiciones extends Component
         }
         $requisicion->approvedBy = auth()->id();
         $requisicion->save();
+        // Log de cambio de estado
+        EstadoRequisicionLog::create([
+            'observacion' => $this->observacionModal ?? '',
+            'log' => 'Cambio a Recibido',
+            'idRequisicion' => $requisicion->id,
+            'created_by' => auth()->id(),
+        ]);
         $this->detalleRequisicion['estado'] = $estadoRecibido ? $estadoRecibido->estado : 'Recibido';
         session()->flash('message', 'Requisición marcada como Recibida.');
     }
@@ -128,12 +137,19 @@ class AdministrarRequisiciones extends Component
         }
         $requisicion->approvedBy = auth()->id();
         $requisicion->save();
+        // Log de cambio de estado
+        EstadoRequisicionLog::create([
+            'observacion' => $this->observacionModal ?? '',
+            'log' => 'Cambio a Rechazado',
+            'idRequisicion' => $requisicion->id,
+            'created_by' => auth()->id(),
+        ]);
         $this->detalleRequisicion['estado'] = $estadoRechazado ? $estadoRechazado->estado : 'Rechazado';
         $this->cerrarDetalleModal();
         session()->flash('message', 'Requisición marcada como Rechazada.');
     }
 
-       public function marcarComoAprobado()
+    public function marcarComoAprobado()
     {
         if (!isset($this->detalleRequisicion['correlativo'])) {
             session()->flash('error', 'No se encontró la requisición.');
@@ -150,6 +166,13 @@ class AdministrarRequisiciones extends Component
         }
         $requisicion->approvedBy = auth()->id();
         $requisicion->save();
+        // Log de cambio de estado
+        EstadoRequisicionLog::create([
+            'observacion' => $this->observacionModal ?? '',
+            'log' => 'Cambio a Aprobado',
+            'idRequisicion' => $requisicion->id,
+            'created_by' => auth()->id(),
+        ]);
         $this->detalleRequisicion['estado'] = $estadoAprobado ? $estadoAprobado->estado : 'Aprobado';
         session()->flash('message', 'Requisición marcada como Aprobada.');
     }
@@ -171,6 +194,13 @@ class AdministrarRequisiciones extends Component
         }
         $requisicion->approvedBy = auth()->id();
         $requisicion->save();
+        // Log de cambio de estado
+        EstadoRequisicionLog::create([
+            'observacion' => $this->observacionModal ?? '',
+            'log' => 'Cambio a En Proceso de Compra',
+            'idRequisicion' => $requisicion->id,
+            'created_by' => auth()->id(),
+        ]);
         $this->detalleRequisicion['estado'] = $estadoProceso ? $estadoProceso->estado : 'En Proceso de Compra';
         session()->flash('message', 'Requisición marcada como En Proceso de Compra.');
     }

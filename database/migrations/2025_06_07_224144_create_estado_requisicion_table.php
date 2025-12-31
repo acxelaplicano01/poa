@@ -49,6 +49,11 @@ return new class extends Migration
                     'created_at' => $now,
                     'updated_at' => $now,
                 ],
+                [
+                    'estado' => 'Finalizado',
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ],
             ]);
         }
        

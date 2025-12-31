@@ -12,6 +12,7 @@ class EstadoRequisicionLog extends BaseModel
         'observacion',
         'log',
         'idRequisicion',
+        'created_by',
         // Los campos de auditoría ya están en BaseModel
     ];
 
