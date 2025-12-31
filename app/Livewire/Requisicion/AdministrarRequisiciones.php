@@ -19,6 +19,9 @@ class AdministrarRequisiciones extends Component
     public $perPage = 10;
     public $sortField = 'id';
     public $sortDirection = 'desc';
+    public $showDetalleModal = false;
+    public $detalleRecursos = [];
+    public $detalleRequisicion = [];
 
     public function sortBy($field)
     {
@@ -50,7 +53,7 @@ class AdministrarRequisiciones extends Component
             $total = ($detalle->cantidad ?? 0) * ($presupuesto->costounitario ?? 0);
             $monto_total += $total;
             $recursos[] = [
-                'nombre' => $presupuesto->recurso ?? '-',
+                'recurso' => $presupuesto->recurso ?? '-',
                 'detalle_tecnico' => $presupuesto->detalle_tecnico ?? '-',
                 'cantidad' => $detalle->cantidad ?? '-',
                 'precio_unitario' => $presupuesto->costounitario ?? 0,
@@ -72,9 +75,9 @@ class AdministrarRequisiciones extends Component
             'fecha_presentado' => $fechaPresentado ? $fechaPresentado->format('M d, Y') : '',
             'fecha_requerido' => $fechaRequerido ? $fechaRequerido->format('M d, Y') : '',
             'estado' => $requisicion->estado->estado ?? '-',
-            'recursos' => $recursos,
             'monto_total' => $monto_total,
         ];
+        $this->detalleRecursos = $recursos;
         $this->showDetalleModal = true;
         $this->observacionModal = '';
         
@@ -89,15 +92,87 @@ class AdministrarRequisiciones extends Component
 
     public function marcarComoRecibido()
     {
-        // Aquí puedes implementar la lógica para marcar como recibido
+        if (!isset($this->detalleRequisicion['correlativo'])) {
+            session()->flash('error', 'No se encontró la requisición.');
+            return;
+        }
+        $requisicion = Requisicion::where('correlativo', $this->detalleRequisicion['correlativo'])->first();
+        if (!$requisicion) {
+            session()->flash('error', 'No se encontró la requisición.');
+            return;
+        }
+        $estadoRecibido = \App\Models\Requisicion\EstadoRequisicion::where('estado', 'Recibido')->first();
+        if ($estadoRecibido) {
+            $requisicion->idEstado = $estadoRecibido->id;
+        }
+        $requisicion->approvedBy = auth()->id();
+        $requisicion->save();
+        $this->detalleRequisicion['estado'] = $estadoRecibido ? $estadoRecibido->estado : 'Recibido';
         session()->flash('message', 'Requisición marcada como Recibida.');
     }
 
     public function marcarComoRechazado()
     {
-        // Aquí puedes implementar la lógica para marcar como rechazado
+        if (!isset($this->detalleRequisicion['correlativo'])) {
+            session()->flash('error', 'No se encontró la requisición.');
+            return;
+        }
+        $requisicion = Requisicion::where('correlativo', $this->detalleRequisicion['correlativo'])->first();
+        if (!$requisicion) {
+            session()->flash('error', 'No se encontró la requisición.');
+            return;
+        }
+        $estadoRechazado = \App\Models\Requisicion\EstadoRequisicion::where('estado', 'Rechazado')->first();
+        if ($estadoRechazado) {
+            $requisicion->idEstado = $estadoRechazado->id;
+        }
+        $requisicion->approvedBy = auth()->id();
+        $requisicion->save();
+        $this->detalleRequisicion['estado'] = $estadoRechazado ? $estadoRechazado->estado : 'Rechazado';
         $this->cerrarDetalleModal();
         session()->flash('message', 'Requisición marcada como Rechazada.');
+    }
+
+       public function marcarComoAprobado()
+    {
+        if (!isset($this->detalleRequisicion['correlativo'])) {
+            session()->flash('error', 'No se encontró la requisición.');
+            return;
+        }
+        $requisicion = Requisicion::where('correlativo', $this->detalleRequisicion['correlativo'])->first();
+        if (!$requisicion) {
+            session()->flash('error', 'No se encontró la requisición.');
+            return;
+        }
+        $estadoAprobado = \App\Models\Requisicion\EstadoRequisicion::where('estado', 'Aprobado')->first();
+        if ($estadoAprobado) {
+            $requisicion->idEstado = $estadoAprobado->id;
+        }
+        $requisicion->approvedBy = auth()->id();
+        $requisicion->save();
+        $this->detalleRequisicion['estado'] = $estadoAprobado ? $estadoAprobado->estado : 'Aprobado';
+        session()->flash('message', 'Requisición marcada como Aprobada.');
+    }
+
+    public function marcarComoProcesoCompra()
+    {
+        if (!isset($this->detalleRequisicion['correlativo'])) {
+            session()->flash('error', 'No se encontró la requisición.');
+            return;
+        }
+        $requisicion = Requisicion::where('correlativo', $this->detalleRequisicion['correlativo'])->first();
+        if (!$requisicion) {
+            session()->flash('error', 'No se encontró la requisición.');
+            return;
+        }
+        $estadoProceso = \App\Models\Requisicion\EstadoRequisicion::where('estado', 'En Proceso de Compra')->first();
+        if ($estadoProceso) {
+            $requisicion->idEstado = $estadoProceso->id;
+        }
+        $requisicion->approvedBy = auth()->id();
+        $requisicion->save();
+        $this->detalleRequisicion['estado'] = $estadoProceso ? $estadoProceso->estado : 'En Proceso de Compra';
+        session()->flash('message', 'Requisición marcada como En Proceso de Compra.');
     }
 
     public function render()

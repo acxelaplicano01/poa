@@ -9,15 +9,14 @@
                 </div>
             @endif
             <!-- Selector de Departamento (si tiene más de uno) -->
-            @if($mostrarSelector)
+            @if ($mostrarSelector)
                 <div class="mb-6 w-full">
                     <label for="departamento" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                         Selecciona un Departamento
                     </label>
-                    <select wire:model.live="departamentoSeleccionado" 
-                            id="departamento"
-                            class="w-full sm:w-auto min-w-[300px] rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                        @foreach($departamentosUsuario as $depto)
+                    <select wire:model.live="departamentoSeleccionado" id="departamento"
+                        class="w-full sm:w-auto min-w-[300px] rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        @foreach ($departamentosUsuario as $depto)
                             <option value="{{ $depto->id }}">
                                 {{ $depto->name }} - {{ $depto->unidadEjecutora->name ?? 'Sin UE' }}
                             </option>
@@ -28,8 +27,8 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <div class="flex flex-col sm:flex-row w-full sm:w-auto space-y-3 sm:space-y-0 sm:space-x-2">
                     <div class="relative w-full sm:w-auto">
-                        <x-input wire:model.live="search" type="text" placeholder="Buscar por correlativo o departamento..."
-                            class="w-full pl-10 pr-4 py-2"/>
+                        <x-input wire:model.live="search" type="text"
+                            placeholder="Buscar por correlativo o departamento..." class="w-full pl-10 pr-4 py-2" />
                         <div class="absolute left-3 top-2.5">
                             <svg class="h-5 w-5 text-zinc-500 dark:text-zinc-400" xmlns="http://www.w3.org/2000/svg"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -39,17 +38,12 @@
                         </div>
                     </div>
                     <div class="w-full sm:w-auto">
-                        <x-select 
-                            id="perPage" 
-                            wire:model.live="perPage"
-                            :options="[
-        ['value' => '10', 'text' => '10 por página'],
-        ['value' => '25', 'text' => '25 por página'],
-        ['value' => '50', 'text' => '50 por página'],
-        ['value' => '100', 'text' => '100 por página'],
-    ]"
-                            class="w-full"
-                        />
+                        <x-select id="perPage" wire:model.live="perPage" :options="[
+                            ['value' => '10', 'text' => '10 por página'],
+                            ['value' => '25', 'text' => '25 por página'],
+                            ['value' => '50', 'text' => '50 por página'],
+                            ['value' => '100', 'text' => '100 por página'],
+                        ]" class="w-full" />
                     </div>
                     <div class="flex flex-col">
                         <select id="estadoFiltro" wire:model.live="estadoFiltro"
@@ -103,9 +97,21 @@
                                 {{ $requisicion->observacion ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                                <span
-                                    class="px-2 py-1 rounded-full text-xs font-semibold {{ $requisicion->estado->estado == 'Presentado' ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-200 text-blue-800' }}">
-                                    {{ $requisicion->estado->estado ?? '-' }}
+                                @php
+                                    $estado = $requisicion->estado->estado ?? '';
+                                    $color = match ($estado) {
+                                        'Presentado' => 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200',
+                                        'Recibido' => 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200',
+                                        'En Proceso de Compra'
+                                            => 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100',
+                                        'Aprobado'
+                                            => 'bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100',
+                                        'Rechazado' => 'bg-red-200 text-red-800 dark:bg-red-700 dark:text-red-100',
+                                        default => 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200',
+                                    };
+                                @endphp
+                                <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $color }}">
+                                    {{ $estado }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
