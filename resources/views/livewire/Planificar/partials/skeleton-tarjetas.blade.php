@@ -143,7 +143,7 @@
         </div>
     </div>
 
-    <!-- Mensaje de carga -->
+    <!-- Mensaje de carga 
     <div class="mt-6 text-center">
         <div class="inline-flex items-center px-4 py-2">
             <div
@@ -151,5 +151,5 @@
             </div>
             <span class="text-sm text-zinc-600 dark:text-zinc-400">Cargando información del departamento...</span>
         </div>
-    </div>
+    </div>-->
 </div>

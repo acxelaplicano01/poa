@@ -46,7 +46,6 @@
                                 id="anio"
                                 class="block w-full rounded-md border-zinc-300 dark:border-zinc-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-zinc-800 dark:text-zinc-100 sm:text-sm"
                             >
-                                <option value="">Todos los años</option>
                                 @foreach($anios as $anio)
                                     <option value="{{ $anio }}">{{ $anio }}</option>
                                 @endforeach
