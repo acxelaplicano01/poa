@@ -84,6 +84,7 @@ class Actividades extends Component
     public $puedeCrearActividades = false;
     public $mensajePlazo = '';
     public $diasRestantes = null;
+    public $esPoaHistorico = false; // Nueva propiedad para POAs históricos
 
     // Propiedades para IA
     public $usarIA = false;
@@ -148,11 +149,22 @@ class Actividades extends Component
     {
         if (isset($this->userContext['poa'])) {
             $poa = $this->userContext['poa'];
-            $this->puedeCrearActividades = $poa->puedePlanificar();
-            $this->diasRestantes = $poa->getDiasRestantesPlanificacion();
             
-            if (!$this->puedeCrearActividades) {
-                $this->mensajePlazo = $poa->getMensajeErrorPlazo('planificacion');
+            // Verificar si el POA es histórico (año ya pasó)
+            $anioActual = (int) date('Y');
+            $this->esPoaHistorico = $poa->anio < $anioActual;
+            
+            // Si es histórico, no se puede crear actividades
+            if ($this->esPoaHistorico) {
+                $this->puedeCrearActividades = false;
+                $this->mensajePlazo = 'Este POA es histórico (año ' . $poa->anio . '). Solo puedes consultar la información, no realizar modificaciones.';
+            } else {
+                $this->puedeCrearActividades = $poa->puedePlanificar();
+                $this->diasRestantes = $poa->getDiasRestantesPlanificacion();
+                
+                if (!$this->puedeCrearActividades) {
+                    $this->mensajePlazo = $poa->getMensajeErrorPlazo('planificacion');
+                }
             }
         }
     }

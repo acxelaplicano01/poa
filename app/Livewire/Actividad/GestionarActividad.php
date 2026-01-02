@@ -30,6 +30,8 @@ class GestionarActividad extends Component
     public $actividadId;
     public $actividad;
     public $actividadEnFormulacion = false;
+    public $esPoaHistorico = false; // Nueva propiedad para POAs históricos
+    public $mensajePlazoHistorico = ''; // Mensaje cuando es POA histórico
     
     // Paso 1: Indicadores
     public $indicadores = [];
@@ -181,8 +183,22 @@ class GestionarActividad extends Component
             'poa'
         ])->findOrFail($this->actividadId);
         
-        // Actualizar si está en estado FORMULACIÓN o REFORMULACIÓN
-        $this->actividadEnFormulacion = in_array($this->actividad->estado, ['FORMULACION', 'REFORMULACION']);
+        // Verificar si el POA es histórico (año ya pasó)
+        $anioActual = (int) date('Y');
+        if ($this->actividad->poa) {
+            $this->esPoaHistorico = $this->actividad->poa->anio < $anioActual;
+            
+            if ($this->esPoaHistorico) {
+                $this->actividadEnFormulacion = false;
+                $this->mensajePlazoHistorico = 'Este POA es histórico (año ' . $this->actividad->poa->anio . '). Solo puedes consultar la información, no realizar modificaciones.';
+            } else {
+                // Actualizar si está en estado FORMULACIÓN o REFORMULACIÓN
+                $this->actividadEnFormulacion = in_array($this->actividad->estado, ['FORMULACION', 'REFORMULACION']);
+            }
+        } else {
+            // Actualizar si está en estado FORMULACIÓN o REFORMULACIÓN
+            $this->actividadEnFormulacion = in_array($this->actividad->estado, ['FORMULACION', 'REFORMULACION']);
+        }
         
         $this->loadIndicadores();
         $this->loadTodasPlanificaciones();
