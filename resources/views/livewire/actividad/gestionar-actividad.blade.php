@@ -772,9 +772,21 @@
                     </div>
                 @endif
                 
-                <!-- Formulario para agregar presupuesto -->
-                <div class="bg-zinc-50 dark:bg-zinc-700 p-4 rounded-lg space-y-4">
-                    <h4 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Agregar Recurso</h4>
+                <!-- Formulario para agregar/editar presupuesto -->
+                <div class="bg-zinc-50 dark:bg-zinc-700 p-4 rounded-lg space-y-4 {{ $presupuestoEditandoId ? 'ring-2 ring-indigo-500' : '' }}">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                            {{ $presupuestoEditandoId ? 'Editar Recurso' : 'Agregar Recurso' }}
+                        </h4>
+                        @if($presupuestoEditandoId)
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Modo Edición
+                            </span>
+                        @endif
+                    </div>
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -868,13 +880,25 @@
                             $puedeEditarPresupuesto = $actividadEnFormulacion || ($tieneRevisionPendientePresup && !$tareaAprobadaPresup);
                         }
                     @endphp
-                    <div class="flex justify-end">
-                        <x-spinner-button wire:click="savePresupuesto" class="{{ !$puedeEditarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeEditarPresupuesto" loadingTarget="savePresupuesto" :loadingText="__('Guardando...')">
-                            <svg class="w-4 h-4 mr-2"  fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Agregar Recurso
-                        </x-spinner-button>
+                    <div class="flex justify-end gap-2">
+                        @if($presupuestoEditandoId)
+                            <x-secondary-button wire:click="cancelarEdicionPresupuesto" class="text-sm">
+                                Cancelar
+                            </x-secondary-button>
+                            <x-spinner-button wire:click="savePresupuesto" class="{{ !$puedeEditarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeEditarPresupuesto" loadingTarget="savePresupuesto" :loadingText="__('Actualizando...')">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Actualizar Recurso
+                            </x-spinner-button>
+                        @else
+                            <x-spinner-button wire:click="savePresupuesto" class="{{ !$puedeEditarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeEditarPresupuesto" loadingTarget="savePresupuesto" :loadingText="__('Guardando...')">
+                                <svg class="w-4 h-4 mr-2"  fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                                Agregar Recurso
+                            </x-spinner-button>
+                        @endif
                     </div>
                 </div>
 
@@ -921,14 +945,24 @@
                                                 L {{ number_format($presupuesto['total'], 2) }}
                                             </td>
                                             <td class="px-3 py-2 text-center">
-                                                <button wire:click="openDeletePresupuestoModal({{ $presupuesto['id'] }})"
-                                                        class="text-red-600 hover:text-red-800 dark:text-red-400 {{ !$puedeEditarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }} cursor-pointer" 
-                                                        {{ !$puedeEditarPresupuesto ? 'disabled' : '' }}
-                                                        title="Eliminar Presupuesto">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
+                                                <div class="flex items-center justify-center gap-2">
+                                                    <button wire:click="editPresupuesto({{ $presupuesto['id'] }})"
+                                                            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 {{ !$puedeEditarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }} cursor-pointer" 
+                                                            {{ !$puedeEditarPresupuesto ? 'disabled' : '' }}
+                                                            title="Editar Presupuesto">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                    </button>
+                                                    <button wire:click="openDeletePresupuestoModal({{ $presupuesto['id'] }})"
+                                                            class="text-red-600 hover:text-red-800 dark:text-red-400 {{ !$puedeEditarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }} cursor-pointer" 
+                                                            {{ !$puedeEditarPresupuesto ? 'disabled' : '' }}
+                                                            title="Eliminar Presupuesto">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach

@@ -124,6 +124,7 @@ class GestionarActividad extends Component
         'idMes' => '',
         'total' => 0
     ];
+    public $presupuestoEditandoId = null;
 
     // URL parameter
     #[\Livewire\Attributes\Url]
@@ -1435,22 +1436,58 @@ class GestionarActividad extends Component
 
             }
             
-            // Crear el presupuesto (registrar la asignación, sin modificar el techo_depto)
-            // Esto es similar a cómo techo_deptos registra asignaciones del techo_ues sin modificarlo
-            Presupuesto::create([
-                'cantidad' => $this->nuevoPresupuesto['cantidad'],
-                'costounitario' => $this->nuevoPresupuesto['costounitario'],
-                'total' => $this->nuevoPresupuesto['total'],
-                'detalle_tecnico' => $this->nuevoPresupuesto['detalle_tecnico'],
-                'recurso' => $recurso->nombre,
-                'idgrupo' => $idgrupo ?? 1,
-                'idobjeto' => $recurso->idobjeto,
-                'idtarea' => $this->tareaSeleccionada,
-                'idfuente' => $this->nuevoPresupuesto['idfuente'],
-                'idunidad' => $this->nuevoPresupuesto['idunidad'],
-                'idMes' => $this->nuevoPresupuesto['idMes'],
-                'created_by' => Auth::id()
-            ]);
+            // Crear o actualizar el presupuesto
+            if ($this->presupuestoEditandoId) {
+                // Modo edición - Actualizar presupuesto existente
+                $presupuestoExistente = Presupuesto::findOrFail($this->presupuestoEditandoId);
+                
+                // Calcular el presupuesto disponible sin contar el presupuesto actual
+                $presupuestoYaAsignadoSinActual = $presupuestoYaAsignado - $presupuestoExistente->total;
+                $presupuestoDisponibleConActual = $techosTotalDisponible - $presupuestoYaAsignadoSinActual;
+                
+                // Verificar que haya suficiente presupuesto disponible
+                if ($presupuestoTotal > $presupuestoDisponibleConActual) {
+                    session()->flash('error', 'Presupuesto insuficiente. Disponible: L ' . number_format($presupuestoDisponibleConActual, 2) . ', Solicitado: L ' . number_format($presupuestoTotal, 2));
+                    DB::rollBack();
+                    return;
+                }
+                
+                $presupuestoExistente->update([
+                    'cantidad' => $this->nuevoPresupuesto['cantidad'],
+                    'costounitario' => $this->nuevoPresupuesto['costounitario'],
+                    'total' => $this->nuevoPresupuesto['total'],
+                    'detalle_tecnico' => $this->nuevoPresupuesto['detalle_tecnico'],
+                    'recurso' => $recurso->nombre,
+                    'idgrupo' => $idgrupo ?? 1,
+                    'idobjeto' => $recurso->idobjeto,
+                    'idfuente' => $this->nuevoPresupuesto['idfuente'],
+                    'idunidad' => $this->nuevoPresupuesto['idunidad'],
+                    'idMes' => $this->nuevoPresupuesto['idMes'],
+                ]);
+                
+                $mensajeExito = 'Recurso presupuestario actualizado exitosamente.';
+            } else {
+                // Modo creación - Crear nuevo presupuesto
+                Presupuesto::create([
+                    'cantidad' => $this->nuevoPresupuesto['cantidad'],
+                    'costounitario' => $this->nuevoPresupuesto['costounitario'],
+                    'total' => $this->nuevoPresupuesto['total'],
+                    'detalle_tecnico' => $this->nuevoPresupuesto['detalle_tecnico'],
+                    'recurso' => $recurso->nombre,
+                    'idgrupo' => $idgrupo ?? 1,
+                    'idobjeto' => $recurso->idobjeto,
+                    'idtarea' => $this->tareaSeleccionada,
+                    'idfuente' => $this->nuevoPresupuesto['idfuente'],
+                    'idunidad' => $this->nuevoPresupuesto['idunidad'],
+                    'idMes' => $this->nuevoPresupuesto['idMes'],
+                    'created_by' => Auth::id()
+                ]);
+                
+                $mensajeExito = 'Recurso presupuestario agregado exitosamente.';
+            }
+            
+            // Actualizar updated_at de la tarea para que aparezca el botón "Marcar como Corregido"
+            $tarea->touch();
             
             DB::commit();
             
@@ -1458,7 +1495,7 @@ class GestionarActividad extends Component
             $this->loadTareas();
             $this->resetNuevoPresupuesto();
             $this->loadTechoDepartamento($tarea, $idFuente);
-            session()->flash('message', 'Recurso presupuestario agregado exitosamente.');
+            session()->flash('message', $mensajeExito);
             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -1482,6 +1519,9 @@ class GestionarActividad extends Component
             
             // Eliminar el presupuesto (sin modificar el techo_depto)
             $presupuesto->delete();
+            
+            // Actualizar updated_at de la tarea para que aparezca el botón "Marcar como Corregido"
+            $tarea->touch();
             
             DB::commit();
             
@@ -1529,6 +1569,46 @@ class GestionarActividad extends Component
             'idMes' => '',
             'total' => 0
         ];
+        $this->presupuestoEditandoId = null;
+    }
+
+    public function editPresupuesto($presupuestoId)
+    {
+        $presupuesto = Presupuesto::with(['fuente', 'unidadMedida', 'mes'])->find($presupuestoId);
+        
+        if (!$presupuesto) {
+            session()->flash('error', 'Presupuesto no encontrado.');
+            return;
+        }
+        
+        // Verificar permisos
+        $this->verificarPuedeEditarTarea($presupuesto->idtarea);
+        
+        // Buscar el recurso por nombre en tareas_historicos
+        $recurso = TareaHistorico::where('nombre', $presupuesto->recurso)->first();
+        
+        $this->presupuestoEditandoId = $presupuestoId;
+        $this->nuevoPresupuesto = [
+            'idRecurso' => $recurso ? $recurso->id : '',
+            'detalle_tecnico' => $presupuesto->detalle_tecnico,
+            'idfuente' => $presupuesto->idfuente,
+            'idunidad' => $presupuesto->idunidad,
+            'costounitario' => $presupuesto->costounitario,
+            'cantidad' => $presupuesto->cantidad,
+            'idMes' => $presupuesto->idMes,
+            'total' => $presupuesto->total
+        ];
+        
+        // Actualizar la info del techo con la fuente seleccionada
+        $tarea = Tarea::find($this->tareaSeleccionada);
+        if ($tarea) {
+            $this->loadTechoDepartamento($tarea, $presupuesto->idfuente);
+        }
+    }
+
+    public function cancelarEdicionPresupuesto()
+    {
+        $this->resetNuevoPresupuesto();
     }
 
     // ============= NAVEGACIÓN ENTRE PASOS =============
