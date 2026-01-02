@@ -848,9 +848,28 @@
                             L {{ number_format($nuevoPresupuesto['total'], 2) }}
                         </span>
                     </div>
-
+                    @php
+                        // Calcular si puede editar presupuesto basándose en la tarea seleccionada
+                        $tareaActual = \App\Models\Tareas\Tarea::find($tareaSeleccionada);
+                        $ultimaRevisionTareaPresup = null;
+                        $tieneRevisionPendientePresup = false;
+                        $tareaAprobadaPresup = false;
+                        $puedeEditarPresupuesto = $actividadEnFormulacion;
+                        
+                        if ($tareaActual) {
+                            $ultimaRevisionTareaPresup = $actividad->revisiones()
+                                ->where('tipo', 'TAREA')
+                                ->where('idElemento', $tareaActual->id)
+                                ->orderBy('created_at', 'desc')
+                                ->first();
+                            
+                            $tieneRevisionPendientePresup = $ultimaRevisionTareaPresup && !$ultimaRevisionTareaPresup->corregido;
+                            $tareaAprobadaPresup = $tareaActual->estado === 'APROBADO';
+                            $puedeEditarPresupuesto = $actividadEnFormulacion || ($tieneRevisionPendientePresup && !$tareaAprobadaPresup);
+                        }
+                    @endphp
                     <div class="flex justify-end">
-                        <x-spinner-button wire:click="savePresupuesto" class="{{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion" loadingTarget="savePresupuesto" :loadingText="__('Guardando...')">
+                        <x-spinner-button wire:click="savePresupuesto" class="{{ !$puedeEditarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$puedeEditarPresupuesto" loadingTarget="savePresupuesto" :loadingText="__('Guardando...')">
                             <svg class="w-4 h-4 mr-2"  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
@@ -903,7 +922,9 @@
                                             </td>
                                             <td class="px-3 py-2 text-center">
                                                 <button wire:click="openDeletePresupuestoModal({{ $presupuesto['id'] }})"
-                                                        class="text-red-600 hover:text-red-800 dark:text-red-400 {{ !$actividadEnFormulacion ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}" :disabled="!$actividadEnFormulacion">
+                                                        class="text-red-600 hover:text-red-800 dark:text-red-400 {{ !$puedeEditarPresupuesto ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }} cursor-pointer" 
+                                                        {{ !$puedeEditarPresupuesto ? 'disabled' : '' }}
+                                                        title="Eliminar Presupuesto">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>

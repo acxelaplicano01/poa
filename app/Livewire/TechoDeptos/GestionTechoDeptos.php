@@ -12,6 +12,7 @@ use App\Models\TechoUes\TechoUe;
 use App\Models\TechoUes\TechoDepto;
 use App\Models\Poa\PoaDepto;
 use App\Models\GrupoGastos\GrupoGasto;
+use App\Models\Presupuestos\Presupuesto;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class GestionTechoDeptos extends Component
@@ -519,14 +520,22 @@ class GestionTechoDeptos extends Component
             return 0.0;
         }
 
-        // Obtener el monto actual asignado desde esta fuente para este departamento
-        $montoActual = TechoDepto::where('idPoa', $this->idPoa)
-            ->where('idUE', $this->idUE)
-            ->where('idDepartamento', $this->idDepartamento)
-            ->where('idTechoUE', $idTechoUE)
-            ->sum('monto');
+        // Obtener el TechoUE para saber la fuente
+        $techoUE = TechoUe::find($idTechoUE);
+        if (!$techoUE) {
+            return 0.0;
+        }
 
-        return floatval($montoActual);
+        // Calcular el monto ya planificado por el departamento desde esta fuente
+        // La cadena es: Presupuesto -> Tarea -> Departamento
+        $montoPlanificado = Presupuesto::where('idfuente', $techoUE->idFuente)
+            ->whereHas('tarea', function ($query) {
+                $query->where('idPoa', $this->idPoa)
+                    ->where('idDeptartamento', $this->idDepartamento);
+            })
+            ->sum('total');
+
+        return floatval($montoPlanificado);
     }
 
     private function validarDisponibilidadPresupuesto($montoAValidar, $idTechoUE)

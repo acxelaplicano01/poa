@@ -8,6 +8,7 @@ use Livewire\Attributes\Layout;
 use App\Models\Poa\Poa;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\TechoUes\TechoUe;
+use App\Models\TechoUes\TechoDepto;
 use App\Models\GrupoGastos\GrupoGasto;
 use App\Services\LogService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -598,13 +599,21 @@ class GestionTechoUeNacional extends Component
             return 0.0;
         }
 
-        // Obtener el monto actual asignado desde esta fuente para esta UE
-        $montoActual = TechoUe::where('idPoa', $this->idPoa)
+        // Obtener el TechoUE para esta UE y fuente
+        $techoUe = TechoUe::where('idPoa', $this->idPoa)
             ->where('idUE', $this->idUnidadEjecutora)
             ->where('idFuente', $idFuente)
+            ->first();
+
+        if (!$techoUe) {
+            return 0.0;
+        }
+
+        // Obtener el monto ya asignado a departamentos desde este TechoUE
+        $montoAsignadoDeptos = TechoDepto::where('idTechoUE', $techoUe->id)
             ->sum('monto');
 
-        return floatval($montoActual);
+        return floatval($montoAsignadoDeptos);
     }
 
     private function validarDisponibilidadPresupuesto($montoAValidar, $idFuente)

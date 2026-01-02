@@ -345,7 +345,7 @@ return [
                         ->setHeroIcon('arrow-trending-up')
                         ->setItems([
                             RkNavigation::make('plazos-poa')
-                                ->setDescription('Gestión de techos presupuestarios por departamento')
+                                ->setDescription('Gestión de plazos estándar y personalizados para el POA')
                                 ->setLabel('Gestión de plazos')
                                 ->setHeroIcon('cog-8-tooth')
                                 ->setEndBlock('plazos-poa'),

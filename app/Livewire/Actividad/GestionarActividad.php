@@ -276,7 +276,7 @@ class GestionarActividad extends Component
     private function verificarActividadEnRevision()
     {
         if (!in_array($this->actividad->estado, ['FORMULACION', 'REFORMULACION'])) {
-            throw new \Exception('Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN.');
+            session()->flash('message', 'Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN.');
         }
     }
 
@@ -298,7 +298,7 @@ class GestionarActividad extends Component
             ->exists();
 
         if (!$tieneRevisionPendiente) {
-            throw new \Exception('Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN, o cuando hay una corrección pendiente.');
+            session()->flash('message', 'Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN, o cuando hay una corrección pendiente.');
         }
 
         return true;
@@ -322,7 +322,7 @@ class GestionarActividad extends Component
             ->exists();
 
         if (!$tieneRevisionPendiente) {
-            throw new \Exception('Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN, o cuando hay una corrección pendiente.');
+            session()->flash('message', 'Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN, o cuando hay una corrección pendiente.');
         }
 
         return true;
@@ -346,7 +346,7 @@ class GestionarActividad extends Component
             ->exists();
 
         if (!$tieneRevisionPendiente) {
-            throw new \Exception('Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN, o cuando hay una corrección pendiente.');
+            session()->flash('message', 'Solo se pueden realizar cambios cuando la actividad está en estado FORMULACIÓN o REFORMULACIÓN, o cuando hay una corrección pendiente.');
         }
 
         return true;
@@ -1157,13 +1157,17 @@ class GestionarActividad extends Component
                 $tarea->load('departamento');
             }
             
-            // Construir consulta para obtener techos del departamento
-            $query = TechoDepto::where('idDepartamento', $tarea->idDeptartamento);
+            $idPoa = $tarea->idPoa;
+            
+            // Construir consulta para obtener techos del departamento en este POA
+            $query = TechoDepto::where('idDepartamento', $tarea->idDeptartamento)
+                ->where('idPoa', $idPoa);
             
             // Si se proporciona una fuente, filtrar por ella a través de techo_ues
             if ($idFuente) {
-                // Obtener los techo_ues que corresponden a esta fuente
+                // Obtener los techo_ues que corresponden a esta fuente Y a este POA
                 $techoUesIds = \App\Models\TechoUes\TechoUe::where('idFuente', $idFuente)
+                    ->where('idPoa', $idPoa)
                     ->pluck('id')
                     ->toArray();
                 
@@ -1344,7 +1348,8 @@ class GestionarActividad extends Component
 
     public function savePresupuesto()
     {
-        $this->verificarActividadEnRevision();
+        // Verificar permisos basados en la tarea seleccionada
+        $this->verificarPuedeEditarTarea($this->tareaSeleccionada);
         
         $this->validate([
             'nuevoPresupuesto.idRecurso' => 'required|exists:tareas_historicos,id',
@@ -1380,28 +1385,30 @@ class GestionarActividad extends Component
             // Obtener la tarea y el departamento
             $tarea = Tarea::findOrFail($this->tareaSeleccionada);
             $idDepartamento = $tarea->idDeptartamento;
+            $idPoa = $tarea->idPoa;
             $idFuente = $this->nuevoPresupuesto['idfuente'];
             
-            // Obtener los techo_ues que corresponden a esta fuente
+            // Obtener los techo_ues que corresponden a esta fuente Y a este POA
             $techoUesIds = \App\Models\TechoUes\TechoUe::where('idFuente', $idFuente)
+                ->where('idPoa', $idPoa)
                 ->pluck('id')
                 ->toArray();
             
             if (empty($techoUesIds)) {
-                throw new \Exception('No hay techo presupuestario para la fuente de financiamiento seleccionada');
+                session()->flash('message', 'No hay techo presupuestario para la fuente de financiamiento seleccionada en este POA');
             }
             
-            // Obtener el techo del departamento para esta fuente (suma de todos los techos deptos para esta fuente)
+            // Obtener el techo del departamento para esta fuente en este POA
             $techosTotalDisponible = TechoDepto::where('idDepartamento', $idDepartamento)
+                ->where('idPoa', $idPoa)
                 ->whereIn('idTechoUE', $techoUesIds)
                 ->sum('monto');
             
             if ($techosTotalDisponible <= 0) {
-                throw new \Exception('No hay techo presupuestario disponible para el departamento y fuente de financiamiento seleccionada');
+                session()->flash('message', 'No hay techo presupuestario disponible para el departamento y fuente de financiamiento seleccionada en este POA');
             }
             
             // Obtener todas las tareas del departamento en este POA
-            $idPoa = $tarea->idPoa;
             $todasLasTareas = Tarea::where('idDeptartamento', $idDepartamento)
                 ->where('idPoa', $idPoa)
                 ->pluck('id')
@@ -1418,13 +1425,14 @@ class GestionarActividad extends Component
             
             // Verificar que el presupuesto disponible sea mayor a 0
             if ($presupuestoDisponible <= 0) {
-                throw new \Exception('No hay presupuesto disponible para esta fuente. Todo el techo ha sido asignado.');
+                session()->flash('message', 'No hay presupuesto disponible para esta fuente. Todo el techo ha sido asignado.');
             }
             
             // Verificar que haya suficiente presupuesto disponible para el monto solicitado
             $presupuestoTotal = $this->nuevoPresupuesto['total'];
             if ($presupuestoTotal > $presupuestoDisponible) {
-                throw new \Exception('Presupuesto insuficiente. Disponible: L ' . number_format($presupuestoDisponible, 2) . ', Solicitado: L ' . number_format($presupuestoTotal, 2));
+                session()->flash('message', 'Presupuesto insuficiente. Disponible: L ' . number_format($presupuestoDisponible, 2) . ', Solicitado: L ' . number_format($presupuestoTotal, 2));
+
             }
             
             // Crear el presupuesto (registrar la asignación, sin modificar el techo_depto)
@@ -1460,12 +1468,13 @@ class GestionarActividad extends Component
 
     public function deletePresupuesto($presupuestoId)
     {
-        $this->verificarActividadEnRevision();
-        
         try {
             DB::beginTransaction();
             
             $presupuesto = Presupuesto::findOrFail($presupuestoId);
+            
+            // Verificar permisos basados en la tarea
+            $this->verificarPuedeEditarTarea($presupuesto->idtarea);
             $idFuente = $presupuesto->idfuente;
             
             // Obtener la tarea
@@ -1489,10 +1498,11 @@ class GestionarActividad extends Component
 
     public function openDeletePresupuestoModal($presupuestoId)
     {
-        $this->verificarActividadEnRevision();
-        
         $presupuesto = Presupuesto::find($presupuestoId);
         if ($presupuesto) {
+            // Verificar permisos basados en la tarea
+            $this->verificarPuedeEditarTarea($presupuesto->idtarea);
+            
             $this->presupuestoToDelete = $presupuesto->toArray();
             $this->showDeletePresupuestoModal = true;
         }
@@ -1500,8 +1510,6 @@ class GestionarActividad extends Component
 
     public function confirmDeletePresupuesto()
     {
-        $this->verificarActividadEnRevision();
-        
         if ($this->presupuestoToDelete) {
             $this->deletePresupuesto($this->presupuestoToDelete['id']);
             $this->showDeletePresupuestoModal = false;
