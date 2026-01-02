@@ -386,21 +386,22 @@ class GestionTechoDeptos extends Component
         // Validar cada monto por fuente
         foreach ($this->montosPorFuente as $idTechoUE => $monto) {
             $montoFloat = floatval($monto);
+            
+            // En modo edición, siempre validar que el monto no sea menor al mínimo permitido
+            if ($this->isEditing) {
+                $montoMinimo = $this->getMontoMinimoPermitido($idTechoUE);
+                if ($montoFloat < $montoMinimo) {
+                    $techoUE = $this->techoUes->firstWhere('id', $idTechoUE);
+                    $fuenteNombre = $techoUE->fuente->nombre ?? 'la fuente';
+                    session()->flash('error', 
+                        "El monto para {$fuenteNombre} no puede ser menor a L " . number_format($montoMinimo, 2) . " (ya hay presupuestos planificados por ese monto)."
+                    );
+                    return;
+                }
+            }
+            
             if ($montoFloat > 0) {
                 $rules["montosPorFuente.{$idTechoUE}"] = 'required|numeric|min:0.01';
-                
-                // En modo edición, validar que el monto no sea menor al mínimo permitido
-                if ($this->isEditing) {
-                    $montoMinimo = $this->getMontoMinimoPermitido($idTechoUE);
-                    if ($montoFloat < $montoMinimo) {
-                        $techoUE = $this->techoUes->firstWhere('id', $idTechoUE);
-                        $fuenteNombre = $techoUE->fuente->nombre ?? 'la fuente';
-                        session()->flash('error', 
-                            "El monto para {$fuenteNombre} no puede ser menor al asignado anteriormente (" . number_format($montoMinimo, 2) . ")."
-                        );
-                        return;
-                    }
-                }
             }
         }
         

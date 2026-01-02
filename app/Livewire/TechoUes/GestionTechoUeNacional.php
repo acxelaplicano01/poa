@@ -280,22 +280,23 @@ class GestionTechoUeNacional extends Component
         // Validar cada monto por fuente
         foreach ($this->montosPorFuente as $idFuente => $monto) {
             $montoFloat = floatval($monto);
+            
+            // En modo edición, siempre validar que el monto no sea menor al mínimo permitido
+            if ($this->isEditing) {
+                $montoMinimo = $this->getMontoMinimoPermitido($idFuente);
+                if ($montoFloat < $montoMinimo) {
+                    $fuentes = $this->getFuentesProperty();
+                    $fuente = $fuentes->firstWhere('id', $idFuente);
+                    $fuenteNombre = $fuente->nombre ?? 'la fuente';
+                    session()->flash('error', 
+                        "El monto para {$fuenteNombre} no puede ser menor a L " . number_format($montoMinimo, 2) . " (ya hay asignaciones a departamentos por ese monto)."
+                    );
+                    return;
+                }
+            }
+            
             if ($montoFloat > 0) {
                 $rules["montosPorFuente.{$idFuente}"] = 'required|numeric|min:0.01';
-                
-                // En modo edición, validar que el monto no sea menor al mínimo permitido
-                if ($this->isEditing) {
-                    $montoMinimo = $this->getMontoMinimoPermitido($idFuente);
-                    if ($montoFloat < $montoMinimo) {
-                        $fuentes = $this->getFuentesProperty();
-                        $fuente = $fuentes->firstWhere('id', $idFuente);
-                        $fuenteNombre = $fuente->nombre ?? 'la fuente';
-                        session()->flash('error', 
-                            "El monto para {$fuenteNombre} no puede ser menor al asignado anteriormente (" . number_format($montoMinimo, 2) . ")."
-                        );
-                        return;
-                    }
-                }
             }
         }
         
