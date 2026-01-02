@@ -1,5 +1,5 @@
 <!-- Modal de confirmación de eliminación -->
-<x-confirmation-modal wire:model="modalDelete" maxWidth="md">
+<x-dialog-modal wire:model="modalDelete" maxWidth="md">
     <x-slot name="title">
         Eliminar Plazo
     </x-slot>
@@ -31,13 +31,12 @@
     </x-slot>
 
     <x-slot name="footer">
-        <x-secondary-button wire:click="$set('modalDelete', false)">
-            Cancelar
-        </x-secondary-button>
+        <x-spinner-secondary-button wire:click="closeDelete" type="button" loadingTarget="closeDelete" loadingText="Cerrando...">
+                {{ __('Cancelar') }}
+        </x-spinner-secondary-button>
 
-        <x-danger-button class="ml-3" wire:click="eliminar">
+        <x-spinner-danger-button class="ml-3" wire:click="eliminar" loadingTarget="eliminar" loadingText="Eliminando...">
             Eliminar
-        </x-danger-button>
+        </x-spinner-danger-button>
     </x-slot>
-</x-confirmation-modal>
-
+</x-dialog-modal>

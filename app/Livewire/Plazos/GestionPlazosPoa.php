@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Plazos;
 
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use App\Models\Poa\Poa;
 use App\Models\Plazos\PlazoPoa;
+use App\Services\LogService;
 use Illuminate\Support\Facades\DB;
 
 class GestionPlazosPoa extends Component
@@ -171,12 +173,46 @@ class GestionPlazosPoa extends Component
             if ($plazo['existe'] && $plazo['id']) {
                 // Actualizar existente
                 PlazoPoa::where('id', $plazo['id'])->update($data);
+                
+                // Log de actualización
+                LogService::activity(
+                    'actualizar',
+                    'plazos_poa',
+                    'Plazo estándar actualizado: ' . $this->tiposPlazosEstandar[$tipo],
+                    [
+                        'plazo_id' => $plazo['id'],
+                        'poa_id' => $this->idPoa,
+                        'poa_anio' => $this->poa->anio ?? null,
+                        'tipo_plazo' => $tipo,
+                        'fecha_inicio' => $plazo['fecha_inicio'],
+                        'fecha_fin' => $plazo['fecha_fin'],
+                        'activo' => $plazo['activo'],
+                    ],
+                    'info'
+                );
             } else {
                 // Crear nuevo
                 $data['created_by'] = auth()->id();
                 $nuevo = PlazoPoa::create($data);
                 $this->plazosEstandar[$tipo]['id'] = $nuevo->id;
                 $this->plazosEstandar[$tipo]['existe'] = true;
+                
+                // Log de creación
+                LogService::activity(
+                    'crear',
+                    'plazos_poa',
+                    'Plazo estándar creado: ' . $this->tiposPlazosEstandar[$tipo],
+                    [
+                        'plazo_id' => $nuevo->id,
+                        'poa_id' => $this->idPoa,
+                        'poa_anio' => $this->poa->anio ?? null,
+                        'tipo_plazo' => $tipo,
+                        'fecha_inicio' => $plazo['fecha_inicio'],
+                        'fecha_fin' => $plazo['fecha_fin'],
+                        'activo' => $plazo['activo'],
+                    ],
+                    'info'
+                );
             }
             
             DB::commit();
@@ -187,6 +223,24 @@ class GestionPlazosPoa extends Component
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Error: ' . $e->getMessage());
+            // Log de creación
+            LogService::activity(
+                'crear',
+                'plazos_poa',
+                'Plazo estándar creado: ' . $this->tiposPlazosEstandar[$tipo],
+                [
+                    'Intentó crearlo' => Auth::user()->name . ' (' . Auth::user()->email . ')',
+                    'error' => $e->getMessage(),
+                    'plazo_id' => $nuevo->id,
+                    'poa_id' => $this->idPoa,
+                    'poa_anio' => $this->poa->anio ?? null,
+                    'tipo_plazo' => $tipo,
+                    'fecha_inicio' => $plazo['fecha_inicio'],
+                    'fecha_fin' => $plazo['fecha_fin'],
+                    'activo' => $plazo['activo'],
+                ],
+                'error'
+            );
             $this->loadPlazos(); // Recargar para mostrar valores anteriores
         }
     }
@@ -269,6 +323,17 @@ class GestionPlazosPoa extends Component
         $this->modalOpen = true;
     }
     
+    public function closeModal()
+    {
+        $this->modalOpen = false;
+        $this->reset(['plazoId', 'tipo_plazo', 'nombre_plazo', 'fecha_inicio_form', 'fecha_fin_form', 'activo_form', 'descripcion']);
+    }
+
+    public function closeDelete()
+    {
+        $this->modalDelete = false;
+    }
+
     public function editar($id)
     {
         $plazo = PlazoPoa::findOrFail($id);
@@ -288,6 +353,8 @@ class GestionPlazosPoa extends Component
         $this->fecha_fin_form = $plazo->fecha_fin ? date('Y-m-d', strtotime($plazo->fecha_fin)) : '';
         $this->activo_form = $plazo->activo;
         $this->descripcion = $plazo->descripcion;
+
+
         
         $this->isEditing = true;
         $this->modalOpen = true;
@@ -328,11 +395,51 @@ class GestionPlazosPoa extends Component
                 }
                 
                 $plazo->update($data);
+                
+                // Log de actualización
+                LogService::activity(
+                    'actualizar',
+                    'plazos_poa',
+                    'Plazo personalizado actualizado: ' . $this->nombre_plazo,
+                    [
+                        'plazo_id' => $plazo->id,
+                        'poa_id' => $this->idPoa,
+                        'poa_anio' => $this->poa->anio ?? null,
+                        'tipo_plazo' => $this->tipo_plazo,
+                        'nombre_plazo' => $this->nombre_plazo,
+                        'fecha_inicio' => $this->fecha_inicio_form,
+                        'fecha_fin' => $this->fecha_fin_form,
+                        'activo' => $this->activo_form,
+                    ],
+                    'info'
+                );
+                
                 $mensaje = 'Plazo personalizado actualizado exitosamente';
+                session()->flash('message', $mensaje);
             } else {
                 $data['created_by'] = auth()->id();
-                PlazoPoa::create($data);
+                $nuevoPlazo = PlazoPoa::create($data);
+                
+                // Log de creación
+                LogService::activity(
+                    'crear',
+                    'plazos_poa',
+                    'Plazo personalizado creado: ' . $this->nombre_plazo,
+                    [
+                        'plazo_id' => $nuevoPlazo->id,
+                        'poa_id' => $this->idPoa,
+                        'poa_anio' => $this->poa->anio ?? null,
+                        'tipo_plazo' => $this->tipo_plazo,
+                        'nombre_plazo' => $this->nombre_plazo,
+                        'fecha_inicio' => $this->fecha_inicio_form,
+                        'fecha_fin' => $this->fecha_fin_form,
+                        'activo' => $this->activo_form,
+                    ], 
+                    'info'
+                );
+                
                 $mensaje = 'Plazo personalizado creado exitosamente';
+                session()->flash('message', $mensaje);
             }
 
             DB::commit();
@@ -373,13 +480,34 @@ class GestionPlazosPoa extends Component
                 $fin = \Carbon\Carbon::parse($this->plazoToDelete->fecha_fin);
                 if ($now->gt($fin)) {
                     session()->flash('error', 'No se puede eliminar un plazo vencido. La fecha de fin ya ha pasado.');
-                    $this->modalDelete = false;
+                    $this->closeDelete();
                     return;
                 }
                 
+                // Guardar información para el log antes de eliminar
+                $plazoId = $this->plazoToDelete->id;
+                $tipoPlazo = $this->plazoToDelete->tipo_plazo;
+                $nombrePlazo = $this->plazoToDelete->nombre_plazo ?? $this->tiposPlazosEstandar[$tipoPlazo] ?? $tipoPlazo;
+                
                 $this->plazoToDelete->delete();
+                
+                // Log de eliminación
+                LogService::activity(
+                    'eliminar',
+                    'plazos_poa',
+                    'Plazo eliminado: ' . $nombrePlazo,
+                    [
+                        'plazo_id' => $plazoId,
+                        'poa_id' => $this->idPoa,
+                        'poa_anio' => $this->poa->anio ?? null,
+                        'tipo_plazo' => $tipoPlazo,
+                        'nombre_plazo' => $nombrePlazo,
+                    ],
+                    'info'
+                );
+                
                 session()->flash('success', 'Plazo eliminado exitosamente');
-                $this->modalDelete = false;
+                $this->closeDelete();
                 $this->plazoToDelete = null;
                 $this->loadPlazos(); // Recargar plazos
             }

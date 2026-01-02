@@ -16,6 +16,7 @@ use App\Models\Poa\Poa;
 use App\Models\Poa\PoaDepto;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\Instituciones\Institucions;
+use App\Services\LogService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -583,9 +584,48 @@ class Actividades extends Component
             if ($this->actividadId) {
                 $actividad = Actividad::findOrFail($this->actividadId);
                 $actividad->update($datos);
+                
+                // Log de actualización
+                LogService::activity(
+                    'actualizar',
+                    'actividades',
+                    'Actividad actualizada: ' . $this->nombre,
+                    [
+                        'actividad_id' => $actividad->id,
+                        'correlativo' => $this->correlativo,
+                        'nombre' => $this->nombre,
+                        'poa_id' => $this->idPoa,
+                        'departamento_id' => $this->idDeptartamento,
+                        'departamento' => $this->userContext['departamento']->name ?? null,
+                        'tipo_actividad' => $this->idTipo,
+                        'categoria' => $this->idCategoria,
+                        'estado' => $this->estado,
+                    ],
+                    'info'
+                );
+                
                 $mensaje = 'Actividad actualizada correctamente';
             } else {
                 $actividad = Actividad::create($datos);
+                
+                // Log de creación
+                LogService::activity(
+                    'crear',
+                    'actividades',
+                    'Actividad creada: ' . $this->nombre,
+                    [
+                        'actividad_id' => $actividad->id,
+                        'correlativo' => $this->correlativo,
+                        'nombre' => $this->nombre,
+                        'poa_id' => $this->idPoa,
+                        'departamento_id' => $this->idDeptartamento,
+                        'departamento' => $this->userContext['departamento']->name ?? null,
+                        'tipo_actividad' => $this->idTipo,
+                        'categoria' => $this->idCategoria,
+                        'generada_con_ia' => !empty($this->indicadoresGenerados),
+                    ],
+                    'info'
+                );
                 
                 // Crear indicadores si se generaron con IA
                 if (!empty($this->indicadoresGenerados) && is_array($this->indicadoresGenerados)) {
@@ -635,7 +675,29 @@ class Actividades extends Component
     {
         if ($this->actividadToDelete) {
             try {
+                // Guardar información para el log antes de eliminar
+                $actividadId = $this->actividadToDelete->id;
+                $actividadNombre = $this->actividadToDelete->nombre;
+                $actividadCorrelativo = $this->actividadToDelete->correlativo;
+                
                 $this->actividadToDelete->delete();
+                
+                // Log de eliminación
+                LogService::activity(
+                    'eliminar',
+                    'actividades',
+                    'Actividad eliminada: ' . $actividadNombre,
+                    [
+                        'actividad_id' => $actividadId,
+                        'correlativo' => $actividadCorrelativo,
+                        'nombre' => $actividadNombre,
+                        'poa_id' => $this->idPoa,
+                        'departamento_id' => $this->idDeptartamento,
+                        'departamento' => $this->userContext['departamento']->name ?? null,
+                    ],
+                    'info'
+                );
+                
                 session()->flash('message', 'Actividad eliminada correctamente');
             } catch (\Exception $e) {
                 session()->flash('error', 'Error al eliminar la actividad: ' . $e->getMessage());

@@ -414,7 +414,14 @@ return [
                         ->setDescription('Visualiza los logs del sistema')
                         ->setLabel('Visor de Logs')
                         ->setHeroIcon('eye')
-                        ->setItems([])
+                        ->setItems([
+                            RkNavigation::make('logs.show')
+                                ->setParentId('logs')
+                                ->setDescription('Visualiza los detalles de un log específico')
+                                ->setLabel('Detalle del Log')
+                                ->setHeroIcon('document-text')
+                                ->setEndBlock('logs.show'),
+                        ])
                         ->setEndBlock('logs'),
 
                     RkNavigation::make('logsdashboard')

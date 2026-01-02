@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\Poa\Poa;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\Departamento\Departamento;
+use App\Services\LogService;
 use App\Models\TechoUes\TechoUe;
 use App\Models\TechoUes\TechoDepto;
 use App\Models\Poa\PoaDepto;
@@ -447,6 +448,28 @@ class GestionTechoDeptos extends Component
         }
         
         $message = $this->isEditing ? 'Techos departamentales actualizados correctamente.' : 'Techos departamentales creados correctamente.';
+        
+        // Obtener nombre del departamento para el log
+        $departamento = Departamento::find($this->idDepartamento);
+        
+        // Log de la actividad
+        LogService::activity(
+            $this->isEditing ? 'actualizar' : 'crear',
+            'techos_departamentales',
+            ($this->isEditing ? 'Techos departamentales actualizados: ' : 'Techos departamentales creados: ') . ($departamento->name ?? 'Departamento ID ' . $this->idDepartamento),
+            [
+                'poa_id' => $this->idPoa,
+                'poa_anio' => $this->poa->anio ?? null,
+                'unidad_ejecutora_id' => $this->idUE,
+                'unidad_ejecutora' => $this->unidadEjecutora->name ?? null,
+                'departamento_id' => $this->idDepartamento,
+                'departamento' => $departamento->name ?? null,
+                'montos_por_fuente' => $this->montosPorFuente,
+                'monto_total' => array_sum(array_map('floatval', $this->montosPorFuente)),
+            ],
+            'info'
+        );
+        
         session()->flash('message', $message);
 
         $this->closeModal();
@@ -567,11 +590,47 @@ class GestionTechoDeptos extends Component
     public function delete()
     {
         if ($this->techoDeptoToDelete) {
+            // Guardar información para el log antes de eliminar
+            $departamentoId = $this->techoDeptoToDelete->idDepartamento;
+            $departamentoNombre = $this->techoDeptoToDelete->departamento->name ?? 'Departamento ID ' . $departamentoId;
+            
+            // Obtener los montos que se van a eliminar para el log
+            $techosAEliminar = TechoDepto::where('idPoa', $this->idPoa)
+                ->where('idUE', $this->idUE)
+                ->where('idDepartamento', $departamentoId)
+                ->with('techoUE.fuente')
+                ->get();
+            
+            $montosEliminados = $techosAEliminar->mapWithKeys(function ($techo) {
+                $fuenteNombre = $techo->techoUE->fuente->nombre ?? 'Fuente ID ' . $techo->idTechoUE;
+                return [$fuenteNombre => $techo->monto];
+            })->toArray();
+            
+            $montoTotalEliminado = $techosAEliminar->sum('monto');
+            
             // Eliminar todos los techos de este departamento
             TechoDepto::where('idPoa', $this->idPoa)
                 ->where('idUE', $this->idUE)
-                ->where('idDepartamento', $this->techoDeptoToDelete->idDepartamento)
+                ->where('idDepartamento', $departamentoId)
                 ->delete();
+            
+            // Log de la actividad
+            LogService::activity(
+                'eliminar',
+                'techos_departamentales',
+                'Techos departamentales eliminados: ' . $departamentoNombre,
+                [
+                    'poa_id' => $this->idPoa,
+                    'poa_anio' => $this->poa->anio ?? null,
+                    'unidad_ejecutora_id' => $this->idUE,
+                    'unidad_ejecutora' => $this->unidadEjecutora->name ?? null,
+                    'departamento_id' => $departamentoId,
+                    'departamento' => $departamentoNombre,
+                    'montos_eliminados' => $montosEliminados,
+                    'monto_total_eliminado' => $montoTotalEliminado,
+                ],
+                'info'
+            );
                 
             session()->flash('message', 'Techos departamentales eliminados correctamente.');
             $this->closeDeleteModal();

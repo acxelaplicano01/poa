@@ -10,7 +10,11 @@
                         </span>
                     </h3>
                     <p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Registrado el {{ $log->created_at->format('d/m/Y') }} a las {{ $log->created_at->format('H:i:s') }}
+                        @if($log->created_at)
+                            Registrado el {{ $log->created_at->format('d/m/Y') }} a las {{ $log->created_at->format('H:i:s') }}
+                        @else
+                            Fecha no disponible
+                        @endif
                     </p>
                 </div>
                 <div class="border border-gray-200 dark:border-zinc-700">

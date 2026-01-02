@@ -197,7 +197,8 @@
     </flux:header>
     {{ $slot }}
 
-
+    @stack('modals')
+    @stack('scripts')
     @fluxScripts
 </body>
 

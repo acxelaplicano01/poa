@@ -9,6 +9,7 @@ use App\Models\Poa\Poa;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\TechoUes\TechoUe;
 use App\Models\GrupoGastos\GrupoGasto;
+use App\Services\LogService;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 #[Layout('layouts.app')]
@@ -317,6 +318,25 @@ class GestionTechoUeNacional extends Component
                 $this->createTechoUe();
             }
 
+            // Obtener nombre de la UE para el log
+            $unidadEjecutora = UnidadEjecutora::find($this->idUnidadEjecutora);
+            
+            // Log de la actividad
+            LogService::activity(
+                $this->isEditing ? 'actualizar' : 'crear',
+                'techos_ue_nacional',
+                ($this->isEditing ? 'Techos UE actualizados: ' : 'Techos UE creados: ') . ($unidadEjecutora->name ?? 'UE ID ' . $this->idUnidadEjecutora),
+                [
+                    'poa_id' => $this->idPoa,
+                    'poa_anio' => $this->poa->anio ?? null,
+                    'unidad_ejecutora_id' => $this->idUnidadEjecutora,
+                    'unidad_ejecutora' => $unidadEjecutora->name ?? null,
+                    'montos_por_fuente' => $this->montosPorFuente,
+                    'monto_total' => array_sum(array_map('floatval', $this->montosPorFuente)),
+                ],
+                'info'
+            );
+
             $this->showModal = false;
             $this->resetForm();
             session()->flash('message', $this->isEditing ? 'Techo actualizado exitosamente.' : 'Techo creado exitosamente.');
@@ -451,9 +471,42 @@ class GestionTechoUeNacional extends Component
     {
         try {
             if ($this->techoUeToDelete) {
+                // Guardar información para el log antes de eliminar
+                $ueId = $this->techoUeToDelete->idUE;
+                $ueNombre = $this->techoUeToDelete->unidadEjecutora->name ?? 'UE ID ' . $ueId;
+                
+                // Obtener los montos que se van a eliminar para el log
+                $techosAEliminar = TechoUe::where('idPoa', $this->idPoa)
+                    ->where('idUE', $ueId)
+                    ->with('fuente')
+                    ->get();
+                
+                $montosEliminados = $techosAEliminar->mapWithKeys(function ($techo) {
+                    $fuenteNombre = $techo->fuente->nombre ?? 'Fuente ID ' . $techo->idFuente;
+                    return [$fuenteNombre => $techo->monto];
+                })->toArray();
+                
+                $montoTotalEliminado = $techosAEliminar->sum('monto');
+                
                 TechoUe::where('idPoa', $this->idPoa)
-                       ->where('idUE', $this->techoUeToDelete->idUE)
+                       ->where('idUE', $ueId)
                        ->delete();
+                
+                // Log de la actividad
+                LogService::activity(
+                    'eliminar',
+                    'techos_ue_nacional',
+                    'Techos UE eliminados: ' . $ueNombre,
+                    [
+                        'poa_id' => $this->idPoa,
+                        'poa_anio' => $this->poa->anio ?? null,
+                        'unidad_ejecutora_id' => $ueId,
+                        'unidad_ejecutora' => $ueNombre,
+                        'montos_eliminados' => $montosEliminados,
+                        'monto_total_eliminado' => $montoTotalEliminado,
+                    ],
+                    'info'
+                );
                 
                 session()->flash('message', 'Todos los techos de la unidad ejecutora han sido eliminados exitosamente.');
             }

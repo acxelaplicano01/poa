@@ -575,7 +575,7 @@ return [
                                     'acceso-consola',
                                 ])
                                 ->setUrlMethod('get')
-                                ->setUrlPattern('techonacional/{idPoa}/analysis/{idUE}')
+                                ->setUrl('techonacional/{idPoa}/analysis/{idUE}')
                                 ->setUrlController('App\Livewire\TechoUes\AnalysisTechoUe')
                                 ->setRoles(['super_admin', 'direccion'])
                                 ->setItems([])
@@ -667,7 +667,7 @@ return [
                             'acceso-consola',
                         ])
                         ->setUrlMethod('get')
-                        ->setUrlPattern('plazos-poa/{idPoa}')
+                        ->setUrl('plazos-poa/{idPoa}')
                         ->setUrlController('App\Livewire\Plazos\GestionPlazosPoa')
                         ->setRoles(['super_admin', 'direccion'])
                         ->setItems([])
@@ -728,6 +728,7 @@ return [
                             'acceso-consola',
                         ])
                         ->setUrlMethod('get')
+                        ->setUrl('logs/{log}')
                         ->setUrlController('App\Http\Controllers\LogViewerController@show')
                         ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
