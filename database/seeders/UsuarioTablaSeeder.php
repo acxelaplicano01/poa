@@ -35,9 +35,9 @@ class UsuarioTablaSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permName, 'guard_name' => 'web']);
         }
         
-        // Crear el rol super-admin
+        // Crear el rol super_admin
         $role = Role::firstOrCreate(
-            ['name' => 'super-admin', 'guard_name' => 'web'],
+            ['name' => 'super_admin', 'guard_name' => 'web'],
             ['description' => 'Super Administrador']
         );
          

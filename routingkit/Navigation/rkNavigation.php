@@ -374,7 +374,10 @@ return [
                         ->setItems([
                             RkNavigation::make('techodeptos.detalle-estructura')
                                 ->setLabel('Detalle de estructura')
-                                ->setDescription('Detalle de asignaciones a departamentos por estructura')
+                                ->setDescription('Detalle de asignaciones a departamentos por estructura'),
+                            RkNavigation::make('analysis-techo-depto')
+                                ->setLabel('Análisis presupuestario')
+                                ->setDescription('Análisis presupuestario del departamento')
                         ])
                         ->setEndBlock('techodeptos'),
                 ])

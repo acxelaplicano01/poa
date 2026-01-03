@@ -27,6 +27,7 @@ class GestionTechoDeptos extends Component
     public $searchConTecho = ''; // Buscador específico para departamentos con techo
     public $searchSinTecho = ''; // Buscador específico para departamentos sin techo
     public $activeTab = 'resumen'; // Nueva propiedad para el tab activo
+    protected $queryStringtab = ['activeTab'];
     public $showModal = false;
     public $showDeleteModal = false;
     public $techoDeptoToDelete = null;
@@ -743,5 +744,30 @@ class GestionTechoDeptos extends Component
             ->sortByDesc('monto_total_asignado');
 
         return $metricasPorEstructura;
+    }
+
+    public function viewAnalysis($idDepartamento)
+    {
+        // Obtener el departamento
+        $departamento = Departamento::findOrFail($idDepartamento);
+        
+        // Obtener los techos de este departamento en el POA actual
+        $techos = TechoDepto::where('idPoa', $this->idPoa)
+            ->where('idUE', $this->idUE)
+            ->where('idDepartamento', $idDepartamento)
+            ->with(['techoUE.fuente'])
+            ->get();
+        
+        if ($techos->isEmpty()) {
+            session()->flash('error', 'No se encontraron techos para este departamento.');
+            return;
+        }
+        
+        // Redirigir a la vista de análisis detallado
+        return redirect()->to(route('analysis-techo-depto', [
+            'idPoa' => $this->idPoa,
+            'idUE' => $this->idUE,
+            'idDepartamento' => $idDepartamento
+        ]));
     }
 }

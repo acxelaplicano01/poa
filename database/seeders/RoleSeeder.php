@@ -15,7 +15,7 @@ class RoleSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         
         // Primero, crear todos los permisos necesarios si no existen
-        $allPermissions = [
+     /*   $allPermissions = [
             'acceso-configuracion',
             'acceso-consola',
             'acceso-planificacion',
@@ -450,5 +450,6 @@ class RoleSeeder extends Seeder
         $this->command->info('  - admin: ' . $admin->permissions->count() . ' permisos');
         $this->command->info('  - planificador: ' . $planificador->permissions->count() . ' permisos');
         $this->command->info('  - direccion: ' . $direccion->permissions->count() . ' permisos');
+        */
     }
 }

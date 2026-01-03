@@ -21,7 +21,7 @@ class PermisoSeeder extends Seeder
         // Nivel 2: Funcionalidad ({modulo}.{funcionalidad})
         // Nivel 3: Acciones ({modulo}.{funcionalidad}.{accion})
         
-        $modulePermissions = [
+       /* $modulePermissions = [
             'configuracion' => [
                 'roles' => ['ver', 'crear', 'editar', 'eliminar'],
                 'usuarios' => ['ver', 'crear', 'editar', 'eliminar'],
@@ -106,6 +106,6 @@ class PermisoSeeder extends Seeder
             ]);
         }
         
-        $this->command->info('Permisos creados exitosamente con estructura jerárquica de 3 niveles.');
+        $this->command->info('Permisos creados exitosamente con estructura jerárquica de 3 niveles.'); */
     }
 }

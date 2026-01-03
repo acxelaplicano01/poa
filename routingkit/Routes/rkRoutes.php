@@ -18,7 +18,7 @@ return [
             //     ->setAccessPermission('acceder-dashboard')
             //     ->setUrlMethod('get')
             //     ->setUrlController('App\Http\Controllers\DashboardController')
-            //     ->setRoles(['admin_general'])
+            //     ->SetRol()
             //     ->setItems([])
             //     ->setEndBlock('dashboard'),
 
@@ -217,7 +217,7 @@ return [
                         ->setUrlMethod('get')
                         ->setUrlPattern('roles/{roleId}/editar')
                         ->setUrlController('App\Livewire\Rol\RoleForm')
-                        ->setRoles(['admin_general'])
+                        ->setRol()
                         ->setItems([])
                         ->setEndBlock('roles.edit'),*/
 
@@ -614,7 +614,21 @@ return [
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\TechoDeptos\GestionTechoDeptos')
                         ->setRoles(['super_admin', 'direccion'])
-                        ->setItems([])
+                        ->setItems([
+                            RkRoute::make('analysis-techo-depto')
+                                ->setParentId('consola')
+                                ->setAccessPermission('acceso-consola')
+                                ->setPermissions([
+                                    'consola.techodeptos.ver',
+                                    'acceso-consola',
+                                ])
+                                ->setUrlMethod('get')
+                                ->setUrl('techodeptos/{idPoa}/{idUE}/analysis/{idDepartamento}')
+                                ->setUrlController('App\Livewire\TechoDeptos\AnalysisTechoDepto')
+                                ->setRoles(['super_admin', 'direccion'])
+                                ->setItems([])
+                                ->setEndBlock('analysis-techo-depto'),
+                        ])
                         ->setEndBlock('techodeptos'),
 
                     RkRoute::make('techodeptos.detalle-estructura')

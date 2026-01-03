@@ -5,17 +5,18 @@
         <div class="mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-700">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                 <div>
-                    <a href="{{ route('techonacional', ['idPoa' => $poa->id]) }}" class="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 mb-2">
+                    <a href="{{ route('asignacionpresupuestaria', ['idPoa' => $poa->id, 'idUE' => $unidadEjecutora->id]) }}" class="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 mb-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                         </svg>
-                        Volver a Gestión de Techos
+                        Volver a Gestión de Techos Departamentales
                     </a>
                     <h2 class="text-xl font-semibold text-zinc-800 dark:text-zinc-200 mt-2">
-                        Análisis Presupuestario: {{ $unidadEjecutora->name ?? 'N/A' }}
+                        Análisis Presupuestario: {{ $departamento->name ?? 'N/A' }}
                     </h2>
                     <div class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                        <p>{{ $unidadEjecutora->descripcion ?? 'Sin descripción' }}</p>
+                        <p>Departamento: <span class="font-semibold text-zinc-700 dark:text-zinc-300">{{ $departamento->siglas ?? '' }}</span> - {{ $departamento->tipo ?? '' }}</p>
+                        <p class="mt-1">Unidad Ejecutora: <span class="font-semibold text-zinc-700 dark:text-zinc-300">{{ $unidadEjecutora->name ?? 'N/A' }}</span></p>
                         <p class="mt-1">POA: <span class="font-semibold text-zinc-700 dark:text-zinc-300">{{ $poa->anio ?? 'N/A' }}</span></p>
                     </div>
                 </div>
@@ -25,33 +26,18 @@
         <!-- Tarjetas de Resumen Presupuestario -->
         <div class="mb-6">
             <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">Resumen Presupuestario</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <!-- Presupuesto General -->
                 <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/40 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <p class="text-xs font-medium text-blue-700 dark:text-blue-300 uppercase tracking-wide">Presupuesto General</p>
+                            <p class="text-xs font-medium text-blue-700 dark:text-blue-300 uppercase tracking-wide">Presupuesto Asignado</p>
                             <p class="text-lg sm:text-xl font-bold text-blue-900 dark:text-blue-100 mt-2">
                                 L. {{ number_format($presupuestoGeneral, 2) }}
                             </p>
                         </div>
                         <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M8 7V6a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-1M3 18v-7a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Zm8-3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Presupuesto Asignado -->
-                <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/40 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <p class="text-xs font-medium text-green-700 dark:text-green-300 uppercase tracking-wide">Asignado</p>
-                            <p class="text-lg sm:text-xl font-bold text-green-900 dark:text-green-100 mt-2">
-                                L. {{ number_format($presupuestoAsignado, 2) }}
-                            </p>
-                        </div>
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                 </div>
@@ -113,17 +99,17 @@
                         <thead class="bg-zinc-50 dark:bg-zinc-700">
                             <tr>
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Fuente</th>
-                                <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Presupuesto General</th>
-                                <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Asignado</th>
+                                <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Presupuesto Asignado</th>
                                 <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Planificado</th>
+                                <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase">Disponible</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                             @forelse($techos as $techo)
                                 @php
-                                    $fuente = $techo['fuente']['identificador'] . ' - ' . $techo['fuente']['nombre'] ?? 'Sin fuente';
-                                    $asignado = $techo['presupuestoAsignado'] ?? 0;
+                                    $fuente = ($techo['techo_u_e']['fuente']['identificador'] ?? '') . ' - ' . ($techo['techo_u_e']['fuente']['nombre'] ?? 'Sin fuente');
                                     $planificado = $techo['presupuestoPlanificado'] ?? 0;
+                                    $disponible = $techo['monto'] - $planificado;
                                 @endphp
                                 <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700/50">
                                     <td class="px-4 sm:px-6 py-3 text-sm font-medium text-zinc-900 dark:text-zinc-100">
@@ -131,15 +117,6 @@
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 text-sm text-right font-semibold text-zinc-900 dark:text-zinc-100">
                                         L. {{ number_format($techo['monto'], 2) }}
-                                    </td>
-                                    <td class="px-4 sm:px-6 py-3 text-sm text-right">
-                                        <span class="text-green-600 dark:text-green-400 font-semibold">L. {{ number_format($asignado, 2) }}</span>
-                                        <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                                            @php
-                                                $porcentajeAsignado = $techo['monto'] > 0 ? ($asignado / $techo['monto']) * 100 : 0;
-                                            @endphp
-                                            {{ number_format($porcentajeAsignado, 1) }}%
-                                        </div>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 text-sm text-right">
                                         <span class="text-amber-600 dark:text-amber-400 font-semibold">L. {{ number_format($planificado, 2) }}</span>
@@ -150,11 +127,22 @@
                                             {{ number_format($porcentajePlanificado, 1) }}%
                                         </div>
                                     </td>
+                                    <td class="px-4 sm:px-6 py-3 text-sm text-right">
+                                        <span class="{{ $disponible >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }} font-semibold">
+                                            L. {{ number_format($disponible, 2) }}
+                                        </span>
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                                            @php
+                                                $porcentajeDisponible = $techo['monto'] > 0 ? ($disponible / $techo['monto']) * 100 : 0;
+                                            @endphp
+                                            {{ number_format($porcentajeDisponible, 1) }}%
+                                        </div>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-4 sm:px-6 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
-                                        No hay techos asignados para esta unidad ejecutora
+                                    <td colspan="4" class="px-4 sm:px-6 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                                        No hay techos asignados para este departamento
                                     </td>
                                 </tr>
                             @endforelse
@@ -164,39 +152,21 @@
             </div>
         </div>
 
-        <!-- Indicadores de Ejecución -->
+        <!-- Indicadores de Planificación -->
         <div>
-            <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">Indicadores de Ejecución</h3>
+            <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">Indicadores de Planificación</h3>
             
             <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 sm:p-6">
                 <div class="space-y-5">
-                    <!-- Indicador 1: General vs Ejecutado -->
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                                <span class="text-sm font-medium text-zinc-600 dark:text-zinc-400">General vs Ejecutado</span>
-                            </div>
-                            @php
-                                $porcentajeEjecucion = $presupuestoGeneral > 0 ? ($presupuestoEjecutado / $presupuestoGeneral) * 100 : 0;
-                            @endphp
-                            <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100">{{ number_format($porcentajeEjecucion, 1) }}%</span>
-                        </div>
-                        <div class="w-full bg-zinc-200 dark:bg-zinc-600 rounded-full h-2.5">
-                            <div class="bg-green-500 dark:bg-green-600 h-2.5 rounded-full transition-all duration-300" 
-                                 style="width: {{ min($porcentajeEjecucion, 100) }}%"></div>
-                        </div>
-                    </div>
-
-                    <!-- Indicador 2: Planificado vs Ejecutado -->
+                    <!-- Indicador 1: Asignado vs Planificado -->
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
                                 <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                <span class="text-sm font-medium text-zinc-600 dark:text-zinc-400">Planificado vs Ejecutado</span>
+                                <span class="text-sm font-medium text-zinc-600 dark:text-zinc-400">Asignado vs Planificado</span>
                             </div>
                             @php
-                                $porcentajePlanificacion = $presupuestoPlanificado > 0 ? ($presupuestoEjecutado / $presupuestoPlanificado) * 100 : 0;
+                                $porcentajePlanificacion = $presupuestoGeneral > 0 ? ($presupuestoPlanificado / $presupuestoGeneral) * 100 : 0;
                             @endphp
                             <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100">{{ number_format($porcentajePlanificacion, 1) }}%</span>
                         </div>
@@ -206,39 +176,40 @@
                         </div>
                     </div>
 
-                    <!-- Indicador 3: Requerido vs Ejecutado -->
+                    <!-- Indicador 2: Presupuesto Disponible -->
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
-                                <span class="text-sm font-medium text-zinc-600 dark:text-zinc-400">Requerido vs Ejecutado</span>
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                                <span class="text-sm font-medium text-zinc-600 dark:text-zinc-400">Presupuesto Disponible</span>
                             </div>
                             @php
-                                $porcentajeRequerido = $presupuestoRequerido > 0 ? ($presupuestoEjecutado / $presupuestoRequerido) * 100 : 0;
+                                $disponibleTotal = $presupuestoGeneral - $presupuestoPlanificado;
+                                $porcentajeDisponible = $presupuestoGeneral > 0 ? ($disponibleTotal / $presupuestoGeneral) * 100 : 0;
                             @endphp
-                            <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100">{{ number_format($porcentajeRequerido, 1) }}%</span>
+                            <span class="text-sm font-bold {{ $disponibleTotal >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                L. {{ number_format($disponibleTotal, 2) }} ({{ number_format($porcentajeDisponible, 1) }}%)
+                            </span>
                         </div>
                         <div class="w-full bg-zinc-200 dark:bg-zinc-600 rounded-full h-2.5">
-                            <div class="bg-amber-500 dark:bg-amber-600 h-2.5 rounded-full transition-all duration-300" 
-                                 style="width: {{ min($porcentajeRequerido, 100) }}%"></div>
+                            <div class="bg-green-500 dark:bg-green-600 h-2.5 rounded-full transition-all duration-300" 
+                                 style="width: {{ min($porcentajeDisponible, 100) }}%"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Nota informativa -->
-    <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-        <div class="flex gap-3">
-            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p class="text-sm text-blue-800 dark:text-blue-300">
-                <strong>Nota:</strong> Este análisis muestra el estado presupuestario consolidado de la unidad ejecutora. Los datos se actualizan en tiempo real con la información registrada en el sistema.
-            </p>
+        <!-- Nota informativa -->
+        <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div class="flex gap-3">
+                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-sm text-blue-800 dark:text-blue-300">
+                    <strong>Nota:</strong> Este análisis muestra el estado presupuestario del departamento. Los datos se actualizan en tiempo real con la información registrada en el sistema.
+                </p>
+            </div>
         </div>
     </div>
-    </div>
-</div>
 </div>
