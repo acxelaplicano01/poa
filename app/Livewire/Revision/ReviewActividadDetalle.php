@@ -7,7 +7,9 @@ use App\Models\Actividad\Actividad;
 use App\Models\Actividad\Revision;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class ReviewActividadDetalle extends Component
 {
     public $idActividad;
@@ -332,6 +334,6 @@ class ReviewActividadDetalle extends Component
 
     public function render()
     {
-        return view('livewire.Revision.review-actividad-detalle')->layout('layouts.app');
+        return view('livewire.Revision.review-actividad-detalle');
     }
 }

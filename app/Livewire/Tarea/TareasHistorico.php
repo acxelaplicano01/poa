@@ -1,16 +1,18 @@
 <?php
 
-    namespace App\Livewire\Tarea;
+namespace App\Livewire\Tarea;
 
-    use Livewire\Component;
-    use Livewire\WithPagination;
-    use App\Models\Tareas\TareaHistorico;
-    use App\Models\GrupoGastos\ObjetoGasto;
-    use App\Models\Requisicion\UnidadMedida;
-    use App\Models\ProcesoCompras\ProcesoCompra;
-    use App\Models\Cubs\Cub;
-    use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
+use Livewire\WithPagination;
+use App\Models\Tareas\TareaHistorico;
+use App\Models\GrupoGastos\ObjetoGasto;
+use App\Models\Requisicion\UnidadMedida;
+use App\Models\ProcesoCompras\ProcesoCompra;
+use App\Models\Cubs\Cub;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
     class TareasHistorico extends Component
     {
         use WithPagination;
@@ -217,6 +219,6 @@
                 'unidadesMedida' => $unidadesMedida,
                 'procesosCompra' => $procesosCompra,
                 'cubs' => $cubs,
-            ])->layout('layouts.app');
+            ]);
         }
     }

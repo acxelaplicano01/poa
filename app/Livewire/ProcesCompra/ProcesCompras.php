@@ -4,12 +4,14 @@ namespace App\Livewire\ProcesCompra;
 
 use Livewire\Component;
     
-    use App\Models\ProcesoCompras\ProcesoCompra as ProcesCompraModel;
-     use App\Models\Empleados\Empleado;
-    use Livewire\WithPagination;
-    use Illuminate\Support\Facades\Auth;
-    use Illuminate\Support\Facades\DB;
-    
+use App\Models\ProcesoCompras\ProcesoCompra as ProcesCompraModel;
+use App\Models\Empleados\Empleado;
+use Livewire\WithPagination;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
+
+#[Layout('layouts.app')]
     class ProcesCompras extends Component
     {
         use WithPagination;
@@ -180,6 +182,6 @@ use Livewire\Component;
             
             return view('livewire.proces-compra.proces-compras', [
                 'procesos' => $procesos,
-            ])->layout('layouts.app');
+            ]);
         }
     }

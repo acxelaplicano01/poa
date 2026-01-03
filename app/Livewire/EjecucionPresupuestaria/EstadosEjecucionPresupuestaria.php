@@ -5,7 +5,9 @@ namespace App\Livewire\EjecucionPresupuestaria;
 use App\Models\EjecucionPresupuestaria\EstadoEjecucionPresupuestaria;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class EstadosEjecucionPresupuestaria extends Component
 {
     use WithPagination;
@@ -150,6 +152,6 @@ class EstadosEjecucionPresupuestaria extends Component
             
         return view('livewire.ejecucion-presupuestaria.estado-ejecucion-presupuestaria', [
             'estados' => $estados
-        ])->layout('layouts.app');
+        ]);
     }
 }

@@ -9,7 +9,9 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Poa\Pei;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Area extends Component
 {
     use WithPagination;
@@ -265,6 +267,6 @@ class Area extends Component
 
         return view('livewire.consola.pei.Areas.areas', [
             'areas' => $areas,
-        ])->layout('layouts.app');
+        ]);
     }
 }

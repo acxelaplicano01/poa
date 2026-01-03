@@ -9,7 +9,9 @@ use App\Models\Dimension\Dimension;
 use App\Models\Departamento\Departamento;
 use App\Models\Poa\Poa;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Consolidado extends Component
 {
     use WithPagination;
@@ -137,6 +139,6 @@ class Consolidado extends Component
             'departamentos' => $this->departamentos,
             'dimensiones' => $this->dimensiones,
             'anios' => $this->anios
-        ])->layout('layouts.app');
+        ]);
     }
 }

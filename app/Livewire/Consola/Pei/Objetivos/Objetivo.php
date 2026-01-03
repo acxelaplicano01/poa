@@ -9,7 +9,9 @@ use Livewire\WithPagination;
 use App\Models\Poa\Pei;
 use App\Models\Dimension\Dimension as DimensionModel;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Objetivo extends Component
 {
     use WithPagination;
@@ -269,6 +271,6 @@ class Objetivo extends Component
 
         return view('livewire.consola.pei.Objetivos.objetivos', [
             'objetivos' => $objetivos,
-        ])->layout('layouts.app');
+        ]);
     }
 }

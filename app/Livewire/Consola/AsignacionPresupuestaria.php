@@ -11,7 +11,9 @@ use App\Models\TechoUes\TechoUe;
 use App\Models\TechoUes\TechoDepto;
 use App\Models\GrupoGastos\GrupoGasto;
 use App\Models\GrupoGastos\Fuente;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class AsignacionPresupuestaria extends Component
 {
     use WithPagination;
@@ -217,7 +219,7 @@ class AsignacionPresupuestaria extends Component
             'grupoGastos' => $grupoGastos,
             'fuentes' => $fuentes,
             'anios' => $anios
-        ])->layout('layouts.app');
+        ]);
     }
 
     public function create()

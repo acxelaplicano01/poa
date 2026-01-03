@@ -6,7 +6,9 @@ use Livewire\Component;
 use App\Models\Poa\Poa;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\TechoUes\TechoDepto;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class DetalleEstructura extends Component
 {
     public $idPoa;
@@ -177,6 +179,6 @@ class DetalleEstructura extends Component
 
     public function render()
     {
-        return view('livewire.techo-deptos.detalle-estructura')->layout('layouts.app');
+        return view('livewire.techo-deptos.detalle-estructura');
     }
 }

@@ -10,7 +10,9 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Usuarios extends Component
 {
     use WithPagination;
@@ -82,7 +84,7 @@ class Usuarios extends Component
             'users' => $users,
             'roles' => $this->roles,
             'empleados' => $empleados
-        ])->layout('layouts.app');
+        ]);
     }
 
     public function create()

@@ -7,7 +7,9 @@ use App\Models\Empleados\Empleado;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\Departamento\Departamento;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.guest')]
 class RegistrarEmpleado extends Component
 {
     // Campos del formulario
@@ -173,6 +175,6 @@ class RegistrarEmpleado extends Component
 
     public function render()
     {
-        return view('livewire.empleado.registrar-empleado')->layout('layouts.guest');
+        return view('livewire.empleado.registrar-empleado');
     }
 }

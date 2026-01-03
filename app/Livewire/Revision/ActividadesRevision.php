@@ -9,7 +9,9 @@ use App\Models\Actividad\Actividad;
 use App\Models\Poa\PoaDepto;
 use App\Models\Tareas\Tarea;
 use App\Models\Presupuestos\Presupuesto;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class ActividadesRevision extends Component
 {
     public $departamentoId;

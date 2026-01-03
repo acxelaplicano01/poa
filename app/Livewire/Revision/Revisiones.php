@@ -9,7 +9,9 @@ use App\Models\Departamento\Departamento;
 use App\Models\Actividad\Actividad;
 use App\Models\Poa\Poa;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Revisiones extends Component
 {
 	protected string $layout = 'layouts.app';
@@ -62,7 +64,7 @@ class Revisiones extends Component
 		if ($this->showActividades && $this->departamentoId) {
 			return view('livewire.Revision.actividades-revision-wrapper', [
 				'departamentoId' => $this->departamentoId,
-			])->layout('layouts.app');
+			]);
 		}
 
 		$revisiones = Departamento::query()
@@ -97,6 +99,6 @@ class Revisiones extends Component
 			'revisiones' => $revisiones,
 			'poaYears' => $this->poaYears,
 			'poaYear' => $this->poaYear,
-		])->layout('layouts.app');
+		]);
 	}
 }

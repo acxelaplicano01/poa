@@ -7,7 +7,9 @@ use App\Services\LogService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Log;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Trimestres extends Component
 {
     use WithPagination;
@@ -201,6 +203,6 @@ class Trimestres extends Component
             
         return view('livewire.mes.trimestres', [
             'trimestres' => $trimestres,
-        ])->layout('layouts.app');
+        ]);
     }
 }

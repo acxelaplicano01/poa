@@ -19,7 +19,9 @@ use App\Models\Requisicion\UnidadMedida;
 use App\Models\TechoUes\TechoDepto;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class GestionarActividad extends Component
 {
     // Control de pasos
@@ -370,7 +372,7 @@ class GestionarActividad extends Component
                 $revision->update(['corregido' => true]);
 
                 // Actualizar estado de la tarea a REVISION
-                $tarea = \App\Models\Tareas\Tarea::findOrFail($tareaId);
+                $tarea = Tarea::findOrFail($tareaId);
                 $tarea->update(['estado' => 'REVISION']);
 
                 session()->flash('message', 'Tarea marcada como corregida exitosamente');
@@ -1674,6 +1676,6 @@ class GestionarActividad extends Component
 
     public function render()
     {
-        return view('livewire.actividad.gestionar-actividad')->layout('layouts.app');
+        return view('livewire.actividad.gestionar-actividad');
     }
 }

@@ -8,7 +8,9 @@ use Livewire\Component;
 use Spatie\Permission\Models\Role;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Roles extends Component
 {
     use WithPagination;
@@ -45,7 +47,7 @@ class Roles extends Component
 
         return view('livewire.rol.roles', [
             'roles' => $roles
-        ])->layout('layouts.app');
+        ]);
     }
 
     public function confirmDelete($id)

@@ -14,7 +14,9 @@ use App\Models\Poa\PoaDepto;
 use App\Models\GrupoGastos\GrupoGasto;
 use App\Models\Presupuestos\Presupuesto;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class GestionTechoDeptos extends Component
 {
     use WithPagination;
@@ -253,7 +255,7 @@ class GestionTechoDeptos extends Component
             'departamentosConTecho' => $departamentosConTechoData,
             'resumenPresupuesto' => $resumenPresupuesto,
             'metricasPorEstructura' => $metricasPorEstructura,
-        ])->layout('layouts.app');
+        ]);
     }
 
     private function getResumenPresupuesto()

@@ -7,7 +7,9 @@ use App\Services\LogService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Log;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class TipoActaEntregas extends Component
 {
     use WithPagination;
@@ -221,6 +223,6 @@ class TipoActaEntregas extends Component
             
         return view('livewire.actas.tipo-acta-entregas', [
             'tipoActaEntregas' => $tipoActaEntregas
-        ])->layout('layouts.app');
+        ]);
     }
 }

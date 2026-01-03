@@ -5,7 +5,9 @@ namespace App\Livewire\Institucion;
 use App\Models\Instituciones\Institucion;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Instituciones extends Component
 {
     use WithPagination;
@@ -156,6 +158,6 @@ class Instituciones extends Component
             
         return view('livewire.institucion.instituciones', [
             'instituciones' => $instituciones
-        ])->layout('layouts.app');
+        ]);
     }
 }

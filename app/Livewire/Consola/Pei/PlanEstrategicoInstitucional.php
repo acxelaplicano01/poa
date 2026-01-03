@@ -5,7 +5,9 @@ namespace App\Livewire\Consola\Pei;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Poa\Pei;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class PlanEstrategicoInstitucional extends Component
 {
     use WithPagination;

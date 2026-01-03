@@ -5,7 +5,9 @@ namespace App\Livewire\Categoria;
 use App\Models\Categoria\Categoria;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Categorias extends Component
 {
     use WithPagination;
@@ -139,6 +141,6 @@ class Categorias extends Component
             
         return view('livewire.categoria.categorias', [
             'categorias' => $categorias
-        ])->layout('layouts.app');
+        ]);
     }
 }

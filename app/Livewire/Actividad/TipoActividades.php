@@ -7,7 +7,9 @@ use App\Services\LogService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Log;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class TipoActividades extends Component
 {
     use WithPagination;
@@ -201,6 +203,6 @@ class TipoActividades extends Component
             
         return view('livewire.actividad.tipo-actividades', [
             'tipoActividades' => $tipoActividades
-        ])->layout('layouts.app');
+        ]);
     }
 }

@@ -8,7 +8,9 @@ use App\Models\Poa\Poa;
 use App\Models\Plazos\PlazoPoa;
 use App\Services\LogService;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class GestionPlazosPoa extends Component
 {
     public $idPoa;
@@ -523,6 +525,6 @@ class GestionPlazosPoa extends Component
     
     public function render()
     {
-        return view('livewire.plazos.gestion-plazos-poa')->layout('layouts.app');
+        return view('livewire.plazos.gestion-plazos-poa');
     }
 }

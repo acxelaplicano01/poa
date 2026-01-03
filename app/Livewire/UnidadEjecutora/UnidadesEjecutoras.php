@@ -6,7 +6,9 @@ use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\Instituciones\Institucion;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class UnidadesEjecutoras extends Component
 {
     use WithPagination;
@@ -247,6 +249,6 @@ class UnidadesEjecutoras extends Component
         return view('livewire.unidad-ejecutora.unidades-ejecutoras', [
             'unidadesEjecutoras' => $unidadesEjecutoras,
             'instituciones' => $instituciones,
-        ])->layout('layouts.app');
+        ]);
     }
 }

@@ -5,7 +5,9 @@ namespace App\Livewire\GrupoGastos;
 use App\Models\GrupoGastos\Fuente;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Fuentes extends Component
 {
     use WithPagination;
@@ -167,6 +169,6 @@ class Fuentes extends Component
 
         return view('livewire.grupo-gastos.fuentes.fuentes', [
             'fuentes' => $fuentes
-        ])->layout('layouts.app');
+        ]);
     }
 }

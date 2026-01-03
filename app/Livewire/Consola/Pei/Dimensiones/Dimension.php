@@ -8,7 +8,9 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Poa\Pei;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Dimension extends Component
 {
     use WithPagination;
@@ -223,6 +225,6 @@ class Dimension extends Component
     return view('livewire.consola.pei.Dimensiones.dimensiones', [
         'dimensions' => $dimensions,
         'peis' => $peis,
-    ])->layout('layouts.app');
+    ]);
 }
 }

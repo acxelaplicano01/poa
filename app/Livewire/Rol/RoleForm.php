@@ -9,7 +9,9 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class RoleForm extends Component
 {
     public $roleId;
@@ -184,7 +186,6 @@ class RoleForm extends Component
 
     public function render()
     {
-        return view('livewire.rol.form')
-            ->layout('layouts.app');
+        return view('livewire.rol.form');
     }
 }

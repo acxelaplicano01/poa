@@ -19,7 +19,9 @@ use App\Models\Instituciones\Institucions;
 use App\Services\LogService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Actividades extends Component
 {
     use WithPagination;
@@ -809,7 +811,7 @@ class Actividades extends Component
             return view('livewire.actividad.actividades', [
                 'actividades' => $actividadesVacias,
                 'resumenPresupuesto' => collect([])
-            ])->layout('layouts.app');
+            ]);
         }
 
         $actividades = Actividad::where('idDeptartamento', $this->idDeptartamento)
@@ -830,6 +832,6 @@ class Actividades extends Component
         return view('livewire.actividad.actividades', [
             'actividades' => $actividades,
             'resumenPresupuesto' => $resumenPresupuesto
-        ])->layout('layouts.app');
+        ]);
     }
 }

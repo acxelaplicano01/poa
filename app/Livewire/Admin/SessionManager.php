@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\User;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class SessionManager extends Component
 {
     use WithPagination;
@@ -186,7 +188,7 @@ class SessionManager extends Component
 
         return view('livewire.admin.session-manager', [
             'sessions' => $sessions
-        ])->layout('layouts.app');
+        ]);
     }
     
     // Función para detectar el navegador

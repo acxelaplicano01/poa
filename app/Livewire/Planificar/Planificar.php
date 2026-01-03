@@ -9,6 +9,9 @@ use App\Models\Poa\Poa;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Lazy;
 //#[Lazy]
+use Livewire\Attributes\Layout;
+
+#[Layout('layouts.app')]
 class Planificar extends Component
 {
     public $departamentoSeleccionado = null;
@@ -19,7 +22,7 @@ class Planificar extends Component
     //crear funcion para placeholder
     /*public function placeholder()
     {
-        return view('livewire.placeholder.loaders')->layout('layouts.app');
+        return view('livewire.placeholder.loaders');
     }*/
         
     public function mount()
@@ -141,6 +144,6 @@ class Planificar extends Component
             'departamentosUsuario' => $this->departamentosUsuario,
             'poasHistorial' => $this->poasHistorial,
             'mostrarSelector' => $this->mostrarSelector,
-        ])->layout('layouts.app');
+        ]);
     }
 }

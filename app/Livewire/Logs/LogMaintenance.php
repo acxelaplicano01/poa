@@ -4,7 +4,9 @@ namespace App\Livewire\Logs;
 
 use Livewire\Component;
 use App\Models\ActivityLog;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class LogMaintenance extends Component
 {
     public $days = 30;

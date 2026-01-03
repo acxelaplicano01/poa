@@ -6,7 +6,9 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Departamento\Departamento;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Departamentos extends Component
 {
     use WithPagination;
@@ -99,7 +101,7 @@ class Departamentos extends Component
             'departamentos' => $departamentos,
             'unidadesEjecutoras' => $unidadesEjecutoras,
             'tipos' => $tipos
-        ])->layout('layouts.app');
+        ]);
     }
 
     public function create()

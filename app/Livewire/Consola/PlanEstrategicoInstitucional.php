@@ -6,7 +6,9 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Poa\Pei;
 use App\Models\Instituciones\Institucion;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class PlanEstrategicoInstitucional extends Component
 {
     use WithPagination;
@@ -82,7 +84,7 @@ class PlanEstrategicoInstitucional extends Component
         return view('livewire.consola.pei.plan-estrategico-institucional', [
             'peis' => $peis,
             'instituciones' => $instituciones
-        ])->layout('layouts.app');
+        ]);
     }
 
     public function create()

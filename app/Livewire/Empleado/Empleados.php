@@ -11,7 +11,9 @@ use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Log;
 use Auth;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class Empleados extends Component
 {
     use WithPagination;
@@ -162,7 +164,7 @@ class Empleados extends Component
         return view('livewire.empleado.empleado', [
             'empleados' => $empleados,
             'unidadesEjecutoras' => $unidadesEjecutoras,
-        ])->layout('layouts.app');
+        ]);
     }
 
     // Abrir modal para crear

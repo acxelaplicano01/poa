@@ -9,7 +9,9 @@ use App\Models\Poa\Poa;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class GestionPlazos extends Component
 {
     use WithPagination;
@@ -256,6 +258,6 @@ class GestionPlazos extends Component
 
         return view('livewire.plazos.gestion-plazos', [
             'plazos' => $plazos,
-        ])->layout('layouts.app');
+        ]);
     }
 }

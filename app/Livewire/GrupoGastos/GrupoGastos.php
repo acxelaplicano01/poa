@@ -5,7 +5,9 @@ namespace App\Livewire\GrupoGastos;
 use App\Models\GrupoGastos\GrupoGasto;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class GrupoGastos extends Component
 {
     use WithPagination;
@@ -159,6 +161,6 @@ class GrupoGastos extends Component
             
         return view('livewire.grupo-gastos.grupo-gasto', [
             'grupoGastos' => $grupoGastos
-        ])->layout('layouts.app');
+        ]);
     }
 }
