@@ -29,7 +29,6 @@ class GestionTechoDeptos extends Component
     public $searchConTecho = ''; // Buscador específico para departamentos con techo
     public $searchSinTecho = ''; // Buscador específico para departamentos sin techo
     public $activeTab = 'resumen'; // Nueva propiedad para el tab activo
-    protected $queryStringtab = ['activeTab'];
     public $showModal = false;
     public $showDeleteModal = false;
     public $techoDeptoToDelete = null;
@@ -63,7 +62,8 @@ class GestionTechoDeptos extends Component
     // Definimos explícitamente cómo queremos que se procesen los parámetros en la URL
     protected $queryString = [
         'idPoa' => ['except' => ''],
-        'idUE' => ['except' => '']
+        'idUE' => ['except' => ''],
+        'activeTab'
     ];
 
     public function mount()

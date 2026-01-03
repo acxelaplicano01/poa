@@ -144,7 +144,7 @@
                                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <span class="hidden sm:inline">Línea de Tiempo</span>
+                                <span class="hidden sm:inline">Configurar Plazos</span>
                                 <span class="sm:hidden">Timeline</span>
                             </span>
                         </button>
@@ -705,6 +705,7 @@
                                                         </td>
                                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                                             <button wire:click="viewAnalysis({{ $idUe }})"
+                                                                title="Analisis presupuestario"
                                                                 class="text-emerald-600 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300 cursor-pointer" title="Ver análisis presupuestario">
                                                                 <svg class="w-5 h-5 text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6.025A7.5 7.5 0 1 0 17.975 14H10V6.025Z"/>

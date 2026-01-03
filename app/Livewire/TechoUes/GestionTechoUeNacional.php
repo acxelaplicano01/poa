@@ -24,6 +24,7 @@ class GestionTechoUeNacional extends Component
     public $searchConTecho = ''; // Buscador específico para UEs con techo
     public $searchSinTecho = ''; // Buscador específico para UEs sin techo
     public $activeTab = 'resumen'; // Propiedad para el tab activo
+    protected $queryString = ['activeTab'];
     public $showModal = false;
     public $showDeleteModal = false;
     public $techoUeToDelete = null;
