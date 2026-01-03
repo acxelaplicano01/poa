@@ -657,22 +657,6 @@ return [
                         ->setItems([])
                         ->setEndBlock('techonacional'),
 
-                    RkRoute::make('plazos')
-                        ->setParentId('consola')
-                        ->setAccessPermission('acceso-consola')
-                        ->setPermissions([
-                            'consola.plazos.gestionar',
-                            'consola.plazos.crear',
-                            'consola.plazos.editar',
-                            'consola.plazos.eliminar',
-                            'acceso-consola',
-                        ])
-                        ->setUrlMethod('get')
-                        ->setUrlController('App\Livewire\Plazos\GestionPlazos')
-                        ->setRoles(['super_admin', 'direccion'])
-                        ->setItems([])
-                        ->setEndBlock('plazos'),
-
                     RkRoute::make('plazos-poa')
                         ->setParentId('consola')
                         ->setAccessPermission('acceso-consola')
