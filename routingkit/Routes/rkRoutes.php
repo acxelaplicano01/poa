@@ -399,6 +399,16 @@ return [
                             ->setRoles(['admin_general'])
                             ->setItems([])
                             ->setEndBlock('requisicion'),
+
+                        // Ruta para descargar PDF de requisición
+                        RkRoute::make('requisicion/{correlativo}/pdf')
+                            ->setParentId('requisiciones')
+                            ->setAccessPermission('acceso-planificacion')
+                            ->setUrlMethod('get')
+                            ->setUrlController('App\\Http\\Controllers\\RequisicionController@descargarPdf')
+                            ->setRoles(['admin_general'])
+                            ->setItems([])
+                            ->setEndBlock('requisicion-pdf'),
                     ])
                     ->setEndBlock('requisiciones'),
 

@@ -1,7 +1,22 @@
 <div>
     <x-dialog-modal wire:model="showDetalleModal" maxWidth="4xl">
         <x-slot name="title">
-            {{ $detalleRequisicion['correlativo'] ?? '' }} {{ $detalleRequisicion['departamento'] ?? '' }}
+            <div class="flex items-center justify-between w-full">
+                <span>
+                    {{ $detalleRequisicion['correlativo'] ?? '' }} {{ $detalleRequisicion['departamento'] ?? '' }}
+                </span>
+                    @if (isset($detalleRequisicion['correlativo']))
+                        <a href="/requisicion/{{ $detalleRequisicion['correlativo'] ?? '' }}/pdf" target="_blank" title="Descargar PDF"
+                           class="ml-4 bg-red-600 hover:bg-red-700 text-white font-semibold px-2.5 py-1.5 rounded flex items-center gap-1 transition text-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="size-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                            </svg>
+                            PDF
+                        </a>
+                    @endif
+            </div>
         </x-slot>
         <x-slot name="content">
             <div class="mb-2">
@@ -64,12 +79,15 @@ $estado = $detalleRequisicion['estado'] ?? '';
         <x-slot name="footer">
             @php $estado = $detalleRequisicion['estado'] ?? ''; @endphp
             <div class="flex flex-row gap-3 w-full items-center">
-                @if ($estado === 'Presentado')
+                @if ($estado === 'Presentado' || $estado === 'En Proceso de Compra')
                     <div class="flex-1">
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400 dark:text-zinc-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            <span
+                                class="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400 dark:text-zinc-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                                 </svg>
                             </span>
                             <input type="text" wire:model.defer="observacionModal" placeholder="Observación"
@@ -77,18 +95,20 @@ $estado = $detalleRequisicion['estado'] ?? '';
                         </div>
                     </div>
                     <div class="flex flex-row gap-3 items-center justify-end">
-                        <button wire:click="marcarComoRecibido"
-                            class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-green-700 dark:hover:bg-green-800">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                            </svg>
-                            Recibido
-                        </button>
+                        @if ($estado === 'Presentado')
+                            <button wire:click="marcarComoRecibido"
+                                class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-green-700 dark:hover:bg-green-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                                Recibido
+                            </button>
+                        @endif
                         <button wire:click="marcarComoRechazado"
                             class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-red-700 dark:hover:bg-red-800">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="w-5 h-5">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                             </svg>
                             Rechazar
@@ -106,8 +126,10 @@ $estado = $detalleRequisicion['estado'] ?? '';
                 @elseif ($estado === 'Aprobado')
                     <button wire:click="marcarComoProcesoCompra"
                         class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-yellow-700 dark:hover:bg-yellow-800">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                         </svg>
                         Proceso de Compra
                     </button>
@@ -125,7 +147,8 @@ $estado = $detalleRequisicion['estado'] ?? '';
             <x-select wire:model.live="departamento" :options="[['value' => 'Todos', 'text' => 'Todos']] +
                 $departamentos->map(fn($d) => ['value' => $d->id, 'text' => $d->name])->toArray()" id="departamento"
                 class="max-w-[150px] w-full text-sm" />
-            <x-select wire:model.live="estado" :options="collect($estados)->map(fn($e) => ['value' => $e, 'text' => $e])->toArray()" id="estado" class="max-w-[120px] w-full text-sm" />
+            <x-select wire:model.live="estado" :options="collect($estados)->map(fn($e) => ['value' => $e, 'text' => $e])->toArray()" id="estado"
+                class="max-w-[120px] w-full text-sm" />
             <x-select wire:model.live="perPage" :options="[
                 ['value' => '10', 'text' => '10 por pág'],
                 ['value' => '25', 'text' => '25 por pág'],
