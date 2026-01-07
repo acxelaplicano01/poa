@@ -233,6 +233,7 @@
             </div>
             <br>
             <div class="datos">
+                            
                 <table class="table">
                     <thead>
                         <tr>
@@ -282,8 +283,9 @@
                 </table>
             </div>
             <div style="margin-top: 20px;">
-                <div style="font-size: 11px; font-weight: 650; background: none; margin-bottom: 0;">FAVOR ADJUTAR
-                    COTIZACIONES</div>
+                 <div style="margin-bottom: 5px;">
+                                <span style="font-weight: bold; font-size: 11px;">FAVOR ADJUNTAR COTIZACIONES</span>
+                            </div>
                 <table class="table" style="margin-top:0;">
                     <thead>
                         <tr>
@@ -323,15 +325,15 @@
                                     <table style="width:100%; border-collapse:collapse; height:auto;">
                                         <tr>
                                             <td style="width:30%; background-color:#B8CCE4; font-weight:600; border-right:1px solid #000;">NOMBRE</td>
-                                            <td style="width:30%; background-color:#fff; text-align:right; padding: 0.5px 0.5px;">{{ $recibido_nombre ?? '' }}</td>
+                                            <td style="width:70%; background-color:#fff; text-align:left; padding: 0.5px 4px;">{{ $recibido_nombre ?? '' }}</td>
                                         </tr>
                                         <tr>
                                             <td style="width:30%; background-color:#B8CCE4; font-weight:600; border-right:1px solid #000;">FECHA</td>
-                                            <td style="width:30%; background-color:#fff; text-align:right; padding: 0.5px 0.5px;">{{ $recibido_fecha ?? '' }}</td>
+                                            <td style="width:70%; background-color:#fff; text-align:left; padding: 0.5px 4px;">{{ $recibido_fecha ?? '' }}</td>
                                         </tr>
                                         <tr>
                                             <td style="width:30%; background-color:#B8CCE4; font-weight:600; border-right:1px solid #000;">HORA</td>
-                                            <td style="width:30%; background-color:#fff; text-align:right; padding: 0.5px 0.5px;">{{ $recibido_hora ?? '' }}</td>
+                                            <td style="width:70%; background-color:#fff; text-align:left; padding: 0.5px 4px;">{{ $recibido_hora ?? '' }}</td>
                                         </tr>
                                     </table>
                                 </td>

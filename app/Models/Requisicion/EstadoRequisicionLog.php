@@ -3,8 +3,10 @@
 namespace App\Models\Requisicion;
 use App\Models\BaseModel;
 use App\Models\Requisicion\Requisicion;
+use App\Models\User;
 
 class EstadoRequisicionLog extends BaseModel
+
 {
     protected $table = 'estado_requisicion_logs';
 
@@ -19,5 +21,10 @@ class EstadoRequisicionLog extends BaseModel
     public function requisicion()
     {
         return $this->belongsTo(Requisicion::class, 'idRequisicion');
+    }
+
+        public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }
