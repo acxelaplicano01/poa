@@ -12,6 +12,7 @@ return [
             'check.empleado',
         ])
         ->setItems([
+            
 
             // RkRoute::make('dashboard')
             //     ->setParentId('auth_group')
@@ -413,13 +414,31 @@ return [
                     ->setEndBlock('requisiciones'),
 
                     RkRoute::make('administrar-requisiciones')
+                            ->setParentId('planificacion')
+                            ->setAccessPermission('administrar.requisiciones.ver')
+                            ->setUrlMethod('get')
+                            ->setUrlController('App\Livewire\Requisicion\AdministrarRequisiciones')
+                            ->setRoles(['admin_general'])
+                            ->setItems([])
+                            ->setEndBlock('administrar-requisiciones'),
+
+                    RkRoute::make('entrega-recursos/{requisicionId}')
+                            ->setParentId('administrar-requisiciones')
+                            ->setAccessPermission('acceder-entrega-recursos')
+                            ->setUrlMethod('get')
+                            ->setUrlController('App\Livewire\Requisicion\EntregaRecursos')
+                            ->setRoles(['admin_general'])
+                            ->setItems([])
+                            ->setEndBlock('entrega-recursos'),
+
+                    /*RkRoute::make('entrega-recursos')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('administrar.requisiciones.ver')
+                        ->setAccessPermission('acceder-entrega-recursos')
                         ->setUrlMethod('get')
-                        ->setUrlController('App\Livewire\Requisicion\AdministrarRequisiciones')
+                        ->setUrlController('App\Livewire\Requisicion\EntregaRecursos')
                         ->setRoles(['admin_general'])
                         ->setItems([])
-                        ->setEndBlock('administrar-requisiciones'),
+                        ->setEndBlock('entrega-recursos'),*/
 
                     RkRoute::make('consolidado')
                         ->setParentId('planificacion')

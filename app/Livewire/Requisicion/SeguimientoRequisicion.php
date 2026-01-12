@@ -80,6 +80,7 @@ class SeguimientoRequisicion extends Component
             ];
         })->toArray();
     }
+    
     // Cuando se edita, no es solo visualización
     public function edit($id)
     {
@@ -96,7 +97,6 @@ class SeguimientoRequisicion extends Component
         });
         $this->recursosSeleccionados = array_values($this->recursosSeleccionados);
     }
-
 
     // Guardar cambios de la edición de requisición
     public function guardarEdicionRequisicion()
@@ -160,7 +160,6 @@ class SeguimientoRequisicion extends Component
         $this->showSumarioModal = false;
         $this->isEditing = false;
     }
-
     
     // Mostrar modal de detalle de recursos
     public function verDetalleRecursos($id)
@@ -173,7 +172,7 @@ class SeguimientoRequisicion extends Component
                 'cantidad' => $detalle->cantidad ?? '-',
                 'precio_unitario' => $detalle->presupuesto->costounitario ?? '-',
                 'total' => ($detalle->cantidad ?? 0) * ($detalle->presupuesto->costounitario ?? 0),
-                'estado' => $detalle->entregado ? 'Entregado' : 'Pendiente',
+                'estado' => $detalle->requisicion->estado->estado ?? 'Pendiente',
                 'ref_acta' => $detalle->referenciaActaEntrega ?? 'No Aplica',
             ];
         })->toArray();
@@ -196,7 +195,6 @@ class SeguimientoRequisicion extends Component
         }
         $mostrarSelector = count($departamentosUsuario) > 1;
 
-        // Inicializar el departamento seleccionado si no está definido
         if ($this->departamentoSeleccionado === null && count($departamentosUsuario) > 0) {
             $this->departamentoSeleccionado = $departamentosUsuario[0]->id;
         }
@@ -228,7 +226,6 @@ class SeguimientoRequisicion extends Component
         $sortDirection = $this->sortDirection ?? 'desc';
         $requisiciones = $query->orderBy($sortField, $sortDirection)->paginate($perPage);
 
-        // Agregar manualmente el departamento del creador a cada requisición
         foreach ($requisiciones as $requisicion) {
             $departamentoCreador = null;
             if (
