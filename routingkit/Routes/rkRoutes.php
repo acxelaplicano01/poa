@@ -445,14 +445,14 @@ return [
                     ])
                     ->setUrlMethod('get')
                     ->setUrlController('App\Livewire\Requisicion\SeguimientoRequisicion')
-                    ->setRoles(['admin_general'])
+                    ->setRoles(['super_admin'])
                     ->setItems([
                         RkRoute::make('mis-requisiciones')
                             ->setParentId('requisiciones')
                             ->setAccessPermission('acceso-planificacion')
                             ->setUrlMethod('get')
                             ->setUrlController('App\Livewire\Requisicion\SeguimientoRequisicion')
-                            ->setRoles(['admin_general'])
+                            ->setRoles(['super_admin'])
                             ->setItems([])
                             ->setEndBlock('mis-requisiciones'),
 
@@ -468,7 +468,7 @@ return [
                             ])
                             ->setUrlMethod('get')
                             ->setUrlController('App\Livewire\Requisicion\Requisicion')
-                            ->setRoles(['admin_general'])
+                            ->setRoles(['super_admin'])
                             ->setItems([])
                             ->setEndBlock('requisicion'),
 
@@ -478,7 +478,7 @@ return [
                             ->setAccessPermission('acceso-planificacion')
                             ->setUrlMethod('get')
                             ->setUrlController('App\\Http\\Controllers\\RequisicionController@descargarPdf')
-                            ->setRoles(['admin_general'])
+                            ->setRoles(['super_admin'])
                             ->setItems([])
                             ->setEndBlock('requisicion-pdf'),
                     ])
@@ -489,9 +489,11 @@ return [
                         ->setAccessPermission('administrar.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Requisicion\AdministrarRequisiciones')
-                        ->setRoles(['admin_general'])
+                        ->setRoles(['super_admin'])
                         ->setItems([])
                         ->setEndBlock('administrar-requisiciones'),
+
+                    
 
                     RkRoute::make('consolidado')
                         ->setParentId('planificacion')
