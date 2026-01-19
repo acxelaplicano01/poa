@@ -8,7 +8,9 @@ use App\Models\Requisicion\Requisicion;
 use App\Models\Requisicion\EstadoRequisicionLog;
 use App\Models\Departamento\Departamento;
 use App\Models\Poa\Poa;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class AdministrarRequisiciones extends Component
 {
     use WithPagination;
@@ -244,6 +246,6 @@ class AdministrarRequisiciones extends Component
             'departamentos' => $departamentos,
             'estados' => $estados,
             'detalleRecursos' => $this->detalleRecursos ?? [],
-        ])->layout('layouts.app');
+        ]);
     }
 }
