@@ -57,4 +57,8 @@ class Presupuesto extends BaseModel
     {
         return $this->belongsTo(\App\Models\GrupoGastos\GrupoGasto::class, 'idgrupo');
     }
+
+    public function tareaHistorico() {
+        return $this->belongsTo(\App\Models\Tareas\TareaHistorico::class, 'idHistorico');
+    }
 }

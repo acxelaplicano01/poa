@@ -416,7 +416,7 @@ return [
                                         ->setEndBlock('review-actividad-detalle'),
                         ])
                         ->setEndBlock('revisiones'),
-
+/*
                     RkRoute::make('requisicion')
                         ->setParentId('planificacion')
                         ->setAccessPermission('acceso-planificacion')
@@ -431,23 +431,67 @@ return [
                         ->setUrlController('App\Livewire\Requisicion\Requisicion')
                         ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
-                        ->setEndBlock('requisicion'),
+                        ->setEndBlock('requisicion'), */
 
-                    RkRoute::make('seguimiento')
+                RkRoute::makeGroup('requisiciones')
+                    ->setParentId('planificacion')
+                    ->setAccessPermission('acceso-planificacion')
+                    ->setPermissions([
+                        'requisiciones.ver',
+                        'requisiciones.crear',
+                        'requisiciones.editar',
+                        'requisiciones.eliminar',
+                        'acceso-planificacion',
+                    ])
+                    ->setUrlMethod('get')
+                    ->setUrlController('App\Livewire\Requisicion\SeguimientoRequisicion')
+                    ->setRoles(['admin_general'])
+                    ->setItems([
+                        RkRoute::make('mis-requisiciones')
+                            ->setParentId('requisiciones')
+                            ->setAccessPermission('acceso-planificacion')
+                            ->setUrlMethod('get')
+                            ->setUrlController('App\Livewire\Requisicion\SeguimientoRequisicion')
+                            ->setRoles(['admin_general'])
+                            ->setItems([])
+                            ->setEndBlock('mis-requisiciones'),
+
+                        RkRoute::make('requisicion')
+                            ->setParentId('requisiciones')
+                            ->setAccessPermission('acceso-planificacion')
+                            ->setPermissions([
+                                'planificacion.requisicion.ver',
+                                'planificacion.requisicion.crear',
+                                'planificacion.requisicion.editar',
+                                'planificacion.requisicion.eliminar',
+                                'acceso-planificacion',
+                            ])
+                            ->setUrlMethod('get')
+                            ->setUrlController('App\Livewire\Requisicion\Requisicion')
+                            ->setRoles(['admin_general'])
+                            ->setItems([])
+                            ->setEndBlock('requisicion'),
+
+                        // Ruta para descargar PDF de requisición
+                        RkRoute::make('requisicion/{correlativo}/pdf')
+                            ->setParentId('requisiciones')
+                            ->setAccessPermission('acceso-planificacion')
+                            ->setUrlMethod('get')
+                            ->setUrlController('App\\Http\\Controllers\\RequisicionController@descargarPdf')
+                            ->setRoles(['admin_general'])
+                            ->setItems([])
+                            ->setEndBlock('requisicion-pdf'),
+                    ])
+                    ->setEndBlock('requisiciones'),
+
+                    RkRoute::make('administrar-requisiciones')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('acceso-planificacion')
-                        ->setPermissions([
-                            'planificacion.seguimiento.ver',
-                            'planificacion.seguimiento.crear',
-                            'planificacion.seguimiento.editar',
-                            'planificacion.seguimiento.eliminar',
-                            'acceso-planificacion',
-                        ])
+                        ->setAccessPermission('administrar.requisiciones.ver')
                         ->setUrlMethod('get')
-                        ->setUrlController('App\Livewire\Requisicion\Requisicion')
-                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
+                        ->setUrlController('App\Livewire\Requisicion\AdministrarRequisiciones')
+                        ->setRoles(['admin_general'])
                         ->setItems([])
-                        ->setEndBlock('seguimiento'),
+                        ->setEndBlock('administrar-requisiciones'),
 
                     RkRoute::make('consolidado')
                         ->setParentId('planificacion')

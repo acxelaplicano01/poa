@@ -218,4 +218,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('can:consola.techonacional.ver');
 }); */
 
-Route::get('/consola/pei/areas', \App\Livewire\Consola\Pei\Areas\Area::class)->name('areas');
+// Route::get('/consola/pei/areas', \App\Livewire\Consola\Pei\Areas\Area::class)->name('areas');

@@ -70,22 +70,46 @@ return [
                 ])
                 ->setEndBlock('revisiones'),
 
-            RkNavigation::make('requisicion')
+            /*RkNavigation::make('requisicion')
                 ->setParentId('planificacion')
                 ->setDescription('Crear o gestionar requisiciones')
                 ->setLabel('Requisicion')
                 ->setHeroIcon('clipboard-document')
                 ->setItems([])
-                ->setEndBlock('requisicion'),
+                ->setEndBlock('requisicion'),*/
 
-            RkNavigation::make('seguimiento')
+            RkNavigation::makeGroup('requisiciones')
                 ->setParentId('planificacion')
-                ->setDescription('Seguimiento de planificaciones')
-                ->setLabel('Dar seguimiento')
-                ->setHeroIcon('eye')
-                ->setItems([])
-                ->setEndBlock('seguimiento'),
+                ->setDescription('Seguimiento de requisiciones')
+                ->setLabel('Requisición')
+                ->setHeroIcon('clipboard-document-list')
+                ->setItems([
+                    RkNavigation::make('mis-requisiciones')
+                        ->setParentId('requisiciones')
+                        ->setDescription('Vista principal de seguimiento')
+                        ->setLabel('Mis requisiciones')
+                        ->setHeroIcon('clipboard-document-list')
+                        ->setItems([])
+                        ->setEndBlock('mis-requisiciones'),
 
+                    RkNavigation::make('requisicion')
+                        ->setParentId('requisiciones')
+                        ->setDescription('Crear o gestionar requisiciones')
+                        ->setLabel('Requisicion')
+                        ->setHeroIcon('document-plus')
+                        ->setItems([])
+                        ->setEndBlock('requisicion'),
+                ])
+                ->setEndBlock('requisiciones'),
+
+            RkNavigation::make('administrar-requisiciones')
+                ->setParentId('planificacion')
+                ->setDescription('Administrar solicitudes de requisiciones')
+                ->setLabel('Dar seguimiento')
+                ->setHeroIcon('chart-bar-square')
+                ->setItems([])
+                ->setEndBlock('administrar-requisiciones'),
+                
             RkNavigation::make('consolidado')
                 ->setParentId('planificacion')
                 ->setDescription('Genera reportes consolidados')

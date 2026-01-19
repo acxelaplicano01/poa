@@ -5,7 +5,7 @@ use App\Models\BaseModel;
 use App\Models\Poa\Poa;
 use App\Models\Departamento\Departamento;
 use App\Models\Requisicion\EstadoRequisicion;
-use App\Models\RequisicionLog\EstadoRequisicionLog;
+use App\Models\Requisicion\EstadoRequisicionLog;
 use App\Models\User;
 
 class Requisicion extends BaseModel
@@ -43,10 +43,10 @@ class Requisicion extends BaseModel
 
     public function creador()
     {
-        return $this->belongsTo(User::class, 'createdBy');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function aprobador()
+    public function aprobadoPor()
     {
         return $this->belongsTo(User::class, 'approvedBy');
     }
