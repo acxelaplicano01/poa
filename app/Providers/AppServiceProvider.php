@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Permission;
+use App\Models\Requisicion\Requisicion;
+use App\Observers\RequisicionObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -67,5 +69,6 @@ class AppServiceProvider extends ServiceProvider
         // Registrar Observers
         \Spatie\Permission\Models\Role::observe(\App\Observers\RolePermissionObserver::class);
         \App\Models\Poa\Poa::observe(\App\Observers\PoaObserver::class);
+        Requisicion::observe(RequisicionObserver::class);
     }
 }
