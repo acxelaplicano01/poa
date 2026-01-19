@@ -26,7 +26,7 @@
                             <td class="px-4 py-2 align-top text-center">L {{ number_format($detalle['precio_unitario'], 2) }}</td>
                             <td class="px-4 py-2 align-top text-center">L {{ number_format($detalle['total'], 2) }}</td>
                             <td class="px-4 py-2 align-top text-center">
-                                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-900 text-white">{{ $detalle['estado'] }}</span>
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-300 text-zinc-900">{{ $detalle['estado'] }}</span>
                             </td>
                             <td class="px-4 py-2 align-top text-center">{{ $detalle['ref_acta'] }}</td>
                         </tr>

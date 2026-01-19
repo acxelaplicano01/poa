@@ -5,7 +5,9 @@ namespace App\Livewire\Requisicion;
 use App\Models\Requisicion\EstadoRequisicion;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class EstadosRequisicion extends Component
 {
     use WithPagination;
@@ -124,6 +126,6 @@ class EstadosRequisicion extends Component
             
         return view('livewire.requisicion.estados-requisicion', [
             'estados' => $estados
-        ])->layout('layouts.app');
+        ]);
     }
 }

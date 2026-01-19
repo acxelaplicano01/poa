@@ -12,6 +12,7 @@ return [
             'check.empleado',
         ])
         ->setItems([
+            
 
             // RkRoute::make('dashboard')
             //     ->setParentId('auth_group')
@@ -492,6 +493,26 @@ return [
                         ->setRoles(['super_admin'])
                         ->setItems([])
                         ->setEndBlock('administrar-requisiciones'),
+
+                    RkRoute::make('entregarecursos')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setUrlMethod('get')
+                        ->setUrl('entregarecursos/{requisicionId}')
+                        ->setUrlController('App\Livewire\Requisicion\EntregaRecursos')
+                        ->setRoles(['super_admin'])
+                        ->setItems([])
+                        ->setEndBlock('entregarecursos'),
+                    
+
+                    /*RkRoute::make('entrega-recursos')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\Requisicion\AdministrarRequisiciones')
+                        ->setRoles(['super_admin'])
+                        ->setItems([])
+                        ->setEndBlock('entrega-recursos'),*/
 
                     
 

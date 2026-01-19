@@ -6,7 +6,9 @@ use App\Models\Requisicion\UnidadMedida;
 use App\Services\LogService;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.app')]
 class UnidadMedidas extends Component
 {
     use WithPagination;
@@ -201,6 +203,6 @@ class UnidadMedidas extends Component
             
         return view('livewire.requisicion.unidad-medidas', [
             'unidadMedidas' => $unidadMedidas
-        ])->layout('layouts.app');
+        ]);
     }
 }
