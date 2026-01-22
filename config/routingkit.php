@@ -200,8 +200,8 @@ return [
     'roles' => [
 
         [
-            'id'   => 'admin_general',
-            'name' => 'admin_general',
+            'id'   => 'super_admin',
+            'name' => 'Super Admin',
             'for_tenant' => false,
         ],
 
@@ -224,11 +224,11 @@ return [
     'development_users' => [
         'admin_general' => [
             'user' => [
-                'name' => "Administrador",
+                'name' => "Acxel Aplicano",
                 'email' => env('MAIL_ADMIN_ADDRESS') ?? 'admin@gmail.com',
                 'password' => env('MAIL_ADMIN_PASSWORD') ?? '12345678',
             ],
-            'roles'    => ['admin_general'],
+            'roles'    => ['super_admin'],
         ],
     ],
 

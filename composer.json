@@ -17,7 +17,12 @@
         "livewire/flux": "^2.4",
         "livewire/livewire": "^3.6",
         "openai-php/laravel": "^0.18.0",
-        "spatie/laravel-permission": "^6.20"
+        "spatie/laravel-permission": "^6.20",
+        "symfony/clock": "^7.0",
+        "symfony/css-selector": "^7.0",
+        "symfony/event-dispatcher": "^7.0",
+        "symfony/string": "^7.0",
+        "symfony/translation": "^7.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
