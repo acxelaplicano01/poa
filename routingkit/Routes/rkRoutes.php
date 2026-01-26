@@ -453,7 +453,7 @@ return [
                             ->setAccessPermission('acceso-planificacion')
                             ->setUrlMethod('get')
                             ->setUrlController('App\Livewire\Requisicion\SeguimientoRequisicion')
-                            ->setRoles(['super_admin'])
+                            ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                             ->setItems([])
                             ->setEndBlock('mis-requisiciones'),
 
@@ -469,7 +469,7 @@ return [
                             ])
                             ->setUrlMethod('get')
                             ->setUrlController('App\Livewire\Requisicion\Requisicion')
-                            ->setRoles(['super_admin'])
+                            ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                             ->setItems([])
                             ->setEndBlock('requisicion'),
 
@@ -478,7 +478,7 @@ return [
                             ->setAccessPermission('acceso-planificacion')
                             ->setUrlMethod('get')
                             ->setUrlController('App\\Http\\Controllers\\RequisicionController@descargarPdf')
-                            ->setRoles(['super_admin'])
+                            ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                             ->setItems([])
                             ->setEndBlock('requisicion-pdf'),
                     ])
@@ -489,7 +489,7 @@ return [
                         ->setAccessPermission('administrar.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Requisicion\AdministrarRequisiciones')
-                        ->setRoles(['super_admin'])
+                        ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
                         ->setEndBlock('administrar-requisiciones'),
 
@@ -499,7 +499,7 @@ return [
                         ->setUrlMethod('get')
                         ->setUrl('entregarecursos/{requisicionId}')
                         ->setUrlController('App\Livewire\Requisicion\EntregaRecursos')
-                        ->setRoles(['super_admin'])
+                        ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
                         ->setEndBlock('entregarecursos'),
                     
@@ -509,7 +509,7 @@ return [
                         ->setUrlMethod('get')
                         ->setUrl('acta-entrega/{requisicionId}/descargar')
                         ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarPdf')
-                        ->setRoles(['super_admin'])
+                        ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
                         ->setEndBlock('acta-entrega-pdf'),
 

@@ -40,6 +40,9 @@ class DatabaseSeeder extends Seeder
         $this->call(GrupoGastoSeeder::class);
         $this->call(ObjetoGastoSeeder::class);
         $this->call(PeiDataSeeder::class);
+        $this->call(ProcesoCompraSeeder::class);
+        $this->call(RecursoSeeder::class);
+
         
     }
 }

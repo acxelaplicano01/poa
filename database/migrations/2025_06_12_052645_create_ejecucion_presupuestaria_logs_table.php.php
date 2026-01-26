@@ -21,13 +21,6 @@ return new class extends Migration
                 $table->foreignId('idEjecucionPresupuestaria')->constrained('ejecucion_presupuestaria');
                 
                 // Auditoría
-                $table->foreignId('created_by')->nullable()->constrained('users');
-                $table->foreignId('updated_by')->nullable()->constrained('users');
-                $table->foreignId('deleted_by')->nullable()->constrained('users');
-                $table->foreignId('created_at')->nullable()->constrained('users');
-                $table->foreignId('updated_at')->nullable()->constrained('users');
-                $table->foreignId('deleted_at')->nullable()->constrained('users');
-
                 
                 $table->timestamps();
                 $table->softDeletes(); 
