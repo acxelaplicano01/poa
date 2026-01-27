@@ -199,7 +199,7 @@
                     <td>
                         <strong>{{ $presupuesto->recurso ?? '-' }}</strong>
                         @if($presupuesto->detalle_tecnico)
-                            <br><small style="color: #555; font-size: 8pt;">{{ $presupuesto->detalle_tecnico }}</small>
+                            <br><small style="color: #050505; font-size: 8pt;">{{ $presupuesto->detalle_tecnico }}</small>
                         @endif
                     </td>
                     <td class="text-right">L {{ number_format($montoUnitario, 2) }}</td>
@@ -246,10 +246,6 @@
                 UNAH - CURLP
             </div>
         </div>
-    </div>
-
-    <div class="footer">
-        <p>Página 1 de 1 </p>
     </div>
 </body>
 </html>

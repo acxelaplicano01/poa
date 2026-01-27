@@ -513,6 +513,16 @@ return [
                         ->setItems([])
                         ->setEndBlock('acta-entrega-pdf'),
 
+                    RkRoute::make('orden-combustible-pdf')
+                        ->setParentId('requisiciones')
+                        ->setAccessPermission('acceso-planificacion')
+                        ->setUrlMethod('get')
+                        ->setUrl('orden-combustible/{detalleId}/pdf')
+                        ->setUrlController('App\\Http\\Controllers\\OrdenCombustiblePdfController@show')
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
+                        ->setItems([])
+                        ->setEndBlock('orden-combustible-pdf'),
+
                     RkRoute::make('consolidado')
                         ->setParentId('planificacion')
                         ->setAccessPermission('acceso-planificacion')
