@@ -242,6 +242,14 @@ return [
                         ->setItems([])
                         ->setEndBlock('procesoscompras'),
 
+                    RkNavigation::make('tipos-proceso-compra')
+                        ->setParentId('config-procesos')
+                        ->setDescription('Gestión de tipos de proceso de compra')
+                        ->setLabel('Tipos proceso compra')
+                        ->setHeroIcon('tag')
+                        ->setItems([])
+                        ->setEndBlock('tipos-proceso-compra'),
+
                     RkNavigation::make('estados-requisicion')
                         ->setParentId('config-procesos')
                         ->setDescription('Gestión de estados de requisición')

@@ -80,11 +80,22 @@ class AdministrarRequisiciones extends Component
             'fecha_requerido' => $fechaRequerido ? $fechaRequerido->format('M d, Y') : '',
             'estado' => $requisicion->estado->estado ?? '-',
             'monto_total' => $monto_total,
+            'tipo_proceso' => $this->obtenerTipoProcesoSugerido($monto_total),
         ];
         $this->detalleRecursos = $recursos;
         $this->showDetalleModal = true;
         $this->observacionModal = '';
         
+    }
+
+    private function obtenerTipoProcesoSugerido($monto)
+    {
+        $tipo = \App\Models\ProcesoCompras\TipoProcesoCompra::obtenerPorMonto($monto);
+        return $tipo ? [
+            'nombre' => $tipo->nombre,
+            'monto_minimo' => $tipo->monto_minimo,
+            'monto_maximo' => $tipo->monto_maximo,
+        ] : null;
     }
 
     public function cerrarDetalleModal()

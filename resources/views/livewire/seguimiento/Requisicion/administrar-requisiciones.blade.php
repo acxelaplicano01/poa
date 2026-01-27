@@ -72,8 +72,23 @@ $estado = $detalleRequisicion['estado'] ?? '';
                         @endforelse
                     </tbody>
                 </table>
-                <div class="text-right font-semibold mt-2 text-zinc-900 dark:text-zinc-100">
-                    Monto total: L {{ number_format($detalleRequisicion['monto_total'] ?? 0, 2) }}
+                <div class="border-t border-zinc-200 dark:border-zinc-700 pt-3 mt-3">
+                    <div class="flex justify-between items-center">
+                        <div class="text-right font-semibold text-zinc-900 dark:text-zinc-100">
+                            Monto total: L {{ number_format($detalleRequisicion['monto_total'] ?? 0, 2) }}
+                        </div>
+                        @if(isset($detalleRequisicion['tipo_proceso']))
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-zinc-600 dark:text-zinc-400">Tipo de proceso sugerido:</span>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                                    {{ ($detalleRequisicion['monto_total'] ?? 0) < 10000 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 
+                                       (($detalleRequisicion['monto_total'] ?? 0) < 50000 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 
+                                       'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300') }}">
+                                    {{ $detalleRequisicion['tipo_proceso']['nombre'] }}
+                                </span>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </x-slot>

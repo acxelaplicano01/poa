@@ -302,6 +302,22 @@ return [
                         ->setItems([])
                         ->setEndBlock('procesoscompras'),
 
+                    RkRoute::make('tipos-proceso-compra')
+                        ->setParentId('configuracion')
+                        ->setAccessPermission('acceso-configuracion')
+                        ->setPermissions([
+                            'configuracion.tipos-proceso-compra.ver',
+                            'configuracion.tipos-proceso-compra.crear',
+                            'configuracion.tipos-proceso-compra.editar',
+                            'configuracion.tipos-proceso-compra.eliminar',
+                            'acceso-configuracion',
+                        ])
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\Livewire\ProcesCompra\TipoProcesoCompraComponent')
+                        ->setRoles(['super_admin', 'admin'])
+                        ->setItems([])
+                        ->setEndBlock('tipos-proceso-compra'),
+
                     RkRoute::make('recursos')
                         ->setParentId('configuracion')
                         ->setAccessPermission('acceso-configuracion')
