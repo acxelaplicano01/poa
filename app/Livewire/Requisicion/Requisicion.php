@@ -573,20 +573,67 @@ class Requisicion extends Component
 
         $idDetalleRequisicion = null;
 
-        $requisicion = Requisicion::where('idPoa', $this->idPoa)
+        // Buscar o crear requisición
+        $requisicion = RequisicionModel::where('idPoa', $this->idPoa)
             ->where('created_by', \Auth::id())
             ->orderByDesc('id')
             ->first();
 
+        // Si no existe requisición, crear una nueva
+        if (!$requisicion) {
+            $poa = Poa::find($this->idPoa);
+            if ($poa) {
+                // Obtener el departamento del usuario actual
+                $empleadoDepto = \DB::table('empleado_deptos')
+                    ->where('idEmpleado', \Auth::id())
+                    ->whereNull('deleted_at')
+                    ->first();
+
+                $idDepartamento = $empleadoDepto ? $empleadoDepto->idDepto : (\Auth::user()->idDepartamento ?? null);
+
+                if (!$idDepartamento) {
+                    throw new \Exception('No se pudo determinar el departamento del usuario.');
+                }
+
+                // Generar correlativo siguiendo la misma lógica del módulo de requisiciones
+                $departamento = \App\Models\Departamento\Departamento::find($idDepartamento);
+                $tipoDepto = $departamento->tipo ?? '';
+                $nombreDepto = $departamento->name ?? '';
+                $ultimo = RequisicionModel::orderBy('id', 'desc')->first();
+                $numero = $ultimo ? $ultimo->id + 1 : 1;
+                $anio = $poa->anio ?? now()->format('Y');
+                $correlativo = \App\Helpers\CorrelativoHelper::generarCorrelativo($tipoDepto, $nombreDepto, $anio, $numero);
+
+                // Estado inicial
+                $estadoInicial = $this->getEstadoPresentadoId();
+
+                $requisicion = RequisicionModel::create([
+                    'correlativo' => $correlativo,
+                    'descripcion' => $descripcion,
+                    'observacion' => $observacion,
+                    'idPoa' => $this->idPoa,
+                    'idDepartamento' => $idDepartamento,
+                    'idEstado' => $estadoInicial,
+                    'fechaSolicitud' => now(),
+                    'fechaRequerido' => now(),
+                    'created_by' => \Auth::id(),
+                ]);
+            }
+        }
+
         if ($requisicion) {
+            // Buscar detalle existente
             $detalle = DetalleRequisicion::where('idRequisicion', $requisicion->id)
                 ->where('idPresupuesto', $this->ordenCombustibleRecursoId)
                 ->orderByDesc('id')
                 ->first();
+            
             if ($detalle) {
                 $idDetalleRequisicion = $detalle->id;
             }
         }
+
+        // Si no se encontró detalle, intentar buscar por POA y Presupuesto
         if (!$idDetalleRequisicion) {
             $detalle = DetalleRequisicion::where('idPoa', $this->idPoa)
                 ->where('idPresupuesto', $this->ordenCombustibleRecursoId)
@@ -596,13 +643,15 @@ class Requisicion extends Component
                 $idDetalleRequisicion = $detalle->id;
             }
         }
-        if (!$idDetalleRequisicion) {
+
+        // Si aún no existe detalle, crear uno nuevo
+        if (!$idDetalleRequisicion && $requisicion) {
             $presupuesto = Presupuesto::find($this->ordenCombustibleRecursoId);
             $idRecurso = $presupuesto ? ($presupuesto->idHistorico ?? $presupuesto->idrecurso ?? null) : null;
             $idUnidadMedida = $presupuesto ? ($presupuesto->idunidad ?? $presupuesto->idUnidadMedida ?? null) : null;
 
-            if ($requisicion && $idRecurso && $idUnidadMedida) {
-                $detalleNuevo = \App\Models\Requisicion\DetalleRequisicion::create([
+            if ($idRecurso && $idUnidadMedida) {
+                $detalleNuevo = DetalleRequisicion::create([
                     'idRequisicion' => $requisicion->id,
                     'idPoa' => $this->idPoa,
                     'idPresupuesto' => $this->ordenCombustibleRecursoId,
@@ -613,12 +662,12 @@ class Requisicion extends Component
                     'created_by' => \Auth::id(),
                 ]);
                 $idDetalleRequisicion = $detalleNuevo->id;
-
+            }
         }
 
         $this->ordenCombustibleData['idDetalleRequisicion'] = $idDetalleRequisicion;
 
-        $ultimo = Requisicion::orderBy('id', 'desc')->first();
+        $ultimo = RequisicionModel::orderBy('id', 'desc')->first();
         $numero = $ultimo ? ($ultimo->id + 1) : 1;
         $anio = now()->format('Y');
         $correlativo = $numero . '-' . $anio;
@@ -660,5 +709,4 @@ class Requisicion extends Component
         $this->showSumarioModal = true;
         session()->flash('message', 'Orden de combustible creada correctamente.');
     }
-}
 }
