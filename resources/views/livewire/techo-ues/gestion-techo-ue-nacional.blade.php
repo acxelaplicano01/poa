@@ -148,6 +148,17 @@
                                 <span class="sm:hidden">Timeline</span>
                             </span>
                         </button>
+                        <button 
+                            wire:click="setActiveTab('tipos-proceso')"
+                            class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 flex-shrink-0 {{ $activeTab === 'tipos-proceso' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300' }}">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                </svg>
+                                <span class="hidden sm:inline">Normas de ejecución</span>
+                                <span class="sm:hidden">Tipos</span>
+                            </span>
+                        </button>
                     </nav>
                 </div>
 
@@ -1074,6 +1085,120 @@
                                 </div>
                             @endif
                         </div>
+                    @elseif($activeTab === 'tipos-proceso')
+                        <!-- Tipos de Proceso de Compras -->
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                                        Normas de ejecución presupuestaria - POA {{ $poa->anio }}
+                                    </h3>
+                                    <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                                        Configure las normas de ejecución presupuestaria y sus rangos de montos para este POA
+                                    </p>
+                                </div>
+                                @can('consola.asignacionnacionalpresupuestaria.crear')
+                                <button wire:click="createTipoProceso" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Crear Tipo de Proceso
+                                </button>
+                                @endcan
+                            </div>
+
+                            @php
+                                $tiposProceso = \App\Models\ProcesoCompras\TipoProcesoCompra::where('idPoa', $idPoa)->orderBy('monto_minimo')->get();
+                            @endphp
+
+                            @if($tiposProceso->count() > 0)
+                                <div class="bg-white dark:bg-zinc-800 shadow overflow-hidden rounded-lg">
+                                    <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+                                        <thead class="bg-zinc-50 dark:bg-zinc-700">
+                                            <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Nombre
+                                                </th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Descripción
+                                                </th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Monto Mínimo
+                                                </th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Monto Máximo
+                                                </th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Estado
+                                                </th>
+                                                <th class="px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Acciones
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700">
+                                            @foreach($tiposProceso as $tipo)
+                                                <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700">
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                                                        {{ $tipo->nombre }}
+                                                    </td>
+                                                    <td class="px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400">
+                                                        {{ $tipo->descripcion ?? '-' }}
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
+                                                        ${{ number_format($tipo->monto_minimo, 2) }}
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
+                                                        {{ $tipo->monto_maximo ? '$' . number_format($tipo->monto_maximo, 2) : 'Sin límite' }}
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        @if($tipo->activo)
+                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                                                                Activo
+                                                            </span>
+                                                        @else
+                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                                                                Inactivo
+                                                            </span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                        @can('consola.asignacionnacionalpresupuestaria.editar')
+                                                        <button wire:click="editTipoProceso({{ $tipo->id }})" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">
+                                                            Editar
+                                                        </button>
+                                                        @endcan
+                                                        @can('consola.asignacionnacionalpresupuestaria.eliminar')
+                                                        <button wire:click="deleteTipoProceso({{ $tipo->id }})" wire:confirm="¿Está seguro de eliminar este tipo de proceso?" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                                            Eliminar
+                                                        </button>
+                                                        @endcan
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="text-center py-12">
+                                    <svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">No hay tipos de proceso configurados</h3>
+                                    <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Comienza creando el primer tipo de proceso de compras para este POA.</p>
+                                    @can('consola.asignacionnacionalpresupuestaria.crear')
+                                    <div class="mt-6">
+                                        <button wire:click="createTipoProceso" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Crear Primer Tipo de Proceso
+                                        </button>
+                                    </div>
+                                    @endcan
+                                </div>
+                            @endif
+                        </div>
                     @endif
                 </div>
             </div>
@@ -1085,5 +1210,70 @@
 
     <!-- Modal de confirmación para eliminar -->
     @include('livewire.techo-ues.deleteConfirmation')
+
+    <!-- Modal para Tipo Proceso de Compras -->
+    @if($showTipoProcesoModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-zinc-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="relative inline-block align-bottom bg-white dark:bg-zinc-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="absolute top-0 right-0 pt-4 pr-4">
+                    <button type="button" wire:click="closeTipoProcesoModal" class="bg-white dark:bg-zinc-800 rounded-md text-zinc-400 hover:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <span class="sr-only">Cerrar</span>
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                        <h3 class="text-lg leading-6 font-medium text-zinc-900 dark:text-zinc-100" id="modal-title">
+                            {{ $isEditingTipoProceso ? 'Editar' : 'Crear' }} Tipo de Proceso de Compras
+                        </h3>
+                        <div class="mt-6 space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Nombre</label>
+                                <input type="text" wire:model="tipoProcesoNombre" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                @error('tipoProcesoNombre') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Descripción</label>
+                                <textarea wire:model="tipoProcesoDescripcion" rows="3" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></textarea>
+                                @error('tipoProcesoDescripcion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Monto Mínimo</label>
+                                    <input type="number" step="0.01" wire:model="tipoProcesoMontoMinimo" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    @error('tipoProcesoMontoMinimo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Monto Máximo (opcional)</label>
+                                    <input type="number" step="0.01" wire:model="tipoProcesoMontoMaximo" class="mt-1 block w-full rounded-md border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    @error('tipoProcesoMontoMaximo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" wire:model="tipoProcesoActivo" id="tipoProcesoActivo" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-zinc-300 rounded">
+                                <label for="tipoProcesoActivo" class="ml-2 block text-sm text-zinc-900 dark:text-zinc-100">
+                                    Activo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button type="button" wire:click="saveTipoProceso" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        {{ $isEditingTipoProceso ? 'Actualizar' : 'Guardar' }}
+                    </button>
+                    <button type="button" wire:click="closeTipoProcesoModal" class="mt-3 w-full inline-flex justify-center rounded-md border border-zinc-300 dark:border-zinc-600 shadow-sm px-4 py-2 bg-white dark:bg-zinc-700 text-base font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
 </div>

@@ -3,6 +3,7 @@
 namespace App\Models\ProcesoCompras;
 
 use App\Models\BaseModel;
+use App\Models\Poa\Poa;
 
 class TipoProcesoCompra extends BaseModel
 {
@@ -14,6 +15,7 @@ class TipoProcesoCompra extends BaseModel
         'monto_minimo',
         'monto_maximo',
         'activo',
+        'idPoa',
     ];
 
     protected $casts = [
@@ -23,11 +25,19 @@ class TipoProcesoCompra extends BaseModel
     ];
 
     /**
-     * Determinar el tipo de proceso según el monto
+     * Relación con POA
      */
-    public static function obtenerPorMonto($monto)
+    public function poa()
     {
-        return self::where('activo', true)
+        return $this->belongsTo(Poa::class, 'idPoa');
+    }
+
+    /**
+     * Determinar el tipo de proceso según el monto y POA
+     */
+    public static function obtenerPorMonto($monto, $idPoa = null)
+    {
+        $query = self::where('activo', true)
             ->where(function ($query) use ($monto) {
                 $query->where(function ($q) use ($monto) {
                     $q->where('monto_minimo', '<=', $monto)
@@ -36,9 +46,13 @@ class TipoProcesoCompra extends BaseModel
                                    ->orWhereNull('monto_maximo');
                       });
                 });
-            })
-            ->orderBy('monto_minimo', 'desc')
-            ->first();
+            });
+        
+        if ($idPoa) {
+            $query->where('idPoa', $idPoa);
+        }
+        
+        return $query->orderBy('monto_minimo', 'desc')->first();
     }
 
     /**
@@ -47,6 +61,14 @@ class TipoProcesoCompra extends BaseModel
     public function scopeActivos($query)
     {
         return $query->where('activo', true);
+    }
+    
+    /**
+     * Scope para filtrar por POA
+     */
+    public function scopePorPoa($query, $idPoa)
+    {
+        return $query->where('idPoa', $idPoa);
     }
 
     /**
