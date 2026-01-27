@@ -16,7 +16,7 @@ return new class extends Migration
                 $table->id();
                 $table->string('nombre_proceso');
                 $table->decimal('monto_total', 15, 2)->default(0);
-                $table->foreignId('idTipoProcesoCompra')->nullable()->constrained('tipo_proceso_compra')->onDelete('set null');
+                $table->unsignedBigInteger('idTipoProcesoCompra')->nullable();
                 $table->foreignId('idUE')->constrained('unidad_ejecutora');
                 $table->timestamps();
                 $table->softDeletes();
