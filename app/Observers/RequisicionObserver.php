@@ -59,14 +59,14 @@ class RequisicionObserver
         try {
             // Crear ejecución presupuestaria con estado "Parcialmente ejecutado" (ID: 1)
             $ejecucion = EjecucionPresupuestaria::create([
-                'observacion' => 'Ejecución iniciada automáticamente al pasar requisición a proceso de compra',
+                'observacion' => 'Sin observación',
                 'fechaInicioEjecucion' => now(),
                 'idRequisicion' => $requisicion->id,
                 'idEstadoEjecucion' => 1, // Parcialmente ejecutado
                 'created_by' => Auth::id(),
             ]);
 
-            Log::info('Ejecución presupuestaria creada desde Observer', [
+            Log::info('Ejecución presupuestaria creada', [
                 'requisicion_id' => $requisicion->id,
                 'ejecucion_id' => $ejecucion->id
             ]);
@@ -93,7 +93,7 @@ class RequisicionObserver
             }
 
         } catch (\Exception $e) {
-            Log::error('Error al crear ejecución presupuestaria en Observer', [
+            Log::error('Error al crear ejecución presupuestaria', [
                 'requisicion_id' => $requisicion->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()

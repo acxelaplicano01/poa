@@ -59,7 +59,7 @@ class Requisicion extends Component
 
         // obtener el departamento real de la requisición
         $departamento = $this->idDepartamento ? Departamento::find($this->idDepartamento) : null;
-        $ultimo = Requisicion::orderByDesc('id')->first();
+        $ultimo = \App\Models\Requisicion\Requisicion::orderBy('id', 'desc')->first();
         $numero = $ultimo ? $ultimo->id + 1 : 1;
         $tipoDepto = $departamento->tipo ?? '';
         $nombreDepto = $departamento->name ?? '';
@@ -88,8 +88,14 @@ class Requisicion extends Component
                 'fechaRequerido' => $this->fechaRequerido,
             ];
             //dd($data);
-            $requisicion = Requisicion::create($data);
-            
+
+            // Usa el modelo correcto para crear la requisición
+            $requisicion = \App\Models\Requisicion\Requisicion::create($data);
+
+            if (!$requisicion) {
+                throw new \Exception('No se pudo crear la requisición.');
+            }
+
             foreach ($this->recursosSeleccionados as $recurso) {
                 $presupuesto = Presupuesto::find($recurso['id']);
                 if ($presupuesto) {
@@ -612,7 +618,7 @@ class Requisicion extends Component
 
         $this->ordenCombustibleData['idDetalleRequisicion'] = $idDetalleRequisicion;
 
-        $ultimo = \DB::table('orden_combustible')->orderByDesc('id')->first();
+        $ultimo = Requisicion::orderBy('id', 'desc')->first();
         $numero = $ultimo ? ($ultimo->id + 1) : 1;
         $anio = now()->format('Y');
         $correlativo = $numero . '-' . $anio;

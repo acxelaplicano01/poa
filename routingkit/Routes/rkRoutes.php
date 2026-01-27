@@ -513,6 +513,26 @@ return [
                         ->setItems([])
                         ->setEndBlock('acta-entrega-pdf'),
 
+                    RkRoute::make('acta-entrega-intermedia-generar')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setUrlMethod('post')
+                        ->setUrl('acta-entrega-intermedia/generar/{idRequisicion}')
+                        ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@generarIntermedia')
+                        ->setRoles(['super_admin', 'admin'])
+                        ->setItems([])
+                        ->setEndBlock('acta-entrega-intermedia-generar'),
+
+                    RkRoute::make('acta-entrega-intermedia-pdf')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setUrlMethod('get')
+                        ->setUrl('acta-entrega-intermedia/{requisicionId}/descargar')
+                        ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarIntermediaPdf')
+                        ->setRoles(['super_admin', 'admin'])
+                        ->setItems([])
+                        ->setEndBlock('acta-entrega-intermedia-pdf'),
+
                     RkRoute::make('orden-combustible-pdf')
                         ->setParentId('requisiciones')
                         ->setAccessPermission('acceso-planificacion')

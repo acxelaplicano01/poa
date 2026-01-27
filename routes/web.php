@@ -219,3 +219,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 }); */
 
 // Route::get('/consola/pei/areas', \App\Livewire\Consola\Pei\Areas\Area::class)->name('areas');
+
+Route::post('/acta-entrega-intermedia/generar/{idRequisicion}', [App\Http\Controllers\ActaEntregaController::class, 'generarIntermedia'])
+    ->name('acta-entrega-intermedia.generar');
