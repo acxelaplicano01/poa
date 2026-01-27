@@ -263,15 +263,28 @@
             <h1 class="text-2xl font-bold text-zinc-800 dark:text-zinc-100">Entrega de Recursos</h1>
             <div class="flex gap-2">
                 @if(($requisicion->estado->estado ?? '') === 'Finalizado')
-                    <a href="{{ route('acta-entrega.pdf', $requisicionId) }}" 
+                    <a href="{{ route('acta-entrega-pdf', $requisicionId) }}" 
                         target="_blank"
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        Descargar Acta PDF
+                        Descargar Acta Final
                     </a>
                 @endif
+
+                {{-- Botón para generar acta intermedia si hay recursos entregados --}}
+                @if(collect($recursosParaEntregar)->where('entregado', '>', 0)->count() > 0)
+                    <a href="{{ route('acta-entrega-intermedia-pdf', $requisicionId) }}" 
+                        target="_blank"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Acta Intermedia
+                    </a>
+                @endif
+
                 <a href="{{ route('administrar-requisiciones') }}" 
                     class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-zinc-600 text-white hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">

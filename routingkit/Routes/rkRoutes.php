@@ -469,7 +469,7 @@ return [
                             ->setAccessPermission('acceso-planificacion')
                             ->setUrlMethod('get')
                             ->setUrlController('App\Livewire\Requisicion\SeguimientoRequisicion')
-                            ->setRoles(['super_admin'])
+                            ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                             ->setItems([])
                             ->setEndBlock('mis-requisiciones'),
 
@@ -485,7 +485,7 @@ return [
                             ])
                             ->setUrlMethod('get')
                             ->setUrlController('App\Livewire\Requisicion\Requisicion')
-                            ->setRoles(['super_admin'])
+                            ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                             ->setItems([])
                             ->setEndBlock('requisicion'),
 
@@ -494,7 +494,7 @@ return [
                             ->setAccessPermission('acceso-planificacion')
                             ->setUrlMethod('get')
                             ->setUrlController('App\\Http\\Controllers\\RequisicionController@descargarPdf')
-                            ->setRoles(['super_admin'])
+                            ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                             ->setItems([])
                             ->setEndBlock('requisicion-pdf'),
                     ])
@@ -505,7 +505,7 @@ return [
                         ->setAccessPermission('administrar.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Requisicion\AdministrarRequisiciones')
-                        ->setRoles(['super_admin'])
+                        ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
                         ->setEndBlock('administrar-requisiciones'),
 
@@ -515,7 +515,7 @@ return [
                         ->setUrlMethod('get')
                         ->setUrl('entregarecursos/{requisicionId}')
                         ->setUrlController('App\Livewire\Requisicion\EntregaRecursos')
-                        ->setRoles(['super_admin'])
+                        ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
                         ->setEndBlock('entregarecursos'),
                     
@@ -525,9 +525,39 @@ return [
                         ->setUrlMethod('get')
                         ->setUrl('acta-entrega/{requisicionId}/descargar')
                         ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarPdf')
-                        ->setRoles(['super_admin'])
+                        ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
                         ->setEndBlock('acta-entrega-pdf'),
+
+                    RkRoute::make('acta-entrega-intermedia-generar')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setUrlMethod('post')
+                        ->setUrl('acta-entrega-intermedia/generar/{idRequisicion}')
+                        ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@generarIntermedia')
+                        ->setRoles(['super_admin', 'admin'])
+                        ->setItems([])
+                        ->setEndBlock('acta-entrega-intermedia-generar'),
+
+                    RkRoute::make('acta-entrega-intermedia-pdf')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setUrlMethod('get')
+                        ->setUrl('acta-entrega-intermedia/{requisicionId}/descargar')
+                        ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarIntermediaPdf')
+                        ->setRoles(['super_admin', 'admin'])
+                        ->setItems([])
+                        ->setEndBlock('acta-entrega-intermedia-pdf'),
+
+                    RkRoute::make('orden-combustible-pdf')
+                        ->setParentId('requisiciones')
+                        ->setAccessPermission('acceso-planificacion')
+                        ->setUrlMethod('get')
+                        ->setUrl('orden-combustible/{detalleId}/pdf')
+                        ->setUrlController('App\\Http\\Controllers\\OrdenCombustiblePdfController@show')
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
+                        ->setItems([])
+                        ->setEndBlock('orden-combustible-pdf'),
 
                     RkRoute::make('consolidado')
                         ->setParentId('planificacion')

@@ -27,15 +27,15 @@
                     | <span class="font-semibold px-3 py-1 rounded-full text-xs"
                         @php
 $estado = $detalleRequisicion['estado'] ?? '';
-                            $color = match($estado) {
-                                'Presentado' => 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200',
-                                'Recibido' => 'bg-cyan-200 text-cyan-800 dark:bg-cyan-700 dark:text-cyan-100',
-                                'En Proceso de Compra' => 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100',
-                                'Aprobado' => 'bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100',
-                                'Rechazado' => 'bg-red-200 text-red-800 dark:bg-red-700 dark:text-red-100',
-                                default => 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200',
-                            }; @endphp
-                        class="{{ $color }}">Estado: {{ $estado }}
+                        $color = match($estado) {
+                            'Presentado' => 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200',
+                            'Recibido' => 'bg-cyan-200 text-cyan-800 dark:bg-cyan-700 dark:text-cyan-100',
+                            'En Proceso de Compra' => 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100',
+                            'Aprobado' => 'bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100',
+                            'Rechazado' => 'bg-red-200 text-red-800 dark:bg-red-700 dark:text-red-100',
+                            default => 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200',
+                        }; @endphp
+                    class="{{ $color }}">Estado: {{ $estado }}
                 </div>
             </div>
             <div
@@ -48,21 +48,51 @@ $estado = $detalleRequisicion['estado'] ?? '';
                             <th class="px-4 py-2 text-center text-xs font-semibold">Cantidad</th>
                             <th class="px-4 py-2 text-center text-xs font-semibold">Precio unitario</th>
                             <th class="px-4 py-2 text-center text-xs font-semibold">Total</th>
+                            <th class="px-4 py-2 text-center text-xs font-semibold">Acción</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($detalleRecursos as $detalle)
                             <tr class="bg-white dark:bg-zinc-900">
                                 <td class="px-4 py-2 align-top whitespace-nowrap text-zinc-900 dark:text-zinc-100">
-                                    {{ $detalle['recurso'] }}</td>
+                                    {{ $detalle['recurso'] }}
+                                </td>
                                 <td class="px-4 py-2 align-top text-zinc-900 dark:text-zinc-100">
-                                    {{ $detalle['detalle_tecnico'] }}</td>
+                                    {{ $detalle['detalle_tecnico'] }}
+                                </td>
                                 <td class="px-4 py-2 align-top text-center text-zinc-900 dark:text-zinc-100">
-                                    {{ $detalle['cantidad'] }}</td>
+                                    {{ $detalle['cantidad'] }}
+                                </td>
                                 <td class="px-4 py-2 align-top text-center text-zinc-900 dark:text-zinc-100">L
-                                    {{ number_format($detalle['precio_unitario'], 2) }}</td>
+                                    {{ number_format($detalle['precio_unitario'], 2) }}
+                                </td>
                                 <td class="px-4 py-2 align-top text-center text-zinc-900 dark:text-zinc-100">L
-                                    {{ number_format($detalle['total'], 2) }}</td>
+                                    {{ number_format($detalle['total'], 2) }}
+                                </td>
+                                <td class="px-4 py-2 align-top text-center">
+                                    @if(
+                                        Str::of(strtolower($detalle['recurso'] ?? ''))->contains('gasolina') ||
+                                        Str::of(strtolower($detalle['recurso'] ?? ''))->contains('diesel')
+                                    )
+                                        @php
+                                            // Asegura que el id esté presente, ya sea como idDetalleRequisicion o id
+                                            $detalleId = $detalle['idDetalleRequisicion'] ?? $detalle['id'] ?? null;
+                                        @endphp
+                                        @if($detalleId)
+                                            <a href="{{ route('orden-combustible-pdf', ['detalleId' => $detalleId]) }}"
+                                                target="_blank"
+                                                title="Descargar Orden de Combustible PDF"
+                                                class="inline-flex items-center gap-1 px-2 py-1 rounded bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-xs font-semibold transition">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                                </svg>
+                                                Orden Combustible
+                                            </a>
+                                        @endif
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr>

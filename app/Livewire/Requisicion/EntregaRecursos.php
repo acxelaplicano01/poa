@@ -191,15 +191,11 @@ class EntregaRecursos extends Component
                 return;
             }
 
-            // Verificar que el presupuesto existe
             if (!$detalleRequisicion->idPresupuesto) {
                 throw new \Exception('El detalle de requisición no tiene un presupuesto asociado.');
             }
-
-            // Obtener la requisición
             $requisicion = Requisicion::findOrFail($this->requisicionId);
 
-            // Buscar o crear la ejecución presupuestaria para esta requisición
             $ejecucionCreada = false;
             $ejecucionPresupuestaria = EjecucionPresupuestaria::where('idRequisicion', $requisicion->id)->first();
             
@@ -268,7 +264,6 @@ class EntregaRecursos extends Component
                 ]);
             }
 
-            // Verificar si todos los recursos han sido ejecutados completamente
             $this->verificarEjecucionCompleta($requisicion, $ejecucionPresupuestaria);
 
             DB::commit();
@@ -334,7 +329,7 @@ class EntregaRecursos extends Component
 
             // Crear log
             EjecucionPresupuestariaLog::create([
-                'observacion' => 'Observación actualizada por el usuario',
+                'observacion' => 'Sin observación',
                 'log' => 'Observación de ejecución modificada',
                 'idEjecucionPresupuestaria' => $ejecucionPresupuestaria->id,
                 'created_by' => Auth::id(),
@@ -379,7 +374,6 @@ class EntregaRecursos extends Component
             }
         }
 
-        // Si todos los recursos están completamente ejecutados, cambiar estado
         if ($todosEjecutados) {
             $ejecucionPresupuestaria->update([
                 'idEstadoEjecucion' => 2, // Ejecutado
@@ -391,7 +385,7 @@ class EntregaRecursos extends Component
             // Crear log
             try {
                 \App\Models\EjecucionPresupuestaria\EjecucionPresupuestariaLog::create([
-                    'observacion' => 'Log generado por el sistema',
+                    'observacion' => 'Sin observación',
                     'log' => 'Ejecución modificada - Estado cambiado a Ejecutado',
                     'idEjecucionPresupuestaria' => $ejecucionPresupuestaria->id,
                     'created_by' => Auth::id(),
@@ -554,11 +548,9 @@ class EntregaRecursos extends Component
                 'correlativo' => $correlativo
             ]);
 
-            // Crear detalles del acta para cada detalle de ejecución
             $detallesRequisicion = DetalleRequisicion::where('idRequisicion', $requisicion->id)->get();
             
             foreach ($detallesRequisicion as $detalleRequisicion) {
-                // Obtener todos los detalles de ejecución de este detalle de requisición
                 $detallesEjecucion = DetalleEjecucionPresupuestaria::where('idDetalleRequisicion', $detalleRequisicion->id)
                     ->where('idEjecucion', $ejecucionPresupuestaria->id)
                     ->get();

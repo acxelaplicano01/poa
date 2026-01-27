@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acta de Entrega</title>
+    <title>Acta de Entrega Intermedia</title>
     <style>
         @page {
             margin: 2cm 1.5cm;
@@ -247,5 +247,6 @@
             </div>
         </div>
     </div>
+
 </body>
 </html>

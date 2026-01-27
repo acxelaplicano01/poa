@@ -72,6 +72,7 @@ class AdministrarRequisiciones extends Component
                 'cantidad' => $detalle->cantidad ?? '-',
                 'precio_unitario' => $presupuesto->costounitario ?? 0,
                 'total' => $total,
+                'idDetalleRequisicion' => $detalle->id,
             ];
         }
 
@@ -217,10 +218,8 @@ class AdministrarRequisiciones extends Component
                 throw new \Exception('No se encontró el estado "En Proceso de Compra"');
             }
 
-            // Guardar la observación anterior
             $observacionAnterior = $requisicion->observacion;
             
-            // Concatenar la nueva observación si existe
             $nuevaObservacion = $observacionAnterior;
             if ($this->observacionModal) {
                 $nuevaObservacion = $observacionAnterior 
@@ -228,7 +227,6 @@ class AdministrarRequisiciones extends Component
                     : $this->observacionModal;
             }
 
-            // Actualizar la requisición
             $requisicion->update([
                 'idEstado' => $estadoProcesoCompra->id,
                 'observacion' => $nuevaObservacion,

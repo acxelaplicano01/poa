@@ -5,8 +5,8 @@ namespace App\Livewire\Requisicion;
 use App\Models\Requisicion\Requisicion as RequisicionModel;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Requisicion\EstadoRequisicion;
-use App\Models\Empleado\Empleado;
-use App\Models\Empleado\EmpleadoDepto;
+use App\Models\Empleados\Empleado;
+use App\Models\Empleados\EmpleadoDepto;
 use App\Models\Tareas\TareaHistorico;
 use App\Models\Presupuestos\Presupuesto;
 use App\Models\Departamento\Departamento;
@@ -57,9 +57,9 @@ class Requisicion extends Component
         $this->idDepartamento = $empleadoDepto ? $empleadoDepto->idDepto : ($user->idDepartamento ?? null);
         $this->idEstado = $this->getEstadoPresentadoId();
 
-        // Ahora sí, obtener el departamento real de la requisición
+        // obtener el departamento real de la requisición
         $departamento = $this->idDepartamento ? Departamento::find($this->idDepartamento) : null;
-        $ultimo = \App\Models\Requisicion\Requisicion::orderByDesc('id')->first();
+        $ultimo = \App\Models\Requisicion\Requisicion::orderBy('id', 'desc')->first();
         $numero = $ultimo ? $ultimo->id + 1 : 1;
         $tipoDepto = $departamento->tipo ?? '';
         $nombreDepto = $departamento->name ?? '';
@@ -88,8 +88,14 @@ class Requisicion extends Component
                 'fechaRequerido' => $this->fechaRequerido,
             ];
             //dd($data);
+
+            // Usa el modelo correcto para crear la requisición
             $requisicion = \App\Models\Requisicion\Requisicion::create($data);
-            
+
+            if (!$requisicion) {
+                throw new \Exception('No se pudo crear la requisición.');
+            }
+
             foreach ($this->recursosSeleccionados as $recurso) {
                 $presupuesto = Presupuesto::find($recurso['id']);
                 if ($presupuesto) {
@@ -167,7 +173,7 @@ class Requisicion extends Component
     public function abrirSumario()
     {
         $this->recursosSeleccionados = [];
-        // Obtener actividades y presupuestos aprobados (igual que en render)
+        // Obtener actividades y presupuestos aprobados 
         $actividades_aprobadas = Tarea::whereHas('presupuestos', function($q) {
             $q->where('cantidad', '>', 0);
         })
@@ -484,4 +490,175 @@ class Requisicion extends Component
         ])->layout($this->layout);
     }
 
+    public $showOrdenCombustibleModal = false;
+    public $ordenCombustibleRecursoId;
+    public $ordenCombustibleRecursoNombre;
+    public $ordenCombustibleData = [
+        'modelo_vehiculo' => '',
+        'placa' => '',
+        'lugar_salida' => '',
+        'lugar_destino' => '',
+        'recorrido_km' => 0,
+        'fecha_actividad' => '',
+        'responsable' => '',
+        'actividades_realizar' => '',
+    ];
+    public $empleados = [];
+
+    public function mount()
+    {
+        $this->empleados = Empleado::all();
+    }
+
+    public function abrirOrdenCombustibleModal($recursoId)
+    {
+        $recurso = collect($this->recursosSeleccionados)->firstWhere('id', $recursoId);
+        $this->ordenCombustibleRecursoId = $recursoId;
+        $this->ordenCombustibleRecursoNombre = $recurso['nombre'] ?? '';
+        $this->ordenCombustibleData = [
+            'modelo_vehiculo' => '',
+            'placa' => '',
+            'lugar_salida' => '',
+            'lugar_destino' => '',
+            'recorrido_km' => 0,
+            'fecha_actividad' => '',
+            'responsable' => '',
+            'actividades_realizar' => '',
+        ];
+        $this->showOrdenCombustibleModal = true;
+    }
+
+    public function cerrarOrdenCombustibleModal()
+    {
+        $this->showOrdenCombustibleModal = false;
+        $this->ordenCombustibleRecursoId = null;
+        $this->ordenCombustibleRecursoNombre = '';
+        $this->ordenCombustibleData = [
+            'modelo_vehiculo' => '',
+            'placa' => '',
+            'lugar_salida' => '',
+            'lugar_destino' => '',
+            'recorrido_km' => 0,
+            'fecha_actividad' => '',
+            'responsable' => '',
+            'actividades_realizar' => '',
+        ];
+    }
+
+    public function guardarOrdenCombustible()
+    {
+        $this->validate([
+            'ordenCombustibleData.modelo_vehiculo' => 'required',
+            'ordenCombustibleData.placa' => 'required',
+            'ordenCombustibleData.lugar_salida' => 'required',
+            'ordenCombustibleData.lugar_destino' => 'required',
+            'ordenCombustibleData.recorrido_km' => 'required|numeric',
+            'ordenCombustibleData.fecha_actividad' => 'required|date',
+            'ordenCombustibleData.responsable' => 'required|exists:empleados,id',
+            'ordenCombustibleData.actividades_realizar' => 'required',
+        ], [
+            'ordenCombustibleData.*.required' => 'Este campo es obligatorio.',
+        ]);
+
+        // Obtener idPoa del recurso seleccionado si no está definido
+        if (empty($this->idPoa) && $this->ordenCombustibleRecursoId) {
+            $presupuesto = Presupuesto::find($this->ordenCombustibleRecursoId);
+            if ($presupuesto && $presupuesto->idtarea) {
+                $tarea = Tarea::find($presupuesto->idtarea);
+                if ($tarea && $tarea->idPoa) {
+                    $this->idPoa = $tarea->idPoa;
+                }
+            }
+        }
+
+        $idDetalleRequisicion = null;
+
+        $requisicion = Requisicion::where('idPoa', $this->idPoa)
+            ->where('created_by', \Auth::id())
+            ->orderByDesc('id')
+            ->first();
+
+        if ($requisicion) {
+            $detalle = DetalleRequisicion::where('idRequisicion', $requisicion->id)
+                ->where('idPresupuesto', $this->ordenCombustibleRecursoId)
+                ->orderByDesc('id')
+                ->first();
+            if ($detalle) {
+                $idDetalleRequisicion = $detalle->id;
+            }
+        }
+        if (!$idDetalleRequisicion) {
+            $detalle = DetalleRequisicion::where('idPoa', $this->idPoa)
+                ->where('idPresupuesto', $this->ordenCombustibleRecursoId)
+                ->orderByDesc('id')
+                ->first();
+            if ($detalle) {
+                $idDetalleRequisicion = $detalle->id;
+            }
+        }
+        if (!$idDetalleRequisicion) {
+            $presupuesto = Presupuesto::find($this->ordenCombustibleRecursoId);
+            $idRecurso = $presupuesto ? ($presupuesto->idHistorico ?? $presupuesto->idrecurso ?? null) : null;
+            $idUnidadMedida = $presupuesto ? ($presupuesto->idunidad ?? $presupuesto->idUnidadMedida ?? null) : null;
+
+            if ($requisicion && $idRecurso && $idUnidadMedida) {
+                $detalleNuevo = \App\Models\Requisicion\DetalleRequisicion::create([
+                    'idRequisicion' => $requisicion->id,
+                    'idPoa' => $this->idPoa,
+                    'idPresupuesto' => $this->ordenCombustibleRecursoId,
+                    'idRecurso' => $idRecurso,
+                    'cantidad' => 1,
+                    'idUnidadMedida' => $idUnidadMedida,
+                    'entregado' => false,
+                    'created_by' => \Auth::id(),
+                ]);
+                $idDetalleRequisicion = $detalleNuevo->id;
+
+        }
+
+        $this->ordenCombustibleData['idDetalleRequisicion'] = $idDetalleRequisicion;
+
+        $ultimo = Requisicion::orderBy('id', 'desc')->first();
+        $numero = $ultimo ? ($ultimo->id + 1) : 1;
+        $anio = now()->format('Y');
+        $correlativo = $numero . '-' . $anio;
+
+        if (empty($this->ordenCombustibleData['idDetalleRequisicion'])) {
+            throw new \Exception('idDetalleRequisicion null');
+        }
+
+        \DB::table('orden_combustible')->insert([
+            'correlativo' => $correlativo,
+            //'monto' => 0,
+            //'monto_en_letras' => '',
+            'monto' => $this->ordenCombustibleData['monto'],
+            'monto_en_letras' => $this->ordenCombustibleData['monto_en_letras'],
+            'modelo_vehiculo' => $this->ordenCombustibleData['modelo_vehiculo'],
+            'lugar_salida' => $this->ordenCombustibleData['lugar_salida'],
+            'lugar_destino' => $this->ordenCombustibleData['lugar_destino'],
+            'placa' => $this->ordenCombustibleData['placa'],
+            'recorrido_km' => $this->ordenCombustibleData['recorrido_km'],
+            'fecha_actividad' => $this->ordenCombustibleData['fecha_actividad'],
+            'actividades_realizar' => $this->ordenCombustibleData['actividades_realizar'],
+            'idPoa' => $this->idPoa,
+            'idDetalleRequisicion' => $this->ordenCombustibleData['idDetalleRequisicion'],
+            'idRecurso' => $this->ordenCombustibleRecursoId,
+            'responsable' => $this->ordenCombustibleData['responsable'],
+            'created_by' => \Auth::id(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        // Marcar el recurso como que ya tiene orden de combustible
+        foreach ($this->recursosSeleccionados as &$recurso) {
+            if ($recurso['id'] == $this->ordenCombustibleRecursoId) {
+                $recurso['orden_combustible_creada'] = true;
+            }
+        }
+        unset($recurso);
+
+        $this->cerrarOrdenCombustibleModal();
+        $this->showSumarioModal = true;
+        session()->flash('message', 'Orden de combustible creada correctamente.');
+    }
+}
 }
