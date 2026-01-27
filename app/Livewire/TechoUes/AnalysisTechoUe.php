@@ -8,6 +8,8 @@ use App\Models\TechoUes\TechoUe;
 use App\Models\TechoUes\TechoDepto;
 use App\Models\Poa\Poa;
 use App\Models\Presupuestos\Presupuesto;
+use App\Models\Requisicion\DetalleRequisicion;
+use App\Models\EjecucionPresupuestaria\DetalleEjecucionPresupuestaria;
 use Livewire\Attributes\Layout;
 
 #[Layout('layouts.app')]
@@ -75,6 +77,23 @@ class AnalysisTechoUe extends Component
                   ->where('idPoa', $this->idPoa);
         })->sum('total');
 
+        // Presupuesto Requerido: Total de cantidades requeridas en detalle_requisicion
+        $this->presupuestoRequerido = DetalleRequisicion::where('idPoa', $this->idPoa)
+            ->whereHas('presupuesto.tarea', function ($query) {
+                $query->where('idUE', $this->idUE);
+            })
+            ->selectRaw('SUM(cantidad * COALESCE((SELECT costounitario FROM presupuestos WHERE presupuestos.id = detalle_requisicion.idPresupuesto), 0)) as total')
+            ->value('total') ?? 0;
+
+        // Presupuesto Ejecutado: Total de montos ejecutados en detalle_ejecucion_presupuestaria
+        $this->presupuestoEjecutado = DetalleEjecucionPresupuestaria::whereHas('detalleRequisicion', function ($query) {
+                $query->where('idPoa', $this->idPoa);
+            })
+            ->whereHas('presupuesto.tarea', function ($query) {
+                $query->where('idUE', $this->idUE);
+            })
+            ->sum('monto_total_ejecutado') ?? 0;
+
         // Calcular presupuestos por fuente
         foreach ($this->techos as &$techo) {
             $techoId = $techo['id'] ?? null;
@@ -91,23 +110,46 @@ class AnalysisTechoUe extends Component
                 // Se calcula sumando presupuestos donde la tarea está asociada a esta fuente
                 $fuenteId = $techo['idFuente'] ?? null;
                 $planificado = 0;
+                $requerido = 0;
+                $ejecutado = 0;
+                
                 if ($fuenteId) {
                     $planificado = Presupuesto::whereHas('tarea', function ($query) {
                         $query->where('idUE', $this->idUE)
                               ->where('idPoa', $this->idPoa);
                     })->where('idFuente', $fuenteId)
                       ->sum('total');
+
+                    // Presupuesto Requerido por Fuente
+                    $requerido = DetalleRequisicion::where('idPoa', $this->idPoa)
+                        ->whereHas('presupuesto', function ($query) use ($fuenteId) {
+                            $query->where('idFuente', $fuenteId)
+                                  ->whereHas('tarea', function ($q) {
+                                      $q->where('idUE', $this->idUE);
+                                  });
+                        })
+                        ->selectRaw('SUM(cantidad * COALESCE((SELECT costounitario FROM presupuestos WHERE presupuestos.id = detalle_requisicion.idPresupuesto), 0)) as total')
+                        ->value('total') ?? 0;
+
+                    // Presupuesto Ejecutado por Fuente
+                    $ejecutado = DetalleEjecucionPresupuestaria::whereHas('detalleRequisicion', function ($query) {
+                            $query->where('idPoa', $this->idPoa);
+                        })
+                        ->whereHas('presupuesto', function ($query) use ($fuenteId) {
+                            $query->where('idFuente', $fuenteId)
+                                  ->whereHas('tarea', function ($q) {
+                                      $q->where('idUE', $this->idUE);
+                                  });
+                        })
+                        ->sum('monto_total_ejecutado') ?? 0;
                 }
                 
                 $techo['presupuestoAsignado'] = $asignado;
                 $techo['presupuestoPlanificado'] = $planificado;
-                $techo['presupuestoRequerido'] = 0;
-                $techo['presupuestoEjecutado'] = 0;
+                $techo['presupuestoRequerido'] = $requerido;
+                $techo['presupuestoEjecutado'] = $ejecutado;
             }
         }
-        
-        // Los otros dos valores (requerido y ejecutado) se pueden agregar cuando haya 
-        // datos reales en las tablas de requisiciones y ejecuciones presupuestarias
     }
 
     public function render()

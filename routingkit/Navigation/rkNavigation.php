@@ -107,7 +107,15 @@ return [
                 ->setDescription('Administrar solicitudes de requisiciones')
                 ->setLabel('Dar seguimiento')
                 ->setHeroIcon('chart-bar-square')
-                ->setItems([])
+                ->setItems([
+                    RkNavigation::make('entregarecursos')
+                        ->setParentId('administrar-requisiciones')
+                        ->setDescription('Entrega de recursos a las requisiciones')
+                        ->setLabel('Entrega de recursos')
+                        ->setHeroIcon('clipboard-document-check')
+                        ->setItems([])
+                        ->setEndBlock('entregarecursos'),
+                ])
                 ->setEndBlock('administrar-requisiciones'),
                 
             RkNavigation::make('consolidado')
