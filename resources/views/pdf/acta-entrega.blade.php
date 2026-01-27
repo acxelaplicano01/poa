@@ -13,47 +13,54 @@
             font-size: 10pt;
             line-height: 1.4;
         }
-        .header-container {
-            display: table;
+        .logo-row {
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 0;
+            padding-top: 0;
         }
-        .header-logo {
-            display: table-cell;
-            width: 100px;
-            vertical-align: top;
-        }
-        .header-logo img {
-            height: 80px;
+        .logo-img {
+            float: left;
+            margin-left: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+            height: 70px;
             width: auto;
+            /* Elimina cualquier espacio extra arriba */
+            display: block;
         }
         .header-text {
-            display: table-cell;
+            clear: both;
             text-align: center;
-            vertical-align: middle;
-            padding-left: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
         }
         .header-text h1 {
             font-size: 13pt;
-            margin: 0 0 5px 0;
+            margin: 0 0 2px 0;
             font-weight: bold;
+            letter-spacing: 0.5px;
         }
         .header-text h2 {
-            font-size: 11pt;
-            margin: 5px 0;
+            font-size: 12pt;
+            margin: 2px 0 6px 0;
             font-weight: bold;
+            letter-spacing: 1px;
         }
         .header-text h3 {
-            font-size: 12pt;
-            margin: 15px 0 0 0;
+            font-size: 11pt;
+            margin: 6px 0 0 0;
             font-weight: bold;
         }
+        .header-divider {
+            border-bottom: 2px solid #000;
+            margin: 10px 0 20px 0;
+        }
         .title {
-            text-align: center;
-            font-size: 11pt;
-            font-weight: bold;
-            margin: 25px 0 20px 0;
-            text-decoration: underline;
+            text-align: left;
+            font-size: 10pt;
+            font-weight: normal;
+            margin: 20px 0 15px 0;
+            text-decoration: none;
         }
         .info-section {
             margin: 20px 0;
@@ -84,7 +91,7 @@
             text-align: left;
         }
         table th {
-            background-color: #f5f5f5;
+            background-color: #ffffff;
             font-weight: bold;
             text-align: center;
         }
@@ -125,42 +132,34 @@
     </style>
 </head>
 <body>
-    <div class="header-container">
-        <div class="header-logo">
-            <img src="{{ public_path('Logo/logounah.png') }}" alt="Logo UNAH">
-        </div>
-        <div class="header-text">
-            <h1>UNIVERSIDAD NACIONAL AUTÓNOMA DE HONDURAS</h1>
-            <h2>UNAH</h2>
-            <h3>ACTA ENTREGA</h3>
-        </div>
+    <div class="logo-row" style="margin-top:0; padding-top:0;">
+        <img class="logo-img" src="{{ public_path('Logo/logounah.png') }}" alt="Logo UNAH">
+    </div>
+    <div class="header-text">
+        <h1>UNIVERSIDAD NACIONAL AUTÓNOMA DE HONDURAS</h1>
+        <h2>UNAH</h2>
+        <h3>ACTA ENTREGA</h3>
     </div>
 
-    <div class="title">
-        Según requisición {{ $requisicion->correlativo }}
-    </div>
-
-    <div class="info-section">
-        <div class="info-row">
-            <span class="info-label">Correlativo Acta:</span>
-            <span>{{ $acta->correlativo }}</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Fecha de Entrega:</span>
-            <span>{{ $acta->fecha_extendida->format('d/m/Y') }}</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Departamento:</span>
-            <span>{{ $requisicion->departamento->name ?? '-' }}</span>
-        </div>
-    </div>
-
-    <p class="content-text">
-        El suscrito administrador del Centro Regional del Litoral Pacífico <strong>HACE CONSTAR</strong> que se entrega los suministros a  
-        <strong>{{ $requisicion->creador->empleado ? trim($requisicion->creador->empleado->nombres . ' ' . $requisicion->creador->empleado->apellidos) : $requisicion->creador->name }}</strong>
+    <p class="content-text" style="text-align:left; margin-bottom: 0;">
+        El suscrito administrador del Centro Regional del Litoral Pacífico <strong>HACE CONSTAR</strong> que se entregó los suministros a:
     </p>
-
-    <p style="margin: 10px 0; font-weight: bold;">Que a continuación se detallan:</p>
+    <p class="content-text" style="text-align:left; margin-top: 0; margin-bottom: 0;">
+        <strong>
+            @if($requisicion->creador->empleado)
+                {{ trim(($requisicion->creador->empleado->nombres ?? $requisicion->creador->empleado->nombre) . ' ' . ($requisicion->creador->empleado->apellidos ?? $requisicion->creador->empleado->apellido)) }}
+            @else
+                {{ $requisicion->creador->name }}
+            @endif
+        </strong>
+    </p>
+    <br>
+    <p class="content-text" style="text-align:left; margin-top: 0; margin-bottom: 0;">
+        Según requisición #{{ $requisicion->correlativo }}
+    </p>
+    <p class="content-text" style="text-align:left; margin-top: 0;">
+        Que a continuación se detallan:
+    </p>
 
     <table>
         <thead>
@@ -194,7 +193,9 @@
                 <tr>
                     <td class="text-center">{{ $contador++ }}</td>
                     <td class="text-center">{{ number_format($cantidadTotal, 2) }}</td>
-                    <td class="text-center">{{ $presupuesto->unidadMedida->unidad ?? 'UND' }}</td>
+                    <td class="text-center">
+                        {{ $presupuesto->unidadMedida->nombre ?? $presupuesto->unidadMedida->unidad ?? 'UND' }}
+                    </td>
                     <td>
                         <strong>{{ $presupuesto->recurso ?? '-' }}</strong>
                         @if($presupuesto->detalle_tecnico)
@@ -205,7 +206,7 @@
                     <td class="text-center">{{ $factura }}</td>
                 </tr>
             @endforeach
-            <tr style="font-weight: bold; background-color: #f0f0f0;">
+            <tr style="font-weight: bold; background-color: #ffffff;">
                 <td colspan="4" class="text-right" style="font-size: 10pt;">TOTAL</td>
                 <td class="text-right" style="font-size: 10pt;">L {{ number_format($total, 2) }}</td>
                 <td></td>
@@ -230,15 +231,25 @@
         </div>
         <div class="signature-block">
             <div class="signature-line">
-                <strong>{{ $requisicion->creador->empleado ? strtoupper(trim($requisicion->creador->empleado->nombres . ' ' . $requisicion->creador->empleado->apellidos)) : strtoupper($requisicion->creador->name) }}</strong><br>
-                Coordinador de Investigación<br>
+                <strong>
+                    @if($requisicion->creador->empleado)
+                        {{ strtoupper(trim(
+                            ($requisicion->creador->empleado->nombres ?? $requisicion->creador->empleado->nombre)
+                            . ' ' .
+                            ($requisicion->creador->empleado->apellidos ?? $requisicion->creador->empleado->apellido)
+                        )) }}
+                    @else
+                        {{ strtoupper($requisicion->creador->name) }}
+                    @endif
+                </strong><br>
+                {{ $requisicion->departamento->name ?? '-' }}<br>
                 UNAH - CURLP
             </div>
         </div>
     </div>
 
     <div class="footer">
-        <p>Página 1 de 1 | Generado el {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p>Página 1 de 1 </p>
     </div>
 </body>
 </html>

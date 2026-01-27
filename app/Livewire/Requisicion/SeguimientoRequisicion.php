@@ -109,7 +109,7 @@ class SeguimientoRequisicion extends Component
         $requisicion->fechaRequerido = $this->fechaRequerido;
         $requisicion->save();
 
-        // Actualizar recursos (eliminar los que se quitaron y actualizar cantidades)
+        // Actualizar recursos 
         $idsSeleccionados = array_column($this->recursosSeleccionados, 'id');
         // Eliminar los recursos que ya no están
         $requisicion->detalleRequisiciones()->whereNotIn('id', $idsSeleccionados)->delete();
