@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tipo_proceso_compra', function (Blueprint $table) {
-            $table->foreignId('idPoa')->nullable()->after('id')->constrained('poas')->onDelete('cascade');
+        Schema::table('procesos_compras', function (Blueprint $table) {
+            //
         });
     }
 
@@ -21,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tipo_proceso_compra', function (Blueprint $table) {
-            $table->dropForeign(['idPoa']);
-            $table->dropColumn('idPoa');
+        Schema::table('procesos_compras', function (Blueprint $table) {
+            //
         });
     }
 };

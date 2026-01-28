@@ -52,6 +52,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('actividads');
+        // No hacer nada, se elimina en la migración de poa_deptos
     }
 };

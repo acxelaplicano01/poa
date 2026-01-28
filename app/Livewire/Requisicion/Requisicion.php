@@ -609,8 +609,8 @@ class Requisicion extends Component
 
                 $requisicion = RequisicionModel::create([
                     'correlativo' => $correlativo,
-                    'descripcion' => $descripcion,
-                    'observacion' => $observacion,
+                    'descripcion' => $this->descripcion,
+                    'observacion' => $this->observacion,
                     'idPoa' => $this->idPoa,
                     'idDepartamento' => $idDepartamento,
                     'idEstado' => $estadoInicial,

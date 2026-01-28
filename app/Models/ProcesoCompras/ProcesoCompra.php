@@ -15,6 +15,7 @@ class ProcesoCompra extends BaseModel
         'monto_total',
         'idTipoProcesoCompra',
         'idUE',
+        'idPoa',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -36,13 +37,19 @@ class ProcesoCompra extends BaseModel
         return $this->belongsTo(TipoProcesoCompra::class, 'idTipoProcesoCompra');
     }
 
+    // Relación con POA
+    public function poa()
+    {
+        return $this->belongsTo(\App\Models\Poa\Poa::class, 'idPoa');
+    }
+
     /**
-     * Actualizar el tipo de proceso según el monto
+     * Actualizar el tipo de proceso según el monto y POA
      */
     public function actualizarTipoProceso()
     {
-        if ($this->monto_total > 0) {
-            $tipo = TipoProcesoCompra::obtenerPorMonto($this->monto_total);
+        if ($this->monto_total > 0 && $this->idPoa) {
+            $tipo = TipoProcesoCompra::obtenerPorMonto($this->monto_total, $this->idPoa);
             if ($tipo) {
                 $this->idTipoProcesoCompra = $tipo->id;
                 $this->save();
