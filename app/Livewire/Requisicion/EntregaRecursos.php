@@ -81,7 +81,7 @@ class EntregaRecursos extends Component
             'observacion_ejecucion' => $ejecucionPresupuestaria->observacion ?? '-',
             'creador' => $empleadoNombreCompleto,
             'estado' => $this->requisicion->estado->estado ?? '-',
-            'fecha_presentado' => $this->requisicion->fechaSolicitud ?? '-',
+            'fecha_presentado' => $this->requisicion->fechaSolicactitud ?? '-',
             'fecha_requerido' => $this->requisicion->fechaRequerido ?? '-',
         ];
         
