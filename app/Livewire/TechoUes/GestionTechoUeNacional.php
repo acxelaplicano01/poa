@@ -10,6 +10,7 @@ use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\TechoUes\TechoUe;
 use App\Models\TechoUes\TechoDepto;
 use App\Models\GrupoGastos\GrupoGasto;
+use App\Models\ProcesoCompras\TipoProcesoCompra;
 use App\Services\LogService;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -35,6 +36,16 @@ class GestionTechoUeNacional extends Component
     public $idUnidadEjecutora = '';
     public $montosPorFuente = []; // Array para almacenar montos por fuente
     public $techoUeEditando = null; // Para edición
+    
+    // Propiedades para tipos de proceso de compras
+    public $showTipoProcesoModal = false;
+    public $tipoProcesoId = null;
+    public $tipoProcesoNombre = '';
+    public $tipoProcesoDescripcion = '';
+    public $tipoProcesoMontoMinimo = 0;
+    public $tipoProcesoMontoMaximo = null;
+    public $tipoProcesoActivo = true;
+    public $isEditingTipoProceso = false;
 
     // Listados para los selects
     public $unidadesEjecutoras = [];
@@ -677,5 +688,86 @@ class GestionTechoUeNacional extends Component
         
         // Redirigir a la vista de análisis detallado
         return redirect()->to(route('analysis-techo-ue', ['idPoa' => $this->idPoa, 'idUE' => $idUE]));
+    }
+    
+    // ==================== GESTIÓN DE TIPOS DE PROCESO DE COMPRAS ====================
+    
+    public function createTipoProceso()
+    {
+        $this->resetTipoProcesoForm();
+        $this->isEditingTipoProceso = false;
+        $this->showTipoProcesoModal = true;
+    }
+    
+    public function editTipoProceso($id)
+    {
+        $tipo = TipoProcesoCompra::findOrFail($id);
+        $this->tipoProcesoId = $tipo->id;
+        $this->tipoProcesoNombre = $tipo->nombre;
+        $this->tipoProcesoDescripcion = $tipo->descripcion;
+        $this->tipoProcesoMontoMinimo = $tipo->monto_minimo;
+        $this->tipoProcesoMontoMaximo = $tipo->monto_maximo;
+        $this->tipoProcesoActivo = $tipo->activo;
+        $this->isEditingTipoProceso = true;
+        $this->showTipoProcesoModal = true;
+    }
+    
+    public function saveTipoProceso()
+    {
+        $this->validate([
+            'tipoProcesoNombre' => 'required|string|max:100',
+            'tipoProcesoDescripcion' => 'nullable|string',
+            'tipoProcesoMontoMinimo' => 'required|numeric|min:0',
+            'tipoProcesoMontoMaximo' => 'nullable|numeric|gte:tipoProcesoMontoMinimo',
+        ], [
+            'tipoProcesoNombre.required' => 'El nombre es obligatorio',
+            'tipoProcesoMontoMinimo.required' => 'El monto mínimo es obligatorio',
+            'tipoProcesoMontoMaximo.gte' => 'El monto máximo debe ser mayor o igual al monto mínimo',
+        ]);
+        
+        $data = [
+            'nombre' => $this->tipoProcesoNombre,
+            'descripcion' => $this->tipoProcesoDescripcion,
+            'monto_minimo' => $this->tipoProcesoMontoMinimo,
+            'monto_maximo' => $this->tipoProcesoMontoMaximo,
+            'activo' => $this->tipoProcesoActivo,
+            'idPoa' => $this->idPoa,
+        ];
+        
+        if ($this->isEditingTipoProceso) {
+            $tipo = TipoProcesoCompra::findOrFail($this->tipoProcesoId);
+            $tipo->update($data);
+            session()->flash('message', 'Tipo de proceso actualizado correctamente');
+        } else {
+            TipoProcesoCompra::create($data);
+            session()->flash('message', 'Tipo de proceso creado correctamente');
+        }
+        
+        $this->resetTipoProcesoForm();
+        $this->showTipoProcesoModal = false;
+    }
+    
+    public function deleteTipoProceso($id)
+    {
+        $tipo = TipoProcesoCompra::findOrFail($id);
+        $tipo->delete();
+        session()->flash('message', 'Tipo de proceso eliminado correctamente');
+    }
+    
+    public function closeTipoProcesoModal()
+    {
+        $this->showTipoProcesoModal = false;
+        $this->resetTipoProcesoForm();
+    }
+    
+    private function resetTipoProcesoForm()
+    {
+        $this->tipoProcesoId = null;
+        $this->tipoProcesoNombre = '';
+        $this->tipoProcesoDescripcion = '';
+        $this->tipoProcesoMontoMinimo = 0;
+        $this->tipoProcesoMontoMaximo = null;
+        $this->tipoProcesoActivo = true;
+        $this->isEditingTipoProceso = false;
     }
 }

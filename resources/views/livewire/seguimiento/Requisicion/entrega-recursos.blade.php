@@ -1,4 +1,4 @@
-<div class="container mx-auto py-8">
+<div class="mx-auto py-8">
     {{-- Mensajes de éxito y error --}}
     @if (session()->has('message'))
         <div class="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md" role="alert">

@@ -31,6 +31,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('cuentas_mayors');      
+        // No hacer nada, se elimina en la migración de grupogastos
     }
 };

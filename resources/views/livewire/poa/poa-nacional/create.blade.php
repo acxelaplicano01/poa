@@ -54,12 +54,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Nombre del POA -->
                 <div class="md:col-span-2">
-                    <x-label for="name" value="{{ __('Nombre del POA') }}" class="mb-2" />
+                    <x-label for="name" value="{{ __('Nombre del año académico') }}" class="mb-2" />
                     <x-input 
                         id="name" 
                         wire:model="name"
                         type="text"
-                        placeholder="Ingrese el nombre del POA Nacional"
+                        placeholder="Ingrese el nombre del año académico"
                         class="mt-1 block w-full"
                     />
                     <x-input-error for="name" class="mt-2" />

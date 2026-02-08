@@ -148,6 +148,17 @@
                                 <span class="sm:hidden">Timeline</span>
                             </span>
                         </button>
+                        <button 
+                            wire:click="setActiveTab('tipos-proceso')"
+                            class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 flex-shrink-0 {{ $activeTab === 'tipos-proceso' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300' }}">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                </svg>
+                                <span class="hidden sm:inline">Normas de ejecución</span>
+                                <span class="sm:hidden">Tipos</span>
+                            </span>
+                        </button>
                     </nav>
                 </div>
 
@@ -1074,6 +1085,125 @@
                                 </div>
                             @endif
                         </div>
+                    @elseif($activeTab === 'tipos-proceso')
+                        <!-- Tipos de Proceso de Compras -->
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                                        Normas de ejecución presupuestaria - POA {{ $poa->anio }}
+                                    </h3>
+                                    <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                                        Configure las normas de ejecución presupuestaria y sus rangos de montos para este POA
+                                    </p>
+                                </div>
+                                @can('consola.asignacionnacionalpresupuestaria.crear')
+                                <button wire:click="createTipoProceso" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Crear Norma presupuestaria
+                                </button>
+                                @endcan
+                            </div>
+
+                            @php
+                                $tiposProceso = \App\Models\ProcesoCompras\TipoProcesoCompra::where('idPoa', $idPoa)->orderBy('monto_minimo')->get();
+                            @endphp
+
+                            @if($tiposProceso->count() > 0)
+                                <div class="bg-white dark:bg-zinc-800 shadow overflow-hidden rounded-lg">
+                                    <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+                                        <thead class="bg-zinc-50 dark:bg-zinc-700">
+                                            <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Nombre
+                                                </th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Descripción
+                                                </th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Monto Mínimo
+                                                </th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Monto Máximo
+                                                </th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Estado
+                                                </th>
+                                                <th class="px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                                                    Acciones
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700">
+                                            @foreach($tiposProceso as $tipo)
+                                                <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700">
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                                                        {{ $tipo->nombre }}
+                                                    </td>
+                                                    <td class="px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400">
+                                                        {{ $tipo->descripcion ?? '-' }}
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
+                                                        L. {{ number_format($tipo->monto_minimo, 2) }}
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
+                                                        {{ $tipo->monto_maximo ? 'L. ' . number_format($tipo->monto_maximo, 2) : 'Sin límite' }}
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        @if($tipo->activo)
+                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                                                                Activo
+                                                            </span>
+                                                        @else
+                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                                                                Inactivo
+                                                            </span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                        @can('consola.asignacionnacionalpresupuestaria.editar')
+                                                        <button wire:click="editTipoProceso({{ $tipo->id }})" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                                                                <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                                                            </svg>
+                                                        </button>
+                                                        @endcan
+                                                        @can('consola.asignacionnacionalpresupuestaria.eliminar')
+                                                        <button wire:click="deleteTipoProceso({{ $tipo->id }})" wire:confirm="¿Está seguro de eliminar esta norma presupuestaria?" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                                            </svg>
+                                                        </button>
+                                                        @endcan
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="text-center py-12">
+                                    <svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">No hay normas presupuestarias configuradas</h3>
+                                    <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Comienza creando la primera norma presupuestaria de proceso de compras para este POA.</p>
+                                    @can('consola.asignacionnacionalpresupuestaria.crear')
+                                    <div class="mt-6">
+                                        <button wire:click="createTipoProceso" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Crear Primera Norma Presupuestaria
+                                        </button>
+                                    </div>
+                                    @endcan
+                                </div>
+                            @endif
+                        </div>
                     @endif
                 </div>
             </div>
@@ -1085,5 +1215,119 @@
 
     <!-- Modal de confirmación para eliminar -->
     @include('livewire.techo-ues.deleteConfirmation')
+
+    <!-- Modal para Normas presupuestarias de Compras -->
+    <x-dialog-modal wire:model="showTipoProcesoModal" maxWidth="lg">
+        <x-slot name="title">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">
+                    {{ $isEditingTipoProceso ? __('Editar Norma Presupuestaria') : __('Nueva Norma Presupuestaria') }}
+                </h3>
+                <button wire:click="closeTipoProcesoModal" type="button"
+                    class="text-zinc-400 bg-transparent hover:bg-zinc-200 hover:text-zinc-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-zinc-600 dark:hover:text-white">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+        </x-slot>
+
+        <x-slot name="content">
+            <form wire:submit.prevent="saveTipoProceso">
+                <div class="space-y-6">
+                    {{-- Nombre --}}
+                    <div>
+                        <x-label for="tipoProcesoNombre" value="{{ __('Nombre *') }}" />
+                        <x-input 
+                            id="tipoProcesoNombre" 
+                            type="text" 
+                            class="mt-1 block w-full" 
+                            wire:model="tipoProcesoNombre" 
+                            placeholder="Ej: Licitación Pública, Compra Directa"
+                        />
+                        <x-input-error for="tipoProcesoNombre" class="mt-2" />
+                    </div>
+
+                    {{-- Descripción --}}
+                    <div>
+                        <x-label for="tipoProcesoDescripcion" value="{{ __('Descripción') }}" />
+                        <textarea 
+                            id="tipoProcesoDescripcion" 
+                            wire:model="tipoProcesoDescripcion"
+                            rows="3"
+                            class="border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mt-1 block w-full"
+                            placeholder="Descripción del tipo de proceso de compras"></textarea>
+                        <x-input-error for="tipoProcesoDescripcion" class="mt-2" />
+                    </div>
+
+                    {{-- Montos --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <x-label for="tipoProcesoMontoMinimo" value="{{ __('Monto Mínimo (L) *') }}" />
+                            <x-input 
+                                id="tipoProcesoMontoMinimo" 
+                                type="number" 
+                                step="0.01"
+                                min="0"
+                                class="mt-1 block w-full" 
+                                wire:model="tipoProcesoMontoMinimo" 
+                                placeholder="0.00"
+                            />
+                            <x-input-error for="tipoProcesoMontoMinimo" class="mt-2" />
+                        </div>
+
+                        <div>
+                            <x-label for="tipoProcesoMontoMaximo" value="{{ __('Monto Máximo (L)') }}" />
+                            <x-input 
+                                id="tipoProcesoMontoMaximo" 
+                                type="number" 
+                                step="0.01"
+                                min="0"
+                                class="mt-1 block w-full" 
+                                wire:model="tipoProcesoMontoMaximo" 
+                                placeholder="Sin límite"
+                            />
+                            <x-input-error for="tipoProcesoMontoMaximo" class="mt-2" />
+                            <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                Dejar vacío para sin límite máximo
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Estado --}}
+                    <div>
+                        <label class="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                wire:model="tipoProcesoActivo"
+                                class="rounded border-zinc-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:ring-indigo-600 dark:focus:ring-offset-zinc-800"
+                            >
+                            <span class="ml-2 text-sm text-zinc-600 dark:text-zinc-400">Activo</span>
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </x-slot>
+
+        <x-slot name="footer">
+            <div class="flex justify-end space-x-2">
+                <x-secondary-button 
+                    wire:click="closeTipoProcesoModal" 
+                    type="button">
+                    {{ __('Cancelar') }}
+                </x-secondary-button>
+
+                <x-spinner-button 
+                    type="submit" 
+                    wire:click="saveTipoProceso"
+                    loadingTarget="saveTipoProceso" 
+                    :loadingText="$isEditingTipoProceso ? 'Actualizando...' : 'Creando...'">
+                    {{ $isEditingTipoProceso ? __('Actualizar') : __('Crear') }}
+                </x-spinner-button>
+            </div>
+        </x-slot>
+    </x-dialog-modal>
 
 </div>

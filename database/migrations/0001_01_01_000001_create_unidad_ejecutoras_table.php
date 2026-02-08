@@ -31,8 +31,9 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('institucions');
+        Schema::dropIfExists('procesos_compras');
         Schema::dropIfExists('unidad_ejecutora');
+        Schema::dropIfExists('institucions');
         
     }
 };

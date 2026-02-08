@@ -302,6 +302,7 @@ return [
                         ->setItems([])
                         ->setEndBlock('procesoscompras'),
 
+
                     RkRoute::make('recursos')
                         ->setParentId('configuracion')
                         ->setAccessPermission('acceso-configuracion')

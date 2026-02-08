@@ -49,6 +49,8 @@
                     :columns="[
                         ['key' => 'id', 'label' => 'ID', 'sortable' => true],
                         ['key' => 'nombre_proceso', 'label' => 'Nombre del Proceso', 'sortable' => true],
+                        ['key' => 'monto_total', 'label' => 'Monto Total', 'sortable' => true],
+                        ['key' => 'tipo_proceso', 'label' => 'Tipo de Proceso'],
                         ['key' => 'actions', 'label' => 'Acciones'],
                     ]"
                     empty-message="{{ __('No se encontraron procesos de compra')}}"
@@ -62,6 +64,21 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
                                     {{ $proceso->nombre_proceso }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
+                                    <div class="text-sm font-medium">${{ number_format($proceso->monto_total, 2) }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($proceso->tipoProcesoCompra)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                            {{ $proceso->monto_total < 10000 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 
+                                               ($proceso->monto_total < 50000 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 
+                                               'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300') }}">
+                                            {{ $proceso->tipoProcesoCompra->nombre }}
+                                        </span>
+                                    @else
+                                        <span class="text-xs text-zinc-500 dark:text-zinc-400">Sin clasificar</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
@@ -85,7 +102,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="px-6 py-4 text-center text-zinc-500 dark:text-zinc-400">
+                                <td colspan="5" class="px-6 py-4 text-center text-zinc-500 dark:text-zinc-400">
                                     {{ __('No se encontraron procesos de compra')}}
                                 </td>
                             </tr>
@@ -118,6 +135,23 @@
                                     </div>
                                 </div>
                                 <h3 class="font-semibold text-zinc-900 dark:text-zinc-200 text-lg mb-2">{{ $proceso->nombre_proceso }}</h3>
+                                <div class="mt-2 space-y-1">
+                                    <div class="flex items-center text-sm text-zinc-600 dark:text-zinc-400">
+                                        <span class="font-medium mr-2">Monto:</span>
+                                        <span class="font-semibold text-zinc-900 dark:text-zinc-200">L{{ number_format($proceso->monto_total, 2) }}</span>
+                                    </div>
+                                    @if($proceso->tipoProcesoCompra)
+                                        <div class="flex items-center text-sm">
+                                            <span class="font-medium text-zinc-600 dark:text-zinc-400 mr-2">Tipo:</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                                {{ $proceso->monto_total < 10000 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 
+                                                   ($proceso->monto_total < 50000 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 
+                                                   'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300') }}">
+                                                {{ $proceso->tipoProcesoCompra->nombre }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         @empty
                             <div class="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow text-center text-zinc-500 dark:text-zinc-400">

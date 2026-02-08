@@ -172,7 +172,8 @@ use Livewire\Attributes\Layout;
         
         public function render()
         {
-            $procesos = ProcesCompraModel::where(function ($query) {
+            $procesos = ProcesCompraModel::with('tipoProcesoCompra')
+                ->where(function ($query) {
                     if ($this->search) {
                         $query->where('nombre_proceso', 'like', '%' . $this->search . '%');
                     }
