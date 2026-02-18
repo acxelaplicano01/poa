@@ -39,6 +39,11 @@ class SeguimientoRequisicion extends Component
     public $search = '';
     public $sortField = 'id';
     public $sortDirection = 'desc';
+
+    public $poaYear = null;
+    public $poaYears = [];
+    public $mostrarSelector = false;
+    public $departamentosUsuario = [];
     
     public function sortBy($field)
     {
@@ -193,12 +198,12 @@ class SeguimientoRequisicion extends Component
         // Lógica para selector de departamento
         $departamentosUsuario = [];
         if (auth()->user() && auth()->user()->empleado) {
-            $departamentosUsuario = auth()->user()->empleado->departamentos ?? [];
+            $departamentosUsuario = auth()->user()->empleado->departamentos()->with('unidadEjecutora')->get(); // Asegúrate de cargar la relación 'unidadEjecutora'
         }
-        $mostrarSelector = count($departamentosUsuario) > 1;
+        $mostrarSelector = $departamentosUsuario->count() > 1;
 
-        if ($this->departamentoSeleccionado === null && count($departamentosUsuario) > 0) {
-            $this->departamentoSeleccionado = $departamentosUsuario[0]->id;
+        if ($this->departamentoSeleccionado === null && $departamentosUsuario->isNotEmpty()) {
+            $this->departamentoSeleccionado = $departamentosUsuario->first()->id; // Selecciona el primer departamento por defecto
         }
 
 
@@ -206,6 +211,11 @@ class SeguimientoRequisicion extends Component
             ->when($this->estadoFiltro && $this->estadoFiltro !== 'Todos', function ($query) {
                 $query->whereHas('estado', function($q) {
                     $q->where('estado', $this->estadoFiltro);
+                });
+            })
+            ->when($this->poaYear, function($q) {
+                $q->whereHas('poa', function($q2) {
+                    $q2->where('anio', $this->poaYear);
                 });
             })
             ->when($this->search, function ($query) {
@@ -241,12 +251,14 @@ class SeguimientoRequisicion extends Component
         }
 
         $poas = Poa::activo()->orderByDesc('anio')->get();
+        $this->poaYears = $poas->pluck('anio')->unique()->sort()->values();
 
         return view('livewire.seguimiento.Requisicion.requisiciones-lista', [
             'requisiciones' => $requisiciones,
             'poas' => $poas,
             'mostrarSelector' => $mostrarSelector,
             'departamentosUsuario' => $departamentosUsuario,
+            'poaYears' => $this->poaYears,
         ]);
     }
 }

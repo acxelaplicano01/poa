@@ -246,7 +246,6 @@ class DetalleActividadRevision extends Component
         session()->flash('message', 'Estado de la tarea actualizado correctamente.');
     }
 
-    // --- Lógica automática para estado de la actividad ---
     public function actualizarEstadoActividad()
     {
         $actividad = $this->actividad;

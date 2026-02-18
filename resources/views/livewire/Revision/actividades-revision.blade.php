@@ -35,8 +35,46 @@
             </div>
             </div>
         </div>
+        <br>
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
             <h2 class="text-xl font-semibold text-zinc-800 dark:text-zinc-200">{{ __('Actividades en Revisión del Departamento') }}</h2>
+
+            <div class="flex flex-col sm:flex-row w-full sm:w-auto space-y-3 sm:space-y-0 sm:space-x-2">
+                <!-- Buscador por nombre de actividad o tarea -->
+                <div class="relative w-full sm:w-auto">
+                    <x-input wire:model.live="search" type="text" placeholder="Buscar actividad..." class="w-full pl-10 pr-4 py-2"/>
+                    
+                    <div class="absolute left-3 top-2.5">
+                        <svg class="h-5 w-5 text-zinc-500 dark:text-zinc-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filtro por año -->
+                <div class="w-full sm:w-auto min-w-[150px] max-w-xs">
+                    <select wire:model.live="poaYear" class="block w-full min-w-[180px] max-w-xs rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 text-sm py-2 px-3">
+                        @foreach($poaYears as $year)
+                            <option value="{{ $year }}">POA {{ $year }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Paginación -->
+                <div class="w-full sm:w-auto">
+                    <x-select 
+                        id="perPage" 
+                        wire:model.live="perPage"
+                        :options="[
+                            ['value' => '10', 'text' => '10 por página'],
+                            ['value' => '25', 'text' => '25 por página'],
+                            ['value' => '50', 'text' => '50 por página'],
+                            ['value' => '100', 'text' => '100 por página'],
+                        ]"
+                        class="w-full"
+                    />
+                </div>
+            </div>
         </div>
         <x-table
             :columns="[
@@ -97,6 +135,7 @@
                     </tr>
                 @endforelse
             </x-slot>
+            
             <x-slot name="mobile">
                 @forelse($actividades as $actividad)
                     <div class="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 mb-4">
@@ -150,5 +189,12 @@
                 @endforelse
             </x-slot>
         </x-table>
+          {{-- Paginación FUERA del x-table --}}
+        @if($actividades->hasPages())
+            <div class="mt-4 px-4">
+                {{ $actividades->links() }}
+            </div>
+        @endif
+
     </div>
 </div>

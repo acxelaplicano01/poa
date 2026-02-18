@@ -4,6 +4,7 @@ namespace App\Models\Actividad;
 use App\Models\BaseModel;
 use App\Models\Actividad\TipoActividad;
 use App\Models\Poa\Poa;
+use App\Models\Poa\PoaDepto;
 use App\Models\Departamento\Departamento;
 use App\Models\UnidadEjecutora\UnidadEjecutora;
 use App\Models\Resultados\Resultado;
@@ -48,6 +49,11 @@ class Actividad extends BaseModel
     public function poa()
     {
         return $this->belongsTo(Poa::class, 'idPoa');
+    }
+
+    public function poaDepto()
+    {
+        return $this->belongsTo(PoaDepto::class, 'idPoaDepto');
     }
 
     public function departamento()

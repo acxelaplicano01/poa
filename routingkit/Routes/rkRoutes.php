@@ -473,6 +473,16 @@ return [
                             ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                             ->setItems([])
                             ->setEndBlock('requisicion'),
+                            
+                        RkRoute::make('requisiciones-sumario')
+                            ->setParentId('requisiciones')
+                            ->setAccessPermission('acceso-planificacion')
+                            ->setUrl('requisicion/requisiciones-sumario')
+                            ->setUrlMethod('get')
+                            ->setUrlController('App\Livewire\Requisicion\SumarioRequisicion') 
+                            ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
+                            ->setItems([])
+                            ->setEndBlock('requisiciones-sumario'),
 
                         RkRoute::make('requisicion/{correlativo}/pdf')
                             ->setParentId('requisiciones')

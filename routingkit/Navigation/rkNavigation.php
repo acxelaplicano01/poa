@@ -89,16 +89,26 @@ return [
                         ->setDescription('Vista principal de seguimiento')
                         ->setLabel('Mis requisiciones')
                         ->setHeroIcon('clipboard-document-list')
-                        ->setItems([])
-                        ->setEndBlock('mis-requisiciones'),
+                        ->setItems([
 
-                    RkNavigation::make('requisicion')
-                        ->setParentId('requisiciones')
-                        ->setDescription('Crear o gestionar requisiciones')
-                        ->setLabel('Requisicion')
-                        ->setHeroIcon('document-plus')
-                        ->setItems([])
-                        ->setEndBlock('requisicion'),
+                            RkNavigation::make('requisicion')
+                                ->setParentId('mis-requisiciones')
+                                ->setDescription('Crear o gestionar requisiciones')
+                                ->setLabel('Requisición')
+                                ->setHeroIcon('document-plus')
+                                ->setItems([
+
+                                    RkNavigation::make('requisiciones-sumario')
+                                        ->setParentId('requisicion')
+                                        //->setDescription('Resumen de requisiciones')
+                                        ->setLabel('Resumen Requisiciones')
+                                        ->setHeroIcon('list-bullet')
+                                        ->setItems([])
+                                        ->setEndBlock('requisiciones-sumario'),
+                                ])
+                                ->setEndBlock('requisicion'),
+                                ])
+                        ->setEndBlock('mis-requisiciones'),
                 ])
                 ->setEndBlock('requisiciones'),
 
@@ -106,7 +116,7 @@ return [
                 ->setParentId('planificacion')
                 ->setDescription('Administrar solicitudes de requisiciones')
                 ->setLabel('Dar seguimiento')
-                ->setHeroIcon('chart-bar-square')
+                ->setHeroIcon('document-check')
                 ->setItems([
                     RkNavigation::make('entregarecursos')
                         ->setParentId('administrar-requisiciones')

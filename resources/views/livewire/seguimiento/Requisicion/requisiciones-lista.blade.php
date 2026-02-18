@@ -28,7 +28,7 @@
                 <div class="flex flex-col sm:flex-row w-full sm:w-auto space-y-3 sm:space-y-0 sm:space-x-2">
                     <div class="relative w-full sm:w-auto">
                         <x-input wire:model.live="search" type="text"
-                            placeholder="Buscar por correlativo o departamento..." class="w-full pl-10 pr-4 py-2" />
+                            placeholder="Buscar Correlativo..." class="w-full pl-10 pr-4 py-2" />
                         <div class="absolute left-3 top-2.5">
                             <svg class="h-5 w-5 text-zinc-500 dark:text-zinc-400" xmlns="http://www.w3.org/2000/svg"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -57,7 +57,17 @@
                             <option value="Finalizado">Finalizado</option>
                         </select>
                     </div>
+                    <div class="w-full sm:w-auto min-w-[150px] max-w-xs">
+                        <select wire:model.live="poaYear"
+                            class="block w-full min-w-[180px] max-w-xs rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 text-sm py-2 px-3">
+                            <option value="">Todos los años</option>
+                            @foreach($poaYears as $year)
+                                <option value="{{ $year }}">POA {{ $year }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
+                
                 <div class="flex justify-end w-full sm:w-auto">
                     <x-spinner-button onclick="window.location.href='/requisicion'"
                         class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">

@@ -23,128 +23,10 @@ use Livewire\Attributes\Layout;
 #[Layout('layouts.app')]
 class Requisicion extends Component
 {
-  
-    // Búsqueda por nombre de actividad o tarea
     public $buscarActividad = '';
-
-    public function crearRequisicionDesdeSumario()
-    {
-        
-        $this->validate([
-            'descripcion' => 'required',
-            'fechaRequerido' => 'required|date',
-        ]);
-
-        $user = Auth::user();
-        if (!$this->idPoa && !empty($this->recursosSeleccionados)) {
-            
-            $primerRecurso = $this->recursosSeleccionados[0];
-            $presupuesto = Presupuesto::find($primerRecurso['id']);
-            if ($presupuesto && $presupuesto->idtarea) {
-                $tarea = Tarea::find($presupuesto->idtarea);
-                if ($tarea && $tarea->idPoa) {
-                    $this->idPoa = $tarea->idPoa;
-                }
-            }
-        }
-        
-        $poa = $this->idPoa ? Poa::find($this->idPoa) : null;
-        // Asignar departamento y estado primero
-        $empleadoDepto = \DB::table('empleado_deptos')
-            ->where('idEmpleado', $user->id)
-            ->whereNull('deleted_at')
-            ->first();
-        $this->idDepartamento = $empleadoDepto ? $empleadoDepto->idDepto : ($user->idDepartamento ?? null);
-        $this->idEstado = $this->getEstadoPresentadoId();
-
-        // obtener el departamento real de la requisición
-        $departamento = $this->idDepartamento ? Departamento::find($this->idDepartamento) : null;
-        $ultimo = \App\Models\Requisicion\Requisicion::orderBy('id', 'desc')->first();
-        $numero = $ultimo ? $ultimo->id + 1 : 1;
-        $tipoDepto = $departamento->tipo ?? '';
-        $nombreDepto = $departamento->name ?? '';
-        $anio = $poa ? $poa->anio : date('Y');
-        $correlativo = \App\Helpers\CorrelativoHelper::generarCorrelativo($tipoDepto, $nombreDepto, $anio, $numero);
-
-        // Asignar departamento y estado
-        $empleadoDepto = \DB::table('empleado_deptos')
-            ->where('idEmpleado', $user->id)
-            ->whereNull('deleted_at')
-            ->first();
-        $this->idDepartamento = $empleadoDepto ? $empleadoDepto->idDepto : ($user->idDepartamento ?? null);
-        $this->idEstado = $this->getEstadoPresentadoId();
-
-        try {
-            $data = [
-                'correlativo' => $correlativo,
-                'descripcion' => $this->descripcion,
-                'observacion' => $this->observacion,
-                'created_by' => $user->id,
-                'approved_by' => null,
-                'idPoa' => $this->idPoa,
-                'idDepartamento' => $this->idDepartamento,
-                'idEstado' => $this->idEstado,
-                'fechaSolicitud' => now(),
-                'fechaRequerido' => $this->fechaRequerido,
-            ];
-            //dd($data);
-
-            // Usa el modelo correcto para crear la requisición
-            $requisicion = \App\Models\Requisicion\Requisicion::create($data);
-
-            if (!$requisicion) {
-                throw new \Exception('No se pudo crear la requisición.');
-            }
-
-            foreach ($this->recursosSeleccionados as $recurso) {
-                $presupuesto = Presupuesto::find($recurso['id']);
-                if ($presupuesto) {
-                    DetalleRequisicion::create([
-                        'idRequisicion' => $requisicion->id,
-                        'idPoa' => $this->idPoa,
-                        'idPresupuesto' => $presupuesto->id,
-                        'idRecurso' => $presupuesto->idHistorico,
-                        'cantidad' => $recurso['cantidad_seleccionada'],
-                        'idUnidadMedida' => $presupuesto->idunidad,
-                        'entregado' => false,
-                        'created_by' => $user->id,
-                    ]);
-                }
-            }
-            $this->showSumarioModal = false;
-            $this->resetInputFields();
-            session()->flash('message', 'Requisición creada correctamente.');
-        } catch (\Exception $e) {
-            $this->errorMessage = 'Error al guardar: ' . $e->getMessage();
-            $this->showErrorModal = true;
-        }
-    }
-    public $mostrarSelector = false;
-    public $departamentosUsuario = [];
-    public $departamentoSeleccionado;
-    public $detalleRequisiciones = [];
-    public $presupuestosSeleccionados = [];
-    public $recursosSeleccionados = [];
-
-    public function agregarRecursoAlSumario($recurso)
-    {
-        if (!collect($this->recursosSeleccionados)->contains('id', $recurso['id'])) {
-            $this->recursosSeleccionados[] = $recurso;
-        }
-    }
-
-    // Quitar recurso del sumario
-    public function quitarRecursoDelSumario($recursoId)
-    {
-        $this->recursosSeleccionados = collect($this->recursosSeleccionados)
-            ->reject(fn($item) => $item['id'] == $recursoId)
-            ->values()
-            ->toArray();
-    }
     use WithPagination;
 
     protected string $layout = 'layouts.app';
-
     public $correlativo;
     public $descripcion;
     public $observacion;
@@ -169,6 +51,210 @@ class Requisicion extends Component
     public $errorMessage = '';
     public $showErrorModal = false;
     public $isEditing = false;
+    public $successMessage = '';
+
+    public $mostrarSelector = false;
+    public $departamentosUsuario = [];
+    public $departamentoSeleccionado;
+    public $detalleRequisiciones = [];
+    public $presupuestosSeleccionados = [];
+    public $recursosSeleccionados = [];
+
+    public $poaYear = null;
+	public $poaYears = [];
+    public $detalleRecursos = [];
+    public $showDetalleRecursosModal = false;
+
+    public $showOrdenCombustibleModal = false;
+    public $ordenCombustibleRecursoId;
+    public $ordenCombustibleRecursoNombre;
+    public $ordenCombustibleData = [
+        'modelo_vehiculo' => '',
+        'placa' => '',
+        'lugar_salida' => '',
+        'lugar_destino' => '',
+        'recorrido_km' => 0,
+        'fecha_actividad' => '',
+        'responsable' => '',
+        'actividades_realizar' => '',
+    ];
+    public $empleados = [];
+
+
+    protected $rules = [
+        'correlativo' => 'required|min:3',
+        'descripcion' => 'required',
+        'observacion' => 'required',
+        'approved_by' => 'nullable|exists:users,id',
+        'idPoa' => 'required|exists:poas,id',
+        'fechaSolicitud' => 'required|date',
+        'fechaRequerido' => 'required|date',
+    ];
+
+    protected $messages = [
+        'correlativo.required' => 'El correlativo es obligatorio.',
+        'correlativo.min' => 'El correlativo debe tener al menos 3 caracteres.',
+        'descripcion.required' => 'La descripción es obligatoria.',
+        'idPoa.required' => 'El POA es obligatorio.',
+        'fechaSolicitud.required' => 'La fecha de solicitud es obligatoria.',
+        'fechaRequerido.required' => 'La fecha requerida es obligatoria.',
+        'observacion.required' => 'La observación es obligatoria.',
+    ];
+
+
+    public function crearRequisicionDesdeSumario()
+    {
+        $this->validate([
+            'descripcion' => 'required',
+            'fechaRequerido' => 'required|date',
+            'departamentoSeleccionado' => 'required|exists:departamentos,id', // Validar que el departamento seleccionado sea válido
+        ]);
+
+        $user = Auth::user();
+
+        if (!$this->idPoa && !empty($this->recursosSeleccionados)) {
+            $primerRecurso = $this->recursosSeleccionados[0];
+            $presupuesto = Presupuesto::find($primerRecurso['id']);
+            if ($presupuesto && $presupuesto->idtarea) {
+                $tarea = Tarea::find($presupuesto->idtarea);
+                if ($tarea && $tarea->idPoa) {
+                    $this->idPoa = $tarea->idPoa;
+                }
+            }
+        }
+
+        $poa = $this->idPoa ? Poa::find($this->idPoa) : null;
+
+        // Usar el departamento seleccionado
+        $this->idDepartamento = $this->departamentoSeleccionado;
+
+        $departamento = $this->idDepartamento ? Departamento::find($this->idDepartamento) : null;
+        $ultimo = \App\Models\Requisicion\Requisicion::orderBy('id', 'desc')->first();
+        $numero = $ultimo ? $ultimo->id + 1 : 1;
+        $tipoDepto = $departamento->tipo ?? '';
+        $nombreDepto = $departamento->name ?? '';
+        $anio = $poa ? $poa->anio : date('Y');
+        $correlativo = \App\Helpers\CorrelativoHelper::generarCorrelativo($tipoDepto, $nombreDepto, $anio, $numero);
+
+        $this->idEstado = $this->getEstadoPresentadoId();
+
+        try {
+            $data = [
+                'correlativo' => $correlativo,
+                'descripcion' => $this->descripcion,
+                'observacion' => $this->observacion,
+                'created_by' => $user->id,
+                'approved_by' => null,
+                'idPoa' => $this->idPoa,
+                'idDepartamento' => $this->idDepartamento, // Asociar el departamento seleccionado
+                'idEstado' => $this->idEstado,
+                'fechaSolicitud' => now(),
+                'fechaRequerido' => $this->fechaRequerido,
+            ];
+
+            $requisicion = \App\Models\Requisicion\Requisicion::create($data);
+
+            if (!$requisicion) {
+                throw new \Exception('No se pudo crear la requisición.');
+            }
+
+            foreach ($this->recursosSeleccionados as $recurso) {
+                $presupuesto = Presupuesto::find($recurso['id']);
+                if ($presupuesto) {
+                    DetalleRequisicion::create([
+                        'idRequisicion' => $requisicion->id,
+                        'idPoa' => $this->idPoa,
+                        'idPresupuesto' => $presupuesto->id,
+                        'idRecurso' => $presupuesto->idHistorico,
+                        'cantidad' => $recurso['cantidad_seleccionada'],
+                        'idUnidadMedida' => $presupuesto->idunidad,
+                        'entregado' => false,
+                        'created_by' => $user->id,
+                    ]);
+                }
+            }
+
+            $this->showSumarioModal = false;
+            $this->resetInputFields();
+            session()->flash('message', 'Requisición creada correctamente.');
+        } catch (\Exception $e) {
+            $this->errorMessage = 'Error al guardar: ' . $e->getMessage();
+            $this->showErrorModal = true;
+        }
+
+        session()->forget('recursosSeleccionados');
+        $this->recursosSeleccionados = [];
+        $this->presupuestosSeleccionados = [];
+    }
+
+    public function agregarRecursoAlSumario($recurso)
+    {
+        if (!collect($this->recursosSeleccionados)->contains('id', $recurso['id'])) {
+            $this->recursosSeleccionados[] = $recurso;
+        }
+    }
+
+    // Quitar recurso del sumario
+    public function quitarRecursoDelSumario($recursoId)
+    {
+        $this->recursosSeleccionados = collect($this->recursosSeleccionados)
+            ->reject(fn($item) => $item['id'] == $recursoId)
+            ->values()
+            ->toArray();
+
+        if (isset($this->presupuestosSeleccionados[$recursoId])) {
+            unset($this->presupuestosSeleccionados[$recursoId]);
+        }
+
+        // Sincronizar con sesión
+        session(['recursosSeleccionados' => $this->recursosSeleccionados]);
+    }
+
+
+    // Detectar cambios en las cantidades solicitadas
+    public function updated($propertyName)
+    {
+        // Si se actualiza una cantidad en presupuestosSeleccionados, actualiza el sumario
+        if (str_starts_with($propertyName, 'presupuestosSeleccionados')) {
+            $this->actualizarSumario();
+        }
+    }
+
+    // Actualizar el sumario de recursos seleccionados
+    public function actualizarSumario()
+    {
+        $this->recursosSeleccionados = [];
+
+        foreach ($this->presupuestosSeleccionados as $presupuestoId => $cantidad) {
+            if ($cantidad !== null && $cantidad !== '' && (int)$cantidad > 0) {
+                $presupuesto = Presupuesto::with(['unidadMedida'])->find($presupuestoId);
+                if ($presupuesto) {
+                    // Buscar la tarea/actividad para el nombre
+                    $tarea = $presupuesto->idtarea ? Tarea::with('actividad')->find($presupuesto->idtarea) : null;
+                    $nombreRecurso = strtoupper($presupuesto->recurso ?? '');
+                    $esCombustible = str_contains($nombreRecurso, 'GASOLINA') || str_contains($nombreRecurso, 'DIESEL');
+
+                    $this->recursosSeleccionados[] = [
+                        'id'                  => $presupuesto->id,
+                        'nombre'              => $presupuesto->recurso,
+                        'actividad'           => $tarea
+                            ? (($tarea->actividad->nombre ?? '-') . ' / ' . ($tarea->nombre ?? '-'))
+                            : '-',
+                        'proceso_compra' => $presupuesto->tareaHistorico && $presupuesto->tareaHistorico->procesoCompra 
+                        ? $presupuesto->tareaHistorico->procesoCompra->nombre_proceso 
+                        : '-',
+                        'cantidad_seleccionada' => (int)$cantidad,
+                        'unidad_medida'       => $presupuesto->unidadMedida->nombre ?? '-',
+                        'precio_unitario'     => $presupuesto->costounitario ?? 0,
+                        'total'               => (int)$cantidad * ($presupuesto->costounitario ?? 0),
+                        'es_combustible'        => $esCombustible,
+                    ];
+                }
+            }
+        }
+        
+    }
+    
     // Abrir el modal de sumario
     public function abrirSumario()
     {
@@ -178,8 +264,16 @@ class Requisicion extends Component
             $q->where('cantidad', '>', 0);
         })
         ->where('estado', 'APROBADO')
+        ->when($this->buscarActividad, function($q) {
+            $q->where(function($subq) {
+                $subq->where('nombre', 'like', '%'.$this->buscarActividad.'%');
+                $subq->orWhereHas('actividad', function($q2) {
+                    $q2->where('nombre', 'like', '%'.$this->buscarActividad.'%');
+                });
+            });
+        })
         ->with(['presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente', 'actividad'])
-        ->get();
+        ->paginate($this->perPage);
 
         foreach ($this->presupuestosSeleccionados as $presupuestoId => $cantidad) {
             if ($cantidad > 0) {
@@ -203,31 +297,6 @@ class Requisicion extends Component
         }
         $this->showSumarioModal = true;
     }
-
-    // Cerrar el modal de sumario
-    public function cerrarSumario()
-    {
-        $this->showSumarioModal = false;
-    }
-
-    protected $rules = [
-        'correlativo' => 'required|min:3',
-        'descripcion' => 'required',
-        'observacion' => 'nullable',
-        'approved_by' => 'nullable|exists:users,id',
-        'idPoa' => 'required|exists:poas,id',
-        'fechaSolicitud' => 'required|date',
-        'fechaRequerido' => 'required|date',
-    ];
-
-    protected $messages = [
-        'correlativo.required' => 'El correlativo es obligatorio.',
-        'correlativo.min' => 'El correlativo debe tener al menos 3 caracteres.',
-        'descripcion.required' => 'La descripción es obligatoria.',
-        'idPoa.required' => 'El POA es obligatorio.',
-        'fechaSolicitud.required' => 'La fecha de solicitud es obligatoria.',
-        'fechaRequerido.required' => 'La fecha requerida es obligatoria.',
-    ];
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -402,112 +471,41 @@ class Requisicion extends Component
         $this->errorMessage = '';
     }
 
-    public function render()
+   /* public function renderSumario()
     {
-        $userId = Auth::id();
-        $departamentosUsuario = Departamento::whereHas('empleados', function($q) use ($userId) {
-            $q->where('empleados.id', $userId);
-        })->with('unidadEjecutora')->get();
-        $mostrarSelector = $departamentosUsuario->count() > 1;
-
-        $requisiciones = RequisicionModel::with(['departamento', 'estado'])
-            ->when($this->busqueda, function($q) {
-                $q->where('correlativo', 'like', '%'.$this->busqueda.'%')
-                  ->orWhereHas('departamento', fn($q) => $q->where('name', 'like', '%'.$this->busqueda.'%'));
-            })
-            ->when($this->estado, function($q) {
-                if ($this->estado > 0) $q->where('idEstado', $this->estado);
-            })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage);
-
-        $poas = Poa::activo()->get();
-        // Obtener años únicos de los POA activos
-        $poaYears = $poas->pluck('anio')->unique()->sort()->values();
-        // Obtener departamentos
-        $departamentos = Departamento::all();
-
-        if ($this->requisicionId) {
-            $requisicion = RequisicionModel::find($this->requisicionId);
-            $this->detalleRequisiciones = $requisicion ? $requisicion->detalleRequisiciones()->with(['recurso', 'presupuesto'])->get() : collect();
-        }
-        $actividades_aprobadas = Tarea::whereHas('presupuestos', function($q) {
-                $q->where('cantidad', '>', 0); 
-            })
-            ->where('estado', 'APROBADO')
-            ->when($this->buscarActividad, function($q) {
-                $q->where(function($subq) {
-                    $subq->where('nombre', 'like', '%'.$this->buscarActividad.'%');
-                    // Si hay relación actividad, buscar también por ese nombre
-                    $subq->orWhereHas('actividad', function($q2) {
-                        $q2->where('nombre', 'like', '%'.$this->buscarActividad.'%');
-                    });
-                });
-            })
-            ->with(['presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente', 'actividad'])
-            ->get();
-
-        $allPresupuestos = collect();
-        foreach ($actividades_aprobadas as $actividad) {
-            foreach ($actividad->presupuestos as $presupuesto) {
-                $allPresupuestos->push($presupuesto);
-            }
-        }
-
-        $valoresPlanificados = [];
-        foreach ($allPresupuestos as $presupuesto) {
-            $cantidadPlanificada = DetalleRequisicion::where('idPresupuesto', $presupuesto->id)
-                ->whereHas('requisicion', function($q) {
-                    $q->whereHas('estado', function($q2) {
-                        $q2->whereIn('estado', ['Presentado', 'Recibido', 'En Proceso de Compra']);
-                    });
-                })
-                ->sum('cantidad');
-            $cantidadDisponible = ($presupuesto->cantidad ?? 0) - $cantidadPlanificada;
-            $costoUnitario = $presupuesto->costounitario ?? 0;
-            $costoDisponible = $cantidadDisponible * $costoUnitario;
-            $costoPlanificado = $cantidadPlanificada * $costoUnitario;
-            $valoresPlanificados[$presupuesto->id] = [
-                'cantidad_disponible' => $cantidadDisponible,
-                'cantidad_planificada' => $cantidadPlanificada,
-                'costo_disponible' => $costoDisponible,
-                'costo_planificado' => $costoPlanificado,
-            ];
-        }
-        return view('livewire.seguimiento.Requisicion.create-requisiciones', [
-            'mostrarSelector' => $mostrarSelector,
-            'departamentosUsuario' => $departamentosUsuario,
-            'departamentoSeleccionado' => $this->departamentoSeleccionado,
-            'requisiciones' => $requisiciones,
-            'poas' => $poas,
-            'detalleRequisiciones' => $this->detalleRequisiciones,
-            'actividades_aprobadas' => $actividades_aprobadas,
-            'poaYears' => $poaYears,
-            'departamentos' => $departamentos,
-            'allPresupuestos' => $allPresupuestos,
-            'recursosSeleccionados' => $this->recursosSeleccionados,
-            'valoresPlanificados' => $valoresPlanificados,
-        ])->layout($this->layout);
-    }
-
-    public $showOrdenCombustibleModal = false;
-    public $ordenCombustibleRecursoId;
-    public $ordenCombustibleRecursoNombre;
-    public $ordenCombustibleData = [
-        'modelo_vehiculo' => '',
-        'placa' => '',
-        'lugar_salida' => '',
-        'lugar_destino' => '',
-        'recorrido_km' => 0,
-        'fecha_actividad' => '',
-        'responsable' => '',
-        'actividades_realizar' => '',
-    ];
-    public $empleados = [];
+        $recursosSeleccionados = $this->recursosSeleccionados;
+        return view('livewire.requisicion.sumario-recursos', compact('recursosSeleccionados'));
+    }*/
 
     public function mount()
     {
         $this->empleados = Empleado::all();
+
+        $recursosGuardados = session('recursosSeleccionados', []);
+        if (!empty($recursosGuardados)) {
+            $this->recursosSeleccionados = $recursosGuardados;
+            // Restaurar también los inputs de cantidad
+            foreach ($recursosGuardados as $recurso) {
+                $this->presupuestosSeleccionados[$recurso['id']] = $recurso['cantidad_seleccionada'];
+            }
+        }
+
+        $this->departamentoSeleccionado = session('departamentoSeleccionado');
+        
+        $userId = Auth::id();
+        $this->departamentosUsuario = Departamento::whereHas('empleados', function($q) use ($userId) {
+            $q->where('empleados.id', $userId);
+        })->with('unidadEjecutora')->get();
+
+        if ($this->departamentosUsuario->count() == 1) {
+            $this->departamentoSeleccionado = $this->departamentosUsuario->first()->id;
+        }
+    }
+
+    
+    public function updatingBuscarActividad()
+    {
+        $this->resetPage();
     }
 
     public function abrirOrdenCombustibleModal($recursoId)
@@ -543,6 +541,21 @@ class Requisicion extends Component
             'responsable' => '',
             'actividades_realizar' => '',
         ];
+    }
+
+    public function irAlSumario()
+    {
+        //dd($this->departamentoSeleccionado); 
+        session([
+            'recursosSeleccionados' => $this->recursosSeleccionados,
+            'departamentoSeleccionado' => $this->departamentoSeleccionado,
+        ]);
+        return redirect()->route('requisiciones-sumario');
+    }
+
+    public function sincronizarDepartamento($id)
+    {
+        $this->departamentoSeleccionado = $id;
     }
 
     public function guardarOrdenCombustible()
@@ -600,7 +613,7 @@ class Requisicion extends Component
                 $tipoDepto = $departamento->tipo ?? '';
                 $nombreDepto = $departamento->name ?? '';
                 $ultimo = RequisicionModel::orderBy('id', 'desc')->first();
-                $numero = $ultimo ? $ultimo->id + 1 : 1;
+                $numero = $ultimo ? ($ultimo->id + 1) : 1;
                 $anio = $poa->anio ?? now()->format('Y');
                 $correlativo = \App\Helpers\CorrelativoHelper::generarCorrelativo($tipoDepto, $nombreDepto, $anio, $numero);
 
@@ -708,5 +721,65 @@ class Requisicion extends Component
         $this->cerrarOrdenCombustibleModal();
         $this->showSumarioModal = true;
         session()->flash('message', 'Orden de combustible creada correctamente.');
+    }
+
+     public function render()
+    {
+        $userId = Auth::id();
+        $this->departamentosUsuario = Departamento::whereHas('empleados', function($q) use ($userId) {
+            $q->where('empleados.id', $userId);
+        })->with('unidadEjecutora')->get();
+        $this->mostrarSelector = $this->departamentosUsuario->count() > 1;
+
+        $actividades_aprobadas = Tarea::whereHas('presupuestos', function($q) {
+            $q->where('cantidad', '>', 0);
+        })
+        ->where('estado', 'APROBADO')
+        ->when($this->buscarActividad, function($q) {
+            $q->where(function($subq) {
+                $subq->where('nombre', 'like', '%'.$this->buscarActividad.'%');
+                $subq->orWhereHas('actividad', function($q2) {
+                    $q2->where('nombre', 'like', '%'.$this->buscarActividad.'%');
+                });
+            });
+        })
+        ->with(['presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente', 'actividad'])
+        ->paginate($this->perPage);
+
+    $allPresupuestos = collect();
+    foreach ($actividades_aprobadas as $actividad) {
+        foreach ($actividad->presupuestos as $presupuesto) {
+            $allPresupuestos->push($presupuesto);
+        }
+    }
+
+    $valoresPlanificados = [];
+    foreach ($allPresupuestos as $presupuesto) {
+        $cantidadPlanificada = DetalleRequisicion::where('idPresupuesto', $presupuesto->id)
+            ->whereHas('requisicion', function($q) {
+                $q->whereHas('estado', function($q2) {
+                    $q2->whereIn('estado', ['Presentado', 'Recibido', 'En Proceso de Compra']);
+                });
+            })
+            ->sum('cantidad');
+        $cantidadDisponible = ($presupuesto->cantidad ?? 0) - $cantidadPlanificada;
+        $costoUnitario = $presupuesto->costounitario ?? 0;
+        $costoDisponible = $cantidadDisponible * $costoUnitario;
+        $costoPlanificado = $cantidadPlanificada * $costoUnitario;
+        $valoresPlanificados[$presupuesto->id] = [
+            'cantidad_disponible' => $cantidadDisponible,
+            'cantidad_planificada' => $cantidadPlanificada,
+            'costo_disponible' => $costoDisponible,
+            'costo_planificado' => $costoPlanificado,
+        ];
+    }
+
+    return view('livewire.seguimiento.Requisicion.create-requisiciones', [
+        'mostrarSelector' => $this->mostrarSelector,
+        'departamentosUsuario' => $this->departamentosUsuario,
+        'departamentoSeleccionado' => $this->departamentoSeleccionado,
+        'actividades_aprobadas' => $actividades_aprobadas, // Pass the variable to the view
+        'valoresPlanificados' => $valoresPlanificados,
+    ])->layout($this->layout);
     }
 }
