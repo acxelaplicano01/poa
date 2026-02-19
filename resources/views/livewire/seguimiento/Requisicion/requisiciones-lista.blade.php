@@ -122,38 +122,41 @@
                 <x-slot name="desktop">
                     @forelse ($requisiciones as $requisicion)
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
-                                    {{ $requisicion->correlativo }}
-                                </span>
-                            </td>
-                            <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
-                                {{ $requisicion->departamento ? $requisicion->departamento->name : '-' }}
-                            </td>
-                            </td>
-                            <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
-                                {{ $requisicion->descripcion }}
-                            </td>
-                            <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
-                                {{ $requisicion->observacion ?? '-' }}
-                            </td>
-                            <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%] whitespace-normal break-words">
-                                @php
-                                    $estado = $requisicion->estado->estado ?? '';
-                                    $color = match ($estado) {
-                                        'Presentado' => 'bg-gray-100 text-gray-800',
-                                        'Recibido' => 'bg-blue-100 text-blue-800',
-                                        'En Proceso de Compra' => 'bg-yellow-100 text-yellow-800',
-                                        'Aprobado' => 'bg-green-100 text-green-800',
-                                        'Rechazado' => 'bg-red-100 text-red-800',
-                                        default => 'bg-gray-100 text-gray-800',
-                                    };
-                                @endphp
-                                <span class="px-2 py-1 rounded-full text-xs font-semibold border {{ $color }} max-w-[120px] block text-center">
-                                    {{ $estado }}
-                                </span>
-                            </td>
-                            <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
+                          <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 px-3 py-1 rounded-full text-xs font-semibold">
+                                {{ $requisicion->correlativo }}
+                            </span>
+                        </td>
+                        <td
+                            class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
+                            {{ $requisicion->departamento->name ?? '-' }}
+                        </td>
+                        <td
+                            class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
+                            {{ $requisicion->descripcion }}
+                        </td>
+                        <td
+                            class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
+                            {{ $requisicion->observacion }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                                $estado = $requisicion->estado->estado ?? '';
+                                $color = match ($estado) {
+                                    'Presentado' => 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200',
+                                    'Recibido' => 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200',
+                                    'En Proceso de Compra'
+                                        => 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100',
+                                    'Aprobado' => 'bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100',
+                                    'Rechazado' => 'bg-red-200 text-red-800 dark:bg-red-700 dark:text-red-100',
+                                    default => 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200',
+                                };
+                            @endphp
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $color }}">
+                                {{ $estado }}
+                            </span>
+                        </td>
+                            <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[30%]">
                                 <div class="flex space-x-2">
                                 <button wire:click="verDetalleRecursos({{ $requisicion->id }})"
                                         class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer"

@@ -29,7 +29,7 @@
         </div>
 
         <!-- Tabla de detalle de recursos -->
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto" style="max-height: 400px; overflow-y: auto;">
             <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700 mb-4">
                 <thead class="bg-zinc-100 dark:bg-zinc-800">
                     <tr>

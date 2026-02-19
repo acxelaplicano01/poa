@@ -240,7 +240,7 @@ $estado = $detalleRequisicion['estado'] ?? '';
                 @forelse ($requisiciones as $requisicion)
                     <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
+                            <span class="bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 px-3 py-1 rounded-full text-xs font-semibold">
                                 {{ $requisicion->correlativo }}
                             </span>
                         </td>

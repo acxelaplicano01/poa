@@ -1,23 +1,4 @@
-<div class="mx-auto py-8">
-    {{-- Mensajes de éxito y error --}}
-    @if (session()->has('message'))
-        <div class="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md" role="alert">
-            <p class="font-medium">{{ session('message') }}</p>
-        </div>
-    @endif
-
-    @if (session()->has('error'))
-        <div class="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
-            <p class="font-medium">{{ session('error') }}</p>
-        </div>
-    @endif
-
-    @error('general')
-        <div class="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
-            <p class="font-medium">{{ $message }}</p>
-        </div>
-    @enderror
-
+<div>
     {{-- Modal de confirmación para finalizar requisición --}}
     <x-dialog-modal wire:model="showConfirmFinalizarModal" maxWidth="md">
         <x-slot name="title">
@@ -295,6 +276,38 @@
     </x-dialog-modal>
 
     <div class="mb-6">
+
+    {{-- Mensajes de éxito/error --}}
+    @if ($successMessage)
+        @include('rk.default.notifications.notification-alert', [
+            'type' => 'success',
+            'dismissible' => true,
+            'icon' => true,
+            'duration' => 5,
+            'slot' => $successMessage,
+        ])
+    @endif
+
+    @if (session()->has('message'))
+        @include('rk.default.notifications.notification-alert', [
+            'type' => 'success',
+            'dismissible' => true,
+            'icon' => true,
+            'duration' => 5,
+            'slot' => session('message'),
+        ])
+    @endif
+
+    @if (session()->has('error'))
+        @include('rk.default.notifications.notification-alert', [
+            'type' => 'error',
+            'dismissible' => true,
+            'icon' => true,
+            'duration' => 8,
+            'slot' => session('error'),
+        ])
+    @endif
+
         <div class="flex items-center justify-between mb-4">
             <h1 class="text-2xl font-bold text-zinc-800 dark:text-zinc-100">Entrega de Recursos</h1>
             <div class="flex gap-2">

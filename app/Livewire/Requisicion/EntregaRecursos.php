@@ -43,6 +43,9 @@ class EntregaRecursos extends Component
     public $pdfDownloadUrl = '';
     public $pdfTitle = '';
 
+    public $successMessage = ''; // Success message
+    public $errorMessage = ''; // Error message
+
     protected $rules = [
         'cantidadEjecutada' => 'required|numeric|min:0',
         'montoUnitarioEjecutado' => 'required|numeric|min:0',
@@ -273,7 +276,7 @@ class EntregaRecursos extends Component
             
             $this->cerrarModal();
             
-            session()->flash('message', 'Ejecución registrada correctamente.');
+            $this->successMessage = 'Ejecución registrada correctamente.'; // Set success message
             
             // Dispatch evento para refrescar la página si es necesario
             $this->dispatch('ejecucion-guardada');
@@ -284,7 +287,7 @@ class EntregaRecursos extends Component
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            $this->addError('general', 'Error al registrar la ejecución: ' . $e->getMessage());
+            $this->errorMessage = 'Error al registrar la ejecución: ' . $e->getMessage(); // Set error message
         }
     }
 
@@ -342,7 +345,7 @@ class EntregaRecursos extends Component
 
             $this->cerrarModalObservacionEjecucion();
 
-            session()->flash('message', 'Observación guardada correctamente.');
+            $this->successMessage = 'Observación guardada correctamente.'; // Set success message
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -350,7 +353,7 @@ class EntregaRecursos extends Component
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            session()->flash('error', 'Error al guardar la observación: ' . $e->getMessage());
+            $this->errorMessage = 'Error al guardar la observación: ' . $e->getMessage(); // Set error message
         }
     }
 
@@ -494,7 +497,7 @@ class EntregaRecursos extends Component
             // Recargar los datos
             $this->mount($this->requisicionId);
 
-            session()->flash('message', 'Requisición finalizada correctamente. Se ha generado el acta de entrega.');
+            $this->successMessage = 'Requisición finalizada correctamente. Se ha generado el acta de entrega.'; // Set success message
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -503,7 +506,7 @@ class EntregaRecursos extends Component
                 'requisicion_id' => $this->requisicionId,
                 'trace' => $e->getTraceAsString()
             ]);
-            session()->flash('error', 'Error al finalizar la requisición: ' . $e->getMessage());
+            $this->errorMessage = 'Error al finalizar la requisición: ' . $e->getMessage(); // Set error message
         }
     }
 
