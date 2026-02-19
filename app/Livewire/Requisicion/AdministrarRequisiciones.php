@@ -405,6 +405,7 @@ class AdministrarRequisiciones extends Component
             'departamentos' => $departamentos,
             'estados' => $estados,
             'detalleRecursos' => $this->detalleRecursos ?? [],
+            'detalleRequisicion' => $this->detalleRequisicion ?? [],
         ]);
     }
 }

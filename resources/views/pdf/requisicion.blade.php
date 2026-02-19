@@ -233,7 +233,6 @@
             </div>
             <br>
             <div class="datos">
-                            
                 <table class="table">
                     <thead>
                         <tr>
@@ -248,31 +247,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @for ($i = 0; $i < 7; $i++)
-                            @if (isset($recursos[$i]))
-                                <tr>
-                                    <td>{{ $i + 1 }}</td>
-                                    <td>{{ $recursos[$i]['cantidad'] }}</td>
-                                    <td>{{ $recursos[$i]['recurso'] }} {{ $recursos[$i]['detalle_tecnico'] }}</td>
-                                    <td>{{ $recursos[$i]['unidad'] }}</td>
-                                    <td>L {{ number_format($recursos[$i]['precio_unitario'], 2) }}</td>
-                                    <td>L {{ number_format($recursos[$i]['total'], 2) }}</td>
-                                    <td>{{ $recursos[$i]['ref_poa'] ?? '' }}</td>
-                                    <td>{{ $recursos[$i]['ref_acta'] ?? '' }}</td>
-                                </tr>
-                            @else
-                                <tr>
-                                    <td>{{ $i + 1 }}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                            @endif
-                        @endfor
+                        @foreach ($recursos as $index => $recurso)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $recurso['cantidad'] }}</td>
+                                <td>{{ $recurso['recurso'] }} {{ $recurso['detalle_tecnico'] }}</td>
+                                <td>{{ $recurso['unidad'] }}</td>
+                                <td>L {{ number_format($recurso['precio_unitario'], 2) }}</td>
+                                <td>L {{ number_format($recurso['total'], 2) }}</td>
+                                <td>{{ $recurso['ref_poa'] ?? '' }}</td>
+                                <td>{{ $recurso['ref_acta'] ?? '' }}</td>
+                            </tr>
+                        @endforeach
                         <tr>
                             <td colspan="5"></td>
                             <td style="font-weight:600;">COSTO TOTAL:</td>

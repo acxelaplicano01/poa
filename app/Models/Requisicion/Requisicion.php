@@ -38,7 +38,7 @@ class Requisicion extends BaseModel
 
     public function estado()
     {
-        return $this->belongsTo(EstadoRequisicion::class, 'idEstado');
+        return $this->belongsTo(EstadoRequisicion::class, 'idEstado', 'id');
     }
 
     public function creador()
@@ -59,5 +59,15 @@ class Requisicion extends BaseModel
     public function detalleRequisiciones()
     {
         return $this->hasMany(DetalleRequisicion::class, 'idRequisicion');
+    }
+
+    public function estadoRequisicion()
+    {
+        return $this->belongsTo(EstadoRequisicion::class, 'idEstado', 'id');
+    }
+
+    public function montoEjecutado()
+    {
+        return $this->sum('detalle_ejecucion_presupuestaria.monto_total_ejecutado');
     }
 }

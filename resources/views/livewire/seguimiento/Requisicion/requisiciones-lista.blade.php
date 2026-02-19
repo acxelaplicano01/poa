@@ -1,4 +1,35 @@
 <div>
+    {{-- Mensajes de éxito/error --}}
+    @if (!empty($successMessage))
+        @include('rk.default.notifications.notification-alert', [
+            'type' => 'success',
+            'dismissible' => true,
+            'icon' => true,
+            'duration' => 5,
+            'slot' => $successMessage,
+        ])
+    @endif
+
+    @if (session()->has('message'))
+        @include('rk.default.notifications.notification-alert', [
+            'type' => 'success',
+            'dismissible' => true,
+            'icon' => true,
+            'duration' => 5,
+            'slot' => session('message'),
+        ])
+    @endif
+
+    @if (session()->has('error'))
+        @include('rk.default.notifications.notification-alert', [
+            'type' => 'error',
+            'dismissible' => true,
+            'icon' => true,
+            'duration' => 8,
+            'slot' => session('error'),
+        ])
+    @endif
+
     @include('livewire.seguimiento.Requisicion.edit-requisicion')
     @include('livewire.seguimiento.Requisicion.detalle-recursos-modal')
     <div class="mx-auto rounded-lg mt-8 sm:mt-6 lg:mt-4 mb-6">
@@ -67,7 +98,7 @@
                         </select>
                     </div>
                 </div>
-                !
+                
                 <div class="flex justify-end w-full sm:w-auto">
                     <x-spinner-button onclick="window.location.href='/requisicion'"
                         class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -96,36 +127,43 @@
                                     {{ $requisicion->correlativo }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
+                            <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
                                 {{ $requisicion->departamento ? $requisicion->departamento->name : '-' }}
                             </td>
                             </td>
-                            <td class="px-6 py-4 text-zinc-900 dark:text-zinc-300 max-w-md truncate">
+                            <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
                                 {{ $requisicion->descripcion }}
                             </td>
-                            <td class="px-6 py-4 text-zinc-900 dark:text-zinc-300 max-w-md truncate">
+                            <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
                                 {{ $requisicion->observacion ?? '-' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
+                            <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%] whitespace-normal break-words">
                                 @php
                                     $estado = $requisicion->estado->estado ?? '';
                                     $color = match ($estado) {
-                                        'Presentado' => 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200',
-                                        'Recibido' => 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200',
-                                        'En Proceso de Compra'
-                                            => 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100',
-                                        'Aprobado'
-                                            => 'bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100',
-                                        'Rechazado' => 'bg-red-200 text-red-800 dark:bg-red-700 dark:text-red-100',
-                                        default => 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200',
+                                        'Presentado' => 'bg-gray-100 text-gray-800',
+                                        'Recibido' => 'bg-blue-100 text-blue-800',
+                                        'En Proceso de Compra' => 'bg-yellow-100 text-yellow-800',
+                                        'Aprobado' => 'bg-green-100 text-green-800',
+                                        'Rechazado' => 'bg-red-100 text-red-800',
+                                        default => 'bg-gray-100 text-gray-800',
                                     };
                                 @endphp
-                                <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $color }}">
+                                <span class="px-2 py-1 rounded-full text-xs font-semibold border {{ $color }} max-w-[120px] block text-center">
                                     {{ $estado }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
                                 <div class="flex space-x-2">
+                                <button wire:click="verDetalleRecursos({{ $requisicion->id }})"
+                                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer"
+                                        title="Ver Detalle de Recursos">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                                        </svg>
+                                    </button>
                                     @if (($requisicion->estado->estado ?? '') === 'Presentado')
                                         <button wire:click="edit({{ $requisicion->id }})"
                                             class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer"
@@ -150,15 +188,6 @@
                                             </svg>
                                         </button>
                                     @endif
-                                    <button wire:click="verDetalleRecursos({{ $requisicion->id }})"
-                                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer"
-                                        title="Ver Detalle de Recursos">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="1.5" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
-                                        </svg>
-                                    </button>
                                 </div>
                             </td>
                         </tr>

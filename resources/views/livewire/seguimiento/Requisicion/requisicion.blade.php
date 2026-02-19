@@ -5,7 +5,7 @@
                 <x-input
                     wire:model.defer="busqueda"
                     type="text"
-                    placeholder="Buscar por correlativo o departamento"
+                    placeholder="Buscar por Correlativo..."
                     class="w-full"
                 />
             </div>

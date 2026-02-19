@@ -38,70 +38,70 @@ $estado = $detalleRequisicion['estado'] ?? '';
                     class="{{ $color }}">Estado: {{ $estado }}
                 </div>
             </div>
-            <div
-                class="overflow-x-auto bg-white dark:bg-zinc-900 rounded-lg shadow dark:shadow-lg border border-zinc-200 dark:border-zinc-700 p-4">
-                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700 mb-4">
-                    <thead class="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200">
-                        <tr>
-                            <th class="px-4 py-2 text-left text-xs font-semibold">Recurso</th>
-                            <th class="px-4 py-2 text-left text-xs font-semibold">Detalle Tecnico</th>
-                            <th class="px-4 py-2 text-center text-xs font-semibold">Cantidad</th>
-                            <th class="px-4 py-2 text-center text-xs font-semibold">Precio unitario</th>
-                            <th class="px-4 py-2 text-center text-xs font-semibold">Total</th>
-                            <th class="px-4 py-2 text-center text-xs font-semibold">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($detalleRecursos as $detalle)
-                            <tr class="bg-white dark:bg-zinc-900">
-                                <td class="px-4 py-2 align-top whitespace-nowrap text-zinc-900 dark:text-zinc-100">
-                                    {{ $detalle['recurso'] }}
-                                </td>
-                                <td class="px-4 py-2 align-top text-zinc-900 dark:text-zinc-100">
-                                    {{ $detalle['detalle_tecnico'] }}
-                                </td>
-                                <td class="px-4 py-2 align-top text-center text-zinc-900 dark:text-zinc-100">
-                                    {{ $detalle['cantidad'] }}
-                                </td>
-                                <td class="px-4 py-2 align-top text-center text-zinc-900 dark:text-zinc-100">L
-                                    {{ number_format($detalle['precio_unitario'], 2) }}
-                                </td>
-                                <td class="px-4 py-2 align-top text-center text-zinc-900 dark:text-zinc-100">L
-                                    {{ number_format($detalle['total'], 2) }}
-                                </td>
-                                <td class="px-4 py-2 align-top text-center">
-                                    @if(
-                                        Str::of(strtolower($detalle['recurso'] ?? ''))->contains('gasolina') ||
-                                        Str::of(strtolower($detalle['recurso'] ?? ''))->contains('diesel')
-                                    )
-                                        @php
-                                            // Asegura que el id esté presente, ya sea como idDetalleRequisicion o id
-                                            $detalleId = $detalle['idDetalleRequisicion'] ?? $detalle['id'] ?? null;
-                                        @endphp
-                                        @if($detalleId)
-                                            <a href="{{ route('orden-combustible-pdf', ['detalleId' => $detalleId]) }}"
-                                                target="_blank"
-                                                title="Descargar Orden de Combustible PDF"
-                                                class="inline-flex items-center gap-1 px-2 py-1 rounded bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-xs font-semibold transition">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                    stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                                                </svg>
-                                                Orden Combustible
-                                            </a>
-                                        @endif
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
+            <div class="overflow-x-auto bg-white dark:bg-zinc-900 rounded-lg shadow dark:shadow-lg border border-zinc-200 dark:border-zinc-700 p-4">
+                <div class="max-h-96 overflow-y-auto"> <!-- Add scrollable container -->
+                    <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700 mb-4">
+                        <thead class="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200">
                             <tr>
-                                <td colspan="7" class="px-4 py-2 text-center text-zinc-500 dark:text-zinc-400">No hay
-                                    recursos para mostrar.</td>
+                                <th class="px-4 py-2 text-left text-xs font-semibold">Recurso</th>
+                                <th class="px-4 py-2 text-left text-xs font-semibold">Detalle Tecnico</th>
+                                <th class="px-4 py-2 text-center text-xs font-semibold">Cantidad</th>
+                                <th class="px-4 py-2 text-center text-xs font-semibold">Precio unitario</th>
+                                <th class="px-4 py-2 text-center text-xs font-semibold">Total</th>
+                                <th class="px-4 py-2 text-center text-xs font-semibold">Acción</th>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @forelse($detalleRecursos as $detalle)
+                                <tr class="bg-white dark:bg-zinc-900">
+                                    <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[20%]">
+                                        {{ $detalle['recurso'] }}
+                                    </td>
+                                    <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
+                                        {{ $detalle['detalle_tecnico'] }}
+                                    </td>
+                                    <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
+                                        {{ $detalle['cantidad'] }}
+                                    </td>
+                                    <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
+                                        L {{ number_format($detalle['precio_unitario'], 2) }}
+                                    </td>
+                                    <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">L
+                                        {{ number_format($detalle['total'], 2) }}
+                                    </td>
+                                    <td class="px-4 py-2 align-top text-center">
+                                        @if(
+                                            Str::of(strtolower($detalle['recurso'] ?? ''))->contains('gasolina') ||
+                                            Str::of(strtolower($detalle['recurso'] ?? ''))->contains('diesel')
+                                        )
+                                            @php
+                                                $detalleId = $detalle['idDetalleRequisicion'] ?? $detalle['id'] ?? null;
+                                            @endphp
+                                            @if($detalleId)
+                                                <a href="{{ route('orden-combustible-pdf', ['detalleId' => $detalleId]) }}"
+                                                    target="_blank"
+                                                    title="Descargar Orden de Combustible PDF"
+                                                    class="inline-flex items-center gap-1 px-2 py-1 rounded bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-xs font-semibold transition">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                                    </svg>
+                                                    Orden Combustible
+                                                </a>
+                                            @endif
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="px-4 py-2 text-center text-zinc-500 dark:text-zinc-400">No hay
+                                        recursos para mostrar.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
                 <div class="border-t border-zinc-200 dark:border-zinc-700 pt-3 mt-3">
                     <div class="flex justify-between items-center">
                         <div class="text-right font-semibold text-zinc-900 dark:text-zinc-100">
@@ -128,49 +128,48 @@ $estado = $detalleRequisicion['estado'] ?? '';
                 @if ($estado === 'Presentado' || $estado === 'En Proceso de Compra')
                     <div class="flex-1">
                         <div class="relative">
-                            <span
-                                class="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400 dark:text-zinc-500">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400 dark:text-zinc-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                                 </svg>
                             </span>
-                            <input type="text" wire:model.defer="observacionModal" placeholder="Observación"
+                            <x-input type="text" wire:model.defer="observacionModal" placeholder="Observación"
                                 class="pl-8 pr-2 py-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700" />
                         </div>
                     </div>
                     <div class="flex flex-row gap-3 items-center justify-end">
                         @if ($estado === 'Presentado')
-                            <button wire:click="marcarComoRecibido"
+                            <x-spinner-button wire:click="marcarComoRecibido" loadingTarget="marcarComoRecibido"
                                 class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-green-700 dark:hover:bg-green-800">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                 </svg>
                                 Recibido
-                            </button>
+                            </x-spinner-button>
                         @endif
-                        <button wire:click="marcarComoRechazado"
+                        <x-spinner-button wire:click="marcarComoRechazado" loadingTarget="marcarComoRechazado"
                             class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-red-700 dark:hover:bg-red-800">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                             </svg>
                             Rechazar
-                        </button>
+                        </x-spinner-button>
                     </div>
                 @elseif ($estado === 'Recibido')
-                    <button wire:click="marcarComoAprobado"
+                    <x-spinner-button wire:click="marcarComoAprobado" loadingTarget="marcarComoAprobado"
                         class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-green-700 dark:hover:bg-green-800">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-5 h-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                         </svg>
                         Aprobado
-                    </button>
+                    </x-spinner-button>
                 @elseif ($estado === 'Aprobado')
-                    <button wire:click="marcarComoProcesoCompra"
+                    <x-spinner-button wire:click="marcarComoProcesoCompra" loadingTarget="marcarComoProcesoCompra"
                         class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-yellow-700 dark:hover:bg-yellow-800">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-6">
@@ -178,10 +177,12 @@ $estado = $detalleRequisicion['estado'] ?? '';
                                 d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                         </svg>
                         Proceso de Compra
-                    </button>
+                    </x-spinner-button>
                 @endif
-                <button wire:click="cerrarDetalleModal"
-                    class="bg-zinc-400 hover:bg-zinc-500 text-white font-semibold px-6 py-2 rounded transition dark:bg-zinc-600 dark:hover:bg-zinc-700">Cancelar</button>
+                <x-spinner-button wire:click="cerrarDetalleModal" loadingTarget="cerrarDetalleModal"
+                    class="bg-zinc-400 hover:bg-zinc-500 text-white font-semibold px-6 py-2 rounded transition dark:bg-zinc-600 dark:hover:bg-zinc-700">
+                    Cancelar
+                </x-spinner-button>
             </div>
         </x-slot>
     </x-dialog-modal>
@@ -224,12 +225,15 @@ $estado = $detalleRequisicion['estado'] ?? '';
                                 {{ $requisicion->correlativo }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                            {{ $requisicion->departamento->name ?? '-' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                            {{ $requisicion->descripcion }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                            {{ $requisicion->observacion }}</td>
+                        <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
+                            {{ $requisicion->departamento->name ?? '-' }}
+                        </td>
+                        <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
+                            {{ $requisicion->descripcion }}
+                        </td>
+                        <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
+                            {{ $requisicion->observacion }}
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @php
                                 $estado = $requisicion->estado->estado ?? '';
@@ -269,22 +273,24 @@ $estado = $detalleRequisicion['estado'] ?? '';
                                     </a>
                                 @endif
                                 @if (($requisicion->estado->estado ?? '') === 'Finalizado')
-                                    <a href="{{ route('acta-entrega-pdf', ['requisicionId' => $requisicion->id]) }}" 
+                                    <a href="{{ route('acta-entrega-pdf', ['requisicionId' => $requisicion->id]) }}"
                                         target="_blank"
                                         title="Descargar Acta de Entrega"
                                         class="p-2 rounded-full hover:bg-red-100 text-red-700 transition">
                                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                     </a>
                                 @endif
                             </div>
                         </td>
-
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-zinc-500">No se encontraron requisiciones</td>
+                        <td colspan="6" class="text-center py-4 text-zinc-500 dark:text-zinc-400">
+                            No se encontraron requisiciones
+                        </td>
                     </tr>
                 @endforelse
             </x-slot>

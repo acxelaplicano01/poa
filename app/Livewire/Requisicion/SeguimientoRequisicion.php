@@ -45,14 +45,24 @@ class SeguimientoRequisicion extends Component
     public $mostrarSelector = false;
     public $departamentosUsuario = [];
     
+    public $successMessage = ''; // Inicializa la variable para evitar errores
+
     public function sortBy($field)
     {
-        if ($this->sortField === $field) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
+        // Validate the sort field against valid columns in the requisicion table
+        $validColumns = ['id', 'correlativo', 'descripcion', 'fechaSolicitud', 'fechaRequerido']; // Add valid columns here
+        $relatedFields = ['departamento']; // Add related fields here
+
+        if (in_array($field, $validColumns)) {
             $this->sortField = $field;
-            $this->sortDirection = 'asc';
+        } elseif (in_array($field, $relatedFields)) {
+            // Handle sorting by related fields explicitly
+            $this->sortField = 'departamento.name'; // Example for sorting by departamento.name
+        } else {
+            $this->sortField = 'id'; // Default to a valid column
         }
+
+        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
     }
 
 
@@ -129,7 +139,7 @@ class SeguimientoRequisicion extends Component
 
         $this->showSumarioModal = false;
         $this->isEditing = false;
-        session()->flash('message', 'Requisición actualizada correctamente.');
+        $this->successMessage = 'Requisición actualizada correctamente.'; // Actualiza el mensaje de éxito
     }
 
     // Mostrar modal de confirmación para eliminar una requisición
@@ -150,7 +160,7 @@ class SeguimientoRequisicion extends Component
             $this->requisicionToDelete->delete();
             $this->showDeleteModal = false;
             $this->requisicionToDelete = null;
-            session()->flash('message', 'Requisición eliminada correctamente.');
+            $this->successMessage = 'Requisición eliminada correctamente.'; // Actualiza el mensaje de éxito
         }
     }
 
@@ -169,22 +179,44 @@ class SeguimientoRequisicion extends Component
     }
     
     // Mostrar modal de detalle de recursos
-    public function verDetalleRecursos($id)
-    {
-        $requisicion = Requisicion::with(['detalleRequisiciones.presupuesto', 'detalleRequisiciones.unidadMedida'])->findOrFail($id);
-        $this->detalleRecursos = $requisicion->detalleRequisiciones->map(function($detalle) {
-            return [
-                'recurso' => $detalle->presupuesto->recurso ?? '-',
-                'detalle_tecnico' => $detalle->presupuesto->detalle_tecnico ?? '-',
-                'cantidad' => $detalle->cantidad ?? '-',
-                'precio_unitario' => $detalle->presupuesto->costounitario ?? '-',
-                'total' => ($detalle->cantidad ?? 0) * ($detalle->presupuesto->costounitario ?? 0),
-                'estado' => $detalle->requisicion->estado->estado ?? 'Pendiente',
-                'ref_acta' => $detalle->referenciaActaEntrega ?? 'No Aplica',
-            ];
-        })->toArray();
-        $this->showDetalleRecursosModal = true;
-    }
+  public function verDetalleRecursos($id)
+{
+    $requisicion = Requisicion::with([
+        'detalleRequisiciones.presupuesto',
+        'estado'
+    ])->findOrFail($id);
+
+    $this->detalleRecursos = $requisicion->detalleRequisiciones->map(function ($detalle) use ($requisicion) {
+        $cantidad = (float)($detalle->cantidad ?? 0);
+        $precioUnitario = (float)($detalle->presupuesto->costounitario ?? 0);
+        return [
+            'recurso'         => $detalle->presupuesto->recurso ?? '-',
+            'detalle_tecnico' => $detalle->presupuesto->detalle_tecnico ?? '-',
+            'cantidad'        => $cantidad,
+            'precio_unitario' => $precioUnitario,
+            'total'           => $cantidad * $precioUnitario,
+            'estado'          => $requisicion->estado->estado ?? 'Desconocido',
+        ];
+    })->toArray();
+
+    $this->montoTotalRequisicion = collect($this->detalleRecursos)->sum('total');
+
+    $this->montoEjecutadoRequisicion = DB::table('detalle_ejecucion_presupuestaria')
+        ->whereIn('idDetalleRequisicion', $requisicion->detalleRequisiciones->pluck('id'))
+        ->sum('monto_total_ejecutado');
+
+    $this->estadoRequisicion = $requisicion->estado->estado ?? 'Desconocido';
+    $this->showDetalleRecursosModal = true;
+}
+
+public function cerrarDetalleModal()
+{
+    $this->showDetalleRecursosModal = false;
+    $this->detalleRecursos = [];
+    $this->montoTotalRequisicion = 0;
+    $this->montoEjecutadoRequisicion = 0;
+    $this->estadoRequisicion = null;
+}
 
     public function cerrarDetalleRecursosModal()
     {
@@ -195,60 +227,53 @@ class SeguimientoRequisicion extends Component
 
     public function render()
     {
-        // Lógica para selector de departamento
-        $departamentosUsuario = [];
-        if (auth()->user() && auth()->user()->empleado) {
-            $departamentosUsuario = auth()->user()->empleado->departamentos()->with('unidadEjecutora')->get(); // Asegúrate de cargar la relación 'unidadEjecutora'
+        // Fetch departments for the user
+        $this->departamentosUsuario = auth()->user() && auth()->user()->empleado
+            ? auth()->user()->empleado->departamentos()->with('unidadEjecutora')->get()
+            : collect();
+
+        // Determine if the selector should be shown
+        $this->mostrarSelector = $this->departamentosUsuario->count() > 1;
+
+        // Set default department if not already selected
+        if ($this->departamentoSeleccionado === null && $this->departamentosUsuario->isNotEmpty()) {
+            $this->departamentoSeleccionado = $this->departamentosUsuario->first()->id;
         }
-        $mostrarSelector = $departamentosUsuario->count() > 1;
 
-        if ($this->departamentoSeleccionado === null && $departamentosUsuario->isNotEmpty()) {
-            $this->departamentoSeleccionado = $departamentosUsuario->first()->id; // Selecciona el primer departamento por defecto
-        }
-
-
+        // Build the query for requisitions
         $query = Requisicion::with(['departamento', 'estado'])
             ->when($this->estadoFiltro && $this->estadoFiltro !== 'Todos', function ($query) {
-                $query->whereHas('estado', function($q) {
+                $query->whereHas('estado', function ($q) {
                     $q->where('estado', $this->estadoFiltro);
                 });
             })
-            ->when($this->poaYear, function($q) {
-                $q->whereHas('poa', function($q2) {
-                    $q2->where('anio', $this->poaYear);
+            ->when($this->poaYear, function ($query) {
+                $query->whereHas('poa', function ($q) {
+                    $q->where('anio', $this->poaYear);
                 });
             })
             ->when($this->search, function ($query) {
-                $query->where(function($q) {
+                $query->where(function ($q) {
                     $q->where('correlativo', 'like', "%{$this->search}%")
-                      ->orWhereHas('departamento', function($q2) {
+                      ->orWhereHas('departamento', function ($q2) {
                           $q2->where('name', 'like', "%{$this->search}%");
                       });
                 });
             })
             ->when($this->departamentoSeleccionado, function ($query) {
-                $query->whereHas('departamento', function($q) {
+                $query->whereHas('departamento', function ($q) {
                     $q->where('id', $this->departamentoSeleccionado);
                 });
             });
 
-        // Paginación dinámica y ordenamiento
-        $perPage = $this->perPage ?? 10;
-        $sortField = $this->sortField ?? 'id';
-        $sortDirection = $this->sortDirection ?? 'desc';
-        $requisiciones = $query->orderBy($sortField, $sortDirection)->paginate($perPage);
-
-        foreach ($requisiciones as $requisicion) {
-            $departamentoCreador = null;
-            if (
-                $requisicion->creador &&
-                $requisicion->creador->empleado &&
-                $requisicion->creador->empleado->departamentos->count()
-            ) {
-                $departamentoCreador = $requisicion->creador->empleado->departamentos->first();
-            }
-            $requisicion->departamento_creador = $departamentoCreador;
+        if ($this->sortField === 'departamento.name') {
+            $query->join('departamentos', 'requisicion.idDepartamento', '=', 'departamentos.id')
+              ->orderBy('departamentos.name', $this->sortDirection);
+        } else {
+            $query->orderBy($this->sortField, $this->sortDirection);
         }
+
+        $requisiciones = $query->paginate($this->perPage ?? 10);
 
         $poas = Poa::activo()->orderByDesc('anio')->get();
         $this->poaYears = $poas->pluck('anio')->unique()->sort()->values();
@@ -256,8 +281,8 @@ class SeguimientoRequisicion extends Component
         return view('livewire.seguimiento.Requisicion.requisiciones-lista', [
             'requisiciones' => $requisiciones,
             'poas' => $poas,
-            'mostrarSelector' => $mostrarSelector,
-            'departamentosUsuario' => $departamentosUsuario,
+            'mostrarSelector' => $this->mostrarSelector,
+            'departamentosUsuario' => $this->departamentosUsuario,
             'poaYears' => $this->poaYears,
         ]);
     }

@@ -40,6 +40,11 @@ class DetalleRequisicion extends BaseModel
         return $this->belongsTo(Presupuesto::class, 'idPresupuesto');
     }
 
+        public function montoEjecutado()
+    {
+        return $this->sum('detalle_ejecucion_presupuestaria.monto_total_ejecutado');
+    }
+
     public function recurso()
     {
         return $this->belongsTo(TareaHistorico::class, 'idRecurso');

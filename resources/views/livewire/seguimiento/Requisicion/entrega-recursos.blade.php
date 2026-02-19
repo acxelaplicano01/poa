@@ -262,35 +262,15 @@
         <div class="flex items-center justify-between mb-4">
             <h1 class="text-2xl font-bold text-zinc-800 dark:text-zinc-100">Entrega de Recursos</h1>
             <div class="flex gap-2">
-                @if(($requisicion->estado->estado ?? '') === 'Finalizado')
-                    <a href="{{ route('acta-entrega-pdf', $requisicionId) }}" 
-                        target="_blank"
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        Descargar Acta Final
-                    </a>
-                @endif
-
-                {{-- Botón para generar acta intermedia si hay recursos entregados --}}
-                @if(collect($recursosParaEntregar)->where('entregado', '>', 0)->count() > 0)
-                    <a href="{{ route('acta-entrega-intermedia-pdf', $requisicionId) }}" 
-                        target="_blank"
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        Acta Intermedia
-                    </a>
-                @endif
-
+               
                 <a href="{{ route('administrar-requisiciones') }}" 
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-zinc-600 text-white hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                    class="inline-flex items-center text-indigo-600 dark:text-indigo-400 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                            clip-rule="evenodd" />
                     </svg>
-                    Regresar
+                    Volver a Requisiciones
                 </a>
             </div>
         </div>
@@ -321,22 +301,49 @@
         {{-- Botón para finalizar requisición --}}
         <div class="mb-4 flex justify-between items-center">
             <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Recursos de la Requisición</h2>
-            @if(($requisicion->estado->estado ?? '') !== 'Finalizado')
-                <x-spinner-button wire:click="abrirModalFinalizar" loadingTarget="abrirModalFinalizar" :loadingText="__('Abriendo...')"
-                    class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition">
-                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg>
-                    {{ __('Finalizar Requisición') }}
-                </x-spinner-button>
-            @else
-                <div class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-zinc-400 text-white cursor-not-allowed">
-                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                    </svg>
-                    {{ __('Requisición Finalizada') }}
-                </div>
-            @endif
+            <div class="flex gap-2">
+                {{-- Botón para generar acta de entrega final --}}
+                @if(($requisicion->estado->estado ?? '') === 'Finalizado')
+                    <a href="{{ route('acta-entrega-pdf', $requisicionId) }}" 
+                        target="_blank"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Descargar Acta Final
+                    </a>
+                @endif
+
+                {{-- Botón para generar acta intermedia --}}
+                @if(collect($recursosParaEntregar)->where('entregado', '>', 0)->count() > 0)
+                    <a href="{{ route('acta-entrega-intermedia-pdf', $requisicionId) }}" 
+                        target="_blank"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Acta Intermedia
+                    </a>
+                @endif
+
+                {{-- Botón para finalizar requisición --}}
+                @if(($requisicion->estado->estado ?? '') !== 'Finalizado')
+                    <x-spinner-button wire:click="abrirModalFinalizar" loadingTarget="abrirModalFinalizar" :loadingText="__('Abriendo...')"
+                        class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ml-auto">
+                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        {{ __('Finalizar Requisición') }}
+                    </x-spinner-button>
+                @else
+                    <div class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-zinc-400 text-white cursor-not-allowed ml-auto">
+                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                        </svg>
+                        {{ __('Requisición Finalizada') }}
+                    </div>
+                @endif
+            </div>
         </div>
 
         <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700 mb-4">
@@ -355,11 +362,11 @@
             <tbody class="bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700">
                 @foreach($recursosParaEntregar as $recurso)
                     <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700/50">
-                        <td class="px-4 py-2 align-top text-sm whitespace-nowrap text-zinc-900 dark:text-zinc-100">{{ $recurso['recurso'] }}</td>
-                        <td class="px-4 py-2 align-top text-sm text-zinc-600 dark:text-zinc-400">{{ $recurso['detalle_tecnico'] }}</td>
-                        <td class="px-4 py-2 align-top text-center text-sm text-zinc-600 dark:text-zinc-400">{{ $recurso['observacion'] ?? '-' }}</td>
-                        <td class="px-4 py-2 align-top text-center text-sm text-zinc-600 dark:text-zinc-400">{{ $recurso['factura'] ?? '-' }}</td>
-                        <td class="px-4 py-2 align-top text-center text-sm text-zinc-600 dark:text-zinc-400">{{ $recurso['fecha_ejecucion'] ?? '-' }}</td>
+                        <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">{{ $recurso['recurso'] }}</td>
+                        <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">{{ $recurso['detalle_tecnico'] }}</td>
+                        <td class="px-3 py-2 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[15%]">{{ $recurso['observacion'] ?? '-' }}</td>
+                        <td class="px-3 py-2 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[15%]">{{ $recurso['factura'] ?? '-' }}</td>
+                        <td class="px-3 py-2 text-center text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[15%]">{{ $recurso['fecha_ejecucion'] ?? '-' }}</td>
                         <td class="px-4 py-2 align-top text-sm">
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2">

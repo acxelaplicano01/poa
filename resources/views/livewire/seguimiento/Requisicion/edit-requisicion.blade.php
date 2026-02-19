@@ -55,20 +55,32 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <x-label for="descripcionRequisicion" value="Descripción" />
-                        <x-input id="descripcionRequisicion" type="text" wire:model.defer="descripcion" placeholder="Descripción" />
+                        <textarea id="descripcionRequisicion" rows="3" wire:model.defer="descripcion"
+                            class="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Descripción detallada"></textarea>
                     </div>
                     <div>
                         <x-label for="observacionRequisicion" value="Observación" />
-                        <x-input id="observacionRequisicion" type="text" wire:model.defer="observacion" placeholder="Observación" />
+                        <textarea id="observacionRequisicion" rows="3" wire:model.defer="observacion"
+                            class="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Observaciones adicionales"></textarea>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 items-end">
-                    <div>
+                    <div class="relative col-span-1">
                         <x-label for="fechaRequerido" value="Fecha a requerir" />
-                        <x-input id="fechaRequerido" type="date" wire:model.defer="fechaRequerido" placeholder="dd/mm/aaaa" />
+                        <div class="relative">
+                            <x-input id="fechaRequerido" type="date" wire:model.defer="fechaRequerido"
+                                class="w-full p-3 pl-10 border border-zinc-300 dark:border-zinc-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" />
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-zinc-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                     <div class="flex justify-end">
-                        <span class="font-semibold text-zinc-900 dark:text-zinc-100">Monto total a requerir: L {{ number_format(collect($recursosSeleccionados)->sum('total'), 2) }}</span>
+                        <span class="font-semibold text-zinc-900 dark:text-zinc-100 text-lg">Monto total a requerir: L {{ number_format(collect($recursosSeleccionados)->sum('total'), 2) }}</span>
                     </div>
                 </div>
             </div>

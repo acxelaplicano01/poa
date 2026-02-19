@@ -80,6 +80,9 @@ class Requisicion extends Component
     ];
     public $empleados = [];
 
+    public $estadoRequisicion;
+    public $montoTotalRequisicion = 0;
+    public $montoEjecutadoRequisicion = 0;
 
     protected $rules = [
         'correlativo' => 'required|min:3',
@@ -313,6 +316,12 @@ class Requisicion extends Component
 
     public function sortBy($field)
     {
+        // Validate the sort field against valid columns in the requisicion table
+        $validColumns = ['id', 'correlativo', 'descripcion', 'fechaSolicitud', 'fechaRequerido']; // Add other valid columns here
+        if (!in_array($field, $validColumns)) {
+            $field = 'id'; // Default to a valid column
+        }
+
         if ($this->sortField === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
         } else {
@@ -349,6 +358,7 @@ class Requisicion extends Component
         $this->fechaSolicitud = now();
         $this->fechaRequerido = null;
         $this->requisicionId = null;
+        $this->successMessage = ''; // Resetea el mensaje de éxito
         $this->resetValidation();
     }
 
@@ -393,30 +403,26 @@ class Requisicion extends Component
                 'fechaSolicitud' => $this->fechaSolicitud,
                 'fechaRequerido' => $this->fechaRequerido,
             ];
-           // dd($data);
             $requisicion = RequisicionModel::updateOrCreate(
                 ['id' => $this->requisicionId],
                 $data
             );
-            session()->flash('message',
-                $this->requisicionId
-                    ? 'Requisición actualizada correctamente.'
-                    : 'Requisición creada correctamente.'
-            );
+            $this->successMessage = $this->requisicionId
+                ? 'Requisición actualizada correctamente.'
+                : 'Requisición creada correctamente.';
             $this->closeModal();
             $this->resetPage();
         } catch (\Exception $e) {
             $this->errorMessage = 'Error al guardar: ' . $e->getMessage();
             $this->showErrorModal = true;
         }
-        }
-    
-       
-        protected function getEstadoPresentadoId()
-        {
-            $estado = \DB::table('estado_requisicion')->where('estado', 'Presentado')->first();
-            return $estado ? $estado->id : null;
-        }
+    }
+
+    protected function getEstadoPresentadoId()
+    {
+        $estado = \DB::table('estado_requisicion')->where('estado', 'Presentado')->first();
+        return $estado ? $estado->id : null;
+    }
 
     public function edit($id)
     {
@@ -496,6 +502,9 @@ class Requisicion extends Component
         $this->departamentosUsuario = Departamento::whereHas('empleados', function($q) use ($userId) {
             $q->where('empleados.id', $userId);
         })->with('unidadEjecutora')->get();
+
+        // Ensure mostrarSelector is set correctly
+        $this->mostrarSelector = $this->departamentosUsuario->count() > 1;
 
         if ($this->departamentosUsuario->count() == 1) {
             $this->departamentoSeleccionado = $this->departamentosUsuario->first()->id;
@@ -735,6 +744,11 @@ class Requisicion extends Component
             $q->where('cantidad', '>', 0);
         })
         ->where('estado', 'APROBADO')
+       ->when($this->poaYear, function($q) {
+                $q->whereHas('poa', function($q2) {
+                    $q2->where('anio', $this->poaYear);
+                });
+            })
         ->when($this->buscarActividad, function($q) {
             $q->where(function($subq) {
                 $subq->where('nombre', 'like', '%'.$this->buscarActividad.'%');
@@ -774,12 +788,16 @@ class Requisicion extends Component
         ];
     }
 
+    $poas = Poa::activo()->get();
+    $this->poaYears = $poas->pluck('anio')->unique()->sort()->values(); // Obtener años únicos de los POA activos
+
     return view('livewire.seguimiento.Requisicion.create-requisiciones', [
         'mostrarSelector' => $this->mostrarSelector,
         'departamentosUsuario' => $this->departamentosUsuario,
         'departamentoSeleccionado' => $this->departamentoSeleccionado,
-        'actividades_aprobadas' => $actividades_aprobadas, // Pass the variable to the view
+        'actividades_aprobadas' => $actividades_aprobadas, // Pasar las actividades filtradas a la vista
         'valoresPlanificados' => $valoresPlanificados,
+        'poaYears' => $this->poaYears, // Pasar los años únicos a la vista
     ])->layout($this->layout);
     }
 }
