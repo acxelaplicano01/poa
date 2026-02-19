@@ -222,3 +222,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::post('/acta-entrega-intermedia/generar/{idRequisicion}', [App\Http\Controllers\ActaEntregaController::class, 'generarIntermedia'])
     ->name('acta-entrega-intermedia.generar');
+
+use App\Http\Controllers\OrdenCombustiblePdfController;
+/*
+// Route to display the PDF inline
+Route::get('/orden-combustible/{detalleId}/pdf', [OrdenCombustiblePdfController::class, 'show'])
+    ->name('orden-combustible-pdf');
+
+// Route to download the PDF
+Route::get('/orden-combustible/{detalleId}/download', [OrdenCombustiblePdfController::class, 'download'])
+    ->name('orden-combustible-pdf-download');
+*/

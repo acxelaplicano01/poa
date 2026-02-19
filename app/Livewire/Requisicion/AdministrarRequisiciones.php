@@ -35,6 +35,11 @@ class AdministrarRequisiciones extends Component
     public $detalleRequisicion = [];
     public $observacionModal = '';
     public $requisicionSeleccionadaId;
+    public $showPdfModal = false;
+    public $pdfUrl = '';
+    public $pdfDownloadUrl = '';
+    public $pdfTitle = '';
+
 
     public function sortBy($field)
     {
@@ -364,6 +369,22 @@ class AdministrarRequisiciones extends Component
             ]);
             session()->flash('error', 'Error al generar el PDF: ' . $e->getMessage());
         }
+    }
+
+    public function abrirPdfModal($url, $downloadUrl, $titulo = 'Vista previa PDF')
+    {
+        $this->pdfUrl = $url;
+        $this->pdfDownloadUrl = $downloadUrl;
+        $this->pdfTitle = $titulo;
+        $this->showPdfModal = true;
+    }
+
+    public function cerrarPdfModal()
+    {
+        $this->showPdfModal = false;
+        $this->pdfUrl = '';
+        $this->pdfDownloadUrl = '';
+        $this->pdfTitle = '';
     }
 
     public function render()

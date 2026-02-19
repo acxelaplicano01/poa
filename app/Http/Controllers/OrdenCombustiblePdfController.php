@@ -10,9 +10,8 @@ use Illuminate\Support\Facades\Auth;
 
 class OrdenCombustiblePdfController extends Controller
 {
-    public function show($detalleId)
+    private function prepararDatos($detalleId): array
     {
-        // Busca la orden de combustible asociada al detalle de requisición
         $orden = \DB::table('orden_combustible')
             ->where('idDetalleRequisicion', $detalleId)
             ->orderByDesc('id')
@@ -22,20 +21,57 @@ class OrdenCombustiblePdfController extends Controller
             abort(404, 'Orden de combustible no encontrada.');
         }
 
-        // Cargar relaciones necesarias manualmente (ajusta según tus modelos)
         $detalleRequisicion = DetalleRequisicion::with([
             'presupuesto.tareaHistorico',
             'presupuesto.tarea',
-            'requisicion.departamento' // Cambia 'depto' por 'departamento'
+            'requisicion.departamento'
         ])->find($detalleId);
 
-        // Simula modelos para la vista (ajusta si tienes modelos Eloquent)
+        $orden = (object) $orden;
+        $orden->detalleRequisicion = $detalleRequisicion;
+        $orden->tareas_historico = $detalleRequisicion->presupuesto->tareaHistorico ?? null;
+        $orden->empleado = $orden->responsable
+            ? \App\Models\Empleados\Empleado::find($orden->responsable)
+            : null;
+
+        return [
+            'orden' => $orden,
+            'userDescarga' => Auth::user(),
+            'userSolicitante' => optional($detalleRequisicion->requisicion)->creador ?? null,
+        ];
+    }
+
+    public function show($detalleId)
+    {
+        $pdf = Pdf::loadView('pdf.orden-combustible', $this->prepararDatos($detalleId));
+
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="orden-combustible-'.$detalleId.'.pdf"');
+    }
+
+   public function download($detalleId)
+    {
+        $orden = \DB::table('orden_combustible')
+            ->where('idDetalleRequisicion', $detalleId)
+            ->orderByDesc('id')
+            ->first();
+
+        if (!$orden) {
+            abort(404, 'Orden de combustible no encontrada.');
+        }
+
+        $detalleRequisicion = DetalleRequisicion::with([
+            'presupuesto.tareaHistorico',
+            'presupuesto.tarea',
+            'requisicion.departamento'
+        ])->find($detalleId);
+
         $orden = (object) $orden;
         $orden->detalleRequisicion = $detalleRequisicion;
         $orden->tareas_historico = $detalleRequisicion->presupuesto->tareaHistorico ?? null;
         $orden->empleado = $orden->responsable ? \App\Models\Empleados\Empleado::find($orden->responsable) : null;
 
-        // Usuario que descarga
         $userDescarga = Auth::user();
         $userSolicitante = optional($detalleRequisicion->requisicion)->creador ?? null;
 
@@ -44,7 +80,7 @@ class OrdenCombustiblePdfController extends Controller
             'userDescarga' => $userDescarga,
             'userSolicitante' => $userSolicitante,
         ]);
-
-        return $pdf->stream('orden-combustible.pdf');
+        
+        return $pdf->download('orden-combustible-' . $detalleId . '.pdf');
     }
 }

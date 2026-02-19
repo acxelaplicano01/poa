@@ -4,7 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Requisición de Materiales</title>
+    
     <style>
+        @page {
+            size: letter; /* Define tamaño carta (8.5 x 11 pulgadas) */
+            margin: 20mm; /* Márgenes estándar */
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
+        }
+
         .Presentado {
             color: white;
             background-color: rgb(31, 31, 31);
@@ -45,11 +56,6 @@
             background-color: rgb(9, 183, 56);
             padding: 8px;
             border-radius: 10px;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 10px;
         }
 
         .parent {
@@ -259,6 +265,21 @@
                                 <td>{{ $recurso['ref_acta'] ?? '' }}</td>
                             </tr>
                         @endforeach
+
+                        {{-- 5 columnas y se va aumentando --}}
+                        @for ($i = count($recursos); $i < 5; $i++)
+                            <tr>
+                                <td>{{ $i + 1 }}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        @endfor
+
                         <tr>
                             <td colspan="5"></td>
                             <td style="font-weight:600;">COSTO TOTAL:</td>

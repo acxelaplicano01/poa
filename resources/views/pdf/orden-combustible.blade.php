@@ -6,6 +6,10 @@
     <title>Orden de Combustible</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+         @page {
+            size: letter; /* Define el tamaño de la página como carta */
+            margin: 20mm; /* Márgenes estándar */
+        }
         body {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 11px;
@@ -47,141 +51,132 @@
             margin-top: 30px !important;
             width: 100% !important;
         }
+        .marca {
+            position: relative;
+        }
         .marca:after {
             content: "COPIA";
             font-size: 8em;
             font-family: 'Arial', sans-serif;
             color: rgba(211, 211, 211, 0.4);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: fixed;
-            top: 560px;
-            left: 165px;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-27deg);
             pointer-events: none;
             user-select: none;
-            transform: rotate(-27deg);
+            z-index: 9999;
         }
     </style>
 </head>
 <body>
-    <main class="flex" style="width:100%;">
-        <div>
-            <div style="display: flex; justify-content: center;">
-                <div class="parent mt-0">
-                    <div class="header d-flex justify-content-center">
-                        <section class="section-header">
-                            <p align="center" style="font-size: 18px;">Campus Choluteca</p> <br>
-                            <p align="center" style="font-size: 12px; "> <br>
-                                ORDEN DE COMBUSTIBLE No. {{ $orden->correlativo ?? '-' }}
-                            </p> <br>
-                            <p align="center" style="font-size: 12px; ">
-                                {{ $orden->detalleRequisicion->requisicion->departamento->siglas ?? '-' }}
-                            </p> <br> <br>
-                        </section> 
+    @php
+        $bloques = ['original', 'copia'];
+    @endphp
+
+    @foreach($bloques as $i => $tipo)
+        <main class="flex {{ $tipo === 'copia' ? 'marca' : '' }}" style="width:100%;">
+            <div>
+                <div style="display: flex; justify-content: center;">
+                    <div class="parent mt-0">
+                        <div class="header d-flex justify-content-center">
+                            <section class="section-header">
+                                <p align="center" style="font-size: 18px;">Campus Choluteca</p> <br>
+                                <p align="center" style="font-size: 12px;"> <br>
+                                    ORDEN DE COMBUSTIBLE No. {{ $orden->correlativo ?? '-' }}
+                                </p> <br>
+                                <p align="center" style="font-size: 12px;">
+                                    {{ $orden->detalleRequisicion->requisicion->departamento->siglas ?? '-' }}
+                                </p> <br><br>
+                            </section>
+                        </div>
+                        <img class="logo-img" src="{{ public_path('Logo/logounah.png') }}" alt="Logo UNAH">
                     </div>
-                    <img class="logo-img" src="{{ public_path('Logo/logounah.png') }}" alt="Logo UNAH">
+                </div>
+                {{-- Tabla de datos --}}
+                <div class="datos-table">
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;" align="center">
+                        <tbody>
+                            <tr>
+                                <td class="b-left b-top b-buttom" width="7%" align="center">
+                                    @php
+                                        $nombreRecurso = strtolower($orden->detalleRequisicion->presupuesto->recurso ?? '');
+                                    @endphp
+                                    @if(str_contains($nombreRecurso, 'gasolina')) X @endif
+                                </td>
+                                <td class="b-left b-top b-buttom" width="23%">Gasolina</td>
+                                <td class="b-left b-top b-buttom b-right" width="16%" rowspan="2">
+                                    L. {{ number_format($orden->monto, 2) }}
+                                </td>
+                                <td class="b-left b-top b-buttom b-right" width="16%" align="left" rowspan="2" colspan="3">
+                                    <span>Valor en Letras: {{ $orden->monto_en_letras }}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="b-left b-buttom">
+                                    @if(str_contains($nombreRecurso, 'diesel')) X @endif
+                                </td>
+                                <td class="b-left b-buttom">Diesel</td>
+                            </tr>
+                            <tr>
+                                <td class="b-left b-buttom" colspan="2" align="right">Vehículo modelo</td>
+                                <td class="b-left b-buttom" colspan="2">{{ $orden->modelo_vehiculo }}</td>
+                                <td class="b-left b-buttom" align="right">No. de placa</td>
+                                <td class="b-right b-left b-buttom" width="16%">{{ $orden->placa }}</td>
+                            </tr>
+                            <tr>
+                                <td class="b-left b-buttom" colspan="2" align="right">Lugar Salida</td>
+                                <td class="b-left b-buttom" colspan="2">{{ $orden->lugar_salida }}</td>
+                                <td class="b-left b-buttom" align="right">Recorrido Km.</td>
+                                <td class="b-right b-left b-buttom">{{ $orden->recorrido_km }}</td>
+                            </tr>
+                            <tr>
+                                <td class="b-left b-buttom" colspan="2" align="right">Lugar destino</td>
+                                <td class="b-left b-buttom" colspan="2">{{ $orden->lugar_destino }}</td>
+                                <td class="b-left b-buttom" align="right">Fecha de actividad</td>
+                                <td class="b-right b-left b-buttom">
+                                    {{ \Carbon\Carbon::parse($orden->fecha_actividad)->format('d/m/Y') }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="b-left b-buttom" colspan="2" align="right">Responsable de la actividad</td>
+                                <td class="b-left b-buttom" colspan="2">
+                                    {{ $orden->empleado->nombre ?? '' }} {{ $orden->empleado->apellido ?? '' }}
+                                </td>
+                                <td class="b-left b-buttom" align="right">Ref. POA</td>
+                                <td class="b-right b-left b-buttom">
+                                    {{ $orden->detalleRequisicion->presupuesto->tarea->actividade->correlativo ?? '-' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="b-left b-buttom b-right" colspan="2" align="right">Actividades a realizar</td>
+                                <td class="b-left b-buttom b-right" colspan="4">{{ $orden->actividades_realizar }}</td>
+                            </tr>
+                            <tr>
+                                <td class="b-left b-buttom b-right" colspan="6">
+                                    Autorizado por: {{ $userDescarga->empleado->nombre ?? '' }} {{ $userDescarga->empleado->apellido ?? '' }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="datos-table">
-                <table style="width: 100%; border-collapse: collapse; border: 1px solid black;" align="center">
-                    <tbody>
-                        <tr>
-                            <td class="b-left b-top b-buttom" width="7%" align="center">
-                                @php
-                                    $nombreRecurso = strtolower($orden->detalleRequisicion->presupuesto->recurso ?? '');
-                                @endphp
-                                @if(str_contains($nombreRecurso, 'gasolina')) X @endif
-                            </td>
-                            <td class="b-left b-top b-buttom" width="23%">Gasolina</td>
-                            <td class="b-left b-top b-buttom b-right" width="16%" rowspan="2">
-                                L. {{ number_format($orden->monto, 2) }}
-                            </td>
-                            <td class="b-left b-top b-buttom b-right" width="16%" align="left" rowspan="2" colspan="3">
-                                <span>Valor en Letras: {{ $orden->monto_en_letras }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="b-left b-buttom">
-                                @if(str_contains($nombreRecurso, 'diesel')) X @endif
-                            </td>
-                            <td class="b-left b-buttom">Diesel</td>
-                        </tr>
-                        <tr>
-                            <td class="b-left b-buttom" colspan="2" align="right">Vehículo modelo</td>
-                            <td class="b-left b-buttom" colspan="2">{{ $orden->modelo_vehiculo }}</td>
-                            <td class="b-left b-buttom" align="right">No. de placa</td>
-                            <td class="b-right b-left b-buttom" width="16%">{{ $orden->placa }}</td>
-                        </tr>
-                        <tr>
-                            <td class="b-left b-buttom" colspan="2" align="right">Lugar Salida</td>
-                            <td class="b-left b-buttom" colspan="2">{{ $orden->lugar_salida }}</td>
-                            <td class="b-left b-buttom" align="right">Recorrido Km.</td>
-                            <td class="b-right b-left b-buttom">{{ $orden->recorrido_km }}</td>
-                        </tr>
-                        <tr>
-                            <td class="b-left b-buttom" colspan="2" align="right">Lugar destino</td>
-                            <td class="b-left b-buttom" colspan="2">{{ $orden->lugar_destino }}</td>
-                            <td class="b-left b-buttom" align="right">Fecha de actividad</td>
-                            <td class="b-right b-left b-buttom">
-                                {{ \Carbon\Carbon::parse($orden->fecha_actividad)->format('d/m/Y') }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="b-left b-buttom" colspan="2" align="right">Responsable de la actividad</td>
-                            <td class="b-left b-buttom" colspan="2">
-                                {{ $orden->empleado->nombre ?? '' }} {{ $orden->empleado->apellido ?? '' }}
-                            </td>
-                            <td class="b-left b-buttom" align="right">Ref. POA</td>
-                            <td class="b-right b-left b-buttom">
-                                {{ $orden->detalleRequisicion->presupuesto->tarea->actividade->correlativo ?? '-' }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="b-left b-buttom b-right" colspan="2" align="right">Actividades a realizar</td>
-                            <td class="b-left b-buttom b-right" colspan="4">{{ $orden->actividades_realizar }}</td>
-                        </tr>
-                        <tr>
-                            <td class="b-left b-buttom b-right" colspan="6">
-                                Autorizado por: {{ $userDescarga->empleado->nombre ?? '' }} {{ $userDescarga->empleado->apellido ?? '' }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table> <br>
-                <p style="font-size: 13px; margin-top:4px;">
-                    @php
-                        use Carbon\Carbon;
-                        $fechaEmitido = $orden->created_at ?? $orden->createdAt ?? now();
-                        $fechaCarbon = Carbon::parse($fechaEmitido);
-                        $meses = [
-                            1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril', 5 => 'mayo', 6 => 'junio',
-                            7 => 'julio', 8 => 'agosto', 9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
-                        ];
-                        $dia = $fechaCarbon->format('d');
-                        $mes = $meses[intval($fechaCarbon->format('m'))];
-                        $anio = $fechaCarbon->format('Y');
-                    @endphp
-                    Emitido: {{ intval($dia) }} de {{ $mes }} de {{ $anio }}
-                </p>
+            <div class="firma" style="width: 100%; margin-top: 30px;">
+                <table style="width: 100%; border: none;">
+
+                    <tr>
+                        <td style="border: none;"></td>
+                        <td style="border: none; width: 220px; text-align: right;">
+                            <div style="border-top: 1px solid; width: 180px; margin-left: auto; text-align: center;">
+                                <p style="font-size: 12px; margin-bottom: 0;">
+                                    {{ $userSolicitante->empleado->nombre ?? '' }} {{ $userSolicitante->empleado->apellido ?? '' }}
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
             </div>
-           
-        </div>
-        <div class="firma" style="width: 100%; margin-top: 30px;">
-            <table style="width: 100%; border: none;">
-                <tr>
-                    <td style="border: none;"></td>
-                    <td style="border: none; width: 220px; text-align: right;">
-                        <div style="border-top: 1px solid; width: 180px; margin-left: auto; text-align: center;">
-                            <p style="font-size: 12px; margin-bottom: 0;">
-                                {{ $userSolicitante->empleado->nombre ?? '' }} {{ $userSolicitante->empleado->apellido ?? '' }}
-                            </p>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="marca"></div>
-    </main>
+        </main>
+    @endforeach
 </body>
 </html>

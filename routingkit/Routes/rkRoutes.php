@@ -492,6 +492,16 @@ return [
                             ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                             ->setItems([])
                             ->setEndBlock('requisicion-pdf'),
+
+                        RkRoute::make('requisicion/{correlativo}/pdf/download')
+                            ->setParentId('requisiciones')
+                            ->setAccessPermission('acceso-planificacion')
+                            ->setUrlMethod('get')
+                            ->setUrlController('App\\Http\\Controllers\\RequisicionController@descargarPdfDownload')
+                            ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
+                            ->setItems([])
+                            ->setEndBlock('requisicion-pdf-download'),
+                        
                     ])
                     ->setEndBlock('requisiciones'),
 
@@ -523,8 +533,18 @@ return [
                         ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
                         ->setEndBlock('acta-entrega-pdf'),
+                    
+                    RkRoute::make('acta-entrega-pdf-download')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setUrlMethod('get')
+                        ->setUrl('acta-entrega/{requisicionId}/descargar/download')
+                        ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarPdfDownload')
+                        ->setRoles(['super_admin', 'admin'])
+                        ->setItems([])
+                        ->setEndBlock('acta-entrega-pdf-download'),
 
-                    RkRoute::make('acta-entrega-intermedia-generar')
+                    /*RkRoute::make('acta-entrega-intermedia-generar')
                         ->setParentId('planificacion')
                         ->setAccessPermission('acceder-entrega-recursos')
                         ->setUrlMethod('post')
@@ -532,7 +552,7 @@ return [
                         ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@generarIntermedia')
                         ->setRoles(['super_admin', 'admin'])
                         ->setItems([])
-                        ->setEndBlock('acta-entrega-intermedia-generar'),
+                        ->setEndBlock('acta-entrega-intermedia-generar'),*/
 
                     RkRoute::make('acta-entrega-intermedia-pdf')
                         ->setParentId('planificacion')
@@ -544,7 +564,17 @@ return [
                         ->setItems([])
                         ->setEndBlock('acta-entrega-intermedia-pdf'),
 
-                    RkRoute::make('orden-combustible-pdf')
+                    RkRoute::make('acta-entrega-intermedia-pdf-download')
+                        ->setParentId('planificacion')
+                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setUrlMethod('get')
+                        ->setUrl('acta-entrega-intermedia/{requisicionId}/descargar/download')
+                        ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarIntermediaPdfDownload')
+                        ->setRoles(['super_admin', 'admin'])
+                        ->setItems([])
+                        ->setEndBlock('acta-entrega-intermedia-pdf-download'),
+
+                    RkRoute::make('orden-combustible/{detalleId}/pdf')
                         ->setParentId('requisiciones')
                         ->setAccessPermission('acceso-planificacion')
                         ->setUrlMethod('get')
@@ -553,6 +583,15 @@ return [
                         ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
                         ->setItems([])
                         ->setEndBlock('orden-combustible-pdf'),
+
+                    RkRoute::make('orden-combustible/{detalleId}/pdf/download')
+                        ->setParentId('requisiciones')
+                        ->setAccessPermission('acceso-planificacion')
+                        ->setUrlMethod('get')
+                        ->setUrlController('App\\Http\\Controllers\\OrdenCombustiblePdfController@download')
+                        ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
+                        ->setItems([])
+                        ->setEndBlock('orden-combustible-pdf-download'),
 
                     RkRoute::make('consolidado')
                         ->setParentId('planificacion')

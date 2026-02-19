@@ -24,7 +24,6 @@ class EntregaRecursos extends Component
     public $detalleRequisicion = [];
     public $recursosParaEntregar = [];
     
-    // Modal properties
     public $showEjecucionModal = false;
     public $recursoSeleccionado = [];
     public $detalleRecursoId;
@@ -34,14 +33,15 @@ class EntregaRecursos extends Component
     public $observacionEjecucion;
     public $fechaEjecucion;
 
-    // Modal de confirmación
     public $showConfirmFinalizarModal = false;
 
     public $esSoloLectura = false;
-
-    // Modal para agregar observación a la ejecución
     public $showObservacionEjecucionModal = false;
     public $observacionEjecucionPresupuestaria;
+    public $showPdfModal = false;
+    public $pdfUrl = '';
+    public $pdfDownloadUrl = '';
+    public $pdfTitle = '';
 
     protected $rules = [
         'cantidadEjecutada' => 'required|numeric|min:0',
@@ -549,6 +549,7 @@ class EntregaRecursos extends Component
             ]);
 
             $detallesRequisicion = DetalleRequisicion::where('idRequisicion', $requisicion->id)->get();
+            $totalDetallesCreados = 0;
             
             foreach ($detallesRequisicion as $detalleRequisicion) {
                 $detallesEjecucion = DetalleEjecucionPresupuestaria::where('idDetalleRequisicion', $detalleRequisicion->id)
@@ -578,14 +579,31 @@ class EntregaRecursos extends Component
             return $actaEntrega;
 
         } catch (\Exception $e) {
-            \Log::error('Error al crear acta de entrega:', [
-                'requisicion_id' => $requisicion->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            throw $e;
+            Log::info('Detalles de acta creados', [
+            'acta_id' => $actaEntrega->id,
+            'total_detalles' => $totalDetallesCreados,
+    ]);
+
+    return $actaEntrega;
         }
     }
+
+    public function abrirPdfModal($url, $downloadUrl, $titulo = 'Vista previa PDF')
+    {
+        $this->pdfUrl = $url;
+        $this->pdfDownloadUrl = $downloadUrl;
+        $this->pdfTitle = $titulo;
+        $this->showPdfModal = true;
+    }
+
+    public function cerrarPdfModal()
+    {
+        $this->showPdfModal = false;
+        $this->pdfUrl = '';
+        $this->pdfDownloadUrl = '';
+        $this->pdfTitle = '';
+    }
+
 
     public function render()
     {

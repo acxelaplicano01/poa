@@ -6,8 +6,12 @@
                     {{ $detalleRequisicion['correlativo'] ?? '' }} {{ $detalleRequisicion['departamento'] ?? '' }}
                 </span>
                 @if (isset($detalleRequisicion['correlativo']))
-                    <a href="/requisicion/{{ $detalleRequisicion['correlativo'] ?? '' }}/pdf" target="_blank"
-                        title="Descargar PDF"
+                    <button
+                        wire:click="abrirPdfModal(
+            '/requisicion/{{ $detalleRequisicion['correlativo'] }}/pdf',
+            '/requisicion/{{ $detalleRequisicion['correlativo'] }}/pdf/download',
+            'Requisición {{ $detalleRequisicion['correlativo'] }}'
+        )"
                         class="ml-4 bg-red-600 hover:bg-red-700 text-white font-semibold px-2.5 py-1.5 rounded flex items-center gap-1 transition text-xs">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-5">
@@ -15,7 +19,7 @@
                                 d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                         </svg>
                         PDF
-                    </a>
+                    </button>
                 @endif
             </div>
         </x-slot>
@@ -35,10 +39,11 @@ $estado = $detalleRequisicion['estado'] ?? '';
                             'Rechazado' => 'bg-red-200 text-red-800 dark:bg-red-700 dark:text-red-100',
                             default => 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200',
                         }; @endphp
-                    class="{{ $color }}">Estado: {{ $estado }}
+                        class="{{ $color }}">Estado: {{ $estado }}
                 </div>
             </div>
-            <div class="overflow-x-auto bg-white dark:bg-zinc-900 rounded-lg shadow dark:shadow-lg border border-zinc-200 dark:border-zinc-700 p-4">
+            <div
+                class="overflow-x-auto bg-white dark:bg-zinc-900 rounded-lg shadow dark:shadow-lg border border-zinc-200 dark:border-zinc-700 p-4">
                 <div class="max-h-96 overflow-y-auto"> <!-- Add scrollable container -->
                     <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700 mb-4">
                         <thead class="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200">
@@ -54,48 +59,58 @@ $estado = $detalleRequisicion['estado'] ?? '';
                         <tbody>
                             @forelse($detalleRecursos as $detalle)
                                 <tr class="bg-white dark:bg-zinc-900">
-                                    <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[20%]">
+                                    <td
+                                        class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[20%]">
                                         {{ $detalle['recurso'] }}
                                     </td>
-                                    <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
+                                    <td
+                                        class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
                                         {{ $detalle['detalle_tecnico'] }}
                                     </td>
-                                    <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
+                                    <td
+                                        class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
                                         {{ $detalle['cantidad'] }}
                                     </td>
-                                    <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
+                                    <td
+                                        class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
                                         L {{ number_format($detalle['precio_unitario'], 2) }}
                                     </td>
-                                    <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">L
+                                    <td
+                                        class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[25%]">
+                                        L
                                         {{ number_format($detalle['total'], 2) }}
                                     </td>
                                     <td class="px-4 py-2 align-top text-center">
-                                        @if(
-                                            Str::of(strtolower($detalle['recurso'] ?? ''))->contains('gasolina') ||
-                                            Str::of(strtolower($detalle['recurso'] ?? ''))->contains('diesel')
-                                        )
+                                        @if (Str::of(strtolower($detalle['recurso'] ?? ''))->contains('gasolina') ||
+                                                Str::of(strtolower($detalle['recurso'] ?? ''))->contains('diesel'))
                                             @php
-                                                $detalleId = $detalle['idDetalleRequisicion'] ?? $detalle['id'] ?? null;
+                                                $detalleId =
+                                                    $detalle['idDetalleRequisicion'] ?? ($detalle['id'] ?? null);
                                             @endphp
-                                            @if($detalleId)
-                                                <a href="{{ route('orden-combustible-pdf', ['detalleId' => $detalleId]) }}"
-                                                    target="_blank"
-                                                    title="Descargar Orden de Combustible PDF"
+                                            @if ($detalleId)
+                                                <button
+                                                    wire:click="abrirPdfModal(
+    '/orden-combustible/{{ $detalleId }}/pdf',
+    '/orden-combustible/{{ $detalleId }}/pdf/download',
+    'Orden de Combustible'
+)"
                                                     class="inline-flex items-center gap-1 px-2 py-1 rounded bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-xs font-semibold transition">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                        stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                        class="w-4 h-4">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                                                     </svg>
                                                     Orden Combustible
-                                                </a>
+                                                </button>
                                             @endif
                                         @endif
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-4 py-2 text-center text-zinc-500 dark:text-zinc-400">No hay
+                                    <td colspan="7" class="px-4 py-2 text-center text-zinc-500 dark:text-zinc-400">No
+                                        hay
                                         recursos para mostrar.</td>
                                 </tr>
                             @endforelse
@@ -107,13 +122,16 @@ $estado = $detalleRequisicion['estado'] ?? '';
                         <div class="text-right font-semibold text-zinc-900 dark:text-zinc-100">
                             Monto total: L {{ number_format($detalleRequisicion['monto_total'] ?? 0, 2) }}
                         </div>
-                        @if(isset($detalleRequisicion['tipo_proceso']))
+                        @if (isset($detalleRequisicion['tipo_proceso']))
                             <div class="flex items-center gap-2">
                                 <span class="text-sm text-zinc-600 dark:text-zinc-400">Tipo de proceso sugerido:</span>
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
-                                    {{ ($detalleRequisicion['monto_total'] ?? 0) < 10000 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 
-                                       (($detalleRequisicion['monto_total'] ?? 0) < 50000 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 
-                                       'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300') }}">
+                                <span
+                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                                    {{ ($detalleRequisicion['monto_total'] ?? 0) < 10000
+                                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                                        : (($detalleRequisicion['monto_total'] ?? 0) < 50000
+                                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+                                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300') }}">
                                     {{ $detalleRequisicion['tipo_proceso']['nombre'] }}
                                 </span>
                             </div>
@@ -128,7 +146,8 @@ $estado = $detalleRequisicion['estado'] ?? '';
                 @if ($estado === 'Presentado' || $estado === 'En Proceso de Compra')
                     <div class="flex-1">
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400 dark:text-zinc-500">
+                            <span
+                                class="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400 dark:text-zinc-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -171,8 +190,8 @@ $estado = $detalleRequisicion['estado'] ?? '';
                 @elseif ($estado === 'Aprobado')
                     <x-spinner-button wire:click="marcarComoProcesoCompra" loadingTarget="marcarComoProcesoCompra"
                         class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-yellow-700 dark:hover:bg-yellow-800">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="size-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                         </svg>
@@ -225,13 +244,16 @@ $estado = $detalleRequisicion['estado'] ?? '';
                                 {{ $requisicion->correlativo }}
                             </span>
                         </td>
-                        <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
+                        <td
+                            class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
                             {{ $requisicion->departamento->name ?? '-' }}
                         </td>
-                        <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
+                        <td
+                            class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
                             {{ $requisicion->descripcion }}
                         </td>
-                        <td class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
+                        <td
+                            class="px-3 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[40%]">
                             {{ $requisicion->observacion }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -263,7 +285,8 @@ $estado = $detalleRequisicion['estado'] ?? '';
                                     </svg>
                                 </button>
                                 @if (($requisicion->estado->estado ?? '') === 'En Proceso de Compra')
-                                    <a href="{{route('entregarecursos', ['requisicionId' => $requisicion->id]) }}" title="Entrega de Recursos"
+                                    <a href="{{ route('entregarecursos', ['requisicionId' => $requisicion->id]) }}"
+                                        title="Entrega de Recursos"
                                         class="p-2 rounded-full hover:bg-green-100 text-green-700 transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -273,17 +296,21 @@ $estado = $detalleRequisicion['estado'] ?? '';
                                     </a>
                                 @endif
                                 @if (($requisicion->estado->estado ?? '') === 'Finalizado')
-                                    <a href="{{ route('acta-entrega-pdf', ['requisicionId' => $requisicion->id]) }}"
-                                        target="_blank"
-                                        title="Descargar Acta de Entrega"
+                                    <button
+                                        wire:click="abrirPdfModal(
+            '/acta-entrega/{{ $requisicion->id }}/descargar',
+            '/acta-entrega/{{ $requisicion->id }}/descargar/download',
+            'Acta de Entrega Final'
+        )"
+                                        title="Ver Acta de Entrega"
                                         class="p-2 rounded-full hover:bg-red-100 text-red-700 transition">
-                                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                    </a>
+                                    </button>
                                 @endif
-                            </div>
                         </td>
                     </tr>
                 @empty
@@ -299,4 +326,50 @@ $estado = $detalleRequisicion['estado'] ?? '';
             {{ $requisiciones->links() }}
         </div>
     </div>
+
+    @if ($showPdfModal)
+        <div class="fixed inset-0 z-[70] flex items-center justify-center bg-opacity-5"
+            wire:click.self="cerrarPdfModal">
+            <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl flex flex-col"
+                style="width: 90vw; max-width: 1100px; height: 92vh;">
+
+                <div
+                    class="flex items-center justify-between px-5 py-3 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 rounded-t-xl">
+                    <h3 class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+                        {{ $pdfTitle }}
+                    </h3>
+                    <div class="flex items-center gap-3">
+                        <a href="{{ $pdfDownloadUrl }}"
+                            class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Descargar
+                        </a>
+                        <button wire:click="cerrarPdfModal"
+                            class="p-1 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 p-2 min-h-0">
+                    <iframe src="{{ $pdfUrl }}"
+                        class="w-full h-full rounded-lg border border-zinc-200 dark:border-zinc-700"
+                        type="application/pdf">
+                        <p class="text-center p-6 text-zinc-500">
+                            Tu navegador no puede mostrar el PDF.
+                            <a href="{{ $pdfDownloadUrl }}" class="text-blue-600 underline">Descárgalo aquí.</a>
+                        </p>
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

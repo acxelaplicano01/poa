@@ -12,123 +12,121 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class ActaEntregaController extends Controller
 {
-    public function descargarPdf($requisicionId)
+
+    private function prepararDatosActa($requisicionId): array
     {
-        try {
-            \Log::info('=== INICIO DESCARGA ACTA PDF ===', ['requisicion_id' => $requisicionId]);
+        $requisicion = Requisicion::with([
+            'departamento', 'estado', 'creador.empleado',
+            'detalleRequisiciones.presupuesto.unidadMedida'
+        ])->findOrFail($requisicionId);
 
-            // Verificar que la requisición existe
-            $requisicion = Requisicion::with([
-                'departamento',
-                'estado',
-                'creador.empleado',
-                'detalleRequisiciones.presupuesto.unidadMedida'
-            ])->find($requisicionId);
+        $actaEntrega = ActaEntrega::with([
+            'tipoActaEntrega', 'ejecucionPresupuestaria',
+            'detalles.detalleRequisicion.presupuesto.unidadMedida',
+            'detalles.detalleEjecucionPresupuestaria'
+        ])->where('idRequisicion', $requisicionId)->firstOrFail();
 
-            if (!$requisicion) {
-                \Log::error('Requisición no encontrada', ['requisicion_id' => $requisicionId]);
-                return back()->with('error', 'Requisición no encontrada.');
-            }
-
-            \Log::info('Requisición encontrada', [
-                'id' => $requisicion->id,
-                'correlativo' => $requisicion->correlativo,
-                'estado' => $requisicion->estado->estado ?? 'N/A'
-            ]);
-
-            // Verificar que existe el acta
-            $actaEntrega = ActaEntrega::with([
-                'tipoActaEntrega',
-                'ejecucionPresupuestaria',
-                'detalles.detalleRequisicion.presupuesto.unidadMedida',
-                'detalles.detalleEjecucionPresupuestaria'
-            ])->where('idRequisicion', $requisicionId)->first();
-
-            if (!$actaEntrega) {
-                \Log::error('Acta no encontrada', ['requisicion_id' => $requisicionId]);
-                return back()->with('error', 'No se encontró el acta de entrega. Asegúrate de que la requisición esté finalizada.');
-            }
-
-            \Log::info('Acta encontrada', [
-                'acta_id' => $actaEntrega->id,
-                'correlativo' => $actaEntrega->correlativo,
-                'detalles_count' => $actaEntrega->detalles->count()
-            ]);
-
-            // Preparar datos
-            $data = [
-                'acta' => $actaEntrega,
-                'requisicion' => $requisicion,
-                'detalles' => $actaEntrega->detalles,
-            ];
-
-            \Log::info('Generando PDF...');
-
-            // Generar PDF
-            $pdf = Pdf::loadView('pdf.acta-entrega', $data);
-            $pdf->setPaper('letter', 'portrait');
-
-            \Log::info('PDF generado exitosamente');
-
-            $filename = 'Acta-Entrega-' . $actaEntrega->correlativo . '.pdf';
-
-            return $pdf->download($filename);
-
-        } catch (\Exception $e) {
-            \Log::error('=== ERROR AL GENERAR PDF ===', [
-                'requisicion_id' => $requisicionId,
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            return back()->with('error', 'Error al generar el PDF: ' . $e->getMessage());
-        }
+        return [
+            'acta' => $actaEntrega,
+            'requisicion' => $requisicion,
+            'detalles' => $actaEntrega->detalles,
+        ];
     }
 
-    public function generarIntermedia($idRequisicion)
+    public function descargarPdf($requisicionId)
     {
-        $userId = auth()->id();
-        $requisicion = Requisicion::findOrFail($idRequisicion);
+        $data = $this->prepararDatosActa($requisicionId);
+        $pdf = Pdf::loadView('pdf.acta-entrega', $data);
+        $pdf->setPaper('letter', 'portrait');
 
-        // Crear el acta intermedia
-        $acta = ActaEntrega::create([
-            'correlativo' => ActaEntrega::generarCorrelativo(), // tu lógica para correlativo
-            'fecha_extendida' => now(),
-            'idTipoActaEntrega' => 2, // Intermedia
-            'idRequisicion' => $requisicion->id,
-            'idEjecucionPresupuestaria' => $requisicion->idEjecucionPresupuestaria ?? null,
-            'created_by' => $userId,
-        ]);
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="Acta-Entrega-'.$data['acta']->correlativo.'.pdf"');
+    }
 
-        // Obtener recursos gestionados
-        $recursosGestionados = DetalleRequisicion::where('idRequisicion', $requisicion->id)
-            ->where('entregado', true)
-            ->get();
+    public function descargarPdfDownload($requisicionId)
+    {
+        $data = $this->prepararDatosActa($requisicionId);
+        $pdf = Pdf::loadView('pdf.acta-entrega', $data);
+        $pdf->setPaper('letter', 'portrait');
 
-        foreach ($recursosGestionados as $detalle) {
-            DetalleActaEntrega::create([
-                'log_cant_ejecutada' => $detalle->cantidad,
-                'log_monto_unitario_ejecutado' => $detalle->presupuesto->costounitario ?? 0,
-                'log_fechaEjecucion' => now(),
-                'idActaEntrega' => $acta->id,
-                'idRequisicion' => $requisicion->id,
-                'idDetalleRequisicion' => $detalle->id,
-                'idEjecucionPresupuestaria' => $requisicion->idEjecucionPresupuestaria ?? null,
-                'idDetalleEjecucionPresupuestaria' => null,
-                'created_by' => $userId,
-            ]);
-        }
-
-        return redirect()->back()->with('message', 'Acta de entrega intermedia generada correctamente.');
+        return $pdf->download('Acta-Entrega-'.$data['acta']->correlativo.'.pdf');
     }
 
     public function descargarIntermediaPdf($requisicionId)
     {
         $requisicion = \App\Models\Requisicion\Requisicion::findOrFail($requisicionId);
 
-        // Busca el acta intermedia (tipo 2) y sus detalles
+        // Buscar o crear, pero SIEMPRE actualizar los detalles
+        $actaEntrega = \App\Models\Actas\ActaEntrega::where('idRequisicion', $requisicionId)
+            ->where('idTipoActaEntrega', 2)
+            ->latest('id')
+            ->first();
+
+        $userId = auth()->id();
+
+        // Obtener TODOS los detalles de ejecución actuales
+        $detallesEjecucion = \App\Models\EjecucionPresupuestaria\DetalleEjecucionPresupuestaria::whereIn(
+            'idDetalleRequisicion',
+            $requisicion->detalleRequisiciones()->pluck('id')->toArray()
+        )->get();
+
+        $idEjecucionPresupuestaria = $detallesEjecucion->first()->idEjecucion ?? null;
+
+        if (!$actaEntrega) {
+            $ultimoActa = \App\Models\Actas\ActaEntrega::orderBy('id', 'desc')->first();
+            $numero = $ultimoActa ? ($ultimoActa->id + 1) : 1;
+            $correlativo = 'ACT-' . str_pad($numero, 6, '0', STR_PAD_LEFT) . '-' . now()->format('Y');
+
+            $actaEntrega = \App\Models\Actas\ActaEntrega::create([
+                'correlativo' => $correlativo,
+                'fecha_extendida' => now(),
+                'idTipoActaEntrega' => 2,
+                'idRequisicion' => $requisicion->id,
+                'idEjecucionPresupuestaria' => $idEjecucionPresupuestaria,
+                'created_by' => $userId,
+            ]);
+        }
+
+        // SIEMPRE borrar detalles viejos y recrear con datos frescos
+        \App\Models\Actas\DetalleActaEntrega::where('idActaEntrega', $actaEntrega->id)->delete();
+
+        foreach ($detallesEjecucion as $detalleEjecucion) {
+            \App\Models\Actas\DetalleActaEntrega::create([
+                'log_cant_ejecutada' => $detalleEjecucion->cant_ejecutada,
+                'log_monto_unitario_ejecutado' => $detalleEjecucion->monto_unitario_ejecutado,
+                'log_fechaEjecucion' => $detalleEjecucion->fechaEjecucion,
+                'idActaEntrega' => $actaEntrega->id,
+                'idRequisicion' => $requisicion->id,
+                'idDetalleRequisicion' => $detalleEjecucion->idDetalleRequisicion,
+                'idEjecucionPresupuestaria' => $detalleEjecucion->idEjecucion,
+                'idDetalleEjecucionPresupuestaria' => $detalleEjecucion->id,
+                'created_by' => $userId,
+                'observacion' => $detalleEjecucion->observacion ?? null,
+                'referenciaActaEntrega' => $detalleEjecucion->referenciaActaEntrega ?? null,
+            ]);
+        }
+
+        $actaEntrega->load('detalles.detalleRequisicion.presupuesto');
+
+        $data = [
+            'requisicion' => $requisicion,
+            'acta' => $actaEntrega,
+            'detalles' => $actaEntrega->detalles,
+            'recursosGestionados' => $requisicion->detalleRequisiciones()->where('entregado', '>', 0)->get(),
+        ];
+
+        $pdf = Pdf::loadView('pdf.acta-entrega-intermedia', $data);
+
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="acta-intermedia-' . $requisicion->correlativo . '.pdf"');
+    }
+    
+    public function descargarIntermediaPdfDownload($requisicionId)
+    {
+        $requisicion = \App\Models\Requisicion\Requisicion::findOrFail($requisicionId);
+
         $actaEntrega = \App\Models\Actas\ActaEntrega::with([
             'detalles.detalleRequisicion.presupuesto'
         ])
@@ -137,63 +135,13 @@ class ActaEntregaController extends Controller
         ->latest('id')
         ->first();
 
-        // Si NO existe acta intermedia, la creamos automáticamente SOLO con los recursos ejecutados (detalle_ejecucion_presupuestaria)
         if (!$actaEntrega) {
-            $userId = auth()->id();
-
-            // Generar correlativo manualmente si no existe el método
-            $ultimoActa = \App\Models\Actas\ActaEntrega::orderBy('id', 'desc')->first();
-            $numero = $ultimoActa ? ($ultimoActa->id + 1) : 1;
-            $anio = now()->format('Y');
-            $correlativo = 'ACT-' . str_pad($numero, 6, '0', STR_PAD_LEFT) . '-' . $anio;
-
-            // Buscar todos los detalles de ejecución presupuestaria de esta requisición
-            $detallesEjecucion = \App\Models\EjecucionPresupuestaria\DetalleEjecucionPresupuestaria::whereIn(
-                'idDetalleRequisicion',
-                $requisicion->detalleRequisiciones()->pluck('id')->toArray()
-            )->get();
-
-            // Tomar el primer idEjecucion para el acta (puedes ajustar si necesitas lógica diferente)
-            $idEjecucionPresupuestaria = $detallesEjecucion->first()->idEjecucion ?? null;
-
-            $actaEntrega = \App\Models\Actas\ActaEntrega::create([
-                'correlativo' => $correlativo,
-                'fecha_extendida' => now(),
-                'idTipoActaEntrega' => 2, // Intermedia
-                'idRequisicion' => $requisicion->id,
-                'idEjecucionPresupuestaria' => $idEjecucionPresupuestaria,
-                'created_by' => $userId,
-            ]);
-
-            // Solo agrega los recursos que tienen ejecución (detalle_ejecucion_presupuestaria)
-            foreach ($detallesEjecucion as $detalleEjecucion) {
-                $detalleReq = $detalleEjecucion->detalleRequisicion;
-                \App\Models\Actas\DetalleActaEntrega::create([
-                    'log_cant_ejecutada' => $detalleEjecucion->cant_ejecutada,
-                    'log_monto_unitario_ejecutado' => $detalleEjecucion->monto_unitario_ejecutado,
-                    'log_fechaEjecucion' => $detalleEjecucion->fechaEjecucion,
-                    'idActaEntrega' => $actaEntrega->id,
-                    'idRequisicion' => $requisicion->id,
-                    'idDetalleRequisicion' => $detalleEjecucion->idDetalleRequisicion,
-                    'idEjecucionPresupuestaria' => $detalleEjecucion->idEjecucion,
-                    'idDetalleEjecucionPresupuestaria' => $detalleEjecucion->id,
-                    'created_by' => $userId,
-                    // Puedes agregar observacion, referenciaActaEntrega, etc. si tu modelo lo permite
-                    'observacion' => $detalleEjecucion->observacion ?? null,
-                    'referenciaActaEntrega' => $detalleEjecucion->referenciaActaEntrega ?? null,
-                ]);
-            }
-
-            // Recargar detalles para el PDF
-            $actaEntrega->load('detalles.detalleRequisicion.presupuesto');
+            abort(404, 'No se encontró el acta intermedia.');
         }
 
-        $detalles = $actaEntrega ? $actaEntrega->detalles : collect();
-
-        // Recursos gestionados para el botón (solo los entregados)
+        $detalles = $actaEntrega->detalles ?? collect();
         $recursosGestionados = $requisicion->detalleRequisiciones()
-            ->where('entregado', '>', 0)
-            ->get();
+            ->where('entregado', '>', 0)->get();
 
         $data = [
             'requisicion' => $requisicion,
@@ -202,8 +150,8 @@ class ActaEntregaController extends Controller
             'recursosGestionados' => $recursosGestionados,
         ];
 
-        $pdf = \PDF::loadView('pdf.acta-entrega-intermedia', $data);
+        $pdf = Pdf::loadView('pdf.acta-entrega-intermedia', $data);
 
-        return $pdf->download('acta-entrega-intermedia-'.$requisicion->correlativo.'.pdf');
+        return $pdf->download('acta-entrega-intermedia-' . $requisicion->correlativo . '.pdf');
     }
 }
