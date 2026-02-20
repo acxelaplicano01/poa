@@ -84,6 +84,9 @@ class Requisicion extends Component
     public $montoTotalRequisicion = 0;
     public $montoEjecutadoRequisicion = 0;
 
+    public $puedeCrearRequisicion = false;
+    public $mensajePlazoRequisicion = '';
+
     protected $rules = [
         'correlativo' => 'required|min:3',
         'descripcion' => 'required',
@@ -107,6 +110,12 @@ class Requisicion extends Component
 
     public function crearRequisicionDesdeSumario()
     {
+
+        if (!$this->puedeCrearRequisicion) {
+            session()->flash('error', $this->mensajePlazoRequisicion);
+            return;
+        }
+
         $this->validate([
             'descripcion' => 'required',
             'fechaRequerido' => 'required|date',
@@ -224,43 +233,53 @@ class Requisicion extends Component
     }
 
     // Actualizar el sumario de recursos seleccionados
-    public function actualizarSumario()
-    {
-        $this->recursosSeleccionados = [];
+   public function actualizarSumario()
+{
+    $this->recursosSeleccionados = [];
 
-        foreach ($this->presupuestosSeleccionados as $presupuestoId => $cantidad) {
-            if ($cantidad !== null && $cantidad !== '' && (int)$cantidad > 0) {
-                $presupuesto = Presupuesto::with(['unidadMedida'])->find($presupuestoId);
-                if ($presupuesto) {
-                    // Buscar la tarea/actividad para el nombre
-                    $tarea = $presupuesto->idtarea ? Tarea::with('actividad')->find($presupuesto->idtarea) : null;
-                    $nombreRecurso = strtoupper($presupuesto->recurso ?? '');
-                    $esCombustible = str_contains($nombreRecurso, 'GASOLINA') || str_contains($nombreRecurso, 'DIESEL');
+    foreach ($this->presupuestosSeleccionados as $presupuestoId => $cantidad) {
+        if ($cantidad !== null && $cantidad !== '' && (int)$cantidad > 0) {
+            $presupuesto = Presupuesto::with(['unidadMedida'])->find($presupuestoId);
+            if ($presupuesto) {
+                $tarea = $presupuesto->idtarea ? Tarea::with('actividad')->find($presupuesto->idtarea) : null;
 
-                    $this->recursosSeleccionados[] = [
-                        'id'                  => $presupuesto->id,
-                        'nombre'              => $presupuesto->recurso,
-                        'actividad'           => $tarea
-                            ? (($tarea->actividad->nombre ?? '-') . ' / ' . ($tarea->nombre ?? '-'))
-                            : '-',
-                        'proceso_compra' => $presupuesto->tareaHistorico && $presupuesto->tareaHistorico->procesoCompra 
-                        ? $presupuesto->tareaHistorico->procesoCompra->nombre_proceso 
-                        : '-',
-                        'cantidad_seleccionada' => (int)$cantidad,
-                        'unidad_medida'       => $presupuesto->unidadMedida->nombre ?? '-',
-                        'precio_unitario'     => $presupuesto->costounitario ?? 0,
-                        'total'               => (int)$cantidad * ($presupuesto->costounitario ?? 0),
-                        'es_combustible'        => $esCombustible,
-                    ];
+                if ($this->poaYear && $tarea && $tarea->poa) {
+                    if ($tarea->poa->anio != $this->poaYear) {
+                        continue; // Saltar recursos de otros POAs
+                    }
                 }
+
+                $nombreRecurso = strtoupper($presupuesto->recurso ?? '');
+                $esCombustible = str_contains($nombreRecurso, 'GASOLINA') || str_contains($nombreRecurso, 'DIESEL');
+
+                $this->recursosSeleccionados[] = [
+                    'id'                    => $presupuesto->id,
+                    'nombre'                => $presupuesto->recurso,
+                    'actividad'             => $tarea
+                        ? (($tarea->actividad->nombre ?? '-') . ' / ' . ($tarea->nombre ?? '-'))
+                        : '-',
+                    'proceso_compra'        => $presupuesto->tareaHistorico && $presupuesto->tareaHistorico->procesoCompra
+                        ? $presupuesto->tareaHistorico->procesoCompra->nombre_proceso
+                        : '-',
+                    'cantidad_seleccionada' => (int)$cantidad,
+                    'unidad_medida'         => $presupuesto->unidadMedida->nombre ?? '-',
+                    'precio_unitario'       => $presupuesto->costounitario ?? 0,
+                    'total'                 => (int)$cantidad * ($presupuesto->costounitario ?? 0),
+                    'es_combustible'        => $esCombustible,
+                    'idPoa'                 => $tarea?->idPoa, // ✅ guardar el POA
+                ];
             }
         }
-        
     }
-    
+}
     // Abrir el modal de sumario
     public function abrirSumario()
     {
+
+        if (!$this->puedeCrearRequisicion) {
+            session()->flash('error', $this->mensajePlazoRequisicion);
+            return;
+        }
         $this->recursosSeleccionados = [];
         // Obtener actividades y presupuestos aprobados 
         $actividades_aprobadas = Tarea::whereHas('presupuestos', function($q) {
@@ -477,12 +496,6 @@ class Requisicion extends Component
         $this->errorMessage = '';
     }
 
-   /* public function renderSumario()
-    {
-        $recursosSeleccionados = $this->recursosSeleccionados;
-        return view('livewire.requisicion.sumario-recursos', compact('recursosSeleccionados'));
-    }*/
-
     public function mount()
     {
         $this->empleados = Empleado::all();
@@ -509,9 +522,18 @@ class Requisicion extends Component
         if ($this->departamentosUsuario->count() == 1) {
             $this->departamentoSeleccionado = $this->departamentosUsuario->first()->id;
         }
+
+        $poa = \App\Models\Poa\Poa::activo()->latest()->first();
+\Log::info('Debug plazo requerimientos', [
+    'poa_id'      => $poa?->id,
+    'poa_activo'  => $poa?->activo,
+    'puedeRequerir' => $poa?->puedeRequerir(),
+    'mensaje'     => $poa?->getMensajeErrorPlazo('requerimientos'),
+]);
+
+        $this->verificarPlazoRequisicion();
     }
 
-    
     public function updatingBuscarActividad()
     {
         $this->resetPage();
@@ -554,6 +576,12 @@ class Requisicion extends Component
 
     public function irAlSumario()
     {
+
+        if (!$this->puedeCrearRequisicion) {
+            session()->flash('error', $this->mensajePlazoRequisicion);
+            return;
+        }
+
         //dd($this->departamentoSeleccionado); 
         session([
             'recursosSeleccionados' => $this->recursosSeleccionados,
@@ -732,6 +760,56 @@ class Requisicion extends Component
         session()->flash('message', 'Orden de combustible creada correctamente.');
     }
 
+    public function limpiarSumario()
+    {
+        $this->recursosSeleccionados = [];
+        $this->presupuestosSeleccionados = [];
+        session()->forget('recursosSeleccionados');
+    }
+
+    private function verificarPlazoRequisicion()
+    {
+        // Si hay un año seleccionado, verificar solo ese POA
+        if ($this->poaYear) {
+            $poa = \App\Models\Poa\Poa::activo()
+                ->where('anio', $this->poaYear)
+                ->first();
+        } else {
+            // Sin filtro, buscar cualquier POA activo con plazo vigente
+            $poa = \App\Models\Poa\Poa::activo()
+                ->whereHas('plazos', function($q) {
+                    $q->where('tipo_plazo', 'requerimientos')
+                    ->where('activo', true)
+                    ->whereDate('fecha_inicio', '<=', now())
+                    ->whereDate('fecha_fin', '>=', now());
+                })
+                ->first();
+
+            // Si ninguno tiene plazo vigente, tomar el primero activo para el mensaje
+            if (!$poa) {
+                $poa = \App\Models\Poa\Poa::activo()->first();
+            }
+        }
+
+        if (!$poa) {
+            $this->puedeCrearRequisicion = false;
+            $this->mensajePlazoRequisicion = 'No hay un POA activo.';
+            return;
+        }
+
+        $this->puedeCrearRequisicion = $poa->puedeRequerir();
+        $this->mensajePlazoRequisicion = $this->puedeCrearRequisicion
+            ? ''
+            : $poa->getMensajeErrorPlazo('requerimientos');
+    }
+    public function updatedPoaYear()
+    {
+        $this->verificarPlazoRequisicion();
+        // Limpiar recursos seleccionados al cambiar de POA
+        $this->recursosSeleccionados = [];
+        $this->presupuestosSeleccionados = [];
+        session()->forget('recursosSeleccionados');
+    }
      public function render()
     {
         $userId = Auth::id();
@@ -798,6 +876,8 @@ class Requisicion extends Component
         'actividades_aprobadas' => $actividades_aprobadas, // Pasar las actividades filtradas a la vista
         'valoresPlanificados' => $valoresPlanificados,
         'poaYears' => $this->poaYears, // Pasar los años únicos a la vista
+        'puedeCrearRequisicion' => $this->puedeCrearRequisicion,
+        'mensajePlazoRequisicion' => $this->mensajePlazoRequisicion,
     ])->layout($this->layout);
     }
 }

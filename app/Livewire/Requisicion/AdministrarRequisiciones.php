@@ -40,6 +40,9 @@ class AdministrarRequisiciones extends Component
     public $pdfDownloadUrl = '';
     public $pdfTitle = '';
 
+    public $puedeSeguimiento = false;
+    public $mensajePlazoSeguimiento = '';
+
 
     public function sortBy($field)
     {
@@ -387,6 +390,17 @@ class AdministrarRequisiciones extends Component
         $this->pdfTitle = '';
     }
 
+    private function verificarPlazoSeguimiento(int $idPoa): bool
+    {
+        return \App\Models\Plazos\PlazoPoa::where('idPoa', $idPoa)
+            ->where('tipo_plazo', 'seguimiento')
+            ->where('activo', true)
+            ->whereNull('nombre_plazo')
+            ->whereDate('fecha_inicio', '<=', now())
+            ->whereDate('fecha_fin', '>=', now())
+            ->exists();
+    }
+
     public function render()
     {
         $anios = Poa::select('anio')->distinct()->orderByDesc('anio')->pluck('anio');
@@ -427,6 +441,7 @@ class AdministrarRequisiciones extends Component
             'estados' => $estados,
             'detalleRecursos' => $this->detalleRecursos ?? [],
             'detalleRequisicion' => $this->detalleRequisicion ?? [],
+            'verificarPlazoSeguimiento' => fn($idPoa) => $this->verificarPlazoSeguimiento($idPoa),
         ]);
     }
 }

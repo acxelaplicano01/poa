@@ -240,7 +240,8 @@ $estado = $detalleRequisicion['estado'] ?? '';
                 @forelse ($requisiciones as $requisicion)
                     <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 px-3 py-1 rounded-full text-xs font-semibold">
+                            <span
+                                class="bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 px-3 py-1 rounded-full text-xs font-semibold">
                                 {{ $requisicion->correlativo }}
                             </span>
                         </td>
@@ -285,15 +286,43 @@ $estado = $detalleRequisicion['estado'] ?? '';
                                     </svg>
                                 </button>
                                 @if (($requisicion->estado->estado ?? '') === 'En Proceso de Compra')
-                                    <a href="{{ route('entregarecursos', ['requisicionId' => $requisicion->id]) }}"
-                                        title="Entrega de Recursos"
-                                        class="p-2 rounded-full hover:bg-green-100 text-green-700 transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="1.5" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v7.5m2.25-6.466a9.016 9.016 0 0 0-3.461-.203c-.536.072-.974.478-1.021 1.017a4.559 4.559 0 0 0-.018.402c0 .464.336.844.775.994l2.95 1.012c.44.15.775.53.775.994 0 .136-.006.27-.018.402-.047.539-.485.945-1.021 1.017a9.077 9.077 0 0 1-3.461-.203M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                                        </svg>
-                                    </a>
+                                    @php
+                                        $plazoOk = $verificarPlazoSeguimiento($requisicion->idPoa);
+                                    @endphp
+
+                                    @if ($plazoOk)
+                                        <a href="{{ route('entregarecursos', ['requisicionId' => $requisicion->id]) }}"
+                                            title="Entrega de Recursos"
+                                            class="p-2 rounded-full hover:bg-green-100 text-green-700 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v7.5m2.25-6.466a9.016 9.016 0 0 0-3.461-.203c-.536.072-.974.478-1.021 1.017a4.559 4.559 0 0 0-.018.402c0 .464.336.844.775.994l2.95 1.012c.44.15.775.53.775.994 0 .136-.006.27-.018.402-.047.539-.485.945-1.021 1.017a9.077 9.077 0 0 1-3.461-.203M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                            </svg>
+                                        </a>
+                                    @else
+                                       
+                                        <div class="relative group">
+                                            <span
+                                                class="p-2 rounded-full text-zinc-300 dark:text-zinc-600 cursor-not-allowed inline-flex">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                    class="size-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v7.5m2.25-6.466a9.016 9.016 0 0 0-3.461-.203c-.536.072-.974.478-1.021 1.017a4.559 4.559 0 0 0-.018.402c0 .464.336.844.775.994l2.95 1.012c.44.15.775.53.775.994 0 .136-.006.27-.018.402-.047.539-.485.945-1.021 1.017a9.077 9.077 0 0 1-3.461-.203M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                                </svg>
+                                            </span>
+                                            <div
+                                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block
+                        bg-zinc-800 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg z-50">
+                                                Plazo de seguimiento no activo
+                                                <div
+                                                    class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
                                 @endif
                                 @if (($requisicion->estado->estado ?? '') === 'Finalizado')
                                     <button
@@ -328,13 +357,9 @@ $estado = $detalleRequisicion['estado'] ?? '';
     </div>
 
     @if ($showPdfModal)
-        <div class="fixed inset-0 z-[70] flex items-center justify-center bg-opacity-5"
-            wire:click.self="cerrarPdfModal">
-            <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl flex flex-col"
-                style="width: 90vw; max-width: 1100px; height: 92vh;">
-
-                <div
-                    class="flex items-center justify-between px-5 py-3 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 rounded-t-xl">
+        <x-dialog-modal wire:model="showPdfModal" maxWidth="4xl">
+            <x-slot name="title">
+                <div class="flex items-center justify-between">
                     <h3 class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
                         {{ $pdfTitle }}
                     </h3>
@@ -358,18 +383,23 @@ $estado = $detalleRequisicion['estado'] ?? '';
                         </button>
                     </div>
                 </div>
-
-                <div class="flex-1 p-2 min-h-0">
-                    <iframe src="{{ $pdfUrl }}"
-                        class="w-full h-full rounded-lg border border-zinc-200 dark:border-zinc-700"
-                        type="application/pdf">
-                        <p class="text-center p-6 text-zinc-500">
-                            Tu navegador no puede mostrar el PDF.
-                            <a href="{{ $pdfDownloadUrl }}" class="text-blue-600 underline">Descárgalo aquí.</a>
-                        </p>
-                    </iframe>
-                </div>
-            </div>
-        </div>
+            </x-slot>
+            <x-slot name="content">
+                <iframe src="{{ $pdfUrl }}"
+                    class="w-full h-[70vh] rounded-lg border border-zinc-200 dark:border-zinc-700"
+                    type="application/pdf">
+                    <p class="text-center p-6 text-zinc-500">
+                        Tu navegador no puede mostrar el PDF.
+                        <a href="{{ $pdfDownloadUrl }}" class="text-blue-600 underline">Descárgalo aquí.</a>
+                    </p>
+                </iframe>
+            </x-slot>
+            <x-slot name="footer">
+                <x-spinner-button wire:click="cerrarPdfModal" loadingTarget="cerrarPdfModal"
+                    class="bg-zinc-400 hover:bg-zinc-500 text-white font-semibold px-6 py-2 rounded transition dark:bg-zinc-600 dark:hover:bg-zinc-700">
+                    Cerrar
+                </x-spinner-button>
+            </x-slot>
+        </x-dialog-modal>
     @endif
 </div>

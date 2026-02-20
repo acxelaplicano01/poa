@@ -86,14 +86,32 @@
 
             <!-- Botón Revisar Sumario -->
             <div class="flex items-center justify-end flex-shrink-0 w-fit ml-auto">
-                <button wire:click="irAlSumario"
-                    class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    {{ __('Revisar sumario') }}
-                </button>
+                @if($puedeCrearRequisicion)
+        <x-spinner-button wire:click="irAlSumario"
+            class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            {{ __('Revisar sumario') }}
+        </x-spinner-button>
+    @else
+        <div class="relative group">
+            <button disabled
+                class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium 
+                       bg-zinc-300 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 
+                       cursor-not-allowed opacity-60">
+                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                {{ __('Revisar sumario') }}
+            </button>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block
+                        bg-zinc-800 text-white text-xs rounded-lg px-3 py-2 shadow-lg z-50 w-64 text-center">
+                {{ $mensajePlazoRequisicion }}
+                <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800"></div>
+            </div>
+        </div>
+    @endif
             </div>
         </div>
     </div>

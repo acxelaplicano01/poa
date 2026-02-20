@@ -30,6 +30,9 @@ class SumarioRequisicion extends Component
     public $isEditing = false;
     public $departamentoSeleccionado = null;
 
+    public $puedeCrearRequisicion = false;
+    public $mensajePlazoRequisicion = '';
+
     public $showOrdenCombustibleModal = false;
     public $ordenCombustibleRecursoId;
     public $ordenCombustibleRecursoNombre;
@@ -63,6 +66,8 @@ class SumarioRequisicion extends Component
             }
             return $recurso;
         })->toArray();
+
+        $this->verificarPlazoRequisicion(); 
     }
 
     public function quitarRecursoDelSumario($recursoId)
@@ -83,6 +88,10 @@ class SumarioRequisicion extends Component
 
     public function crearRequisicion()
     {
+        if (!$this->puedeCrearRequisicion) {
+            session()->flash('error', $this->mensajePlazoRequisicion);
+            return;
+        }
         $this->validate([
             'descripcion' => 'required',
             'fechaRequerido' => 'required|date',
@@ -421,10 +430,43 @@ class SumarioRequisicion extends Component
         return $entero == 0 ? 'CERO' : $convertir($entero);
     }
 
+    private function verificarPlazoRequisicion()
+    {
+        $poas = \App\Models\Poa\Poa::activo()->get();
+
+        if ($poas->isEmpty()) {
+            $this->puedeCrearRequisicion = false;
+            $this->mensajePlazoRequisicion = 'No hay un POA activo.';
+            return;
+        }
+
+        // Buscar el POA que tenga el plazo de requerimientos vigente
+        foreach ($poas as $poa) {
+            if ($poa->puedeRequerir()) {
+                $this->puedeCrearRequisicion = true;
+                $this->mensajePlazoRequisicion = '';
+                return;
+            }
+        }
+
+        // Ningún POA tiene el plazo vigente — mostrar mensaje del POA que tenga algo configurado
+        $this->puedeCrearRequisicion = false;
+
+        $poaConPlazo = $poas->first(function($poa) {
+            return $poa->plazos()->where('tipo_plazo', 'requerimientos')->exists();
+        });
+
+        $this->mensajePlazoRequisicion = $poaConPlazo
+            ? $poaConPlazo->getMensajeErrorPlazo('requerimientos')
+            : 'No hay un plazo de requerimientos configurado.';
+    }
+
     public function render()
     {
         return view('livewire.requisicion.sumario-recursos', [
             'recursosSeleccionados' => $this->recursosSeleccionados,
+            'puedeCrearRequisicion' => $this->puedeCrearRequisicion,
+            'mensajePlazoRequisicion' => $this->mensajePlazoRequisicion,
         ]);
     }
 }

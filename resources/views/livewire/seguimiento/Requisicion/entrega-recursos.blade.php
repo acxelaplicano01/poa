@@ -516,14 +516,10 @@
         </table>
     </div>
 
-    @if ($showPdfModal)
-        <div class="fixed inset-0 z-[70] flex items-center justify-center bg-opacity-5"
-            wire:click.self="cerrarPdfModal">
-            <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl flex flex-col"
-                style="width: 90vw; max-width: 1100px; height: 92vh;">
-
-                <div
-                    class="flex items-center justify-between px-5 py-3 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 rounded-t-xl">
+ @if ($showPdfModal)
+        <x-dialog-modal wire:model="showPdfModal" maxWidth="4xl">
+            <x-slot name="title">
+                <div class="flex items-center justify-between">
                     <h3 class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
                         {{ $pdfTitle }}
                     </h3>
@@ -547,18 +543,23 @@
                         </button>
                     </div>
                 </div>
-
-                <div class="flex-1 p-2 min-h-0">
-                    <iframe src="{{ $pdfUrl }}"
-                        class="w-full h-full rounded-lg border border-zinc-200 dark:border-zinc-700"
-                        type="application/pdf">
-                        <p class="text-center p-6 text-zinc-500">
-                            Tu navegador no puede mostrar el PDF.
-                            <a href="{{ $pdfDownloadUrl }}" class="text-blue-600 underline">Descárgalo aquí.</a>
-                        </p>
-                    </iframe>
-                </div>
-            </div>
-        </div>
+            </x-slot>
+            <x-slot name="content">
+                <iframe src="{{ $pdfUrl }}"
+                    class="w-full h-[70vh] rounded-lg border border-zinc-200 dark:border-zinc-700"
+                    type="application/pdf">
+                    <p class="text-center p-6 text-zinc-500">
+                        Tu navegador no puede mostrar el PDF.
+                        <a href="{{ $pdfDownloadUrl }}" class="text-blue-600 underline">Descárgalo aquí.</a>
+                    </p>
+                </iframe>
+            </x-slot>
+            <x-slot name="footer">
+                <x-spinner-button wire:click="cerrarPdfModal" loadingTarget="cerrarPdfModal"
+                    class="bg-zinc-400 hover:bg-zinc-500 text-white font-semibold px-6 py-2 rounded transition dark:bg-zinc-600 dark:hover:bg-zinc-700">
+                    Cerrar
+                </x-spinner-button>
+            </x-slot>
+        </x-dialog-modal>
     @endif
 </div>
