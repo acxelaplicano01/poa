@@ -40,9 +40,71 @@ class AdministrarRequisiciones extends Component
     public $pdfDownloadUrl = '';
     public $pdfTitle = '';
 
-    public $puedeSeguimiento = false;
-    public $mensajePlazoSeguimiento = '';
+    public $puedeSeguimiento = false; // Indica si se puede realizar seguimiento
+    public $mensajePlazoSeguimiento = ''; 
+    public $diasRestantes = null; 
 
+    public function mount()
+    {
+        $this->anio = Poa::select('anio')->distinct()->orderByDesc('anio')->value('anio');
+
+        $this->verificarPlazoSeguimientoGeneral();
+    }
+
+    public function updatedAnio()
+    {
+        $this->verificarPlazoSeguimientoGeneral();
+    }
+
+    private function verificarPlazoSeguimientoGeneral()
+    {
+        $poa = Poa::activo()
+            ->when($this->anio, function ($query) {
+                $query->where('anio', $this->anio);
+            })
+            ->first();
+
+        if (!$poa) {
+            $this->puedeSeguimiento = false;
+            $this->mensajePlazoSeguimiento = 'No hay un POA activo para el año seleccionado.';
+            $this->diasRestantes = null;
+            return;
+        }
+
+        $plazo = $poa->plazos()
+            ->where('tipo_plazo', 'seguimiento')
+            ->where('activo', true)
+            ->first();
+
+        if (!$plazo) {
+            $this->puedeSeguimiento = false;
+            $this->mensajePlazoSeguimiento = 'No hay un plazo configurado para esta acción.';
+            $this->diasRestantes = null;
+            return;
+        }
+
+        if (now()->lt($plazo->fecha_inicio)) {
+            $this->puedeSeguimiento = false;
+            $this->mensajePlazoSeguimiento = 'El plazo para esta acción aún no ha iniciado. Inicia el ' . $plazo->fecha_inicio->format('d/m/Y') . '.';
+            $this->diasRestantes = null;
+            return;
+        }
+
+        if (now()->gt($plazo->fecha_fin)) {
+            $this->puedeSeguimiento = false;
+            $this->mensajePlazoSeguimiento = 'El plazo para esta acción ya pasó.';
+            $this->diasRestantes = null;
+            return;
+        }
+
+        // Corregir el cálculo de días restantes
+        $this->diasRestantes = now()->startOfDay()->diffInDays($plazo->fecha_fin->endOfDay(), false);
+        $this->puedeSeguimiento = $this->diasRestantes >= 0;
+
+        if (!$this->puedeSeguimiento) {
+            $this->mensajePlazoSeguimiento = 'El plazo para gestionar el seguimiento ha finalizado.';
+        }
+    }
 
     public function sortBy($field)
     {
@@ -410,38 +472,43 @@ class AdministrarRequisiciones extends Component
         ];
 
         $query = Requisicion::with(['departamento', 'estado'])
-            ->when($this->search, function($q) {
+            ->when($this->search, function ($q) {
                 $q->where('correlativo', 'like', "%{$this->search}%")
-                  ->orWhereHas('departamento', function($q2) {
-                      $q2->where('name', 'like', "%{$this->search}%");
-                  });
+                    ->orWhereHas('departamento', function ($q2) {
+                        $q2->where('name', 'like', "%{$this->search}%");
+                    });
             })
-            ->when($this->anio, function($q) {
-                $q->whereHas('poa', function($q2) {
+            ->when($this->anio, function ($q) {
+                $q->whereHas('poa', function ($q2) {
                     $q2->where('anio', $this->anio);
                 });
             })
-            ->when($this->departamento && $this->departamento !== 'Todos', function($q) {
-                $q->whereHas('departamento', function($q2) {
+            ->when($this->departamento && $this->departamento !== 'Todos', function ($q) {
+                $q->whereHas('departamento', function ($q2) {
                     $q2->where('id', $this->departamento);
                 });
             })
-            ->when($this->estado && $this->estado !== 'Todos', function($q) {
-                $q->whereHas('estado', function($q2) {
+            ->when($this->estado && $this->estado !== 'Todos', function ($q) {
+                $q->whereHas('estado', function ($q2) {
                     $q2->where('estado', $this->estado);
                 });
             });
 
         $requisiciones = $query->orderBy($this->sortField, $this->sortDirection)->paginate($this->perPage);
 
+        // Verificar el plazo de seguimiento para cada requisición
+        $requisiciones->each(function ($requisicion) {
+            $requisicion->plazoSeguimientoActivo = $this->verificarPlazoSeguimiento($requisicion->idPoa);
+        });
+
         return view('livewire.seguimiento.Requisicion.administrar-requisiciones', [
             'requisiciones' => $requisiciones,
             'anios' => $anios,
             'departamentos' => $departamentos,
             'estados' => $estados,
-            'detalleRecursos' => $this->detalleRecursos ?? [],
-            'detalleRequisicion' => $this->detalleRequisicion ?? [],
-            'verificarPlazoSeguimiento' => fn($idPoa) => $this->verificarPlazoSeguimiento($idPoa),
+            'diasRestantes' => $this->diasRestantes,
+            'mensajePlazoSeguimiento' => $this->mensajePlazoSeguimiento,
+            'puedeSeguimiento' => $this->puedeSeguimiento,
         ]);
     }
 }

@@ -149,20 +149,34 @@ class SumarioRequisicion extends Component
             ]);
 
             foreach ($this->recursosSeleccionados as $recurso) {
-                $presupuesto = Presupuesto::find($recurso['id']);
-                if ($presupuesto) {
-                    DetalleRequisicion::create([
-                        'idRequisicion' => $requisicion->id,
-                        'idPoa'         => $this->idPoa,
-                        'idPresupuesto' => $presupuesto->id,
-                        'idRecurso'     => $presupuesto->idHistorico,
-                        'cantidad'      => $recurso['cantidad_seleccionada'],
-                        'idUnidadMedida'=> $presupuesto->idunidad,
-                        'entregado'     => false,
-                        'created_by'    => $user->id,
-                    ]);
-                }
+            $presupuesto = Presupuesto::find($recurso['id']);
+            if ($presupuesto) {
+                $detalle = DetalleRequisicion::create([
+                    'idRequisicion' => $requisicion->id,
+                    'idPoa'         => $this->idPoa,
+                    'idPresupuesto' => $presupuesto->id,
+                    'idRecurso'     => $presupuesto->idHistorico,
+                    'cantidad'      => $recurso['cantidad_seleccionada'],
+                    'idUnidadMedida'=> $presupuesto->idunidad,
+                    'entregado'     => false,
+                    'created_by'    => $user->id,
+                ]);
+
+                // Actualizar orden de combustible con el detalle definitivo
+                \DB::table('orden_combustible')
+                    ->where('idRecurso', $presupuesto->id)
+                    ->where('created_by', $user->id)
+                    ->whereNull('idDetalleRequisicion') // solo los que no tienen detalle aún
+                    ->orWhere(function($q) use ($presupuesto, $user) {
+                        // o los que tienen un detalle provisional diferente
+                        $q->where('idRecurso', $presupuesto->id)
+                        ->where('created_by', $user->id);
+                    })
+                    ->orderByDesc('id')
+                    ->limit(1)
+                    ->update(['idDetalleRequisicion' => $detalle->id]); // apuntar al detalle real
             }
+        }
             session()->forget('recursosSeleccionados');
             $this->showCrearRequisicionModal = false;
             session()->flash('message', 'Requisición creada correctamente.');
@@ -171,6 +185,7 @@ class SumarioRequisicion extends Component
             }
             session()->forget('recursosSeleccionados');
             session()->forget('departamentoSeleccionado');
+            session()->forget('poaYearSeleccionado');
             return redirect()->route('requisicion');
 
         } catch (\Exception $e) {

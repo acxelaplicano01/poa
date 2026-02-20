@@ -1,4 +1,47 @@
 <div>
+    {{-- Banner informativo del plazo de seguimiento --}}
+    @if (!$puedeSeguimiento && $mensajePlazoSeguimiento)
+        <div class="mb-4 bg-amber-100 dark:bg-amber-900/30 border border-amber-400 dark:border-amber-700 text-amber-800 dark:text-amber-300 px-4 py-3 rounded-lg"
+            role="alert">
+            <div class="flex items-start justify-between">
+                <div class="flex items-start flex-1">
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <p class="font-semibold">Plazo de seguimiento no disponible</p>
+                        <p class="text-sm mt-1">{{ $mensajePlazoSeguimiento }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Contador de días restantes para el plazo de seguimiento --}}
+    @if ($puedeSeguimiento && $diasRestantes !== null)
+        <div class="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 px-4 py-3 rounded-lg flex items-center justify-between"
+            role="alert">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <div>
+                    <p class="font-semibold text-sm">Plazo de seguimiento activo</p>
+                    <p class="text-xs mt-0.5">Puedes gestionar el seguimiento dentro del plazo establecido.</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="flex items-baseline">
+                    <span class="text-3xl font-bold">{{ intval($diasRestantes) }}</span>
+                    <span class="text-sm ml-1">{{ $diasRestantes == 1 ? 'día' : 'días' }}</span>
+                </div>
+                <p class="text-xs mt-0.5">{{ $diasRestantes == 1 ? 'restante' : 'restantes' }}</p>
+            </div>
+        </div>
+    @endif
+
     <x-dialog-modal wire:model="showDetalleModal" maxWidth="4xl">
         <x-slot name="title">
             <div class="flex items-center justify-between w-full">
@@ -90,18 +133,18 @@ $estado = $detalleRequisicion['estado'] ?? '';
                                             @if ($detalleId)
                                                 <button
                                                     wire:click="abrirPdfModal(
-    '/orden-combustible/{{ $detalleId }}/pdf',
-    '/orden-combustible/{{ $detalleId }}/pdf/download',
-    'Orden de Combustible'
-)"
-                                                    class="inline-flex items-center gap-1 px-2 py-1 rounded bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-xs font-semibold transition">
+                                                    '/orden-combustible/{{ $detalleId }}/pdf',
+                                                    '/orden-combustible/{{ $detalleId }}/pdf/download',
+                                                    'Orden de Combustible'
+                                                )"
+                                                    title="Descargar Orden de Combustible"
+                                                    class="p-2 rounded-full hover:bg-yellow-100 text-yellow-700 transition">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                        class="w-4 h-4">
+                                                        class="w-6 h-6">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                                                     </svg>
-                                                    Orden Combustible
                                                 </button>
                                             @endif
                                         @endif
@@ -181,8 +224,8 @@ $estado = $detalleRequisicion['estado'] ?? '';
                 @elseif ($estado === 'Recibido')
                     <x-spinner-button wire:click="marcarComoAprobado" loadingTarget="marcarComoAprobado"
                         class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-green-700 dark:hover:bg-green-800">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-5 h-5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                         </svg>
                         Aprobado
@@ -286,11 +329,7 @@ $estado = $detalleRequisicion['estado'] ?? '';
                                     </svg>
                                 </button>
                                 @if (($requisicion->estado->estado ?? '') === 'En Proceso de Compra')
-                                    @php
-                                        $plazoOk = $verificarPlazoSeguimiento($requisicion->idPoa);
-                                    @endphp
-
-                                    @if ($plazoOk)
+                                    @if ($requisicion->plazoSeguimientoActivo)
                                         <a href="{{ route('entregarecursos', ['requisicionId' => $requisicion->id]) }}"
                                             title="Entrega de Recursos"
                                             class="p-2 rounded-full hover:bg-green-100 text-green-700 transition">
@@ -302,7 +341,6 @@ $estado = $detalleRequisicion['estado'] ?? '';
                                             </svg>
                                         </a>
                                     @else
-                                       
                                         <div class="relative group">
                                             <span
                                                 class="p-2 rounded-full text-zinc-300 dark:text-zinc-600 cursor-not-allowed inline-flex">

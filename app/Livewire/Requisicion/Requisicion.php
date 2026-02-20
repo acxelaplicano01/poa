@@ -23,10 +23,10 @@ use Livewire\Attributes\Layout;
 #[Layout('layouts.app')]
 class Requisicion extends Component
 {
-    public $buscarActividad = '';
     use WithPagination;
-
     protected string $layout = 'layouts.app';
+    protected $paginationTheme = 'tailwind';
+    public $buscarActividad = '';
     public $correlativo;
     public $descripcion;
     public $observacion;
@@ -52,6 +52,7 @@ class Requisicion extends Component
     public $showErrorModal = false;
     public $isEditing = false;
     public $successMessage = '';
+    public $diasRestantes = null;
 
     public $mostrarSelector = false;
     public $departamentosUsuario = [];
@@ -326,11 +327,11 @@ class Requisicion extends Component
         $this->showSumarioModal = true;
     }
 
-    protected $queryString = [
+    /*protected $queryString = [
         'search' => ['except' => ''],
         'sortField' => ['except' => 'id'],
         'sortDirection' => ['except' => 'desc'],
-    ];
+    ];*/
 
     public function updatedCorrelativo($value)
     {
@@ -502,14 +503,13 @@ class Requisicion extends Component
         $this->errorMessage = '';
     }
 
-    public function mount()
+   public function mount()
     {
         $this->empleados = Empleado::all();
 
         $recursosGuardados = session('recursosSeleccionados', []);
         if (!empty($recursosGuardados)) {
             $this->recursosSeleccionados = $recursosGuardados;
-            // Restaurar también los inputs de cantidad
             foreach ($recursosGuardados as $recurso) {
                 $this->presupuestosSeleccionados[$recurso['id']] = $recurso['cantidad_seleccionada'];
             }
@@ -522,22 +522,20 @@ class Requisicion extends Component
             $q->where('empleados.id', $userId);
         })->with('unidadEjecutora')->get();
 
-        // Ensure mostrarSelector is set correctly
         $this->mostrarSelector = $this->departamentosUsuario->count() > 1;
 
         if ($this->departamentosUsuario->count() == 1) {
             $this->departamentoSeleccionado = $this->departamentosUsuario->first()->id;
         }
-
-        $poa = Poa::activo()->latest()->first();
-        $this->poaYear = $poa?->anio; // Inicializar el año del POA activo
-
-        \Log::info('Debug plazo requerimientos', [
-            'poa_id'      => $poa?->id,
-            'poa_activo'  => $poa?->activo,
-            'puedeRequerir' => $poa?->puedeRequerir(),
-            'mensaje'     => $poa?->getMensajeErrorPlazo('requerimientos'),
-        ]);
+        
+        $poaYearGuardado = session('poaYearSeleccionado');
+        
+        if ($poaYearGuardado) {
+            $this->poaYear = $poaYearGuardado;
+        } else {
+            $poa = Poa::activo()->latest()->first();
+            $this->poaYear = $poa?->anio;
+        }
 
         $this->verificarPlazoRequisicion();
     }
@@ -594,6 +592,7 @@ class Requisicion extends Component
         session([
             'recursosSeleccionados' => $this->recursosSeleccionados,
             'departamentoSeleccionado' => $this->departamentoSeleccionado,
+            'poaYearSeleccionado'    => $this->poaYear,
         ]);
         return redirect()->route('requisiciones-sumario');
     }
@@ -601,6 +600,7 @@ class Requisicion extends Component
     public function sincronizarDepartamento($id)
     {
         $this->departamentoSeleccionado = $id;
+        $this->resetPage();
     }
 
     public function guardarOrdenCombustible()
@@ -777,42 +777,66 @@ class Requisicion extends Component
 
     private function verificarPlazoRequisicion()
     {
-        // Si hay un año seleccionado, verificar solo ese POA
-        if ($this->poaYear) {
-            $poa = \App\Models\Poa\Poa::activo()
-                ->where('anio', $this->poaYear)
-                ->first();
-        } else {
-            // Sin filtro, buscar cualquier POA activo con plazo vigente
-            $poa = \App\Models\Poa\Poa::activo()
-                ->whereHas('plazos', function($q) {
-                    $q->where('tipo_plazo', 'requerimientos')
-                    ->where('activo', true)
-                    ->whereDate('fecha_inicio', '<=', now())
-                    ->whereDate('fecha_fin', '>=', now());
-                })
-                ->first();
-
-            // Si ninguno tiene plazo vigente, tomar el primero activo para el mensaje
-            if (!$poa) {
-                $poa = \App\Models\Poa\Poa::activo()->first();
-            }
-        }
+        // Obtener el POA correspondiente al año seleccionado
+        $poa = Poa::activo()
+            ->when($this->poaYear, function ($query) {
+                $query->where('anio', $this->poaYear);
+            })
+            ->first();
 
         if (!$poa) {
             $this->puedeCrearRequisicion = false;
-            $this->mensajePlazoRequisicion = 'No hay un POA activo.';
+            $this->mensajePlazoRequisicion = 'No hay un POA activo para el año seleccionado.';
+            $this->diasRestantes = null;
             return;
         }
 
-        $this->puedeCrearRequisicion = $poa->puedeRequerir();
-        $this->mensajePlazoRequisicion = $this->puedeCrearRequisicion
-            ? ''
-            : $poa->getMensajeErrorPlazo('requerimientos');
+        // Obtener el plazo activo para el POA seleccionado
+        $plazo = $poa->plazos()
+            ->where('tipo_plazo', 'requerimientos')
+            ->where('activo', true)
+            ->first();
+
+        if (!$plazo) {
+            $this->puedeCrearRequisicion = false;
+            $this->mensajePlazoRequisicion = 'No hay un plazo configurado para esta acción.';
+            $this->diasRestantes = null;
+            return;
+        }
+
+        // Validar si el plazo aún no ha iniciado
+        if (now()->lt($plazo->fecha_inicio)) {
+            $this->puedeCrearRequisicion = false;
+            $this->mensajePlazoRequisicion = 'El plazo para esta acción aún no ha iniciado. Inicia el ' . $plazo->fecha_inicio->format('d/m/Y') . '.';
+            $this->diasRestantes = null;
+            return;
+        }
+
+        // Validar si el plazo ya pasó
+        if (now()->gt($plazo->fecha_fin)) {
+            $this->puedeCrearRequisicion = false;
+            $this->mensajePlazoRequisicion = 'El plazo para esta acción ya pasó.';
+            $this->diasRestantes = null;
+            return;
+        }
+
+        // Calcular días restantes como un número entero
+        $this->diasRestantes = floor(now()->diffInDays($plazo->fecha_fin, false));
+        $this->puedeCrearRequisicion = $this->diasRestantes >= 0;
+        $this->diasRestantes = $poa->getDiasRestantes('requerimientos'); 
+
+        if (!$this->puedeCrearRequisicion) {
+            $this->mensajePlazoRequisicion = 'El plazo para gestionar requisiciones ha finalizado.';
+        }
     }
+
     public function updatedPoaYear()
     {
+        // Actualizar el cálculo del plazo cuando se cambia el POA en el select
         $this->verificarPlazoRequisicion();
+        $this->resetPage();
+        session(['poaYearSeleccionado' => $this->poaYear]);
+
         // Limpiar recursos seleccionados al cambiar de POA
         $this->recursosSeleccionados = [];
         $this->presupuestosSeleccionados = [];
@@ -903,6 +927,7 @@ class Requisicion extends Component
         'poaYears' => $this->poaYears, // Pasar los años únicos a la vista
         'puedeCrearRequisicion' => $this->puedeCrearRequisicion,
         'mensajePlazoRequisicion' => $this->mensajePlazoRequisicion,
+        'diasRestantes' => $this->diasRestantes, // Pass remaining days to the view
     ])->layout($this->layout);
     }
 }

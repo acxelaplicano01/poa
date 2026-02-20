@@ -11,35 +11,47 @@ use Illuminate\Support\Facades\Auth;
 class OrdenCombustiblePdfController extends Controller
 {
     private function prepararDatos($detalleId): array
-    {
-        $orden = \DB::table('orden_combustible')
-            ->where('idDetalleRequisicion', $detalleId)
-            ->orderByDesc('id')
-            ->first();
+{
+    // ✅ Buscar primero por idDetalleRequisicion exacto
+    $orden = \DB::table('orden_combustible')
+        ->where('idDetalleRequisicion', $detalleId)
+        ->orderByDesc('id')
+        ->first();
 
-        if (!$orden) {
-            abort(404, 'Orden de combustible no encontrada.');
+    // ✅ Si no encuentra, buscar por el presupuesto relacionado al detalle
+    if (!$orden) {
+        $detalle = DetalleRequisicion::find($detalleId);
+        if ($detalle) {
+            $orden = \DB::table('orden_combustible')
+                ->where('idRecurso', $detalle->idPresupuesto)
+                ->orderByDesc('id')
+                ->first();
         }
-
-        $detalleRequisicion = DetalleRequisicion::with([
-            'presupuesto.tareaHistorico',
-            'presupuesto.tarea',
-            'requisicion.departamento'
-        ])->find($detalleId);
-
-        $orden = (object) $orden;
-        $orden->detalleRequisicion = $detalleRequisicion;
-        $orden->tareas_historico = $detalleRequisicion->presupuesto->tareaHistorico ?? null;
-        $orden->empleado = $orden->responsable
-            ? \App\Models\Empleados\Empleado::find($orden->responsable)
-            : null;
-
-        return [
-            'orden' => $orden,
-            'userDescarga' => Auth::user(),
-            'userSolicitante' => optional($detalleRequisicion->requisicion)->creador ?? null,
-        ];
     }
+
+    if (!$orden) {
+        abort(404, 'Orden de combustible no encontrada.');
+    }
+
+    $detalleRequisicion = DetalleRequisicion::with([
+        'presupuesto.tareaHistorico',
+        'presupuesto.tarea',
+        'requisicion.departamento'
+    ])->find($detalleId);
+
+    $orden = (object) $orden;
+    $orden->detalleRequisicion = $detalleRequisicion;
+    $orden->tareas_historico = $detalleRequisicion->presupuesto->tareaHistorico ?? null;
+    $orden->empleado = $orden->responsable
+        ? \App\Models\Empleados\Empleado::find($orden->responsable)
+        : null;
+
+    return [
+        'orden' => $orden,
+        'userDescarga' => Auth::user(),
+        'userSolicitante' => optional($detalleRequisicion->requisicion)->creador ?? null,
+    ];
+}
 
     public function show($detalleId)
     {

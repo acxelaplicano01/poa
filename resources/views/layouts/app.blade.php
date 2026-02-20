@@ -9,4 +9,4 @@
 
  <x-rk.flux::app>
     {{ $slot ?? 'Contenido principal' }}
-</x-rk.flux::app>    
+</x-rk.flux::app>

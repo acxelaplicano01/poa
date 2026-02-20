@@ -109,7 +109,7 @@
                                     L. {{ number_format($orden->monto, 2) }}
                                 </td>
                                 <td class="b-left b-top b-buttom b-right" width="16%" align="left" rowspan="2" colspan="3">
-                                    <span>Valor en Letras: {{ $orden->monto_en_letras }}</span>
+                                    <span>Valor en Letras: {{ $orden->monto_en_letras }} LEMPIRAS</span>
                                 </td>
                             </tr>
                             <tr>

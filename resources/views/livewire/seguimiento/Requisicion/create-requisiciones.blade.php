@@ -1,4 +1,6 @@
 <div>
+
+
     {{-- Mensajes de éxito/error --}}
     @if ($successMessage)
         @include('rk.default.notifications.notification-alert', [
@@ -9,8 +11,6 @@
             'slot' => $successMessage,
         ])
     @endif
-
-   
 
     @if (session()->has('message'))
         @include('rk.default.notifications.notification-alert', [
@@ -32,25 +32,67 @@
         ])
     @endif
 
+    {{-- Alerta de plazo --}}
+    @if (!$puedeCrearRequisicion && $mensajePlazoRequisicion)
+        <div class="mb-4 bg-amber-100 dark:bg-amber-900/30 border border-amber-400 dark:border-amber-700 text-amber-800 dark:text-amber-300 px-4 py-3 rounded-lg"
+            role="alert">
+            <div class="flex items-start justify-between">
+                <div class="flex items-start flex-1">
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <p class="font-semibold">Plazo de gestión de requisiciones no disponible</p>
+                        <p class="text-sm mt-1">{{ $mensajePlazoRequisicion }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Contador de días restantes --}}
+    @if ($puedeCrearRequisicion && $diasRestantes !== null)
+        <div class="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 px-4 py-3 rounded-lg flex items-center justify-between"
+            role="alert">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <div>
+                    <p class="font-semibold text-sm">Plazo de gestión de requisiciones activo</p>
+                    <p class="text-xs mt-0.5">Puedes gestionar requisiciones dentro del plazo establecido.</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="flex items-baseline">
+                    <span class="text-3xl font-bold">{{ intval($diasRestantes) }}</span>
+                    <span class="text-sm ml-1">{{ $diasRestantes == 1 ? 'día' : 'días' }}</span>
+                </div>
+                <p class="text-xs mt-0.5">{{ $diasRestantes == 1 ? 'restante' : 'restantes' }}</p>
+            </div>
+        </div>
+    @endif
+
     <div class="bg-white dark:bg-zinc-900 rounded-lg shadow p-4 mb-6">
-        @if($mostrarSelector)
-    <div class="mb-4 w-full">
-        <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-            Departamento
-        </label>
-        <select
-            x-data
-            x-on:change="$wire.set('departamentoSeleccionado', $event.target.value)"
-            class="w-full sm:w-auto min-w-[300px] rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            <option value="">Selecciona un departamento</option>
-            @foreach($departamentosUsuario as $depto)
-                <option value="{{ $depto->id }}" {{ $departamentoSeleccionado == $depto->id ? 'selected' : '' }}>
-                    {{ $depto->name }} - {{ $depto->unidadEjecutora->name ?? 'Sin UE' }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-@endif
+        @if ($mostrarSelector)
+            <div class="mb-4 w-full">
+                <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                    Departamento
+                </label>
+                <select x-data x-on:change="$wire.set('departamentoSeleccionado', $event.target.value)"
+                    class="w-full sm:w-auto min-w-[300px] rounded-md border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="">Selecciona un departamento</option>
+                    @foreach ($departamentosUsuario as $depto)
+                        <option value="{{ $depto->id }}"
+                            {{ $departamentoSeleccionado == $depto->id ? 'selected' : '' }}>
+                            {{ $depto->name }} - {{ $depto->unidadEjecutora->name ?? 'Sin UE' }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
         <div class="flex flex-wrap items-center w-full gap-4">
             <!-- Input de búsqueda -->
             <div class="relative w-full sm:w-auto">
@@ -77,43 +119,49 @@
 
             <!-- Filtro de POA por años -->
             <div class="w-full sm:w-auto min-w-[150px] max-w-xs">
-                 <select wire:model.live="poaYear"
-                            class="block w-full min-w-[180px] max-w-xs rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 text-sm py-2 px-3">
-                            
-                            @foreach($poaYears as $year)
-                                <option value="{{ $year }}">POA {{ $year }}</option>
-                            @endforeach
-                        </select>
+                <select wire:model.live="poaYear"
+                    class="block w-full min-w-[180px] max-w-xs rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 text-sm py-2 px-3">
+
+                    @foreach ($poaYears as $year)
+                        <option value="{{ $year }}">POA {{ $year }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <!-- Botón Revisar Sumario -->
             <div class="flex items-center justify-end flex-shrink-0 w-fit ml-auto">
-                @if($puedeCrearRequisicion)
-        <x-spinner-button wire:click="irAlSumario"
-            class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            {{ __('Revisar sumario') }}
-        </x-spinner-button>
-    @else
-        <div class="relative group">
-            <button disabled
-                class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium 
+                @if ($puedeCrearRequisicion)
+                    <x-spinner-button wire:click="irAlSumario"
+                        class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        {{ __('Revisar sumario') }}
+                    </x-spinner-button>
+                @else
+                    <div class="relative group">
+                        <button disabled
+                            class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium 
                        bg-zinc-300 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 
                        cursor-not-allowed opacity-60">
-                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                {{ __('Revisar sumario') }}
-            </button>
-            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            {{ __('Revisar sumario') }}
+                        </button>
+                        <div
+                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block
                         bg-zinc-800 text-white text-xs rounded-lg px-3 py-2 shadow-lg z-50 w-64 text-center">
-                {{ $mensajePlazoRequisicion }}
-                <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800"></div>
-            </div>
-        </div>
-    @endif
+                            {{ $mensajePlazoRequisicion }}
+                            <div
+                                class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800">
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -199,7 +247,8 @@
                             @endforeach
                         @empty
                             <tr>
-                                <td colspan="5" class="px-3 py-2 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                                <td colspan="5"
+                                    class="px-3 py-2 text-center text-sm text-zinc-500 dark:text-zinc-400">
                                     {{ __('No hay recursos disponibles.') }}
                                 </td>
                             </tr>
@@ -208,7 +257,6 @@
                 </table>
             </div>
 
-            {{-- Paginación --}}
             @if ($actividades_aprobadas->hasPages())
                 <div class="mt-4">
                     {{ $actividades_aprobadas->links() }}
@@ -278,5 +326,3 @@
         </div>
     </div>
 </div>
-
-
