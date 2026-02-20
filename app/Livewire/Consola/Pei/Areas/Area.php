@@ -204,9 +204,25 @@ class Area extends Component
     {
         try {
             $areaId = $this->areaToDelete->id;
+
+            // Verificar si tiene resultados hijos
+            $tieneHijos = DB::table('pei_elementos')
+                ->where('elemento_tipo', 'resultados')
+                ->whereExists(function($query) use ($areaId) {
+                    $query->select(DB::raw(1))
+                        ->from('resultados')
+                        ->whereColumn('resultados.id', 'pei_elementos.elemento_id')
+                        ->where('resultados.idArea', $areaId);
+                })
+                ->exists();
+
+            if ($tieneHijos) {
+                session()->flash('error', 'No se puede eliminar esta área porque tiene resultados asociados. Elimine primero los resultados.');
+                $this->showDeleteModal = false;
+                return;
+            }
+
             $this->areaToDelete->delete();
-            
-            // Eliminar de pei_elementos
             DB::table('pei_elementos')
                 ->where('elemento_id', $areaId)
                 ->where('elemento_tipo', 'areas')

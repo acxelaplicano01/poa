@@ -208,9 +208,25 @@ class Objetivo extends Component
     {
         try {
             $objetivoId = $this->objetivoToDelete->id;
+
+            // Verificar si tiene áreas hijas
+            $tieneHijos = DB::table('pei_elementos')
+                ->where('elemento_tipo', 'areas')
+                ->whereExists(function($query) use ($objetivoId) {
+                    $query->select(DB::raw(1))
+                        ->from('areas')
+                        ->whereColumn('areas.id', 'pei_elementos.elemento_id')
+                        ->where('areas.idObjetivo', $objetivoId);
+                })
+                ->exists();
+
+            if ($tieneHijos) {
+                session()->flash('error', 'No se puede eliminar este objetivo porque tiene áreas asociadas. Elimine primero las áreas.');
+                $this->showDeleteModal = false;
+                return;
+            }
+
             $this->objetivoToDelete->delete();
-            
-            // Eliminar de pei_elementos
             DB::table('pei_elementos')
                 ->where('elemento_id', $objetivoId)
                 ->where('elemento_tipo', 'objetivos')

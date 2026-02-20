@@ -18,6 +18,27 @@ class PlanEstrategicoInstitucional extends Component
     public $sortField = 'id';
     public $sortDirection = 'asc';
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+        $this->sortField = $field;
+    }
+
+    public function closeErrorModal()
+    {
+        $this->showErrorModal = false;
+        $this->errorMessage = '';
+    }
+
     public function render()
     {
         $peis = Pei::query()

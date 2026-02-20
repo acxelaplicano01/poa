@@ -21,8 +21,9 @@ class ActividadesRevision extends Component
     public $buscarActividad = '';
     public $poaYear = '';
     public $perPage = 10;
+    
 
-    public function mount($departamentoId)
+    public function mount($departamentoId, $poaYear = null)
     {
         $this->departamentoId = $departamentoId;
         $this->cargarResumen();
@@ -33,9 +34,10 @@ class ActividadesRevision extends Component
             ->unique()
             ->sortDesc()
             ->toArray();
-
-        $this->poaYear = $this->poaYears[0] ?? '';
-    }
+        
+        $this->poaYear = $poaYear ?? ($this->poaYears[0] ?? '');$this->poaYear = $poaYear ?? ($this->poaYears[0] ?? '');
+        $this->cargarResumen();
+        }
 
     public function updatingBuscarActividad()
     {
@@ -45,6 +47,7 @@ class ActividadesRevision extends Component
     public function updatedPoaYear()
     {
         $this->resetPage();
+        $this->cargarResumen();
     }
 
     public function updatedPerPage()
@@ -78,15 +81,19 @@ class ActividadesRevision extends Component
         $this->resumen = compact('nombreDepartamento', 'presupuesto', 'planificado', 'numActividades', 'porcentaje');
     }
 
-    public function render()
+  public function render()
     {
-         logger('buscarActividad = ' . $this->buscarActividad);
         $actividades = Actividad::with(['tipo', 'categoria'])
             ->where('idDeptartamento', $this->departamentoId)
             ->whereIn('estado', ['REVISION', 'APROBADO', 'RECHAZADO'])
             ->when($this->buscarActividad, fn($q) =>
                 $q->where('nombre', 'like', '%' . $this->buscarActividad . '%')
             )
+            ->when($this->poaYear, function($q) {  
+                $q->whereHas('poa', function($q2) {
+                    $q2->where('anio', $this->poaYear);
+                });
+            })
             ->orderBy('nombre')
             ->paginate($this->perPage);
 

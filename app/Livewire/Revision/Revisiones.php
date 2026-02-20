@@ -64,6 +64,7 @@ class Revisiones extends Component
 		if ($this->showActividades && $this->departamentoId) {
 			return view('livewire.Revision.actividades-revision-wrapper', [
 				'departamentoId' => $this->departamentoId,
+				'poaYear' => $this->poaYear,
 			]);
 		}
 
@@ -97,7 +98,7 @@ class Revisiones extends Component
 
 		return view('livewire.Revision.revision', [
 			'revisiones' => $revisiones,
-			'poaYears' => $this->poaYears,
+			//'poaYears' => $this->poaYears,
 			'poaYear' => $this->poaYear,
 		]);
 	}

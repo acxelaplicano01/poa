@@ -245,7 +245,7 @@ class Requisicion extends Component
 
                 if ($this->poaYear && $tarea && $tarea->poa) {
                     if ($tarea->poa->anio != $this->poaYear) {
-                        continue; // Saltar recursos de otros POAs
+                        continue; // Saltar recursos de otros POA
                     }
                 }
 
@@ -294,7 +294,13 @@ class Requisicion extends Component
                 });
             });
         })
-        ->with(['presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente', 'actividad'])
+        ->when($this->departamentoSeleccionado, function($q) {
+            // Filtrar por el departamento seleccionado a través de tareas relacionadas con presupuestos
+            $q->where('idDeptartamento', $this->departamentoSeleccionado);
+        })
+        ->with(['presupuestos' => function($query) {
+            $query->where('cantidad', '>', 0); // Filtrar presupuestos con cantidad mayor a 0
+        }, 'presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente', 'actividad'])
         ->paginate($this->perPage);
 
         foreach ($this->presupuestosSeleccionados as $presupuestoId => $cantidad) {
@@ -523,13 +529,15 @@ class Requisicion extends Component
             $this->departamentoSeleccionado = $this->departamentosUsuario->first()->id;
         }
 
-        $poa = \App\Models\Poa\Poa::activo()->latest()->first();
-\Log::info('Debug plazo requerimientos', [
-    'poa_id'      => $poa?->id,
-    'poa_activo'  => $poa?->activo,
-    'puedeRequerir' => $poa?->puedeRequerir(),
-    'mensaje'     => $poa?->getMensajeErrorPlazo('requerimientos'),
-]);
+        $poa = Poa::activo()->latest()->first();
+        $this->poaYear = $poa?->anio; // Inicializar el año del POA activo
+
+        \Log::info('Debug plazo requerimientos', [
+            'poa_id'      => $poa?->id,
+            'poa_activo'  => $poa?->activo,
+            'puedeRequerir' => $poa?->puedeRequerir(),
+            'mensaje'     => $poa?->getMensajeErrorPlazo('requerimientos'),
+        ]);
 
         $this->verificarPlazoRequisicion();
     }
@@ -818,15 +826,26 @@ class Requisicion extends Component
         })->with('unidadEjecutora')->get();
         $this->mostrarSelector = $this->departamentosUsuario->count() > 1;
 
+        // Obtener el POA activo o el correspondiente al año seleccionado
+        $poa = Poa::activo()
+            ->when($this->poaYear, function($q) {
+                $q->where('anio', $this->poaYear);
+            })
+            ->first();
+
+        if ($poa) {
+            $this->idPoa = $poa->id; // Asignar el idPoa del POA encontrado
+        }
+
         $actividades_aprobadas = Tarea::whereHas('presupuestos', function($q) {
             $q->where('cantidad', '>', 0);
         })
         ->where('estado', 'APROBADO')
-       ->when($this->poaYear, function($q) {
-                $q->whereHas('poa', function($q2) {
-                    $q2->where('anio', $this->poaYear);
-                });
-            })
+        ->when($this->poaYear, function($q) {
+            $q->whereHas('poa', function($q2) {
+                $q2->where('anio', $this->poaYear);
+            });
+        })
         ->when($this->buscarActividad, function($q) {
             $q->where(function($subq) {
                 $subq->where('nombre', 'like', '%'.$this->buscarActividad.'%');
@@ -835,7 +854,13 @@ class Requisicion extends Component
                 });
             });
         })
-        ->with(['presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente', 'actividad'])
+        ->when($this->departamentoSeleccionado, function($q) {
+            // Filtrar por el departamento seleccionado a través de tareas relacionadas con presupuestos
+            $q->where('idDeptartamento', $this->departamentoSeleccionado);
+        })
+        ->with(['presupuestos' => function($query) {
+            $query->where('cantidad', '>', 0); // Filtrar presupuestos con cantidad mayor a 0
+        }, 'presupuestos.objetoGasto', 'presupuestos.mes', 'presupuestos.unidadMedida', 'presupuestos.fuente', 'actividad'])
         ->paginate($this->perPage);
 
     $allPresupuestos = collect();

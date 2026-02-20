@@ -10,6 +10,8 @@
         ])
     @endif
 
+   
+
     @if (session()->has('message'))
         @include('rk.default.notifications.notification-alert', [
             'type' => 'success',
@@ -77,7 +79,7 @@
             <div class="w-full sm:w-auto min-w-[150px] max-w-xs">
                  <select wire:model.live="poaYear"
                             class="block w-full min-w-[180px] max-w-xs rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 text-sm py-2 px-3">
-                            <option value="">Todos los años</option>
+                            
                             @foreach($poaYears as $year)
                                 <option value="{{ $year }}">POA {{ $year }}</option>
                             @endforeach
@@ -276,3 +278,5 @@
         </div>
     </div>
 </div>
+
+
