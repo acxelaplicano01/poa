@@ -244,6 +244,12 @@ class Requisicion extends Component
             if ($presupuesto) {
                 $tarea = $presupuesto->idtarea ? Tarea::with('actividad')->find($presupuesto->idtarea) : null;
 
+                if ($this->departamentoSeleccionado && $tarea) {
+                    if ($tarea->idDeptartamento != $this->departamentoSeleccionado) {
+                        continue; // Saltar recursos de otro departamento
+                    }
+                }
+
                 if ($this->poaYear && $tarea && $tarea->poa) {
                     if ($tarea->poa->anio != $this->poaYear) {
                         continue; // Saltar recursos de otros POA
@@ -599,6 +605,12 @@ class Requisicion extends Component
 
     public function sincronizarDepartamento($id)
     {
+        if ($this->departamentoSeleccionado != $id) {
+            $this->recursosSeleccionados = [];
+            $this->presupuestosSeleccionados = [];
+            session()->forget('recursosSeleccionados');
+        }
+        
         $this->departamentoSeleccionado = $id;
         $this->resetPage();
     }

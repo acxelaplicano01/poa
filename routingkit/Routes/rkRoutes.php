@@ -438,13 +438,13 @@ return [
                 RkRoute::makeGroup('requisiciones')
                     ->setParentId('planificacion')
                     ->setAccessPermission('acceso-planificacion')
-                    ->setPermissions([
+                   /* ->setPermissions([
                         'requisiciones.ver',
                         'requisiciones.crear',
                         'requisiciones.editar',
                         'requisiciones.eliminar',
                         'acceso-planificacion',
-                    ])
+                    ])*/
                     ->setUrlMethod('get')
                     ->setUrlController('App\Livewire\Requisicion\SeguimientoRequisicion')
                     ->setRoles(['super_admin'])
@@ -507,7 +507,10 @@ return [
 
                     RkRoute::make('administrar-requisiciones')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('administrar.requisiciones.ver')
+                        ->setAccessPermission('administrar.requisiciones')
+                         ->setPermissions([
+                                'administrar.requisiciones.ver',
+                            ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Requisicion\AdministrarRequisiciones')
                         ->setRoles(['super_admin', 'admin'])
@@ -516,7 +519,12 @@ return [
 
                     RkRoute::make('entregarecursos')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setAccessPermission('administrar.requisiciones')
+                         ->setPermissions([
+                                'administrar.requisiciones.gestionar-estados',
+                                'administrar.requisiciones.ejecutar',
+                                'administrar.requisiciones.ver',
+                            ])
                         ->setUrlMethod('get')
                         ->setUrl('entregarecursos/{requisicionId}')
                         ->setUrlController('App\Livewire\Requisicion\EntregaRecursos')
@@ -526,7 +534,7 @@ return [
                     
                     RkRoute::make('acta-entrega-pdf')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setAccessPermission('administrar.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrl('acta-entrega/{requisicionId}/descargar')
                         ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarPdf')
@@ -536,7 +544,7 @@ return [
                     
                     RkRoute::make('acta-entrega-pdf-download')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setAccessPermission('administrar.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrl('acta-entrega/{requisicionId}/descargar/download')
                         ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarPdfDownload')
@@ -556,7 +564,7 @@ return [
 
                     RkRoute::make('acta-entrega-intermedia-pdf')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setAccessPermission('administrar.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrl('acta-entrega-intermedia/{requisicionId}/descargar')
                         ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarIntermediaPdf')
@@ -566,7 +574,7 @@ return [
 
                     RkRoute::make('acta-entrega-intermedia-pdf-download')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('acceder-entrega-recursos')
+                        ->setAccessPermission('administrar.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrl('acta-entrega-intermedia/{requisicionId}/descargar/download')
                         ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarIntermediaPdfDownload')
@@ -576,7 +584,7 @@ return [
 
                     RkRoute::make('orden-combustible/{detalleId}/pdf')
                         ->setParentId('requisiciones')
-                        ->setAccessPermission('acceso-planificacion')
+                        ->setAccessPermission('administrar.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrl('orden-combustible/{detalleId}/pdf')
                         ->setUrlController('App\\Http\\Controllers\\OrdenCombustiblePdfController@show')
@@ -586,7 +594,7 @@ return [
 
                     RkRoute::make('orden-combustible/{detalleId}/pdf/download')
                         ->setParentId('requisiciones')
-                        ->setAccessPermission('acceso-planificacion')
+                        ->setAccessPermission('administrar.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrlController('App\\Http\\Controllers\\OrdenCombustiblePdfController@download')
                         ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
