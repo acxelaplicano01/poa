@@ -14,6 +14,11 @@ use Database\Seeders\FuenteSeeder;
 use Database\Seeders\GrupoGastoSeeder;
 use Database\Seeders\ObjetoGastoSeeder;
 use Database\Seeders\CubSeeder;
+use Database\Seeders\TechoDeptoSeeder;
+use Database\Seeders\TechoUesSeeder;
+use Database\Seeders\DepartamentoSeeder;
+use Database\Seeders\PoasSeeder;
+use Database\Seeders\PoaDeptoSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,9 +29,10 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        $this->call(RoleSeeder::class);
+        $this->call(RolesSeeder::class);
         $this->call(PermisoSeeder::class);
         $this->call(UsuarioTablaSeeder::class);
+        $this->call(UsuariosSeeder::class);
         $this->call(InstitucionSeeder::class);
         $this->call(UnidadEjecutoraSeeder::class);
         $this->call(FuenteSeeder::class);
@@ -42,6 +48,14 @@ class DatabaseSeeder extends Seeder
         $this->call(PeiDataSeeder::class);
         $this->call(ProcesoCompraSeeder::class);
         $this->call(RecursoSeeder::class);
+
+        /*
+        $this->call(TechoDeptoSeeder::class);
+        $this->call(TechoUesSeeder::class);
+        $this->call(PoasSeeder::class);
+        $this->call(PoaDeptoSeeder::class);
+        $this->call(EmpleadosSeeder::class);
+        $this->call(EmpleadoDeptoSeeder::class);*/
 
         
     }
