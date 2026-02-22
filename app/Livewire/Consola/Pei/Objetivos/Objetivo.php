@@ -255,35 +255,72 @@ class Objetivo extends Component
         $this->errorMessage = '';
     }
 
+    public function mount($pei = null, $dimension = null)
+    {
+        try {
+            $this->peiId = $pei ?? request()->query('pei');
+            $this->idDimension = $dimension ?? request()->query('dimension');
+
+            // Validar PEI
+            if ($this->peiId === null) {
+                throw new \Exception('PEI no especificado. Use ?pei=1 en la URL.');
+            }
+
+            if (!Pei::where('id', $this->peiId)->exists()) {
+                throw new \Exception('PEI no encontrado.');
+            }
+
+            // Validar Dimensión
+            if ($this->idDimension === null) {
+                throw new \Exception('Dimensión no especificada. Use ?dimension=1 en la URL.');
+            }
+
+            if (!DimensionModel::where('id', $this->idDimension)->exists()) {
+                throw new \Exception('Dimensión no encontrada.');
+            }
+        } catch (\Exception $e) {
+            $this->errorMessage = $e->getMessage();
+            $this->showErrorModal = true;
+        }
+    }
+
     public function render()
     {
-        // Validación en cada render
-        if ($this->peiId === null) {
-            abort(400, 'PEI no especificado. Use ?pei=1 en la URL.');
-        }
+        try {
+            // Validar que el PEI esté especificado
+            if ($this->peiId === null) {
+                throw new \Exception('PEI no especificado. Use ?pei=1 en la URL.');
+            }
 
-        if (!Pei::where('id', $this->peiId)->exists()) {
-            abort(404, 'PEI no encontrado.');
-        }
+            if (!Pei::where('id', $this->peiId)->exists()) {
+                throw new \Exception('PEI no encontrado.');
+            }
 
-        // Validar que la dimensión esté especificada
-        if ($this->idDimension === null) {
-            abort(400, 'Dimensión no especificada. Use ?dimension=1 en la URL.');
-        }
+            // Validar que la dimensión esté especificada
+            if ($this->idDimension === null) {
+                throw new \Exception('Dimensión no especificada. Use ?dimension=1 en la URL.');
+            }
 
-        if (!DimensionModel::where('id', $this->idDimension)->exists()) {
-            abort(404, 'Dimensión no encontrada.');
-        }
+            if (!DimensionModel::where('id', $this->idDimension)->exists()) {
+                throw new \Exception('Dimensión no encontrada.');
+            }
 
-        // Filtrar objetivos por la dimensión actual e incluir áreas relacionadas
-        $objetivos = ObjetivoModel::with('areas')
-            ->where('idDimension', $this->idDimension)
-            ->when($this->search, function ($query) {
-                $query->where('nombre', 'like', '%' . $this->search . '%')
-                      ->orWhere('descripcion', 'like', '%' . $this->search . '%');
-            })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage);
+            // Obtener los objetivos asociados a la dimensión
+            $objetivos = ObjetivoModel::where('idDimension', $this->idDimension)
+                ->when($this->search, function ($query) {
+                    $query->where('nombre', 'like', '%' . $this->search . '%')
+                          ->orWhere('descripcion', 'like', '%' . $this->search . '%');
+                })
+                ->orderBy($this->sortField, $this->sortDirection)
+                ->paginate($this->perPage);
+
+        } catch (\Exception $e) {
+            $this->errorMessage = $e->getMessage();
+            $this->showErrorModal = true;
+
+            // Retornar un paginador vacío en caso de error
+            $objetivos = ObjetivoModel::whereRaw('1 = 0')->paginate($this->perPage);
+        }
 
         return view('livewire.consola.pei.Objetivos.objetivos', [
             'objetivos' => $objetivos,

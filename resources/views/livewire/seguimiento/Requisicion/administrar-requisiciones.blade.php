@@ -1,5 +1,5 @@
 <div>
-    @can('administrar.requisiciones.ver')
+    @can('seguimiento.requisiciones.ver')
         {{-- Banner informativo del plazo de seguimiento --}}
         @if (!$puedeSeguimiento && $mensajePlazoSeguimiento)
             <div class="mb-4 bg-amber-100 dark:bg-amber-900/30 border border-amber-400 dark:border-amber-700 text-amber-800 dark:text-amber-300 px-4 py-3 rounded-lg"
@@ -203,7 +203,7 @@ $estado = $detalleRequisicion['estado'] ?? '';
                             </div>
                         </div>
                         <div class="flex flex-row gap-3 items-center justify-end">
-                            @can('administrar.requisiciones.gestionar-estados')
+                            @can('seguimiento.requisiciones.gestionar-estados')
                                 @if ($estado === 'Presentado')
                                     <x-spinner-button wire:click="marcarComoRecibido" loadingTarget="marcarComoRecibido"
                                         class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-green-700 dark:hover:bg-green-800">
@@ -225,7 +225,7 @@ $estado = $detalleRequisicion['estado'] ?? '';
                             @endcan
                         </div>
                     @elseif ($estado === 'Recibido')
-                        @can('administrar.requisiciones.gestionar-estados')
+                        @can('seguimiento.requisiciones.gestionar-estados')
                             <x-spinner-button wire:click="marcarComoAprobado" loadingTarget="marcarComoAprobado"
                                 class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-green-700 dark:hover:bg-green-800">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -236,7 +236,7 @@ $estado = $detalleRequisicion['estado'] ?? '';
                             </x-spinner-button>
                         @endcan
                     @elseif ($estado === 'Aprobado')
-                        @can('administrar.requisiciones.gestionar-estados')
+                        @can('seguimiento.requisiciones.gestionar-estados')
                             <x-spinner-button wire:click="marcarComoProcesoCompra" loadingTarget="marcarComoProcesoCompra"
                                 class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2 dark:bg-yellow-700 dark:hover:bg-yellow-800">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

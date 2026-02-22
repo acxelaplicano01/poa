@@ -507,9 +507,9 @@ return [
 
                     RkRoute::make('administrar-requisiciones')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('administrar.requisiciones')
+                        ->setAccessPermission('seguimiento.requisiciones')
                          ->setPermissions([
-                                'administrar.requisiciones.ver',
+                                'seguimiento.requisiciones.ver',
                             ])
                         ->setUrlMethod('get')
                         ->setUrlController('App\Livewire\Requisicion\AdministrarRequisiciones')
@@ -519,11 +519,11 @@ return [
 
                     RkRoute::make('entregarecursos')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('administrar.requisiciones')
+                        ->setAccessPermission('seguimiento.requisiciones')
                          ->setPermissions([
-                                'administrar.requisiciones.gestionar-estados',
-                                'administrar.requisiciones.ejecutar',
-                                'administrar.requisiciones.ver',
+                                'seguimiento.requisiciones.gestionar-estados',
+                                'seguimiento.requisiciones.ejecutar',
+                                'seguimiento.requisiciones.ver',
                             ])
                         ->setUrlMethod('get')
                         ->setUrl('entregarecursos/{requisicionId}')
@@ -534,7 +534,7 @@ return [
                     
                     RkRoute::make('acta-entrega-pdf')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('administrar.requisiciones.ver')
+                        ->setAccessPermission('seguimiento.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrl('acta-entrega/{requisicionId}/descargar')
                         ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarPdf')
@@ -544,7 +544,7 @@ return [
                     
                     RkRoute::make('acta-entrega-pdf-download')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('administrar.requisiciones.ver')
+                        ->setAccessPermission('seguimiento.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrl('acta-entrega/{requisicionId}/descargar/download')
                         ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarPdfDownload')
@@ -564,7 +564,7 @@ return [
 
                     RkRoute::make('acta-entrega-intermedia-pdf')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('administrar.requisiciones.ver')
+                        ->setAccessPermission('seguimiento.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrl('acta-entrega-intermedia/{requisicionId}/descargar')
                         ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarIntermediaPdf')
@@ -574,7 +574,7 @@ return [
 
                     RkRoute::make('acta-entrega-intermedia-pdf-download')
                         ->setParentId('planificacion')
-                        ->setAccessPermission('administrar.requisiciones.ver')
+                        ->setAccessPermission('seguimiento.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrl('acta-entrega-intermedia/{requisicionId}/descargar/download')
                         ->setUrlController('App\\Http\\Controllers\\ActaEntregaController@descargarIntermediaPdfDownload')
@@ -584,7 +584,7 @@ return [
 
                     RkRoute::make('orden-combustible/{detalleId}/pdf')
                         ->setParentId('requisiciones')
-                        ->setAccessPermission('administrar.requisiciones.ver')
+                        ->setAccessPermission('seguimiento.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrl('orden-combustible/{detalleId}/pdf')
                         ->setUrlController('App\\Http\\Controllers\\OrdenCombustiblePdfController@show')
@@ -594,7 +594,7 @@ return [
 
                     RkRoute::make('orden-combustible/{detalleId}/pdf/download')
                         ->setParentId('requisiciones')
-                        ->setAccessPermission('administrar.requisiciones.ver')
+                        ->setAccessPermission('seguimiento.requisiciones.ver')
                         ->setUrlMethod('get')
                         ->setUrlController('App\\Http\\Controllers\\OrdenCombustiblePdfController@download')
                         ->setRoles(['super_admin', 'admin', 'direccion', 'planificador'])
@@ -683,10 +683,10 @@ return [
                                                     ->setParentId('consola')
                                                     ->setAccessPermission('acceso-consola')
                                                     ->setPermissions([
-                                                        'consola.tipoactividades.ver', 
-                                                        'consola.tipoactividades.editar', 
-                                                        'consola.tipoactividades.crear', 
-                                                        'consola.tipoactividades.eliminar', 
+                                                        'consola.resultados.ver', 
+                                                        'consola.resultados.editar', 
+                                                        'consola.resultados.crear', 
+                                                        'consola.resultados.eliminar', 
                                                         'acceso-consola'
                                                     ])
                                                     ->setUrlMethod('get')

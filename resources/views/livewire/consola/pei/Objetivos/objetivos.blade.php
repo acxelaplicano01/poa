@@ -1,4 +1,14 @@
 <div>
+    <a href="{{ route('dimensiones', ['pei' => $peiId]) }}"
+        class="inline-flex items-center text-indigo-600 dark:text-indigo-400 mb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                clip-rule="evenodd" />
+        </svg>
+        Volver a Dimensiones
+    </a>
+
     <div class="mx-auto rounded-lg mt-8 sm:mt-6 lg:mt-4 mb-6">
         <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow sm:rounded-lg p-4 sm:p-6">
 
@@ -62,7 +72,6 @@
                 sort-field="{{ $sortField }}"
                 sort-direction="{{ $sortDirection }}"
                 :columns="[
-                    ['key' => 'id', 'label' => 'ID', 'sortable' => true],
                     ['key' => 'nombre', 'label' => 'Nombre', 'sortable' => true],
                     ['key' => 'descripcion', 'label' => 'Descripción', 'sortable' => true],
                     ['key' => 'areas', 'label' => 'Áreas'],
@@ -74,13 +83,10 @@
                 <x-slot name="desktop">
                     @forelse ($objetivos as $objetivo)
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                                {{ $objetivo->id }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
+                            <td class="px-3 py-2 text-left text-sm font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[70%] text-justify">
                                 {{ $objetivo->nombre }}
                             </td>
-                            <td class="px-6 py-4 text-zinc-900 dark:text-zinc-300 max-w-md truncate">
+                            <td class="px-3 py-2 text-left text-sm font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[560%] text-justify">
                                 {{ $objetivo->descripcion }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
@@ -179,8 +185,9 @@
 
     <!-- Modal de errores -->
     <x-error-modal 
-        :show="$showErrorModal" 
+        wire:model="showErrorModal" 
+        title="Error en Objetivos"
         :message="$errorMessage"
-        wire:click="hideError"
+        closeMethod="closeErrorModal"
     />
 </div>

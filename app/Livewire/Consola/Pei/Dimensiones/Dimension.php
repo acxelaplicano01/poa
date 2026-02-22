@@ -125,11 +125,23 @@ class Dimension extends Component
         $this->validate();
 
         try {
+            // Crear o actualizar la dimensión
             $dimension = DimensionModel::updateOrCreate(['id' => $this->dimensionId], [
                 'nombre' => $this->name,
                 'descripcion' => $this->descripcion,
-                'idPei' => $this->peiId,
+                'idPei' => $this->peiId, 
             ]);
+
+            // Asociar la dimensión al PEI en la tabla pei_elementos
+            if (!$this->dimensionId) {
+                DB::table('pei_elementos')->insert([
+                    'idPei' => $this->peiId,
+                    'elemento_id' => $dimension->id,
+                    'elemento_tipo' => 'dimensiones',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
 
             session()->flash('message', 
                 $this->dimensionId 
@@ -151,27 +163,62 @@ class Dimension extends Component
 
     public function edit($id)
     {
-        $dimension = DimensionModel::findOrFail($id);
-        $this->dimensionId = $id;
-        $this->name = $dimension->nombre;        
-        $this->descripcion = $dimension->descripcion;
-        $this->peiId = $dimension->idPei;
-        $this->isEditing = true;
-        $this->openModal();
+        try {
+            // Buscar la dimensión por su ID
+            $dimension = DimensionModel::findOrFail($id);
+
+            // Asignar los valores a las propiedades del componente
+            $this->dimensionId = $dimension->id;
+            $this->name = $dimension->nombre;
+            $this->descripcion = $dimension->descripcion;
+            $this->peiId = $dimension->idPei;
+
+            $this->isEditing = true;
+            $this->openModal();
+        } catch (\Exception $e) {
+            \Log::error('Error al intentar editar la dimensión: ' . $e->getMessage());
+            $this->errorMessage = 'Error al intentar editar la dimensión.';
+            $this->showErrorModal = true;
+        }
     }
 
     public function confirmDelete($id)
     {
-        $this->dimensionToDelete = DimensionModel::findOrFail($id);
-        $this->showDeleteModal = true;
+        try {
+            // Buscar la dimensión a eliminar
+            $this->dimensionToDelete = DimensionModel::findOrFail($id);
+            $this->showDeleteModal = true;
+        } catch (\Exception $e) {
+            \Log::error('Error al intentar confirmar eliminación de dimensión: ' . $e->getMessage());
+            $this->errorMessage = 'Error al intentar confirmar eliminación de la dimensión.';
+            $this->showErrorModal = true;
+        }
     }
 
     public function delete()
     {
         try {
+            // Validar que exista una dimensión para eliminar
+            if (!$this->dimensionToDelete) {
+                throw new \Exception('No se encontró la dimensión para eliminar.');
+            }
+
             $dimensionId = $this->dimensionToDelete->id;
+
+            // Verificar si la dimensión tiene objetivos asociados
+            $tieneObjetivos = DB::table('objetivos')
+                ->where('idDimension', $dimensionId)
+                ->exists();
+
+            if ($tieneObjetivos) {
+                session()->flash('error', 'No se puede eliminar esta dimensión porque tiene objetivos asociados. Elimine primero los objetivos.');
+                $this->showDeleteModal = false;
+                return;
+            }
+
+            // Eliminar la dimensión
             $this->dimensionToDelete->delete();
-            
+
             // Eliminar de pei_elementos
             DB::table('pei_elementos')
                 ->where('elemento_id', $dimensionId)
@@ -183,9 +230,11 @@ class Dimension extends Component
             $this->resetPage();
         } catch (\Exception $e) {
             \Log::error('Error al eliminar dimensión: ' . $e->getMessage());
-            $this->errorMessage = 'Error al eliminar la Dimensión: ' . $e->getMessage();
+            $this->errorMessage = 'Error al eliminar la dimensión: ' . $e->getMessage();
             $this->showDeleteModal = false;
             $this->showErrorModal = true;
+        } finally {
+            $this->dimensionToDelete = null;
         }
     }
 
@@ -201,30 +250,63 @@ class Dimension extends Component
         $this->errorMessage = '';
     }
 
+    public function mount($pei = null)
+    {
+        try {
+            $this->peiId = $pei ?? request()->query('pei');
+
+            // Validar PEI
+            if ($this->peiId === null) {
+                throw new \Exception('PEI no especificado. Use ?pei=1 en la URL.');
+            }
+
+            // Verificar si el PEI existe en la tabla pei_elementos
+            $peiExists = DB::table('pei_elementos')
+                ->where('idPei', $this->peiId)
+                ->where('elemento_tipo', 'dimensiones')
+                ->exists();
+
+            if (!$peiExists) {
+                throw new \Exception('El PEI especificado no tiene dimensiones asociadas.');
+            }
+        } catch (\Exception $e) {
+            $this->errorMessage = $e->getMessage();
+            $this->showErrorModal = true;
+        }
+    }
+
     public function render()
-{
+    {
+        try {
+            // Validar que el PEI esté especificado
+            if ($this->peiId === null) {
+                throw new \Exception('PEI no especificado. Use ?pei=1 en la URL.');
+            }
 
-    if ($this->peiId === null) {
-        abort(400, 'PEI no especificado. Use ?pei=1 en la URL.');
+            // Verificar que el PEI exista en la tabla peis
+            if (!Pei::where('id', $this->peiId)->exists()) {
+                throw new \Exception('El PEI especificado no existe.');
+            }
+
+            // Obtener las dimensiones asociadas al PEI
+            $dimensions = DimensionModel::where('idPei', $this->peiId)
+                ->when($this->search, function ($query) {
+                    $query->where('nombre', 'like', '%' . $this->search . '%')
+                          ->orWhere('descripcion', 'like', '%' . $this->search . '%');
+                })
+                ->orderBy($this->sortField, $this->sortDirection)
+                ->paginate($this->perPage);
+
+        } catch (\Exception $e) {
+            $this->errorMessage = $e->getMessage();
+            $this->showErrorModal = true;
+
+            // Retornar un paginador vacío en caso de error
+            $dimensions = DimensionModel::whereRaw('1 = 0')->paginate($this->perPage);
+        }
+
+        return view('livewire.consola.pei.Dimensiones.dimensiones', [
+            'dimensions' => $dimensions,
+        ]);
     }
-
-    if (!Pei::where('id', $this->peiId)->exists()) {
-        abort(404, 'PEI no encontrado.');
-    }
-
-    $dimensions = DimensionModel::where('idPei', $this->peiId)
-        ->when($this->search, function ($query) {
-            $query->where('nombre', 'like', '%' . $this->search . '%')
-                  ->orWhere('descripcion', 'like', '%' . $this->search . '%');
-        })
-        ->orderBy($this->sortField, $this->sortDirection)
-        ->paginate($this->perPage);
-
-    $peis = Pei::orderBy('name')->get();
-
-    return view('livewire.consola.pei.Dimensiones.dimensiones', [
-        'dimensions' => $dimensions,
-        'peis' => $peis,
-    ]);
-}
 }

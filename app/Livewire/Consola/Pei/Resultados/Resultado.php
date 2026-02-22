@@ -239,35 +239,94 @@ class Resultado extends Component
         $this->errorMessage = '';
     }
 
+    public function mount($pei = null, $area = null)
+    {
+        try {
+            $this->peiId = $pei ?? request()->query('pei');
+            $this->idArea = $area ?? request()->query('area');
+
+            // Validar PEI
+            if ($this->peiId === null) {
+                throw new \Exception('PEI no especificado. Use ?pei=1 en la URL.');
+            }
+
+            if (!Pei::where('id', $this->peiId)->exists()) {
+                throw new \Exception('PEI no encontrado.');
+            }
+
+            // Validar Área
+            if ($this->idArea === null) {
+                throw new \Exception('Área no especificada. Use ?area=1 en la URL.');
+            }
+
+            $areaModel = AreaModel::with('objetivo.dimension')->find($this->idArea);
+
+            if (!$areaModel) {
+                throw new \Exception('Área no encontrada.');
+            }
+
+            // Validar que el área pertenece al PEI especificado
+            $areaPeiId = $areaModel->objetivo?->dimension?->idPei;
+            if ($areaPeiId !== $this->peiId) {
+                throw new \Exception('El área no pertenece al PEI especificado.');
+            }
+
+            // Establecer idObjetivo desde el área
+            $this->idObjetivo = $areaModel->idObjetivo;
+        } catch (\Exception $e) {
+            $this->errorMessage = $e->getMessage();
+            $this->showErrorModal = true;
+        }
+    }
+
     public function render()
     {
-        // Validación en cada render
-        if ($this->peiId === null) {
-            abort(400, 'PEI no especificado. Use ?pei=1 en la URL.');
+        try {
+            // Validar que el PEI esté especificado
+            if ($this->peiId === null) {
+                throw new \Exception('PEI no especificado. Use ?pei=1 en la URL.');
+            }
+
+            if (!Pei::where('id', $this->peiId)->exists()) {
+                throw new \Exception('PEI no encontrado.');
+            }
+
+            // Validar que el área esté especificada
+            if ($this->idArea === null) {
+                throw new \Exception('Área no especificada. Use ?area=1 en la URL.');
+            }
+
+            $area = AreaModel::with('objetivo')->find($this->idArea);
+
+            if (!$area) {
+                throw new \Exception('Área no encontrada.');
+            }
+
+            // Establecer el idObjetivo desde el área
+            $this->idObjetivo = $area->idObjetivo;
+
+            $resultados = ResultadoModel::where('idArea', $this->idArea)
+                ->when($this->search, function ($query) {
+                    $query->where('nombre', 'like', '%' . $this->search . '%')
+                          ->orWhere('descripcion', 'like', '%' . $this->search . '%');
+                })
+                ->orderBy($this->sortField, $this->sortDirection)
+                ->paginate($this->perPage);
+
+            return view('livewire.consola.pei.resultados.resultados', [
+                'resultados' => $resultados,
+                'idObjetivo' => $this->idObjetivo,
+                'peiId' => $this->peiId,
+            ]);
+        } catch (\Exception $e) {
+            $this->errorMessage = $e->getMessage();
+            $this->showErrorModal = true;
+
+            return view('livewire.consola.pei.resultados.resultados', [
+                'resultados' => [],
+                'idObjetivo' => null,
+                'peiId' => null,
+            ]);
         }
-
-        if (!Pei::where('id', $this->peiId)->exists()) {
-            abort(404, 'PEI no encontrado.');
-        }
-
-        if ($this->idArea === null) {
-            abort(400, 'Área no especificada. Use ?area=1 en la URL.');
-        }
-
-        if (!AreaModel::where('id', $this->idArea)->exists()) {
-            abort(404, 'Área no encontrada.');
-        }
-
-        $resultados = ResultadoModel::where('idArea', $this->idArea)
-            ->when($this->search, function ($query) {
-                $query->where('nombre', 'like', '%' . $this->search . '%')
-                      ->orWhere('descripcion', 'like', '%' . $this->search . '%');
-            })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage);
-
-        return view('livewire.consola.pei.resultados.resultados', [
-            'resultados' => $resultados,
-        ]);
     }
 }

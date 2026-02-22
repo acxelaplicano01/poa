@@ -1,4 +1,22 @@
 <div>
+    <a href="{{ route('objetivos', ['pei' => $peiId, 'dimension' => $idDimension ?? null]) }}"
+        class="inline-flex items-center text-indigo-600 dark:text-indigo-400 mb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                clip-rule="evenodd" />
+        </svg>
+        Volver a Objetivos
+    </a>
+
+    <!-- Modal de errores -->
+    <x-error-modal 
+        wire:model="showErrorModal" 
+        title="Error en Áreas"
+        :message="$errorMessage"
+        closeMethod="closeErrorModal"
+    />
+
     <div class="mx-auto rounded-lg mt-8 sm:mt-6 lg:mt-4 mb-6">
         <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow sm:rounded-lg p-4 sm:p-6">
 
@@ -62,7 +80,6 @@
                 sort-field="{{ $sortField }}"
                 sort-direction="{{ $sortDirection }}"
                 :columns="[
-                    ['key' => 'id', 'label' => 'ID', 'sortable' => true],
                     ['key' => 'nombre', 'label' => 'Nombre', 'sortable' => true],
                     ['key' => 'resultados', 'label' => 'Resultados'],
                     ['key' => 'actions', 'label' => 'Acciones'],
@@ -73,13 +90,10 @@
                 <x-slot name="desktop">
                     @forelse ($areas as $area)
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
-                                {{ $area->id }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
+                            <td class="px-3 py-2 text-left text-sm font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[60%]">
                                 {{ $area->nombre }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-zinc-900 dark:text-zinc-300">
+                            <td class="px-3 py-2 text-left text-sm font-medium text-zinc-500 dark:text-zinc-300 uppercase w-[30%]">
                                 <!-- Botón para redirigir a los resultados relacionados -->
                                 <a href="{{ route('resultados', ['pei' => $peiId, 'area' => $area->id]) }}" 
                                    class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -175,8 +189,9 @@
 
     <!-- Modal de errores -->
     <x-error-modal 
-        :show="$showErrorModal" 
+        wire:model="showErrorModal" 
+        title="Error en Áreas"
         :message="$errorMessage"
-        wire:click="closeErrorModal"
+        closeMethod="closeErrorModal"
     />
 </div>

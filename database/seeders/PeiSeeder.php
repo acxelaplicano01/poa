@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Poa\Pei;
+use App\Models\Areas\Area;
+use App\Models\Resultados\Resultado;
 use App\Models\Instituciones\Institucion;
 
 class PeiSeeder extends Seeder
@@ -13,39 +15,1060 @@ class PeiSeeder extends Seeder
      */
     public function run(): void
     {
-        // Obtener algunas instituciones
-        $instituciones = Institucion::take(3)->get();
-        
-        if ($instituciones->count() === 0) {
-            $this->command->warn('No hay instituciones disponibles. Ejecute el seeder de instituciones primero.');
-            return;
-        }
-
-        $peis = [
-            [
-                'name' => 'Plan Estratégico Institucional 2020-2024',
-                'initialYear' => 2020,
-                'finalYear' => 2024,
-                'idInstitucion' => $instituciones->first()->id,
-            ],
-            [
-                'name' => 'PEI Universidad Nacional 2023-2027',
-                'initialYear' => 2023,
-                'finalYear' => 2027,
-                'idInstitucion' => $instituciones->count() > 1 ? $instituciones->get(1)->id : $instituciones->first()->id,
-            ],
-            [
-                'name' => 'Plan Estratégico Ministerial 2025-2030',
-                'initialYear' => 2025,
-                'finalYear' => 2030,
-                'idInstitucion' => $instituciones->count() > 2 ? $instituciones->get(2)->id : $instituciones->first()->id,
-            ],
+        // Áreas 
+        $areas = [
+            ['nombre' => 'a) Mejoramiento de la Calidad Educativa.', 'idObjetivo' => 1, 'created_by' => 1],
+            ['nombre' => 'a) Mejoramiento de la Calidad Educativa', 'idObjetivo' => 2, 'created_by' => 1],
+            ['nombre' => 'a) Las facultades y los centros regionales se insertan en el eje de fomento de la investigación; desarrollan investigación en el marco de las prioridades de investigación.', 'idObjetivo' => 3, 'created_by' => 1],
+            ['nombre' => 'b) Las Facultades y los Centros Regionales se insertan en el eje de publicación, difusión y comunicación; promueven y publican las investigaciones realizadas por su personal docente y estudiantil.', 'idObjetivo' => 3, 'created_by' => 1],
+            ['nombre' => 'c.1) Las facultades y los centros regionales identifican los proyectos de investigación, cuyos resultados sean susceptibles de protección, uso y explotación de la propiedad intelectual.', 'idObjetivo' => 3, 'created_by' => 1],
+            ['nombre' => 'd) Las facultades y los centros regionales  se insertan en el eje de capacitación en investigación; aprovechan la oferta de capacitación y actualización en investigación científica.', 'idObjetivo' => 3, 'created_by' => 1],
+            ['nombre' => 'e) Las facultades y los centros regionales se insertan en el eje de gestión de la investigación; cuentan con al menos instancias de gestión y/o ejecución de la investigación que promueven y gestionan recursos internos/ externos y  desarrollan proyectos de investigación que contribuyen a la solución de problemas y a la generación de conocimiento pertinente.', 'idObjetivo' => 3, 'created_by' => 1],
+            ['nombre' => 'a) Vínculos académicos y alianzas estratégicas', 'idObjetivo' => 6, 'created_by' => 1],
+            ['nombre' => 'b) Socialización y creación de conocimiento en vinculación', 'idObjetivo' => 6, 'created_by' => 1],
+            ['nombre' => 'c)  Gestión académica y administrativa de la vinculación', 'idObjetivo' => 6, 'created_by' => 1],
+            ['nombre' => 'a) Inserción laboral', 'idObjetivo' => 5, 'created_by' => 1],
+            ['nombre' => 'b) Actualización profesional y formación continua', 'idObjetivo' => 5, 'created_by' => 1],
+            ['nombre' => 'c) Estudios de seguimiento de graduados', 'idObjetivo' => 5, 'created_by' => 1],
+            ['nombre' => 'd) Asociación de Graduados', 'idObjetivo' => 5, 'created_by' => 1],
+            ['nombre' => 'e) Plataforma Virtual', 'idObjetivo' => 5, 'created_by' => 1],
+            ['nombre' => 'f) Servicios y Beneficios', 'idObjetivo' => 5, 'created_by' => 1],
+            ['nombre' => 'g) Eventos y Encuentros', 'idObjetivo' => 5, 'created_by' => 1],
+            ['nombre' => 'a) Servicio Social y gestión del riesgo', 'idObjetivo' => 4, 'created_by' => 1],
+            ['nombre' => 'b)  Educación No Formal', 'idObjetivo' => 4, 'created_by' => 1],
+            ['nombre' => 'c) Comunicación y Difusión', 'idObjetivo' => 4, 'created_by' => 1],
         ];
 
-        foreach ($peis as $peiData) {
-            Pei::create($peiData);
+        foreach ($areas as $areaData) {
+            Area::create($areaData);
         }
 
-        $this->command->info('PEIs de prueba creados exitosamente.');
+        // Nuevas áreas adicionales
+        $newAreas = [
+            ['nombre' => 'd) Desarrollo Local y Cultura', 'idObjetivo' => 4, 'created_by' => 1],
+            ['nombre' => 'a) Fortalecimiento de las competencias docentes para la educación superior que faciliten el aprendizaje y mejoren la eficiencia terminal.', 'idObjetivo' => 7, 'created_by' => 1],
+            ['nombre' => 'a) Brindar atención a los estudiantes universitarios de forma integral en su dimensión psico-pedagógica y social, que involucre aspectos interpersonales-afectivos, mediación de conflictos, orientación, asesoría, rendimiento académico, inducción vocacional y laboral.', 'idObjetivo' => 8, 'created_by' => 1],
+            ['nombre' => 'b.) Contribuir a la promoción, prevención y atención integral de la salud en el estudiantado universitario, para mejorar su calidad de vida y rendimiento académico.', 'idObjetivo' => 8, 'created_by' => 1],
+            ['nombre' => 'c.) Promover la realización de actividades socioculturales y deportivas tanto recreativas, competitivas y de intercambio estudiantil universitario.', 'idObjetivo' => 8, 'created_by' => 1],
+            ['nombre' => 'd) Contribuir al mejoramiento de la calidad de vida estudiantil mediante la promoción de espacios y beneficios que le permitan el desarrollo de sus potencialidades bajo perspectivas de equidad e inclusión, además de promover una cultura de solidaridad, cooperación y participación ciudadana a través de la formación de líderes y voluntarios universitarios.', 'idObjetivo' => 8, 'created_by' => 1],
+            ['nombre' => 'a) Mejoramiento de la Calidad, la Pertinencia y la equidad.', 'idObjetivo' => 9, 'created_by' => 1],
+            ['nombre' => 'b) Fortalecimiento de la Calidad.', 'idObjetivo' => 29, 'created_by' => 1],
+            ['nombre' => 'a) Fortalecimiento y consolidación del proceso de organización y desarrollo de las redes educativas regionales de la UNAH, y de los planes estratégicos y tácticos para continuar con la reforma integral de los centros regionales de la UNAH.', 'idObjetivo' => 10, 'created_by' => 1],
+            ['nombre' => 'b) Mejorar significativamente la cobertura de la UNAH y el acceso de la población hondureña a los servicios académicos de la UNAH.', 'idObjetivo' => 10, 'created_by' => 1],
+            ['nombre' => 'c) Desarrollar los Centros Regionales de la UNAH, como polos de desarrollo científico, técnico, y cultural de las regiones del país.', 'idObjetivo' => 10, 'created_by' => 1],
+            ['nombre' => 'a) ÉTICA: Transversalización del Eje Curricular de Ética en las actividades administrativas y como eje integrador de los demás ejes del Modelo Educativo de la UNAH.', 'idObjetivo' => 11, 'created_by' => 1],
+            ['nombre' => 'c) IDENTIDAD: Producción del conocimiento con identidad, nacional, regional, local, y para la internacionalización académica de la UNAH.', 'idObjetivo' => 13, 'created_by' => 1],
+            ['nombre' => 'b) CIUDADANÍA: Expansión del perfil profesional con elementos de  ciudadanía educativa.', 'idObjetivo' => 12, 'created_by' => 1],
+            ['nombre' => 'd) CULTURA: Formación de ciudadanos de cultura, globales, de región, y productivos, potenciando el rol de los CRU.', 'idObjetivo' => 30, 'created_by' => 1],
+            ['nombre' => 'a) Fortalecimiento de la cultura de Innovación Institucional y Educativa.', 'idObjetivo' => 14, 'created_by' => 1],
+            ['nombre' => 'c) Mejoramiento de la Calidad, la Pertinencia y la Equidad.', 'idObjetivo' => 32, 'created_by' => 1],
+            ['nombre' => 'a) Mejoramiento de la Calidad y la Pertinencia.', 'idObjetivo' => 31, 'created_by' => 1],
+            ['nombre' => 'b) Fortalecimiento de  la Planificación, Monitoria y Evaluación de la Gestión Académica.', 'idObjetivo' => 15, 'created_by' => 1],
+            ['nombre' => 'a) Las facultades y centros regionales se insertan en el eje de Los posgrados, la UNAH y el país; diseñando, posgrados que el país, la ciencia y la propia universidad necesitan, contribuyendo de esa  manera al desarrollo económico, político y social de nuestro país.', 'idObjetivo' => 16, 'created_by' => 1],
+            ['nombre' => 'b) Las facultades y centros regionales se insertan en el eje de Gestión Académico-Institucional; creando y aprobando nuevos posgrados académicos y pofesionalizante,con un sistema de posgrados integrado plenamente a los departamentos.', 'idObjetivo' => 16, 'created_by' => 1],
+            ['nombre' => 'c) Las facultades y centros regionales se insertan en el eje de Evaluación y Acreditación; procurando que sus posgrados sean objeto de evaluación  institucional constante, autoevaluación y acreditación regional, para aumentar el prestigio académico de la UNAH.', 'idObjetivo' => 16, 'created_by' => 1],
+            ['nombre' => 'd) Las facultades y centros regionales se insertan en el eje de Investigación, desarrollo e innovación; integrando la función de investigación en sus diferentes posgrados y que estos provechen el programa de investigación que oferta la UNAH (becas, capacitaciones, revistas, congresos)  y la estructura de investigación de la UNAH (institutos, grupos, observatorios) todo ello en alineamiento con las prioridades de investigación de la UNAH y de las facultades y centros regionales.', 'idObjetivo' => 16, 'created_by' => 1],
+            ['nombre' => 'e) Las facultades y centros regionales se insertan en el eje de Vinculación Universidad Estado, sectores productivos y sectores sociales; con una relación institucional estructurada, posgrados de la UNAH  reconocidos y contribuyendo al desarrollo económico, social y político del país.', 'idObjetivo' => 16, 'created_by' => 1],
+            ['nombre' => 'f) Las facultades y los centros regionales se insertan en el eje de Regionalización e internacionalización; elaboración y ejecución de estrategias de regionalización interna e internacionalización de los posgrados, con el propósito de formar profesionales con visión de mundo y de enfoque inter y multidisciplinario.', 'idObjetivo' => 16, 'created_by' => 1],
+            ['nombre' => 'g) Las facultades y los centro regionales se insertan en el eje de Formación y  capacitación; registrando y acreditando un cuerpo de profesionales especializado en la gestión de posgrados, incluyendo el componente de investigación.', 'idObjetivo' => 16, 'created_by' => 1],
+            ['nombre' => 'a)Las Unidades Académicas y Administrativas disponen y tienen  acceso a los servicios de la plataforma tecnológica y al programa de desarrollo tecnológico de la UNAH.', 'idObjetivo' => 18, 'created_by' => 1],
+            ['nombre' => 'b) La infraestructura de las sedes universitarias en termino de aulas, salones, talleres, laboratorios, oficinas u otros, son suficientes y adecuados para el logro de los objetivos institucionales.', 'idObjetivo' => 18, 'created_by' => 1],
+            ['nombre' => 'c) Los Departamentos Académicos y las carreras disponen del equipo didáctico necesario para facilitar el proceso del desarrollo educativo.', 'idObjetivo' => 18, 'created_by' => 1],
+            ['nombre' => 'a)La unidad académica cuenta con un presupuesto que le permite realizar adecuadamente las funciones de docencia, investigación, vinculación y gestión académica programadas por la carrera.', 'idObjetivo' => 17, 'created_by' => 1],
+            ['nombre' => 'b) La institución cuenta con la normativa interna e institucional para garantizar la buena organización, el buen funcionamiento y el cumplimiento de las normas y procedimientos.', 'idObjetivo' => 17, 'created_by' => 1],
+            ['nombre' => 'a) Fortalecimiento Institucional mediante el desarrollo Docente y Personal Administrativo responde a las necesidades académicas y a lo establecido en la normativa institucional', 'idObjetivo' => 19, 'created_by' => 1],
+            ['nombre' => 'a) Mejoramiento de la Calidad, la Pertinencia y la Equidad', 'idObjetivo' => 20, 'created_by' => 1],
+            ['nombre' => 'a) Fortalecer la capacidad institucional para la elaboración, negociación y ejecución de iniciativas de cooperación con instancias internacionales para potenciar la labor docente, la investigación científica y las actividades de apoyo de la UNAH a la sociedad, la formación integral de los estudiantes y docentes, la infraestructura, la cooperación al desarrollo y el intercambio de conocimiento.', 'idObjetivo' => 21, 'created_by' => 1],
+            ['nombre' => 'b) Incremento del grado de visibilidad e involucramiento interinstitucional de la UNAH en el marco de las redes universitarias.', 'idObjetivo' => 21, 'created_by' => 1],
+            ['nombre' => 'c) Implementación del registro de acciones de internacionalización.', 'idObjetivo' => 21, 'created_by' => 1],
+            ['nombre' => 'a) Lograr que la UNAH lleve a cabo en forma sostenida y permanente, un ejercicio pleno y responsable del principio de autonomía, que le permita participar activamente en la transformación de la sociedad hondureña.', 'idObjetivo' => 22, 'created_by' => 1],
+            ['nombre' => 'Mejoramiento de gestión académica, administrativa y financiera.', 'idObjetivo' => 23, 'created_by' => 1],
+            ['nombre' => 'b) Fortalecer la atribución que la Constitución de la República le otorga a la UNAH de organizar, dirigir y desarrollar la educación superior y profesional.', 'idObjetivo' => 33, 'created_by' => 1],
+            ['nombre' => 'a) Conducir en coordinación con la Rectoría de la UNAH, el cumplimiento de la atribución que la Constitución de la República le otorga a la UNAH de organizar, dirigir y desarrollar la educación superior y profesional de Honduras.', 'idObjetivo' => 24, 'created_by' => 1],
+            ['nombre' => 'b) Conducir e impulsar el cumplimiento de los trece objetivos estratégicos del Sistema de Educación Superior formulados en el Plan Estratégico de Desarrollo 2017-2026, en forma pro activa y con gestión de apoyo financiero nacional e internacional.', 'idObjetivo' => 24, 'created_by' => 1],
+            ['nombre' => 'c) Consolidar el funcionamiento del Consejo Nacional de Educación, ejerciendo la Rectoría de la UNAH la Vice-Presidencia del mismo y la Dirección de Educación Superior, la Secretaría, así como la conducción de proyectos de integración de la Educación Nacional a través de la Comisión Bipartita.', 'idObjetivo' => 24, 'created_by' => 1],
+            ['nombre' => 'a) Formación y Cultura TI', 'idObjetivo' => 25, 'created_by' => 1],
+            ['nombre' => 'b) Servicios de Información', 'idObjetivo' => 25, 'created_by' => 1],
+            ['nombre' => 'c) Gestión de las TICs.', 'idObjetivo' => 25, 'created_by' => 1],
+            ['nombre' => 'Graduados', 'idObjetivo' => 34, 'created_by' => 1],
+            ['nombre' => 'Educación Bi-modal', 'idObjetivo' => 34, 'created_by' => 1],
+            ['nombre' => 'Actualización Curricular', 'idObjetivo' => 34, 'created_by' => 1],
+            ['nombre' => 'POSGRADOS', 'idObjetivo' => 35, 'created_by' => 1],
+            ['nombre' => 'Eje Transversal: Internacionalización', 'idObjetivo' => 35, 'created_by' => 1],
+            ['nombre' => 'Desarrollo Curricular Integral', 'idObjetivo' => 36, 'created_by' => 1],
+            ['nombre' => 'Inclusión Educativa', 'idObjetivo' => 37, 'created_by' => 1],
+            ['nombre' => 'Fomento y Desarrollo de la Investigación', 'idObjetivo' => 38, 'created_by' => 1],
+            ['nombre' => 'Eje Transversal: Internacionalización', 'idObjetivo' => 38, 'created_by' => 1],
+            ['nombre' => 'Proyectos de Vinculación', 'idObjetivo' => 39, 'created_by' => 1],
+            ['nombre' => 'Capacitaciones y Tutorías', 'idObjetivo' => 40, 'created_by' => 1],
+            ['nombre' => 'Arte y Cultura', 'idObjetivo' => 40, 'created_by' => 1],
+            ['nombre' => 'Becas Estudiantiles', 'idObjetivo' => 40, 'created_by' => 1],
+            ['nombre' => 'Deporte Universitario', 'idObjetivo' => 40, 'created_by' => 1],
+            ['nombre' => 'Voluntariado', 'idObjetivo' => 40, 'created_by' => 1],
+            ['nombre' => 'Servicios Universitarios de Salud', 'idObjetivo' => 40, 'created_by' => 1],
+            ['nombre' => 'Gestión de la Información', 'idObjetivo' => 41, 'created_by' => 1],
+            ['nombre' => 'Transparencia y Rendición de Cuentas', 'idObjetivo' => 41, 'created_by' => 1],
+            ['nombre' => 'Fortalecimiento Institucional', 'idObjetivo' => 42, 'created_by' => 1],
+            ['nombre' => 'Gestión Constitucional', 'idObjetivo' => 43, 'created_by' => 1],
+            ['nombre' => 'Acreditación Institucional', 'idObjetivo' => 43, 'created_by' => 1],
+            ['nombre' => 'Responsabilidad Ambiental', 'idObjetivo' => 43, 'created_by' => 1],
+            ['nombre' => 'Elecciones Estudiantiles', 'idObjetivo' => 44, 'created_by' => 1],
+            ['nombre' => 'Patrimonio UNAH', 'idObjetivo' => 45, 'created_by' => 1],
+            ['nombre' => 'P', 'idObjetivo' => 45, 'created_by' => 1],
+            ['nombre' => 'Mejoramiento de la Gestión Descentralizada', 'idObjetivo' => 46, 'created_by' => 1],
+            ['nombre' => 'Eje Transversal: Aseguramiento de la Calidad', 'idObjetivo' => 47, 'created_by' => 1],
+            ['nombre' => 'Generación de Ingresos Propios', 'idObjetivo' => 47, 'created_by' => 1],
+            ['nombre' => 'Gestión del Talento Humano', 'idObjetivo' => 48, 'created_by' => 1],
+            ['nombre' => 'Gestión Académica', 'idObjetivo' => 49, 'created_by' => 1],
+            ['nombre' => 'Eje Transversal: Internacionalización', 'idObjetivo' => 50, 'created_by' => 1],
+            ['nombre' => 'Estadísticas', 'idObjetivo' => 51, 'created_by' => 1],
+            ['nombre' => 'Gestión Estratégica', 'idObjetivo' => 51, 'created_by' => 1],
+            ['nombre' => 'Eje Transversal: Aseguramiento de la Calidad', 'idObjetivo' => 52, 'created_by' => 1],
+        ];
+
+        foreach ($newAreas as $areaData) {
+            Area::create($areaData);
+        }
+
+        // Crear Resultados
+        $resultados = [
+            [
+                'nombre' => 'a.1) Implementados currículos innovadores a nivel de grado y postgrado (macro, meso y micro currículos), en todas las Facultades y Centros Regionales Universitarios.',
+                'descripcion' => 'id Resultado SPI: 952',
+                'idArea' => 1,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.2) Aplicada la política de bimodalidad con base en los diagnósticos regionales de necesidades y potencialidades auténticas.',
+                'descripcion' => 'id Resultado SPI: 960',
+                'idArea' => 2,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Las facultades y los centros regionales  desarrollan proyectos de investigación enmarcados en los temas prioritarios de la UNAH y de la facultad o centro regional a la cual están adscritas.',
+                'descripcion' => 'id Resultado SPI: 968',
+                'idArea' => 3,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.2) Las facultades y los centros regionales  compiten por fondos concursables para investigación a nivel interno o externo.',
+                'descripcion' => 'id Resultado SPI: 970',
+                'idArea' => 3,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.3) Las facultades y los centros regionales  postulan candidatos para concursar por reconocimientos que premien: 
+• Investigación Científica UNAH 2014, (4 categorías).
+• Excelencia en la Investigación, (2 categorías)
+• Ideas sobre tecnología e innovación, (2 categorías).
+• Ensayo sobre investigación, transferencia tecnológica e innovación
+• Excelencia en Gestión de la investigación.',
+                'descripcion' => 'id resultado SPI: 973',
+                'idArea' => 3,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.4) Las facultades y los centros regionales promueven la asignación de investigación como carga académica en la UNAH, con el desarrollo de proyectos de investigación.',
+                'descripcion' => 'id Resultado SPI: 975',
+                'idArea' => 3,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) Las facultades y los centros regionales  publican artículos con estándares internacionales en revistas científicas de la UNAH.',
+                'descripcion' => 'id resultado SPI: 980',
+                'idArea' => 4,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.2) Las facultades y los centros regionales crean y fortalecen sus revistas científicas siguiendo los estándares internacionales de calidad.',
+                'descripcion' => 'id resultado SPI: 982',
+                'idArea' => 4,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.3) Las facultades y los centros regionales participan en los encuentros académicos organizados por la Dirección de Investigación Científica (congresos,  encuentros, foros y otros eventos de investigación científica).',
+                'descripcion' => 'id resultado SPI:985',
+                'idArea' => 4,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.4)Las facultades y los centros regionales participan en los encuentros académicos organizados por la Dirección de Investigación Científica (congresos,  encuentros, foros y otros eventos de investigación científica).',
+                'descripcion' => 'id resultado SPI: 991',
+                'idArea' => 4,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.5) Las facultades y los centros regionales organizan encuentros (foros, conversatorios, simposios talleres etc.), para divulgar los resultados de las investigaciones realizadas.',
+                'descripcion' => 'id resultado SPI: 993',
+                'idArea' => 4,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.6) Las facultades y los centros regionales impulsan la representación institucional con ponencias en eventos científicos internacionales con recursos internos y externos.',
+                'descripcion' => 'id resultado SPI: 995',
+                'idArea' => 4,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c) Las facultades y los centros regionales  se insertan en el eje de protección de los resultados de investigación; utilizan los resultados de las investigaciones para contribuir a la solución de los problemas prioritarios del país y al desarrollo científico y técnico.',
+                'descripcion' => 'id Resultado SPI: 1072',
+                'idArea' => 5,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.1) Las facultades y los centros regionales  participan en el programa de capacitación ofertado por la Dirección de Investigación Científica.',
+                'descripcion' => 'id resultado SPI: 1075',
+                'idArea' => 6,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'e.1) Las facultades y centros regionales cuenta con una estructura de investigación creada y fortalecida: institutos de investigación, unidades de gestión de la investigación, grupos de investigación, observatorios académicos, círculos de creatividad, spin off universitarias e incubadoras.',
+                'descripcion' => 'idResultado SPI:1079',
+                'idArea' => 7,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'e.2) Firmados convenios de cooperación con instituciones nacionales e internacionales.',
+                'descripcion' => 'id Resultado SPI: 1089',
+                'idArea' => 7,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'e.3) Fortalecidos los vínculos de la UNAH con el gobierno, sectores productivos, sectores sociales y otras universidades, en torno a la investigación científica, para contribuir de forma integral al conocimiento y solución de los principales problemas del país.',
+                'descripcion' => 'id Resultado SPI: 1091',
+                'idArea' => 7,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Comités de vinculación creados y funcionando con calidad y pertinencia en las unidades académicas, ejecutando proyectos de vinculación relacionados con las áreas prioritarias.',
+                'descripcion' => 'id Resultado SPI: 1246',
+                'idArea' => 8,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.2) Unidades académicas aplicando las políticas de vinculación en sus procesos de vinculación con la sociedad según sus contextos.',
+                'descripcion' => 'id Resultado SPI: 1247',
+                'idArea' => 8,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) La Dirección de Vinculación organiza anualmente encuentros locales, regionales, nacionales e internacionales que contribuye al debate académico del quehacer de vinculación.',
+                'descripcion' => 'id Resultado SPI: 1268',
+                'idArea' => 9,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.2) Creado un Sistema de información de procesos de vinculación con indicadores de resultados.',
+                'descripcion' => 'id Resultado SPI: 1285',
+                'idArea' => 9,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.1) Los Comités de Vinculación (CV) en las Unidades Académicas de las Facultades y Centros Regionales, funcionan y cumplen con la planificación académica en vinculación y asignan recursos para su ejecución.',
+                'descripcion' => 'id Resultado SPI: 1270',
+                'idArea' => 10,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.2) La carrera gestiona recursos internos y externos en coordinación con la Dirección de Vinculación UNAH-Sociedad y la Vicerrectoría de Relaciones Internacionales.',
+                'descripcion' => 'id Resultado SPI: 1482',
+                'idArea' => 10,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.3) Propiciar las alianzas con otras entidades públicas y de la sociedad  del país, para el desarrollo de procesos de cooperación recíproca para el fortalecimiento de la Educación pública y gratuita y temáticas de formación de interés educativo de los actores de la sociedad',
+                'descripcion' => 'id Resultado SPI: 1274',
+                'idArea' => 8,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.4) Convenios suscritos entre la UNAH e instancias de la sociedad civil, el Estado, los gobiernos locales, el sector productivo.',
+                'descripcion' => 'id Resultado SPI: 1289',
+                'idArea' => 8,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Creación de la bolsa de empleo de graduados',
+                'descripcion' => 'id Resultado SPI: 1299',
+                'idArea' => 11,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) Creación de un programa de actualización de conocimientos para los graduados y no graduados en todas las áreas.',
+                'descripcion' => 'id Resultado SPI: 1300',
+                'idArea' => 12,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.1)  Realización de estudios de graduados en las temáticas siguientes: Empleabilidad, pertinencia de la calidad educativa, percepción de los empleadores, satisfacción de los empleadores, satisfacción de la comunidad con el graduado de la UNAH, entre otros.',
+                'descripcion' => 'id Resultado SPI: 1301',
+                'idArea' => 13,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.1) Brindar acompañamiento a las asociaciones acuerpando su trabajo y a la vez realizando simultáneamente parte del mismo.',
+                'descripcion' => 'id Resultado SPI: 1302',
+                'idArea' => 14,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'e.1) Creación y actualización permanente de la base de dato de nuestros graduados, a través de un acercamiento virtual, mediante el llenado de un formulario.',
+                'descripcion' => 'id Resultado SPI: 1303',
+                'idArea' => 15,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'f.1) Crear una cartera de servicios que la universidad proporcione a sus graduados.',
+                'descripcion' => 'id Resultado SPI: 1304',
+                'idArea' => 16,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'g.1) Fomentar espacios de discusión, análisis, debates e intercambios académicos entre graduados, estudiantes y profesores universitarios para el enriquecimiento de la ciencia, la tecnología y la innovación en los distintos campos del conocimiento.',
+                'descripcion' => 'id Resultado SPI: 1305',
+                'idArea' => 17,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Ejecución del Sistema Integral de Atención Primaria en Salud Familiar-Comunitario en 30 municipios del país conjuntamente con la Secretaría de Salud, las municipalidades, la SEPLAN, la Secretaría de Educación y la AMOHN.',
+                'descripcion' => 'id Resultado SPI: 1254',
+                'idArea' => 18,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.2) La Dirección de Vinculación promueve el intercambio de experiencias y buenas prácticas en el quehacer de vinculación entre las unidades académicas y Centros Regionales.',
+                'descripcion' => 'id Resultado SPI: 1256',
+                'idArea' => 18,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.3) Formular y ejecutar en Ciudad Universitaria y en cada centro regional universitario, un PLAN UNIVERSITARIO ANUAL DE APOYO A LA GESTIÓN DE RIESGOS, bajo la coordinación de la Maestría en Gestión del Riesgo.',
+                'descripcion' => 'id Resultado SPI: 1297',
+                'idArea' => 18,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) . Integrar programas y planes para la implementación de los servicios de educación no formal a nivel de diplomados, cursos libres, talleres, seminarios, conferencias, con las unidades académicas y en alianza con otros actores de la sociedad.',
+                'descripcion' => 'id Resultado SPI: 1258',
+                'idArea' => 19,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.2)  Promover encuentros académicos de análisis y reflexión permanente sobre temas relevantes de la realidad nacional, y del sistema educativo nacional incluyendo la educación superior como bien público y gratuito.',
+                'descripcion' => 'id Resultado SPI: 1260',
+                'idArea' => 19,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.3) Generar una oferta básica de procesos de Educación no Formal (ENF) por facultades y centros regionales a través de sus distintas carreras (disciplinarias o interdisciplinarias), con aliados estratégicos identificados por los comités de vinculación, orientados a fortalecer el sistema nacional de educación pública y gratuita  del país.',
+                'descripcion' => 'id Resultado SPI: 1272',
+                'idArea' => 19,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.4)  Ejecutar un proyecto piloto de APOYO A LA EDUCACIÓN FORMAL. Y NO FORMAL en los municipios donde funciona el programa APS. En educación no formal se trabajará en construir capacidades locales diversas, orientadas al desarrollo local, la construcción de ciudadanía y cultura de paz, mediante ciclos de conferencias, cursos libres, seminarios, diplomados y otros procesos de educación no formal, disciplinares, e interdisciplinarios, dirigidos a  diferentes actores locales y municipales, en complemento y coordinación con los programas APS FC y DESARROLLO ECONÓMICO LOCAL.',
+                'descripcion' => 'id Resultado SPI : 1293',
+                'idArea' => 19,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.1) La Dirección de Vinculación cuenta con estructura y mecanismos de divulgación de los procesos de vinculación para el apoyo a la difusión del quehacer de vinculación a nivel nacional.',
+                'descripcion' => 'id Resultado SPI: 1262',
+                'idArea' => 20,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.2) Las carreras realiza actividades para divulgar los proyectos de vinculación.',
+                'descripcion' => 'id Resultado SPI: 1276',
+                'idArea' => 20,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.3) La DVUS Edita y publica documentos académicos de las diferentes temáticas abordadas en los distintos procesos académicos de vinculación con la sociedad.',
+                'descripcion' => 'id resultado SPI: 1283',
+                'idArea' => 20,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.4) Las unidades académicas sistematizan sus procesos de vinculación ejecutados, de acuerdo a los lineamientos propuestos por la DVUS.',
+                'descripcion' => 'id resultado SPI: 1291',
+                'idArea' => 20,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.1) Se cuenta con actores cooperantes identificados y estructurados en mesas temáticas para la ejecución y respaldo de los proyectos de desarrollo local de los municipios.',
+                'descripcion' => 'id resultado SPI: 1264',
+                'idArea' => 21,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.2) Se identifican las cadenas de valor de producción que inciden en el desarrollo económico local en los municipios seleccionados.',
+                'descripcion' => 'id resultado SPI: 1266',
+                'idArea' => 21,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.3) Diseñado un programa orientado al fortalecimiento institucional y el emprendedurismo y desarrollo de capacidades locales en donde funciona el Sistema APS, con la participación plena de las unidades académicas de las áreas sociales y económicas.',
+                'descripcion' => 'id resultado SPI: 1278',
+                'idArea' => 21,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.4) Se mejoran los niveles nutricionales locales y se estimula la generación de empleo e ingresos mediante la creación de microempresas familiares comunitarias en los municipios seleccionados.',
+                'descripcion' => 'id resultado SPI: 1280',
+                'idArea' => 21,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.5) Ejecutar un proyecto piloto de APOYO A LA GESTIÓN CULTURAL orientado a potenciar los factores culturales como elementos de desarrollo local y regional, en complemento y coordinación con los programas de salud, producción y educación, en dos municipios en los que funcionen dichos programas.',
+                'descripcion' => 'id resultado SPI: 1295',
+                'idArea' => 21,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Personal Docente implementando prácticas innovadoras, alineadas con el modelo educativo.',
+                'descripcion' => 'id Resultado PEI: 1118',
+                'idArea' => 22,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Estudiantes orientados profesionalmente a través del Centro de Orientación Vocacional Universitario (COVU).',
+                'descripcion' => 'id Resultado SPI: 1306',
+                'idArea' => 23,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.2) Estudiantes en riesgo académico reciben asesoría y tutoría como formas de atención.',
+                'descripcion' => 'id resultado SPI: 1308',
+                'idArea' => 23,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.3) Implementar la Bolsa Universitaria de Trabajo en alianza con la Secretaría del Trabajo y Seguridad Social para identificar espacios laborales que favorezcan la empleabilidad de los egresados de la UNAH.',
+                'descripcion' => 'id resultado SPI: 1324',
+                'idArea' => 23,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) Implementado de forma gradual y progresiva la estrategia de Atención Primaria en Salud estudiantil (APS) bajo el modelo de Universidades con Estilos de Vida Saludables que marquen la pauta para la construcción de la Política de Salud Universitaria.',
+                'descripcion' => 'id resultado SPI: 1310',
+                'idArea' => 24,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.2) Instalados los servicios de salud en todos los Centros Regionales bajo el modelo de Universidades con Estilos de Vida Saludables que respondan a las necesidades de atención, promoción y formación de los estudiantes en los distintos contextos y zonas geográficas.',
+                'descripcion' => 'id resultado SPI: 1312',
+                'idArea' => 24,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.3) Expandidos los servicios de laboratorio para su auto-sostenibilidad en coordinación con la Escuela de Microbiología, ofreciendo servicios de calidad y a bajo costo a la población en general.',
+                'descripcion' => 'id resultado SPI:1326',
+                'idArea' => 24,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.1) Realizado festivales y encuentros culturales con la participación de estudiantes de CU y CR.',
+                'descripcion' => 'id resultado SPI: 1314',
+                'idArea' => 25,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.2) Desarrollado el Festival Interuniversitario de Cultura y Arte (FICCUA) para consolidar procesos de integración cultural en la región Centroamericana.',
+                'descripcion' => 'id resultado SPI: 1316',
+                'idArea' => 25,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.3) Desarrollados programas socio-culturales para el fomento de una cultura y valores de paz, integración y cohesión estudiantil, familiar y social.',
+                'descripcion' => 'id resultado SPI: 1318',
+                'idArea' => 25,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.4) Realizados los primeros Juegos Universitarios Deportivos de la UNAH (JUDUNAH) para promover el intercambio estudiantil universitario y la identificación de atletas para la conformación de delegaciones que representan a la UNAH en instancias deportivas nacionales y regionales.',
+                'descripcion' => 'id resultado SPI: 1320',
+                'idArea' => 25,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.1) Reformulada las políticas de estímulos educativos bajo criterios de equidad y calidad:
+> Becas Municipales
+> Becas de Inclusión Social (Pueblos Indígenas y Afrodescendientes)
+> Becas por Desempeño Estudiantil (museos, bibliotecas, librería, centros de arte, deportes y cultura)
+> Vigentes: excelencia, equidad, cultura y arte y deporte)
+> En estudio: exoneración de matrícula a estudiantes de excelencia.',
+                'descripcion' => 'id resultado SPI: 1322',
+                'idArea' => 26,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.2) Se apoya el fortalecimiento y ampliación de servicios de la Cooperativa Estudiantil “Lucem Aspicio” u otras. Apoyar el fortalecimiento y la ampliación de los servicios   de la Cooperativa Estudiantil “Lucem Aspicio” u otras.',
+                'descripcion' => 'id resultado SPI: 1328',
+                'idArea' => 26,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.3)  Elaborar una linea base para el establecimiento de las residencias estudiantiles y Centros de Cuidades Infantiles.',
+                'descripcion' => 'id resultado SPI: 1330',
+                'idArea' => 26,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.4) Se cuenta con una Escuela de Líderes Universitarios estudiantiles.',
+                'descripcion' => 'id resultado SPI: 1332',
+                'idArea' => 26,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.5) Contar  con una estrategia integral de atención a la diversidad del estudiantado universitario.',
+                'descripcion' => 'id resultado SPI:1334',
+                'idArea' => 26,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.6) Priorizados y fortalecidos los proyectos de voluntariado.',
+                'descripcion' => 'id resultado SPI: 1336',
+                'idArea' => 26,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Aplicación de Sistema de Seguimiento a graduados.  Base de Datos de Egresados, Actualizadas y Monitoreada.',
+                'descripcion' => 'id resultado SPI: 1129',
+                'idArea' => 27,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) Graduados universitarios y Personal Administrativo participan en programa de relevo docente.',
+                'descripcion' => 'id resultado SPI: 1131',
+                'idArea' => 28,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Las unidades académicas participan en redes académicas a través de la movilidad y el uso de las TICS por campo del conocimiento para la generación y promoción de la gestión del conocimiento.',
+                'descripcion' => 'id resultado SPI: 1137',
+                'idArea' => 29,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) Resultados permanentes y sostenidos de contribución al Desarrollo Humano Sostenible regional, generados por las 8 Redes Educativas Regionales de la UNAH.',
+                'descripcion' => 'id resultado SPI: 1138',
+                'idArea' => 29,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.1) Gestión exitosa del Sistema de Difusión Científica y Cultural de la UNAH, con participación sostenida y permanente en redes asociativas nacionales e internacionales.',
+                'descripcion' => 'id resultado SPI: 1139',
+                'idArea' => 29,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Transversalizado el EJE CURRICULAR DE ÉTICA en los planes de estudio de la UNAH, que propicie un sello de “Lo Esencial” en los graduados de la UNAH. (R. de Desarrollo Curricular Integral).',
+                'descripcion' => 'id resultado SPI: 1151',
+                'idArea' => 32,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.1) Fortalecida la IDENTIDAD NACIONAL E INSTITUCIONAL, con un saber local revalorizado e internacionalizado.',
+                'descripcion' => 'id resultado SPI: 1153',
+                'idArea' => 33,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) Impregnados los currículos de una preocupación por los derechos humanos, lo socio-cultural, la interculturalidad y la gestión de vida cultural, desde actividades curriculares, extracurriculares, y la vinculación universidad – sociedad.',
+                'descripcion' => 'id resultado SPI: 1162',
+                'idArea' => 34,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'd.1) Gestionados una serie de instrumentos culturales (en especial la POLÍTICA DE CULTURA, y oferta educativa, encaminada hacia la formación integral – profesional en la relación de cultura y desarrollo.',
+                'descripcion' => 'id resultado SPI: 1159',
+                'idArea' => 35,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Aplicación del modelo de innovación educativa que integre como ámbitos de innovación educativa: el currículo, las metodologías, las estrategias de enseñanza y aprendizaje, los materiales y recursos didácticos, el uso educativo de las TIC, la relación con el entorno, la profesionalización docente y directiva.',
+                'descripcion' => 'id resultado SPI: 1167',
+                'idArea' => 36,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.1) Comisiones mixtas de Seguridad e Higiene',
+                'descripcion' => 'id resultado SPI: 1181',
+                'idArea' => 37,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.2)  Sistema en Gestión Ambiental (ISO 14001)',
+                'descripcion' => 'id resultado SPI: 1182',
+                'idArea' => 37,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.3) Adhesión al programa de Universidades Promotoras de la Salud (OPS)',
+                'descripcion' => 'id resultado SPI: 1183',
+                'idArea' => 37,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.4) Sistema de Gestión de Seguridad e Higiene Ocupacional (OSHAS 18001)',
+                'descripcion' => 'id resultado SPI: 1184',
+                'idArea' => 37,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.5) Oficina de Responsabilidad Social Universitaria en funcionamiento',
+                'descripcion' => 'id resultado SPI: 1185',
+                'idArea' => 37,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'f.5) Las facultades y los centros regionales establecen vínculos de colaboración, comunicación e  información con posgrados de otros países a través de las tecnologías de información y comunicación.',
+                'descripcion' => 'id resultado SPI: 1236',
+                'idArea' => 45,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'g.1) Las facultades y centros regionales promueven que los posgrados participen en el programa de capacitación ofertado por la Dirección del Sistema de Estudios de Posgrado.',
+                'descripcion' => 'id resultado SPI: 1238',
+                'idArea' => 46,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'g.2) Las facultades y centros regionales impulsan los cursos de actualización a los egresados de posgrado de la UNAH,  de acuerdo a su temática.',
+                'descripcion' => 'id resultado SPI: 1241',
+                'idArea' => 46,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Plataforma tecnológica eficiente, accesible en todos los predios de las sedes, modalidades y unidades académicas de la UNAH.',
+                'descripcion' => 'id resultado SPI: 1017',
+                'idArea' => 47,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) "Macro proyecto de Desarrollo Físico implementado, incluyendo Centros Regionales, CRAED, ITS.\n2) Infraestructura física de CRAED pilotos en proceso de construcción."',
+                'descripcion' => 'id resultado SPI: 1018',
+                'idArea' => 47,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.1) "Aulas equipadas con proyectores y equipos de ayuda multimedia.\n2) Fortalecida la red de bibliotecas universitarias, librerías universitarias y la editorial, tanto virtuales como físicas."',
+                'descripcion' => 'id resultado SPI: 1019',
+                'idArea' => 47,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Docentes regularizados y contratados de acuerdo a la meta propuesta.',
+                'descripcion' => 'id resultado SPI: 1020',
+                'idArea' => 50,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) Normativa aprobada y en ejecución.',
+                'descripcion' => 'id resultado SPI: 1021',
+                'idArea' => 51,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Consolidado un sistema de desarrollo del talento humano con relevo de docentes y personal administrativo de excelencia y liderazgo.',
+                'descripcion' => 'id resultado SPI: 1030',
+                'idArea' => 52,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Todas las unidades  académicas de la UNAH deberán estar articuladas e integradas a un sistema de gestión que integra la planificación, monitoria, evaluación y control; basado en  una estructura organizativa ágil y flexible y cumpliendo con las normas y estándares definidos.',
+                'descripcion' => 'id resultado SPI: 1035',
+                'idArea' => 53,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.2) Impulsar la conectividad, acceso a información digital, uso de herramientas informáticas, laboratorios, plataformas de interacción y de educación virtual y facilitar la generación e introducción de innovaciones tecnológicas para el mejoramiento de los aprendizajes, incorporando la ciencia y la tecnología a los procesos de enseñanza y a la creación de conocimiento.',
+                'descripcion' => 'id resultado SPI: 1037',
+                'idArea' => 53,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1)  Incremento de las movilidades internacionales realizadas',
+                'descripcion' => 'id resultado SPI: 1338',
+                'idArea' => 54,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.2) Proyectos y/o programas de cooperación e investigación gestionados por la unidad',
+                'descripcion' => 'id resultado SPI: 1339',
+                'idArea' => 54,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1)  Relaciones internacionales con otras instituciones fortalecidas',
+                'descripcion' => 'id resultado SPI: 1340',
+                'idArea' => 55,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.1) Actividades en internacionalización registradas y monitoreadas',
+                'descripcion' => 'id resultado SPI: 1348',
+                'idArea' => 56,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) Sistema de educación superior regularizado en términos de calidad y pertinencia.',
+                'descripcion' => 'id resultado SPI: 1356',
+                'idArea' => 59,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.2) Plan de Desarrollo de la Educación Superior implementado y consolidado.',
+                'descripcion' => 'id resultado SPI: 1376',
+                'idArea' => 59,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Fortalecida y agilizada la gestión académica, administrativa y financiera  hacia las redes educativas regionales.',
+                'descripcion' => 'id resultado SPI: 1530',
+                'idArea' => 58,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Instancias que conforman las autoridades de dirección superior, desarrollando su respectivo rol en forma coordinada.',
+                'descripcion' => 'id resultado SPI: 1353',
+                'idArea' => 57,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.2) Manejo oportuno y eficiente de los conflictos internos que se originen producto de discrepancias o problemas entre los distintos sectores de la UNAH.',
+                'descripcion' => 'id resultado SPI: 1370',
+                'idArea' => 57,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) La Dirección de Educación Superior es reconocida en su rol de conductor de la política educativa de nivel superior, bien organizada y con los recursos humanos y materiales que requiere para su eficaz y eficiente funcionamiento.',
+                'descripcion' => 'id resultado SPI: 1363',
+                'idArea' => 60,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.2) La Dirección de Educación Superior es fedataria pública de los actos del nivel superior, da seguimiento eficaz y asegura el  cumplimiento de las resoluciones de los órganos de gobierno de El nivel Superior y responde en tiempo y forma las solicitudes presentadas por los centros de educación superior y por peticionarios de validación de estudios.',
+                'descripcion' => 'id resultado SPI: 1364',
+                'idArea' => 60,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.3) Servicios ofrecidos con plena satisfacción de los usuarios',
+                'descripcion' => 'id resultado SPI: 1365',
+                'idArea' => 60,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.4) Plan Estratégico DES  y planes operativos anuales de la DES, y de los Departamentos cumplidos,  Informes de proyectos impulsados por la Dirección de Educación Superior, observatorio de la Educación Superior funcionando, Sistemas informativos y bases de dato funcionando, sitios web actualizados y activos, edición y distribución de publicaciones varias.',
+                'descripcion' => 'id resultado SPI: 1366',
+                'idArea' => 60,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) Sistema de Educación Superior vinculado con los sistemas educativos regionales y mundiales, convenios de cooperación suscritos y en ejecución, adaptación de las grandes tendencias internacionales a las políticas educativas del país. Vinculación amplia con expertos, asesoría, pasantías.',
+                'descripcion' => 'id resultado SPI: 1484',
+                'idArea' => 61,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.2) Sistema de Educación Superior integrado a redes socioeducativas nacionales e internacionales.',
+                'descripcion' => 'id resultado SPI: 1486',
+                'idArea' => 61,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.3) Documento de Plan Estratégico del Sistema de Educación Superior , validado y aprobado. Objetivos propuestos cumplidos.  Sistema de Educación Superior en camino a su desarrollo.',
+                'descripcion' => 'id resultado SPI: 1488',
+                'idArea' => 61,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.4) Proyectos de país desarrollados por los Centros de Educación Superior.  Financiamiento disponible.',
+                'descripcion' => 'id resultado SPI: 1490',
+                'idArea' => 61,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.5) El sistema de educación superior integrado a redes académicas. Alianzas estratégicas formalizadas a través de convenios.',
+                'descripcion' => 'id resultado SPI: 1492',
+                'idArea' => 61,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.6) Plataformas tecnológicas desarrolladas y en funcionamiento.',
+                'descripcion' => 'id resultado SPI: 1496',
+                'idArea' => 61,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.1) Proponer y desarrollar proyectos conducentes a la integración curricular desde los niveles pre-básica hasta el nivel superior.',
+                'descripcion' => 'id resultado SPI: 1386',
+                'idArea' => 62,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.3) Promover procesos de formación docente para los niveles pre-básico, básico, medio y superior de la educación nacional.',
+                'descripcion' => 'id resultado SPI: 1390',
+                'idArea' => 62,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'c.2) Incidir para el desarrollo del modelo de la Educación Técnica en los Niveles de Educación Media y Superior y su instauración en el Sistema Educativo Nacional.',
+                'descripcion' => 'id resultado SPI: 1388',
+                'idArea' => 62,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.1) Comunidad universitaria con mayor conocimiento en el uso de las TIC en las facultades y centros regionales',
+                'descripcion' => 'id resultado SPI: 1413',
+                'idArea' => 63,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'a.2) Buenas prácticas para el uso adecuado de las TIC fortalecidas, difundidas y en aplicación por las unidades académicas y administrativas de la UNAH.',
+                'descripcion' => 'id resultado SPI: 1414',
+                'idArea' => 63,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.1) Unidades académicas y administrativas con conocimiento de los servicios y recursos TI para sus actividades académicas y administrativas',
+                'descripcion' => 'id resultado SPI: 1415',
+                'idArea' => 64,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.2) Portal Web activo y mejorado ofreciendo información del ámbito universitario.',
+                'descripcion' => 'id resultado SPI: 1421',
+                'idArea' => 64,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'b.3) Sistema Bibliotecario y Depto. de Recursos de Aprendizaje fortalecidos con colecciones desarrolladas y a disposición de la comunidad.',
+                'descripcion' => 'id resultado SPI: 1441',
+                'idArea' => 64,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Incrementado el número de estudiantes con formación académica en el nivel superior en los diferentes Centros regionales de la UNAH.',
+                'descripcion' => 'N/A',
+                'idArea' => 66,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Aplicado el modelo de innovación educativa que integre como ámbitos de innovación educativa: el currículo, las metodologías, las estrategias de enseñanza y aprendizaje, los materiales y recursos didácticos, el uso educativo de las TIC, la relación con el entorno, la profesionalización docente y directiva.',
+                'descripcion' => 'N/A',
+                'idArea' => 67,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Los pensum académicos de la UNAH darán respuesta a las necesidades de formación que requieren las sociedades modernas para el incremento de la calidad de vida de los hondureños.',
+                'descripcion' => 'N/A',
+                'idArea' => 68,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'La UNAH contara con programas de posgrado que garanticen competencias de investigación,  que unido a la calidad de los programas y a su capacidad de actualización, estarán en consonancia con los desafíos de crecimiento y desarrollo del país y la región.',
+                'descripcion' => 'N/A',
+                'idArea' => 69,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Las Facultades y Centros Regionales fortalecen y desarrollan sus posgrados mediante la participación en el Congreso organizado por la Dirección del Sistema de Estudios de Posgrado.',
+                'descripcion' => 'N/A',
+                'idArea' => 69,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Ampliada la armonización curricular y reconocimiento de las titulaciones a nivel internacional.',
+                'descripcion' => 'N/A',
+                'idArea' => 70,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Transversalizado el EJE CURRICULAR DE ÉTICA en los planes de estudio, que propicie que los graduados de la UNAH sean profesionales íntegros y con características humanísticas.',
+                'descripcion' => 'N/A',
+                'idArea' => 71,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Incrementada en la UNAH la atención a  personas con discapacidad, facilitando su procesos educativo desde el ingreso, permanencia y promoción.',
+                'descripcion' => 'N/A',
+                'idArea' => 72,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Incrementado el alcance de la educación superior en la UNAH en atención a las minorías étnicas.',
+                'descripcion' => 'N/A',
+                'idArea' => 72,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'La UNAH participa  en la transformación de la sociedad hondureña a través de la investigación científica, humanística y tecnológica, la difusión general de la cultura y el estudio de los problemas.',
+                'descripcion' => 'N/A',
+                'idArea' => 73,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Fortalecidos los equipos de investigación existentes o en fase de creación',
+                'descripcion' => 'N/A',
+                'idArea' => 74,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Fortalecidos los vínculos entre la academia, sociedad y estado por medio de la producción de conocimientos pertinentes que contribuyan a la solución de los problemas actuales de país.',
+                'descripcion' => 'N/A',
+                'idArea' => 75,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Fortalecidos los conocimientos de los estudiantes que han ingresado a la UNAH y ha caído en riego académico evitando la deserción académica.',
+                'descripcion' => 'N/A',
+                'idArea' => 76,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Fortalecida la imagen institucional a nivel regional y consolidados los principios de fraternidad, solidaridad y hermandad entre los pueblos, para el fortalecimiento de la sociedad centroamericana; estimulando la movilidad académica y cultural de los estudiantes de la región.',
+                'descripcion' => 'N/A',
+                'idArea' => 77,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Fortalecidas las políticas de estímulos educativos bajo criterios de equidad y calidad, mediante la asignación y gestión de Becas de Inclusión Social (Pueblos Indígenas y Afrodescendientes), Becas por Desempeño Estudiantil (en museos, bibliotecas, librería, centros de arte, deportes y cultura), Becas de excelencia, equidad, cultura y arte y deporte)',
+                'descripcion' => 'N/A',
+                'idArea' => 78,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Promovido el intercambio estudiantil universitario y la identificación de atletas  para la conformación de delegaciones que representan a la UNAH en instancias deportivas nacionales y regionales.',
+                'descripcion' => 'N/A',
+                'idArea' => 79,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Fomentada la formación integral en los estudiantes mediante su participación en proyectos de voluntariado.',
+                'descripcion' => 'N/A',
+                'idArea' => 80,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Instalados los servicios de salud en todos los Centros Regionales bajo el modelo de Universidades con Estilos de Vida Saludables que respondan a las necesidades de atención, promoción y formación de los estudiantes en los distintos contextos y zonas geográficas',
+                'descripcion' => 'N/A',
+                'idArea' => 81,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Las autoridades Universitarias cuentan con la información necesaria que sirva de apoyo en los procesos de evaluación y la toma de decisiones, mediante un Sistema de Información Integrado.',
+                'descripcion' => 'N/A',
+                'idArea' => 82,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Evidenciada en la rendición de cuentas a la sociedad hondureña y en la atención oportuna efectiva y pertinente a las demandas  de ésta.',
+                'descripcion' => 'N/A',
+                'idArea' => 83,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Servicios de calidad en las funciones sustantivas de la UNAH (docencia, investigación y vinculación universidad-sociedad)',
+                'descripcion' => 'N/A',
+                'idArea' => 84,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'La UNAH participa en el desarrollo humano sostenible en la sociedad hondureña, de la mano con el Estado quien aporta al desarrollo y engrandecimiento de la Universidad Nacional Autónoma de Honduras.',
+                'descripcion' => 'N/A',
+                'idArea' => 85,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Consolidado en todas las Unidades Académicas de la UNAH, el Sistema de Gestión de la Calidad, con procesos permanentes y sostenidos de autoevaluación y acreditación institucional, de programas y carreras; de certificación y recertificación profesional de los profesores universitarios.',
+                'descripcion' => 'N/A',
+                'idArea' => 86,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Convertir a la Universidad en una Institución respetuosa del medio ambiente, saludable y segura para todos, que cree conciencia y promueva estilos de vida saludables dentro de la sociedad,',
+                'descripcion' => 'N/A',
+                'idArea' => 87,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Una comunidad universitaria con profesionales formados y en formación del mas alto nivel que respetan los derechos humanos universales',
+                'descripcion' => 'N/A',
+                'idArea' => 88,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Asegurados legalmente todo el patrimonio de la UNAH',
+                'descripcion' => 'N/A',
+                'idArea' => 89,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Ampliado el proyecto de Descentralización del proceso administrativo a las principales sedes administrativas de la UNAH',
+                'descripcion' => 'N/A',
+                'idArea' => 91,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'La UNAH hará uso de sus recursos de una manera equitativa y transparente mediante una distribución financiera de la transferencia Constitucional del 6% de parte del Gobierno de Honduras.',
+                'descripcion' => 'N/A',
+                'idArea' => 92,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Innovar y mejorar la gestión administrativa-financiera, en función de la actividad académica, principalmente la que esta relacionada en la generación y captación de recursos por los diferentes unidades, aplicando procesos administrativos y principios de eficiencia, eficacia, transparencia y rendición de cuentas en todos los actos de la UNAH.',
+                'descripcion' => 'N/A',
+                'idArea' => 93,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Consolidado un sistema de gestión y desarrollo del talento humano con relevo de docentes y personal administrativo de excelencia y liderazgo.',
+                'descripcion' => 'N/A',
+                'idArea' => 94,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Las unidades académicas tendrán una estructura organizativa ágil y flexible acorde con los objetivos institucionales y de cada unidad en particular, para una gestión académica eficiente.',
+                'descripcion' => 'N/A',
+                'idArea' => 95,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Incrementada la calidad y el prestigio internacional de la UNAH.',
+                'descripcion' => 'N/A',
+                'idArea' => 96,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Sistema de Educación Superior vinculado con los sistemas educativos regionales y mundiales a través de con-venios de cooperación para su actualización y adaptación según las grandes tendencias internacionales y a las políticas educativas del país.',
+                'descripcion' => 'N/A',
+                'idArea' => 97,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Fortalecida la gestión estratégica del Sistema de Educación Superior en pos del desarrollo de la Educación Superior de Honduras.',
+                'descripcion' => 'N/A',
+                'idArea' => 98,
+                'created_by' => 1,
+            ],
+            [
+                'nombre' => 'Mejorada la calidad y cantidad de profesionales formados en el nivel de educación superior que forman parte de desarrollo humano de Honduras.',
+                'descripcion' => 'N/A',
+                'idArea' => 99,
+                'created_by' => 1,
+            ],
+                        
+        ];
+
+        foreach ($resultados as $resultadoData) {
+            Resultado::create($resultadoData);
+        }
+
+       
+
+        $this->command->info('PEIs Areas y Resultados creados.');
     }
 }

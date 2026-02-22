@@ -1,4 +1,4 @@
-<x-dialog-modal wire:model="showModal" maxWidth="lg">
+<x-dialog-modal wire:model="showModal" maxWidth="4xl">
         <x-slot name="title">
             <div class="flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">

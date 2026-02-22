@@ -24,6 +24,7 @@ class Area extends Component
     #[Url(as: 'pei')]
     public ?int $peiId = 1;
 
+    public $idDimension;
     public $nombre;
     public $areaId;
     public $search = '';
@@ -251,35 +252,72 @@ class Area extends Component
         $this->errorMessage = '';
     }
 
-    public function mount()
+    public function mount($pei = null, $objetivo = null)
     {
-        if ($this->peiId === null) {
-            abort(400, 'PEI no especificado. Use ?pei=1 en la URL.');
-        }
+        try {
+            $this->peiId = $pei ?? request()->query('pei');
+            $this->idObjetivo = $objetivo ?? request()->query('objetivo');
 
-        if (!Pei::where('id', $this->peiId)->exists()) {
-            abort(404, 'PEI no encontrado.');
+            // Validar PEI
+            if ($this->peiId === null) {
+                throw new \Exception('PEI no especificado. Use ?pei=1 en la URL.');
+            }
+
+            if (!Pei::where('id', $this->peiId)->exists()) {
+                throw new \Exception('PEI no encontrado.');
+            }
+
+            // Validar Objetivo
+            if ($this->idObjetivo === null) {
+                throw new \Exception('Objetivo no especificado. Use ?objetivo=1 en la URL.');
+            }
+
+            $objetivo = ObjetivoModel::with('dimension')->find($this->idObjetivo);
+
+            if (!$objetivo) {
+                throw new \Exception('Objetivo no encontrado.');
+            }
+
+            // Establecer idDimension desde la dimensión del objetivo
+            $this->idDimension = $objetivo->dimension?->id;
+
+            if ($this->idDimension === null) {
+                throw new \Exception('Dimensión no especificada para el objetivo.');
+            }
+        } catch (\Exception $e) {
+            $this->errorMessage = $e->getMessage();
+            $this->showErrorModal = true;
         }
     }
 
     public function render()
     {
-        // Validar que el objetivo esté especificado
-        if ($this->idObjetivo === null) {
-            abort(400, 'Objetivo no especificado. Use ?objetivo=1 en la URL.');
-        }
+        try {
+            // Validar que el objetivo esté especificado
+            if ($this->idObjetivo === null) {
+                throw new \Exception('Objetivo no especificado. Use ?objetivo=1 en la URL.');
+            }
 
-        if (!ObjetivoModel::where('id', $this->idObjetivo)->exists()) {
-            abort(404, 'Objetivo no encontrado.');
-        }
+            // Verificar que el objetivo exista en la tabla objetivos
+            if (!ObjetivoModel::where('id', $this->idObjetivo)->exists()) {
+                throw new \Exception('El objetivo especificado no existe.');
+            }
 
-        // Filtrar áreas por el objetivo actual
-        $areas = AreaModel::where('idObjetivo', $this->idObjetivo)
-            ->when($this->search, function ($query) {
-                $query->where('nombre', 'like', '%' . $this->search . '%');
-            })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage);
+            // Obtener las áreas asociadas al objetivo
+            $areas = AreaModel::where('idObjetivo', $this->idObjetivo)
+                ->when($this->search, function ($query) {
+                    $query->where('nombre', 'like', '%' . $this->search . '%');
+                })
+                ->orderBy($this->sortField, $this->sortDirection)
+                ->paginate($this->perPage);
+
+        } catch (\Exception $e) {
+            $this->errorMessage = $e->getMessage();
+            $this->showErrorModal = true;
+
+            // Retornar un paginador vacío en caso de error
+            $areas = AreaModel::whereRaw('1 = 0')->paginate($this->perPage);
+        }
 
         return view('livewire.consola.pei.Areas.areas', [
             'areas' => $areas,

@@ -1,5 +1,5 @@
 <div>
-    @can('administrar.requisiciones.ejecutar')
+    @can('seguimiento.requisiciones.ejecutar')
         {{-- Modal de confirmación para finalizar requisición --}}
         <x-dialog-modal wire:model="showConfirmFinalizarModal" maxWidth="md">
             <x-slot name="title">

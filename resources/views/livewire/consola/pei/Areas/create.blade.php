@@ -1,4 +1,4 @@
-<x-dialog-modal wire:model="showModal" maxWidth="lg">
+<x-dialog-modal wire:model="showModal" maxWidth="4xl">
         <x-slot name="title">
             <div class="flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
@@ -23,6 +23,18 @@
                     <x-input id="nombre" wire:model="nombre" type="text" class="mt-1 block w-full bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-gray-300 dark:border-zinc-700" />
                     <x-input-error for="nombre" class="mt-2" />
                 </div>
+
+                 <div class="mb-4">
+                <x-label for="descripcion" value="{{ __('Descripción') }}" class="dark:text-zinc-100" />
+                <x-textarea 
+                    id="descripcion" 
+                    wire:model="descripcion" 
+                    class="mt-1 block w-full bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-gray-300 dark:border-zinc-700"
+                    rows="3"
+                ></x-textarea>
+                
+                <x-input-error for="descripcion" class="mt-2" />
+            </div>
 
                 <!-- Campo oculto para el ID del Objetivo -->
                 <input type="hidden" wire:model="objetivoId" />
