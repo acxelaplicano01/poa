@@ -706,7 +706,7 @@ class GestionTechoDeptos extends Component
                 return $techoDepto->departamento->estructura ?? 'Sin Estructura';
             })
             ->map(function ($techosPorEstructura, $estructura) {
-                $departamentosUnicos = $techosPorEstructura->pluck('departamento')->unique('id');
+                $departamentosUnicos = $techosPorEstructura->pluck('departamento')->filter()->unique('id');
                 $montoTotal = $techosPorEstructura->sum('monto');
                 $cantidadDepartamentos = $departamentosUnicos->count();
                 $promedioMonto = $cantidadDepartamentos > 0 ? $montoTotal / $cantidadDepartamentos : 0;

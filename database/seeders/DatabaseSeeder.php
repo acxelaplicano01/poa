@@ -20,6 +20,11 @@ use Database\Seeders\TechoUesSeeder;
 use Database\Seeders\DepartamentoSeeder;
 use Database\Seeders\PoasSeeder;
 use Database\Seeders\PoaDeptoSeeder;
+use Database\Seeders\TechoDeptoSeeder;
+use Database\Seeders\TechoUesSeeder;
+use Database\Seeders\DepartamentoSeeder;
+use Database\Seeders\PoasSeeder;
+use Database\Seeders\PoaDeptoSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -50,6 +55,14 @@ class DatabaseSeeder extends Seeder
         $this->call(PeiSeeder::class);
         $this->call(ProcesoCompraSeeder::class);
         $this->call(RecursoSeeder::class);
+
+        /*
+        $this->call(TechoDeptoSeeder::class);
+        $this->call(TechoUesSeeder::class);
+        $this->call(PoasSeeder::class);
+        $this->call(PoaDeptoSeeder::class);
+        $this->call(EmpleadosSeeder::class);
+        $this->call(EmpleadoDeptoSeeder::class);*/
 
         
     }
