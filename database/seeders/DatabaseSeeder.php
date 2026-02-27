@@ -20,6 +20,22 @@ use Database\Seeders\TechoUesSeeder;
 use Database\Seeders\DepartamentoSeeder;
 use Database\Seeders\PoasSeeder;
 use Database\Seeders\PoaDeptoSeeder;
+use Database\Seeders\EmpleadosSeeder;
+use Database\Seeders\EmpleadoDeptoSeeder;
+use Database\Seeders\ActividadesSeeder;
+use Database\Seeders\IndicadoresSeeder;
+use Database\Seeders\PlanificacionsSeeder;
+use Database\Seeders\EmpleadoActividadsSeeder;
+use Database\Seeders\TareasSeeder;
+use Database\Seeders\PresupuestosSeeder;
+use Database\Seeders\RevisionesSeeder;
+use Database\Seeders\EstadoRequisicionLogsSeeder;
+use Database\Seeders\RequisicionSeeder;
+use Database\Seeders\DetalleRequisicionSeeder;
+use Database\Seeders\EjecucionPresupuestariaSeeder;
+use Database\Seeders\EjecucionPresupuestariaLogsSeeder;
+use Database\Seeders\DetalleEjecucionPresupuestariaSeeder;
+use Database\Seeders\OrdenCombustibleSeeder;
 
 class DatabaseSeeder extends Seeder
 {
