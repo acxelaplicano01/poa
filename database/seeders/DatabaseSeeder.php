@@ -12,14 +12,9 @@ use Database\Seeders\InstitucionSeeder;
 use Database\Seeders\UnidadEjecutoraSeeder;
 use Database\Seeders\FuenteSeeder;
 use Database\Seeders\GrupoGastoSeeder;
-use Database\Seeders\ObjetoGastoSeeder;
+use Database\Seeders\ObjetoGastosSeeder;
 use Database\Seeders\CubSeeder;
 use App\Models\Area;
-use Database\Seeders\TechoDeptoSeeder;
-use Database\Seeders\TechoUesSeeder;
-use Database\Seeders\DepartamentoSeeder;
-use Database\Seeders\PoasSeeder;
-use Database\Seeders\PoaDeptoSeeder;
 use Database\Seeders\TechoDeptoSeeder;
 use Database\Seeders\TechoUesSeeder;
 use Database\Seeders\DepartamentoSeeder;
@@ -50,19 +45,37 @@ class DatabaseSeeder extends Seeder
         $this->call(CategoriasSeeder::class);
         $this->call(CubSeeder::class);
         $this->call(GrupoGastoSeeder::class);
-        $this->call(ObjetoGastoSeeder::class);
+        $this->call(ObjetoGastosSeeder::class);
         $this->call(PeiDataSeeder::class);
         $this->call(PeiSeeder::class);
         $this->call(ProcesoCompraSeeder::class);
         $this->call(RecursoSeeder::class);
 
-        /*
+        
         $this->call(TechoDeptoSeeder::class);
         $this->call(TechoUesSeeder::class);
         $this->call(PoasSeeder::class);
         $this->call(PoaDeptoSeeder::class);
         $this->call(EmpleadosSeeder::class);
-        $this->call(EmpleadoDeptoSeeder::class);*/
+        $this->call(EmpleadoDeptoSeeder::class);
+        $this->call(ActividadesSeeder::class);
+        $this->call(IndicadoresSeeder::class);
+        $this->call(PlanificacionsSeeder::class);
+        $this->call(EmpleadoActividadsSeeder::class);
+        $this->call(TareasSeeder::class);
+        $this->call(PresupuestosSeeder::class);
+        $this->call(RevisionesSeeder::class);
+        $this->call(EstadoRequisicionLogsSeeder::class);
+        $this->call(RequisicionSeeder::class);
+        $this->call(DetalleRequisicionSeeder::class);
+        $this->call(EjecucionPresupuestariaSeeder::class);
+        $this->call(EjecucionPresupuestariaLogsSeeder::class);
+        $this->call(DetalleEjecucionPresupuestariaSeeder::class);
+        $this->call(OrdenCombustibleSeeder::class);
+        
+
+
+
 
         
     }
