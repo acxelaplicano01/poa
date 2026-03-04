@@ -12,6 +12,7 @@ class EjecucionPresupuestariaLogsSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         DB::table('ejecucion_presupuestaria_logs')->truncate();
 
+        
         $data = [
             ['id' => 1, 'observacion' => 'Log generado por el sistema', 'log' => 'Ejecucion creada', 'idEjecucionPresupuestaria' => 1, 'created_by' => 61, 'updated_by' => null, 'deleted_by' => null, 'created_at' => '2024-04-17 11:40:42', 'updated_at' => '2024-04-17 11:40:42', 'deleted_at' => null],
             ['id' => 2, 'observacion' => 'Log generado por el sistema', 'log' => 'Ejecucion creada', 'idEjecucionPresupuestaria' => 2, 'created_by' => 10, 'updated_by' => null, 'deleted_by' => null, 'created_at' => '2024-05-02 13:28:42', 'updated_at' => '2024-05-02 13:28:42', 'deleted_at' => null],
